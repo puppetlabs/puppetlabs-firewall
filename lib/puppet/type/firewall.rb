@@ -104,6 +104,17 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:sport) do
+    desc "The value for the iptables --source-port parameter.
+      If an array is specified, values will be passed to multiport module."
+
+    validate do |value|
+      if value.is_a?(Array) && value.length > 15
+        self.fail "multiport module only accepts <= 15 ports"
+      end
+    end
+  end
+
+  newproperty(:dport) do
     desc "The value for the iptables --destination-port parameter.
       If an array is specified, values will be passed to multiport module."
 
@@ -206,21 +217,21 @@ Puppet::Type.newtype(:firewall) do
     # Now we analyse the individual properties to make sure they apply to
     # the correct combinations.
     if value(:iniface)
-      unless value(:chain) =~ /INPUT|FORWARD|PREROUTING/
+      unless value(:chain).to_s =~ /INPUT|FORWARD|PREROUTING/
         self.fail "Parameter iniface only applies to chains " \
           "INPUT,FORWARD,PREROUTING"
       end
     end
 
     if value(:outiface)
-      unless value(:chain) =~ /INPUT|FORWARD|PREROUTING/
+      unless value(:chain).to_s =~ /INPUT|FORWARD|PREROUTING/
         self.fail "Parameter outiface only applies to chains " \
           "INPUT,FORWARD,PREROUTING"
       end
     end
 
     if value(:dport)
-      unless value(:proto) =~ /tcp|udp|sctp/
+      unless value(:proto).to_s =~ /tcp|udp|sctp/
         self.fail "[%s] Parameter dport only applies to sctp, tcp and udp " \
           "protocols. Current protocol is [%s] and dport is [%s]" %
           [value(:name), should(:proto), should(:dport)]
@@ -255,7 +266,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == "MASQUERADE"
-      unless value(:table) =~ /nat/
+      unless value(:table).to_s =~ /nat/
         self.fail "Parameter jump => MASQUERADE only applies to table => nat"
       end
     end
