@@ -1,4 +1,4 @@
-## puppet-functions module
+## puppetlabs-firewall module
 
 ### Overview
 
