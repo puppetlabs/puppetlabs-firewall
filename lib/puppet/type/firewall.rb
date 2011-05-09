@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'puppet/util/firewall'
-require 'puppet/util/ipcidr'
 
 Puppet::Type.newtype(:firewall) do
   @doc = "Manipulate firewall rules"
