@@ -60,8 +60,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # Flush the property hash once done.
   def flush
     debug("[flush]")
-    needs_change = @property_hash.delete(:needs_change)
-    if needs_change
+    if @property_hash.delete(:needs_change)
       notice("Properties changed - updating rule")
       update
     end
@@ -143,8 +142,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     
     # Find list of current rules based on chain
     self.class.instances.each do |rule|
-      next unless rule.chain == resource[:chain].to_s
-      rules << rule.name
+      rules << rule.name if rule.chain == resource[:chain].to_s
     end
 
     # No rules at all? Just bail now.
