@@ -142,10 +142,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     
     # Find list of current rules based on chain
     self.class.instances.each do |rule|
-      next unless rule.chain == resource[:chain]
-      rules << rule
+      next unless rule.chain == resource[:chain].to_s
+      rules << rule.name
     end
-    
+
     # No rules at all? Just bail now.
     return 1 if rules.empty?
 
