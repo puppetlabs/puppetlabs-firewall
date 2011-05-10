@@ -11,8 +11,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   defaultfor :operatingsystem => [:redhat, :debian, :ubuntu, :fedora, :suse, :centos, :sles, :oel, :ovm]
   confine :operatingsystem => [:redhat, :debian, :ubuntu, :fedora, :suse, :centos, :sles, :oel, :ovm]
 
-  mk_resource_methods
-
   @@resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
@@ -74,13 +72,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     debug "[instances]"
     table = nil
     rules = []
+    counter = 1
     iptables_save.lines do |line|
       unless line =~ /^\#\s+|^\:\S+|^COMMIT/
         if line =~ /^\*/
           table = line.sub(/\*/, "").chomp!
         else
-          if hash = rule_to_hash(line, table)
+          if hash = rule_to_hash(line, table, counter)
             rules << new(hash)
+            counter += 1
           end
         end
       end
@@ -88,7 +88,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     rules
   end
 
-  def self.rule_to_hash(line, table)
+  def self.rule_to_hash(line, table, counter)
     hash = {}
     keys = []
     values = line.dup
@@ -107,6 +107,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     hash[:provider] = self.name.to_s
     hash[:table] = table
     hash[:ensure] = :present
+    hash[:rulenum] = counter
     hash
   end
 
