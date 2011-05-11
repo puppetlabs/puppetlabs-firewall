@@ -3,6 +3,7 @@ firewall { '000 allow foo':
   jump => "ACCEPT",
   proto => "tcp",
 }
+
 firewall { '001 allow boo':
   jump => "ACCEPT",
   iniface => "eth0",
@@ -12,25 +13,24 @@ firewall { '001 allow boo':
   destination => "1.1.1.0/24",
   source => "2.2.2.0/24",
 }
+
 firewall { '999 bar':
   dport => "1233",
   proto => "tcp",
   jump => "DROP",
 }
+
 firewall { '002 foo':
   dport => "1233",
   proto => "tcp",
   jump => "DROP",
 }
+
 firewall { "010 icmp":
   proto => "icmp",
-#  icmp => "any",
+  icmp => "echo-reply",
   jump => "ACCEPT",
 }
-#firewall { "050 horrowshow":
-#  
-#}
-
 
 resources { 'firewall':
   purge => true

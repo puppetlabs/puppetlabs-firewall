@@ -20,6 +20,8 @@
 require 'puppet/util/firewall'
 
 Puppet::Type.newtype(:firewall) do
+  include Puppet::Util::Firewall
+
   @doc = "Manipulate firewall rules"
 
   ensurable do
