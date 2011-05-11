@@ -79,7 +79,7 @@ firewall { '055 INPUT allow DNS':
 }
 
 firewall { '999 FORWARD drop':
-  chain => 'OUTPUT',
+  chain => 'FORWARD',
   jump => 'DROP'
 }
 
