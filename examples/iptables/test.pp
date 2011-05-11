@@ -45,8 +45,8 @@ firewall { '005 INPUT disregard DHCP':
 }
 
 firewall { '006 INPUT disregard netbios':
-  proto => 'udp'
-  dport => ['netbios-ns', 'netbios-dgm', 'netbios-ssn']
+  proto => 'udp',
+  dport => ['netbios-ns', 'netbios-dgm', 'netbios-ssn'],
   jump => 'DROP'
 }
 
