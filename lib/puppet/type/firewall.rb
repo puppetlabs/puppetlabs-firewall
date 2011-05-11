@@ -114,6 +114,10 @@ Puppet::Type.newtype(:firewall) do
         self.fail "multiport module only accepts <= 15 ports"
       end
     end
+
+    munge do |value|
+      @resource.string_to_port(value)
+    end
   end
 
   newproperty(:dport) do
@@ -124,6 +128,10 @@ Puppet::Type.newtype(:firewall) do
       if value.is_a?(Array) && value.length > 15
         self.fail "multiport module only accepts <= 15 ports"
       end
+    end
+
+    munge do |value|
+      @resource.string_to_port(value)
     end
   end
 
