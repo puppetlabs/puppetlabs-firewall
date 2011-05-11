@@ -226,9 +226,9 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:outiface)
-      unless value(:chain).to_s =~ /INPUT|FORWARD|PREROUTING/
+      unless value(:chain).to_s =~ /OUTPUT|FORWARD|PREROUTING/
         self.fail "Parameter outiface only applies to chains " \
-          "INPUT,FORWARD,PREROUTING"
+          "OUTPUT,FORWARD,PREROUTING"
       end
     end
 
