@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'puppet/util/firewall'
+require 'puppet/property/ordered_list'
 
 Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
@@ -120,10 +121,10 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:dport) do
+  newproperty(:dport, :array_matching => :all) do
     desc "The value for the iptables --destination-port parameter.
       If an array is specified, values will be passed to multiport module."
-
+    
     validate do |value|
       if value.is_a?(Array) && value.length > 15
         self.fail "multiport module only accepts <= 15 ports"
@@ -132,6 +133,17 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       @resource.string_to_port(value)
+    end
+
+    def value_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
+
+    def change_to_s(currentvalue, newvalue)
+      currentvalue = value_to_s(currentvalue) if currentvalue != :absent
+      newvalue = value_to_s(newvalue)
+      super(currentvalue, newvalue)
     end
   end
 
