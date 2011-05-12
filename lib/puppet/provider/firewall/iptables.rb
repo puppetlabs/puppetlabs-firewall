@@ -50,7 +50,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def delete
     debug 'Deleting rule %s' % resource[:name]
-    iptables "-D", properties[:chain], properties[:rulenum]
+    iptables "-D", properties[:chain], insert_order
   end
 
   def exists?
@@ -119,7 +119,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def update_args
     args = []
-    args << ["-R", resource[:chain], properties[:rulenum]]
+    args << ["-R", resource[:chain], insert_order]
     args << general_args
     args
   end
@@ -130,7 +130,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     @@resource_list.each do |res|
       if(resource.value(res))
         args << @@resource_map[res].split(' ')
-        args << resource[res]
+        if resource[res].is_a?(Array)
+          args << resource[res].join(',')
+        else
+          args << resource[res]
+        end
       end
     end
     args

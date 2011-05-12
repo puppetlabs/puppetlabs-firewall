@@ -106,7 +106,7 @@ Puppet::Type.newtype(:firewall) do
       Accepts a single string or array."
   end
 
-  newproperty(:sport) do
+  newproperty(:sport, :array_matching => :all) do
     desc "The value for the iptables --source-port parameter.
       If an array is specified, values will be passed to multiport module."
 
@@ -118,6 +118,17 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       @resource.string_to_port(value)
+    end
+
+    def value_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
+
+    def change_to_s(currentvalue, newvalue)
+      currentvalue = value_to_s(currentvalue) if currentvalue != :absent
+      newvalue = value_to_s(newvalue)
+      super(currentvalue, newvalue)
     end
   end
 
