@@ -52,15 +52,6 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:rulenum) do
-    desc "A read only parameter which indicates the row number for this
-      rule."
-
-    validate do
-      fail "rulenum is read-only"
-    end
-  end
-
   newproperty(:chain) do
     desc "The value for the iptables -A parameter.
       Possible values are: 'INPUT', 'FORWARD', 'OUTPUT', 'PREROUTING', 'POSTROUTING'.
