@@ -96,14 +96,24 @@ Puppet::Type.newtype(:firewall) do
     defaultto "ACCEPT"
   end
 
-  newproperty(:source) do
+  newproperty(:source, :array_matching => :all) do
     desc "The value for the iptables --source parameter.
       Accepts a single string or array."
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
   end
 
-  newproperty(:destination) do
+  newproperty(:destination, :array_matching => :all) do
     desc "The value for the iptables --destination parameter.
       Accepts a single string or array."
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
   end
 
   newproperty(:sport, :array_matching => :all) do
@@ -120,15 +130,9 @@ Puppet::Type.newtype(:firewall) do
       @resource.string_to_port(value)
     end
 
-    def value_to_s(value)
+    def should_to_s(value)
       value = [value] unless value.is_a?(Array)
       value.join(',')
-    end
-
-    def change_to_s(currentvalue, newvalue)
-      currentvalue = value_to_s(currentvalue) if currentvalue != :absent
-      newvalue = value_to_s(newvalue)
-      super(currentvalue, newvalue)
     end
   end
 
@@ -146,15 +150,9 @@ Puppet::Type.newtype(:firewall) do
       @resource.string_to_port(value)
     end
 
-    def value_to_s(value)
+    def should_to_s(value)
       value = [value] unless value.is_a?(Array)
       value.join(',')
-    end
-
-    def change_to_s(currentvalue, newvalue)
-      currentvalue = value_to_s(currentvalue) if currentvalue != :absent
-      newvalue = value_to_s(newvalue)
-      super(currentvalue, newvalue)
     end
   end
 
@@ -202,10 +200,15 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:state) do
+  newproperty(:state, :array_matching => :all) do
     desc "The value for the iptables -m state --state parameter.
       Possible values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'.
       Accepts a single string or array."
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
   end
 
   newproperty(:limit) do
