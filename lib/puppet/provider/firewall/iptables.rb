@@ -103,10 +103,16 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     keys << :chain
 
     keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
+    [:dport, :sport, :destination, :source, :state].each do |prop|
+      if hash[prop] =~ /,/
+        hash[prop] = hash[prop].split(',')
+      else
+        hash[prop] = [hash[prop]]
+      end
+    end
     hash[:provider] = self.name.to_s
     hash[:table] = table
     hash[:ensure] = :present
-    hash[:rulenum] = counter
     hash
   end
 
