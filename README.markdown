@@ -36,3 +36,20 @@ Deny all:
     firewall { "999 deny all other requests":
       jump => "DENY",
     }
+
+### Supported firewalls
+
+Currently we support:
+
+* Iptables
+
+But plans are to support lots of other firewall implementations:
+
+* Linux IPv6 (ip6tables)
+* FreeBSD (ipf)
+* Mac OS X (ipfw)
+* OpenBSD (pf)
+* Cisco (ASA and basic access lists)
+
+If you have knowledge in these rules and wish to contribute to this project
+feel free to submit patches (after signing a Puppetlabs CLA :-).
