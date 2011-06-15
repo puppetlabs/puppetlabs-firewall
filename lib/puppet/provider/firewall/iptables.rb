@@ -113,6 +113,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     hash[:provider] = self.name.to_s
     hash[:table] = table
     hash[:ensure] = :present
+
+    # Munge some vars here ...
+    # proto should equal 'all' if undefined
+    hash[:proto] = "all" if !hash.include?(:proto)
+
     hash
   end
 
