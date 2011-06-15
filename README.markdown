@@ -53,3 +53,17 @@ But plans are to support lots of other firewall implementations:
 
 If you have knowledge in these rules and wish to contribute to this project
 feel free to submit patches (after signing a Puppetlabs CLA :-).
+
+### Testing
+
+Make sure you have:
+
+    rake
+
+Install the necessary gems:
+
+    gem install rspec
+
+And run the tests from the root of the source code:
+
+    rake test
