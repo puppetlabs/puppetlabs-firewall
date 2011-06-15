@@ -14,6 +14,25 @@ Please see the included Apache Software License for more legal details regarding
 
 From github, download the module into your modulepath on your Puppetmaster. If you are not sure where your module path is try this command:
 
-  puppet --configprint modulepath
+    puppet --configprint modulepath
 
 Depending on the version of Puppet, you may need to restart the puppetmasterd (or Apache) process before this module will work.
+
+### Quickstart
+
+Once the module is in the correct modulepath, you should be able to create some
+firewall rules like the below examples. Remember, that rules are lexically 
+ordered by the resource title at this point.
+
+Basic accept ICMP request example:
+
+    firewall { "000 accept all icmp requests":
+      proto => "icmp",
+      jump => "ACCEPT",
+    }
+
+Deny all:
+
+    firewall { "999 deny all other requests":
+      jump => "DENY",
+    }
