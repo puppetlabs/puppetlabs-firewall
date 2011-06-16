@@ -1,6 +1,5 @@
 # Puppet Firewall type
 require 'puppet/util/firewall'
-require 'puppet/property/ordered_list'
 
 Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
