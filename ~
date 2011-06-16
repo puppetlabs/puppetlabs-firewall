@@ -144,7 +144,7 @@ describe Puppet::Type.type(:firewall) do
       end
     end
 
-    it 'should fail if icmp type is not recognized' do
+    if 'should fail if icmp type is not recognized' do
       lambda { @resource[:icmp] = 'foo' }.should raise_error(Puppet::Error)
     end
   end
@@ -158,17 +158,6 @@ describe Puppet::Type.type(:firewall) do
     it 'should accept value as an array' do
       @resource[:state] = ['INVALID', 'NEW']
       @resource[:state].should == ['INVALID', 'NEW']
-    end
-  end
-
-  describe ':burst' do
-    it 'should accept numeric values' do
-      @resource[:burst] = 12
-      @resource[:burst].should == 12
-    end
-
-    it 'should fail if value is not numeric' do
-      lambda { @resource[:burst] = 'foo' }.should raise_error(Puppet::Error)
     end
   end
 end
