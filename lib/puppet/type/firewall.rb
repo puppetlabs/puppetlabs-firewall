@@ -93,12 +93,6 @@ Puppet::Type.newtype(:firewall) do
     desc "The value for the iptables --source-port parameter.
       If an array is specified, values will be passed to multiport module."
 
-    validate do |value|
-      if value.is_a?(Array) && value.length > 15
-        self.fail "multiport module only accepts <= 15 ports"
-      end
-    end
-
     munge do |value|
       @resource.string_to_port(value)
     end
@@ -113,12 +107,6 @@ Puppet::Type.newtype(:firewall) do
     desc "The value for the iptables --destination-port parameter.
       If an array is specified, values will be passed to multiport module."
     
-    validate do |value|
-      if value.is_a?(Array) && value.length > 15
-        self.fail "multiport module only accepts <= 15 ports"
-      end
-    end
-
     munge do |value|
       @resource.string_to_port(value)
     end

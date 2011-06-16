@@ -97,10 +97,6 @@ describe Puppet::Type.type(:firewall) do
         @resource[port] = ['22','23']
         @resource[port].should == [22,23]
       end
-      
-      it "should fail if more that 15 #{port}s are specified" do
-        lambda { @resource[port] = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17'] }.should raise_error(Puppet::Error)
-      end
     end
   end
 
