@@ -1,17 +1,19 @@
 require 'spec_helper'
 
-provider_class = Puppet::Type.type(:firewall).provider(:iptables)
-describe provider_class do
+describe 'iptables provider' do
   before :each do
-    @resource = Puppet::Type::Firewall.new({
-      :name => '000-test-foo', 
-      :chain => 'INPUT', 
+    @provider = Puppet::Type.type(:firewall).provider(:iptables)
+    @resource = @provider.new(Puppet::Type::Firewall.new({
+      :name => '000-test-foo',
+      :chain => 'INPUT',
       :jump => 'ACCEPT'
-    })
-    @provider = provider_class.new(@resource)
+    }))
   end
   
-  it 'should match jump' do
-    @provider
+  it "should be able to get a list of existing rules" do
+    @provider.instances.each do |rule|
+      rule.should be_instance_of(@provider)
+      rule.properties[:provider].to_s.should == @provider.name.to_s
+    end
   end
 end
