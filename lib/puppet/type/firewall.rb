@@ -153,11 +153,16 @@ Puppet::Type.newtype(:firewall) do
     desc "The value for the iptables --icmp-type parameter"
 
     munge do |value|
-      num = @resource.icmp_name_to_number(value)
-      if num == nil && value != ""
+      if value.kind_of?(String)
+        value = @resource.icmp_name_to_number(value)
+      else
+        value
+      end
+
+      if value == nil && value != ""
         self.fail("cannot work out icmp type")
       end
-      num
+      value
     end
   end
 

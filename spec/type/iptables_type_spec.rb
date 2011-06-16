@@ -140,6 +140,11 @@ describe Puppet::Type.type(:firewall) do
       end
     end
 
+    it 'should accept values as integers' do
+      @resource[:icmp] = 9
+      @resource[:icmp].should == 9
+    end
+
     it 'should fail if icmp type is not recognized' do
       lambda { @resource[:icmp] = 'foo' }.should raise_error(Puppet::Error)
     end
