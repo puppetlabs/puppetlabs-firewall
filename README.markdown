@@ -67,7 +67,9 @@ Creates rule when present, removes it when absent.
 Name of firewall rule. This at the moment also is used for ordering, so its
 common practice to prefix all rules with numbers to force ordering. For example:
 
-000 accept local traffic
+    name => "000 accept local traffic"
+
+This will occur very early.
 
 #### chain
 
