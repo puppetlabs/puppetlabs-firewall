@@ -54,6 +54,144 @@ But plans are to support lots of other firewall implementations:
 If you have knowledge in these rules and wish to contribute to this project
 feel free to submit patches (after signing a Puppetlabs CLA :-).
 
+### Parameters
+
+#### ensure
+
+Creates rule when present, removes it when absent.
+
+#### name
+
+* namevar
+
+Name of firewall rule. This at the moment also is used for ordering, so its
+common practice to prefix all rules with numbers to force ordering. For example:
+
+000 accept local traffic
+
+#### chain
+
+Name of the chain to use. Can be one of the built-ins:
+
+* INPUT
+* FORWARD
+* OUTPUT
+* PREROUTING
+* POSTROUTING
+
+The default value is 'INPUT'.
+
+#### table
+
+Table to use. Can be one of:
+
+* nat
+* mangle
+* filter
+* raw
+
+By default the setting is 'filter'.
+
+#### proto
+
+Protocol to filter. By default this is 'tcp'.
+
+#### jump
+
+Action to perform when filter is matched. Can be one of:
+
+* ACCEPT
+* DROP
+* QUEUE
+* RETURN
+* REJECT
+* DNAT
+* SNAT
+* LOG
+* MASQUERADE
+* REDIRECT
+
+The default value is 'ACCEPT'.
+
+#### source
+
+An array of source addresses. For example:
+
+    source => ['192.168.2.0/24', '10.2.3.0/24']
+
+#### destination
+
+An array of destination addresses to match. For example:
+
+    destination => ['192.168.2.0/24', '10.2.3.0/24']
+
+#### sport
+
+For protocols that support ports, this is a list of source ports to filter on.
+
+#### dport
+
+For protocols that support ports, this is a list of destination ports to filter on.
+
+#### iniface
+
+Input interface to filter on.
+
+#### outiface
+
+Output interface to filter on.
+
+#### tosource
+
+When using jump => "SNAT" you can specify the new source address using this
+parameter.
+
+#### todestination
+
+When using jump => "DNAT" you can specify the new destination address using
+this paramter.
+
+#### toports
+
+Specifies a range of ports to use for masquerade.
+
+#### reject
+
+When combined with jump => "REJECT" you can specify a different icmp response
+to be sent back to the packet sender.
+
+#### log_level
+
+When combined with jump => "LOG" specifies the log level to log to.
+
+#### log_prefix
+
+When combined with jump => "LOG" specifies the log prefix to use when logging.
+
+#### icmp
+
+Specifies the type of ICMP to match.
+
+#### state
+
+When matching using stateful inspection you can match on different states such
+as:
+
+* INVALID
+* ESTABLISHED
+* NEW
+* RELATED
+
+#### limit
+
+A rate to limit matched packets in the form of:
+
+    rate/[/second/|/minute|/hour|/day]
+
+#### burst
+
+Maximum initial packets to match before limit checks (above) apply.
+
 ### Testing
 
 Make sure you have:
