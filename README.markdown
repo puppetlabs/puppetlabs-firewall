@@ -18,6 +18,13 @@ From github, download the module into your modulepath on your Puppetmaster. If y
 
 Depending on the version of Puppet, you may need to restart the puppetmasterd (or Apache) process before this module will work.
 
+This module uses both Ruby based providers so your Puppet configuration (ie. puppet.conf) must include the following items:
+
+    [agent]
+    pluginsync = true
+    
+The module will not operate normally without these features enabled.
+
 ### Quickstart
 
 Once the module is in the correct modulepath, you should be able to create some
