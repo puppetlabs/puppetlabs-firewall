@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:firewall) do
   before :each do
-    @resource = Puppet::Type.type(:firewall).new({
-      :name => 'new_resource',
+    setup_resource(:firewall, {
+      :name  => '000 test foo',
       :chain => 'INPUT',
-      :jump => 'ACCEPT'
+      :jump  => 'ACCEPT'
     })
   end
 
