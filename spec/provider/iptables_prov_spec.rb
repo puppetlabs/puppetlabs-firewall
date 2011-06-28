@@ -2,7 +2,12 @@ require 'spec_helper'
 
 describe 'iptables provider' do
   before :each do
-    @provider = Puppet::Type.type(:firewall).provider(:iptables)
+    setup_provider(:firewall, :iptables)
+    setup_resource(:firewall, {
+      :name  => '000 test foo',
+      :chain => 'INPUT',
+      :jump  => 'ACCEPT'
+    })
   end
   
   it 'should be able to get a list of existing rules' do
@@ -32,11 +37,11 @@ describe 'iptables provider' do
 
   describe 'when modifying resources' do
     before :each do
-      @resource = @provider.new(Puppet::Type::Firewall.new({
-        :name => '000-test-foo',
-        :chain => 'INPUT',
-        :jump => 'ACCEPT'
-      }))
+      setup_instance(@provider, @resource)
+    end
+
+    it 'should do something' do
+      @instance.insert_args.class.should == Array
     end
   end
 end
