@@ -55,6 +55,19 @@ Source NAT example (perfect for a virtualization host):
       table  => 'nat',
     }
 
+You can make firewall rules persistent with the following iptables example:
+
+    exec { "persist-firewall":
+      command => $operatingsystem ? {
+        "debian" => "/sbin/iptables > /etc/iptables/rules.v4",
+        /(RedHat|CentOS)/ => "/sbin/iptables > /etc/sysconfig/iptables",
+      }
+      refreshonly => true,
+    }
+    Firewall {
+      notify => Exec["persist-firewall"]
+    }
+
 ### Supported firewalls
 
 Currently we support:
