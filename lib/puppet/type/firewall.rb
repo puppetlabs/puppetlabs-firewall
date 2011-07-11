@@ -26,9 +26,13 @@ Puppet::Type.newtype(:firewall) do
 
     # Keep rule names simple
     validate do |value|
-      if value !~ /^[a-zA-Z0-9 \-_]+$/ then
+      if value !~ /[a-zA-Z0-9 \-_]+/
         self.fail "Not a valid rule name. Make sure it contains ASCII " \
           "alphanumeric, spaces, hyphens or underscores."
+      end
+
+      if value !~ /^\d+/
+        self.fail 'Not a valid rule name. Rules names must start with a digit'
       end
     end
   end
