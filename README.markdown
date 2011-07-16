@@ -68,6 +68,24 @@ You can make firewall rules persistent with the following iptables example:
       notify => Exec["persist-firewall"]
     }
 
+If you wish to ensure any reject rules are executed last, try using stages.
+The following example shows the creation of a class which is where your 
+last rules should run, this however should belong in a puppet module.
+
+    class my_fw::deny {
+      iptables { "999 deny all":
+        jump => "DENY"
+      }
+    }
+
+    stage { pre: before => Stage[main] }
+    stage { post: require => Stage[main] }
+
+    class { "my_fw::deny": stage => "post" }
+
+By placing the 'my_fw::deny' class in the post stage it will always be inserted
+last thereby avoiding locking you out before the accept rules are inserted.
+
 ### Supported firewalls
 
 Currently we support:
@@ -85,7 +103,7 @@ But plans are to support lots of other firewall implementations:
 If you have knowledge in these rules and wish to contribute to this project
 feel free to submit patches (after signing a Puppetlabs CLA :-).
 
-### Parameters
+### Generic Properties
 
 #### ensure
 
@@ -102,49 +120,9 @@ common practice to prefix all rules with numbers to force ordering. For example:
 
 This will occur very early.
 
-#### chain
-
-Name of the chain to use. Can be one of the built-ins:
-
-* INPUT
-* FORWARD
-* OUTPUT
-* PREROUTING
-* POSTROUTING
-
-The default value is 'INPUT'.
-
-#### table
-
-Table to use. Can be one of:
-
-* nat
-* mangle
-* filter
-* raw
-
-By default the setting is 'filter'.
-
 #### proto
 
 Protocol to filter. By default this is 'tcp'.
-
-#### jump
-
-Action to perform when filter is matched. Can be one of:
-
-* ACCEPT
-* DROP
-* QUEUE
-* RETURN
-* REJECT
-* DNAT
-* SNAT
-* LOG
-* MASQUERADE
-* REDIRECT
-
-The default value is 'ACCEPT'.
 
 #### source
 
@@ -166,6 +144,55 @@ For protocols that support ports, this is a list of source ports to filter on.
 
 For protocols that support ports, this is a list of destination ports to filter on.
 
+### Iptables Properties
+
+#### chain
+
+Name of the chain to use. Can be one of the built-ins:
+
+* INPUT
+* FORWARD
+* OUTPUT
+* PREROUTING
+* POSTROUTING
+
+Or you can provide a user-based chain.
+
+The default value is 'INPUT'.
+
+#### table
+
+Table to use. Can be one of:
+
+* nat
+* mangle
+* filter
+* raw
+* rawpost
+
+By default the setting is 'filter'.
+
+#### jump
+
+Action to perform when filter is matched. Can be one of:
+
+* ACCEPT
+* DROP
+* QUEUE
+* RETURN
+* REJECT
+* DNAT
+* SNAT
+* LOG
+* MASQUERADE
+* REDIRECT
+
+Or this can be a user defined chain.
+
+The default value is 'ACCEPT'.
+
+### Interface Matching Properties
+
 #### iniface
 
 Input interface to filter on.
@@ -173,6 +200,8 @@ Input interface to filter on.
 #### outiface
 
 Output interface to filter on.
+
+### NAT Properties
 
 #### tosource
 
@@ -188,10 +217,14 @@ this paramter.
 
 Specifies a range of ports to use for masquerade.
 
+### Reject Properties
+
 #### reject
 
 When combined with jump => "REJECT" you can specify a different icmp response
 to be sent back to the packet sender.
+
+### Logging Properties
 
 #### log_level
 
@@ -201,9 +234,13 @@ When combined with jump => "LOG" specifies the log level to log to.
 
 When combined with jump => "LOG" specifies the log prefix to use when logging.
 
+### ICMP Matching Properties
+
 #### icmp
 
 Specifies the type of ICMP to match.
+
+### State Matching Properties
 
 #### state
 
@@ -214,6 +251,8 @@ as:
 * ESTABLISHED
 * NEW
 * RELATED
+
+### Rate Limiting Properties
 
 #### limit
 
