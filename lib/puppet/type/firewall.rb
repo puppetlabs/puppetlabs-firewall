@@ -44,6 +44,12 @@ Puppet::Type.newtype(:firewall) do
     newvalues(/^\d+[a-zA-Z0-9\s\-_]+$/)
   end
 
+  newparam(:action) do
+    desc "Action to perform on this rule."
+    newvalues(:accept, :reject, :drop)
+    defaultto :accept
+  end
+
   # Generic matching properties
   newproperty(:source, :array_matching => :all) do
     desc "The source IP address to match. Accepts a string or array."
