@@ -5,6 +5,17 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   
   @doc = "Iptables type provider"
 
+  has_feature :iptables
+  has_feature :rate_limiting
+  has_feature :snat
+  has_feature :dnat
+  has_feature :interface_match
+  has_feature :icmp_match
+  has_feature :state_match
+  has_feature :reject_type
+  has_feature :log_level
+  has_feature :log_prefix
+
   commands :iptables => '/sbin/iptables'
   commands :iptables_save => '/sbin/iptables-save'
 
@@ -34,8 +45,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :tosource => "--to-source",
   }
 
-  @@resource_list = [:table, :source, :destination, :iniface, :outiface, :proto, :sport, :dport, :tosource, :todest,
-                     :reject, :log_level, :log_prefix, :name, :state, :icmp, :limit, :burst, :toports, :jump]
+  @@resource_list = [:table, :source, :destination, :iniface, :outiface, 
+    :proto, :sport, :dport, :reject, :log_level, :log_prefix, :name, :state, 
+    :icmp, :limit, :burst, :toports, :jump, :todest, :tosource]
 
 
   def insert

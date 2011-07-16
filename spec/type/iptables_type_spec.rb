@@ -29,7 +29,7 @@ describe Puppet::Type.type(:firewall) do
     end
 
     it 'should fail when the chain value is not recognized' do
-      lambda { @resource[:chain] = 'foo' }.should raise_error(Puppet::Error)
+      lambda { @resource[:chain] = 'not valid' }.should raise_error(Puppet::Error)
     end
   end
 
