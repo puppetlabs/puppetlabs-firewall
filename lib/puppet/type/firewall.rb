@@ -24,12 +24,10 @@ Puppet::Type.newtype(:firewall) do
     desc "Manage the state of this rule."
 
     newvalue(:present) do
-      desc "Ensure the rule is present"
       provider.insert
     end
 
     newvalue(:absent) do
-      desc "Ensure the rule is absent"
       provider.delete
     end
 
