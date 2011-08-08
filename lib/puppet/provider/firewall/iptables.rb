@@ -46,9 +46,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   }
 
   @@resource_list = [:table, :source, :destination, :iniface, :outiface, 
-    :proto, :sport, :dport, :reject, :log_level, :log_prefix, :name, :state, 
-    :icmp, :limit, :burst, :toports, :jump, :todest, :tosource]
-
+    :proto, :sport, :dport, :name, :state, :icmp, :limit, :burst, :jump, 
+    :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
