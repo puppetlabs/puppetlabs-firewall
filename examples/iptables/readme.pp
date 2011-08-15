@@ -1,5 +1,5 @@
   firewall { '000 allow packets with valid state':
-    state       => ['RELATED,ESTABLISHED'],
+    state       => ['RELATED', 'ESTABLISHED'],
     jump        => 'ACCEPT',
   }
   firewall { '001 allow icmp':
