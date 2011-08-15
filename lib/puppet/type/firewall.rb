@@ -49,22 +49,12 @@ Puppet::Type.newtype(:firewall) do
   end
 
   # Generic matching properties
-  newproperty(:source, :array_matching => :all) do
-    desc "The source IP address to match. Accepts a string or array."
-
-    def should_to_s(value)
-      value = [value] unless value.is_a?(Array)
-      value.join(',')
-    end
+  newproperty(:source) do
+    desc "The source IP address to match."
   end
 
-  newproperty(:destination, :array_matching => :all) do
-    desc "The destination IP address to match. Accepts a string or array."
-
-    def should_to_s(value)
-      value = [value] unless value.is_a?(Array)
-      value.join(',')
-    end
+  newproperty(:destination) do
+    desc "The destination IP address to match."
   end
 
   newproperty(:sport, :array_matching => :all) do
