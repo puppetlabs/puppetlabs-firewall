@@ -22,7 +22,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   defaultfor :operatingsystem => [:redhat, :debian, :ubuntu, :fedora, :suse, :centos, :sles, :oel, :ovm]
   confine :operatingsystem => [:redhat, :debian, :ubuntu, :fedora, :suse, :centos, :sles, :oel, :ovm]
 
-  @@resource_map = {
+  @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
     :dport => "-m multiport --dports",
@@ -45,7 +45,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :tosource => "--to-source",
   }
 
-  @@resource_list = [:table, :source, :destination, :iniface, :outiface, 
+  @resource_list = [:table, :source, :destination, :iniface, :outiface, 
     :proto, :sport, :dport, :name, :state, :icmp, :limit, :burst, :jump, 
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
@@ -105,8 +105,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     keys = []
     values = line.dup
 
-    @@resource_list.reverse.each do |k|
-      if values.slice!(@@resource_map[k])
+    @resource_list.reverse.each do |k|
+      if values.slice!(@resource_map[k])
         keys << k
       end
     end
@@ -149,9 +149,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   def general_args
     debug "Current resource: %s" % resource.class
     args = []
-    @@resource_list.each do |res|
+    self.class.instance_variable_get('@resource_list').each do |res|
       if(resource.value(res))
-        args << @@resource_map[res].split(' ')
+        args << self.class.instance_variable_get('@resource_map')[res].split(' ')
         if resource[res].is_a?(Array)
           args << resource[res].join(',')
         else

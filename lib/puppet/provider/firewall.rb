@@ -1,5 +1,5 @@
 class Puppet::Provider::Firewall < Puppet::Provider
-  
+
   # Prefetch our rule list. This is ran once every time before any other
   # action (besides initialization of each object).
   def self.prefetch(resources)
@@ -35,7 +35,7 @@ class Puppet::Provider::Firewall < Puppet::Provider
   # Executed if method is missing. In this case we are going to catch 
   # unqualified property methods for dynamic property setting and getting.
   def method_missing(meth, *args, &block)
-    dynamic_methods = @@resource_map.keys
+    dynamic_methods = self.class.instance_variable_get('@resource_map').keys
     dynamic_methods << :chain
     dynamic_methods << :table
 
