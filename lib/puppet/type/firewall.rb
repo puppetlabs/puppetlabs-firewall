@@ -87,7 +87,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:proto) do
     desc "The specific protocol to match for this rule."
-    newvalues(:tcp, :udp, :icmp, :esp, :ah, :vrrp, :igmp, :all)
+    newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :all)
     defaultto "tcp"
   end
 
