@@ -106,7 +106,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values = line.dup
 
     @resource_list.reverse.each do |k|
-      if values.slice!(@resource_map[k])
+      if values.slice!(/\s#{@resource_map[k]}/)
         keys << k
       end
     end
