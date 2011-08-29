@@ -59,8 +59,8 @@ You can make firewall rules persistent with the following iptables example:
 
     exec { "persist-firewall":
       command => $operatingsystem ? {
-        "debian" => "/sbin/iptables > /etc/iptables/rules.v4",
-        /(RedHat|CentOS)/ => "/sbin/iptables > /etc/sysconfig/iptables",
+        "debian" => "/sbin/iptables-save > /etc/iptables/rules.v4",
+        /(RedHat|CentOS)/ => "/sbin/iptables-save > /etc/sysconfig/iptables",
       }
       refreshonly => true,
     }
