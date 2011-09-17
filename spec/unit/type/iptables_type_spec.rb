@@ -1,12 +1,26 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:firewall) do
+firewall = Puppet::Type.type(:firewall)
+
+describe firewall do
   before :each do
-    setup_resource(:firewall, {
+    @class = firewall
+    @provider = stub 'provider'
+    @provider.stubs(:name).returns(:iptables)
+    Puppet::Type::Firewall.stubs(:defaultprovider).returns @provider
+
+    @resource = @class.new({
       :name  => '000 test foo',
       :chain => 'INPUT',
       :jump  => 'ACCEPT'
     })
+  end
+
+  # Example on how to test and have the full validation kick in
+  #lambda { @class.new(:name => "001-test", :chain => chain) }.should_not raise_error
+
+  it 'should have :name be its namevar' do
+    @class.key_attributes.should == [:name]
   end
 
   describe ':name' do
@@ -42,7 +56,7 @@ describe Puppet::Type.type(:firewall) do
     end
 
     it "should fail when table value is not recognized" do
-      lambda { @resource[:table] = 'foo' }.should raise_error(Puppet::Error)
+      lambda { @resource[:table] = 'not valid' }.should raise_error(Puppet::Error)
     end
   end
 
@@ -76,12 +90,7 @@ describe Puppet::Type.type(:firewall) do
     describe addr do
       it "should accept a #{addr} as a string" do
         @resource[addr] = '127.0.0.1'
-        @resource[addr].should == ['127.0.0.1']
-      end
-
-      it "should accept a #{addr} as an array" do
-        @resource[addr] = ['127.0.0.1', '4.2.2.2']
-        @resource[addr].should == ['127.0.0.1', '4.2.2.2']
+        @resource[addr].should == '127.0.0.1'
       end
     end
   end
@@ -152,13 +161,13 @@ describe Puppet::Type.type(:firewall) do
 
   describe ':state' do
     it 'should accept value as a string' do
-      @resource[:state] = 'INVALID'
-      @resource[:state].should == ['INVALID']
+      @resource[:state] = :INVALID
+      @resource[:state].should == [:INVALID]
     end
 
     it 'should accept value as an array' do
-      @resource[:state] = ['INVALID', 'NEW']
-      @resource[:state].should == ['INVALID', 'NEW']
+      @resource[:state] = [:INVALID, :NEW]
+      @resource[:state].should == [:INVALID, :NEW]
     end
   end
 
