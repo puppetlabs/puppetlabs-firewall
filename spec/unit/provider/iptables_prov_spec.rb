@@ -1,5 +1,46 @@
 require 'spec_helper'
 
+describe 'iptables provider detection' do
+  before :each do
+    require 'puppet/provider/confine/exists'
+    @exists = Puppet::Provider::Confine::Exists
+
+    # Reset the default provider
+    Puppet::Type.type(:firewall).defaultprovider = nil
+  end
+
+  it "should default to iptables provider if /sbin/iptables[-save] exists" do
+    # Stub lookup for /sbin/iptables & /sbin/iptables-save
+    @exists.any_instance.stubs(:which).with("/sbin/iptables").
+      returns "/sbin/iptables"
+    @exists.any_instance.stubs(:which).with("/sbin/iptables-save").
+      returns "/sbin/iptables-save"
+
+    # Every other command should return false so we don't pick up any
+    # other providers
+    @exists.any_instance.stubs(:which).with() { |value|
+      ! ["/sbin/iptables","/sbin/iptables-save"].include?(value)
+    }.returns false
+
+    # Create a resource instance and make sure the provider is iptables
+    resource = Puppet::Type.type(:firewall).new({
+      :name => '000 test foo',
+    })
+    resource.provider.class.to_s.should == "Puppet::Type::Firewall::ProviderIptables"
+  end
+
+  it "should raise a default provider error when there are no commands" do
+    # Stub all commands lookups so they return nothing 
+    @exists.any_instance.stubs(:which).returns false
+
+    # Instantiate a resource instance and make sure it raises an exception
+    lambda { resource = Puppet::Type.type(:firewall).new({ 
+      :name => '000 test foo' }) }.should raise_error(Puppet::DevError, 
+      "Could not find a default provider for firewall")
+  end
+
+end
+
 describe 'iptables provider' do
   before :each do
     @provider = Puppet::Type.type(:firewall).provider(:iptables)
