@@ -19,8 +19,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   commands :iptables => '/sbin/iptables'
   commands :iptables_save => '/sbin/iptables-save'
 
-  defaultfor :operatingsystem => [:redhat, :debian, :ubuntu, :fedora, :suse, :centos, :sles, :oel, :ovm]
-  confine :operatingsystem => [:redhat, :debian, :ubuntu, :fedora, :suse, :centos, :sles, :oel, :ovm]
+  defaultfor :kernel => :linux
 
   @resource_map = {
     :burst => "--limit-burst",
