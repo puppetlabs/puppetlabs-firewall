@@ -1,4 +1,5 @@
 require 'puppet/provider/firewall'
+require 'digest/md5'
 
 Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
@@ -60,7 +61,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def delete
     debug 'Deleting rule %s' % resource[:name]
-    iptables "-D", properties[:chain], insert_order
+    iptables delete_args
   end
 
   def exists?
@@ -119,7 +120,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     [:dport, :sport, :state].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
-    
+
+    # This forces all existing, commentless rules to be moved to the bottom of the stack.
+    # Puppet-firewall requires that all rules have comments (resource names) and will fail if
+    # a rule in iptables does not have a comment. We get around this by appending a high level
+    if ! hash[:name]
+      hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
+    end
+
+    hash[:line] = line
     hash[:provider] = self.name.to_s
     hash[:table] = table
     hash[:ensure] = :present
@@ -127,7 +136,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Munge some vars here ...
     # proto should equal 'all' if undefined
     hash[:proto] = "all" if !hash.include?(:proto)
-
     hash
   end
 
@@ -143,6 +151,31 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     args << ["-R", resource[:chain], insert_order]
     args << general_args
     args
+  end
+
+  def delete_args
+    count = []
+    line = properties[:line].gsub(/\-A/, '-D').split
+    
+    # Grab all comment indices
+    line.each do |v|
+      if v =~ /"/
+        count << line.index(v)
+      end
+    end
+    
+    if ! count.empty?
+      # Remove quotes and set first comment index to full string
+      line[count.first] = line[count.first..count.last].join(' ').gsub(/"/, '')
+
+      # Make all remaining comment indices nil
+      ((count.first + 1)..count.last).each do |i|
+        line[i] = nil
+      end
+    end
+    
+    # Return array without nils
+    line.compact
   end
 
   def general_args
