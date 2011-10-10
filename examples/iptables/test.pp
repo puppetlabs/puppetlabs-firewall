@@ -1,11 +1,11 @@
 firewall { '000 allow foo':
   dport => [7061, 7062],
-  jump => "ACCEPT",
+  action => accept,
   proto => "tcp",
 }
 
 firewall { '001 allow boo':
-  jump => "ACCEPT",
+  action => accept,
   iniface => "eth0",
   sport => "123",
   dport => "123",
@@ -24,84 +24,84 @@ firewall { '100 snat for network foo2':
 }
 
 firewall { '999 bar':
+  action => accept,
   dport => "1233",
   proto => "tcp",
-  jump => "DROP",
 }
 
 firewall { '002 foo':
+  action => drop,
   dport => "1233",
   proto => "tcp",
-  jump => "DROP",
 }
 
 firewall { '010 icmp':
+  action => accept,
   proto => "icmp",
   icmp => "echo-reply",
-  jump => "ACCEPT",
 }
 
 firewall { '010 INPUT allow loopback':
+  action => accept,
   iniface => 'lo',
   chain => 'INPUT',
-  jump => 'ACCEPT'
 }
 
 firewall { '005 INPUT disregard DHCP':
+  action => drop,
   dport => ['bootpc', 'bootps'],
-  jump => 'DROP',
   proto => 'udp'
 }
 
 firewall { '006 INPUT disregard netbios':
+  action => drop,
   proto => 'udp',
   dport => ['netbios-ns', 'netbios-dgm', 'netbios-ssn'],
-  jump => 'DROP'
 }
 
 firewall { '006 Disregard CIFS':
+  action => drop,
   dport => 'microsoft-ds',
-  jump => 'DROP',
   proto => 'tcp'
 }
 
 firewall { '050 INPUT drop invalid':
+  action => drop,
   state => 'INVALID',
-  jump => 'DROP'
 }
 
 firewall { '051 INPUT allow related and established':
+  action => accept,
   state => ['RELATED', 'ESTABLISHED'],
-  jump => 'ACCEPT'
 }
 
 firewall { '053 INPUT allow ICMP':
+  action => accept,
   icmp => '8',
   proto => 'icmp',
-  jump => 'ACCEPT'
 }
 
 firewall { '055 INPUT allow DNS':
+  action => accept,
   proto => 'udp',
-  jump => 'ACCEPT',
   sport => 'domain'
 }
 
 firewall { '999 FORWARD drop':
+  action => drop,
   chain => 'FORWARD',
-  jump => 'DROP'
 }
 
 firewall { '001 OUTPUT allow loopback':
+  action => accept,
   chain => 'OUTPUT',
   outiface => 'lo',
-  jump => 'ACCEPT'
 }
 
 firewall { '100 OUTPUT drop invalid':
+  action => drop,
   chain => 'OUTPUT',
   state => 'INVALID',
-  jump => 'DROP'
 }
 
 resources { 'firewall':

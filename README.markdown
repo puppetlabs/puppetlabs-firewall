@@ -35,13 +35,13 @@ Basic accept ICMP request example:
 
     firewall { "000 accept all icmp requests":
       proto => "icmp",
-      jump => "ACCEPT",
+      action => "accept",
     }
 
 Deny all:
 
-    firewall { "999 deny all other requests":
-      jump => "DENY",
+    firewall { "999 drop all other requests":
+      action => "drop",
     }
 
 Source NAT example (perfect for a virtualization host):
@@ -72,18 +72,18 @@ If you wish to ensure any reject rules are executed last, try using stages.
 The following example shows the creation of a class which is where your 
 last rules should run, this however should belong in a puppet module.
 
-    class my_fw::deny {
-      iptables { "999 deny all":
-        jump => "DENY"
+    class my_fw::drop {
+      iptables { "999 drop all":
+        action => "drop"
       }
     }
 
     stage { pre: before => Stage[main] }
     stage { post: require => Stage[main] }
 
-    class { "my_fw::deny": stage => "post" }
+    class { "my_fw::drop": stage => "post" }
 
-By placing the 'my_fw::deny' class in the post stage it will always be inserted
+By placing the 'my_fw::drop' class in the post stage it will always be inserted
 last thereby avoiding locking you out before the accept rules are inserted.
 
 ### Supported firewalls
@@ -119,6 +119,17 @@ common practice to prefix all rules with numbers to force ordering. For example:
     name => "000 accept local traffic"
 
 This will occur very early.
+
+#### action
+
+This is the action to perform on a match. Can be one of:
+
+* accept - the packet is accepted
+* reject - the packet is rejected with a suitable ICMP response
+* drop - the packet is dropped
+
+If you specify no value it will simply match the rule but perform no
+action unless you provide a provider specific parameter (such as 'jump').
 
 #### proto
 
@@ -174,22 +185,24 @@ By default the setting is 'filter'.
 
 #### jump
 
-Action to perform when filter is matched. Can be one of:
+Action to perform when filter is matched for iptables. Can be one of:
 
-* ACCEPT
-* DROP
 * QUEUE
 * RETURN
-* REJECT
 * DNAT
 * SNAT
 * LOG
 * MASQUERADE
 * REDIRECT
 
-Or this can be a user defined chain.
+But any valid chain name is allowed. 
 
-The default value is 'ACCEPT'.
+For the values ACCEPT, DROP and REJECT you must use the generic 
+'action' parameter. This is to enfore the use of generic parameters where
+possible for maximum cross-platform modelling.
+
+If you set both 'accept' and 'jump' parameters, you will get an error as 
+only one of the options should be set.
 
 ### Interface Matching Properties
 

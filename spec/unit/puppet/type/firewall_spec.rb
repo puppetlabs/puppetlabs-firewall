@@ -1,3 +1,5 @@
+#!/usr/bin/env rspec
+
 require 'spec_helper'
 
 firewall = Puppet::Type.type(:firewall)
@@ -9,15 +11,8 @@ describe firewall do
     @provider.stubs(:name).returns(:iptables)
     Puppet::Type::Firewall.stubs(:defaultprovider).returns @provider
 
-    @resource = @class.new({
-      :name  => '000 test foo',
-      :chain => 'INPUT',
-      :jump  => 'ACCEPT'
-    })
+    @resource = @class.new({:name  => '000 test foo'})
   end
-
-  # Example on how to test and have the full validation kick in
-  #lambda { @class.new(:name => "001-test", :chain => chain) }.should_not raise_error
 
   it 'should have :name be its namevar' do
     @class.key_attributes.should == [:name]
@@ -31,6 +26,24 @@ describe firewall do
 
     it 'should not accept a name with non-ASCII chars' do
       lambda { @resource[:name] = '%*#^(#$' }.should raise_error(Puppet::Error)
+    end
+  end
+
+  describe ':action' do
+    it "should have no default" do
+      res = @class.new(:name => "000 test")
+      res.parameters[:action].should == nil
+    end
+ 
+    [:accept, :drop, :reject].each do |action|
+      it "should accept value #{action}" do
+        @resource[:action] = action
+        @resource[:action].should == action
+      end
+    end
+
+    it 'should fail when value is not recognized' do
+      lambda { @resource[:action] = 'not valid' }.should raise_error(Puppet::Error)
     end
   end
 
@@ -74,15 +87,26 @@ describe firewall do
   end
 
   describe ':jump' do
-    [:ACCEPT, :DROP, :QUEUE, :RETURN, :REJECT, :DNAT, :SNAT, :LOG, :MASQUERADE, :REDIRECT].each do |jump|
+    it "should have no default" do
+      res = @class.new(:name => "000 test")
+      res.parameters[:jump].should == nil
+    end
+
+    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT'].each do |jump|
       it "should accept jump value #{jump}" do
         @resource[:jump] = jump
         @resource[:jump].should == jump
       end
     end
 
+    ['ACCEPT', 'DROP', 'REJECT'].each do |jump|
+      it "should now fail when value #{jump}" do
+        lambda { @resource[:jump] = jump }.should raise_error(Puppet::Error)
+      end
+    end
+
     it "should fail when jump value is not recognized" do
-      lambda { @resource[:proto] = 'jump' }.should raise_error(Puppet::Error)
+      lambda { @resource[:jump] = '%^&*' }.should raise_error(Puppet::Error)
     end
   end
 
@@ -179,6 +203,18 @@ describe firewall do
 
     it 'should fail if value is not numeric' do
       lambda { @resource[:burst] = 'foo' }.should raise_error(Puppet::Error)
+    end
+  end
+
+  describe ':action and :jump' do
+    it 'should allow only 1 to be set at a time' do
+      expect { 
+        @class.new(
+          :name => "001-test", 
+          :action => "accept", 
+          :jump => "custom_chain"
+        )
+      }.should raise_error(Puppet::Error, /^Only one of the parameters 'action' and 'jump' can be set$/)
     end
   end
 end
