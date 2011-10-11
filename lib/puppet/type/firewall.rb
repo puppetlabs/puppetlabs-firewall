@@ -195,6 +195,10 @@ Puppet::Type.newtype(:firewall) do
     desc "Rate limiting burst value (per second)."
     newvalue(/^\d+$/)
   end
+
+  newparam(:line) do
+    desc 'Read-only property for caching the rule line'
+  end
   
   validate do
     debug("[validate]")
