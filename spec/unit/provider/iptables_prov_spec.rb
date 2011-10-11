@@ -38,7 +38,6 @@ describe 'iptables provider detection' do
       :name => '000 test foo' }) }.should raise_error(Puppet::DevError, 
       "Could not find a default provider for firewall")
   end
-
 end
 
 describe 'iptables provider' do
@@ -81,14 +80,57 @@ describe 'iptables provider' do
     end
   end
 
-  describe 'when modifying resources' do
+  describe 'when converting rules without comments to resources' do
+    before :each do
+      @rule = '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061, 7062 -j ACCEPT'
+      @resource = @provider.rule_to_hash(@rule, 'filter', 0)
+      @instance = @provider.new(@resource)
+    end
+
+    it 'rule name contains a MD5 sum of the line' do
+      @resource[:name].should == "9999 #{Digest::MD5.hexdigest(@resource[:line])}"
+    end
+  end
+
+  describe 'when creating resources' do
     before :each do
       @instance = @provider.new(@resource)
       @provider.expects(:execute).with(['/sbin/iptables-save']).returns("")
     end
 
-    it 'should do something' do
+    it 'insert_args should be an array' do
       @instance.insert_args.class.should == Array
+    end
+  end
+
+  describe 'when modifying resources' do
+    before :each do
+      @instance = @provider.new(@resource)
+      @provider.expects(:execute).with(['/sbin/iptables-save']).returns ""
+    end
+
+    it 'update_args should be an array' do
+      @instance.update_args.class.should == Array
+    end
+  end
+
+  describe 'when deleting resources' do
+    before :each do
+      @rule = '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061, 7062 -j ACCEPT'
+      @resource = @provider.rule_to_hash(@rule, 'filter', 0)
+      @instance = @provider.new(@resource)
+    end
+
+    it 'resource[:line] looks like the original rule' do
+      @resource[:line] == @rule
+    end
+
+    it 'delete_args is an array' do
+      @instance.delete_args.class.should == Array
+    end
+
+    it 'delete_args is the same as the rule string when joined' do
+      @instance.delete_args.join(' ').should == @rule.gsub(/\-A/, '-D')
     end
   end
 end
