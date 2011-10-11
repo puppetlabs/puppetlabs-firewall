@@ -52,8 +52,10 @@ module Puppet::Util::Firewall
         ports << Socket.getservbyname(port) unless port.kind_of?(Integer)
       end
       ports
-    else
+    elsif value.kind_of?(Integer)
       Socket.getservbyname(value)
+    else
+      value
     end
   end
 end
