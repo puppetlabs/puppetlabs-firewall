@@ -1,10 +1,17 @@
 require 'rake'
 require 'rspec/core/rake_task'
 
-task :default => [:test]
+task :default do
+  sh %{rake -T}
+end
 
-desc 'Run RSpec'
-RSpec::Core::RakeTask.new(:test) do |t|
+# Aliases for spec. The (s) versions are used by rvm specs/tests.
+task :test    => [:spec]
+task :tests   => [:spec]
+task :specs   => [:spec]
+
+desc 'Run all RSpec tests'
+RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = ['--color']
 end
 
