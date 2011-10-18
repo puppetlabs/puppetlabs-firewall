@@ -42,10 +42,9 @@ Puppet::Type.newtype(:firewall) do
     newvalues(/^\d+[a-zA-Z0-9\s\-_]+$/)
   end
 
-  newparam(:action) do
+  newproperty(:action) do
     desc "Action to perform on this rule."
     newvalues(:accept, :reject, :drop)
-    defaultto :accept
   end
 
   # Generic matching properties
@@ -108,11 +107,30 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:jump, :required_features => :iptables) do
-    desc "The value for the iptables --jump parameter. Normal values are: 
-          'ACCEPT', 'DROP', 'QUEUE', 'RETURN', REJECT', 'DNAT', 'SNAT', 'LOG', 
-          'MASQUERADE', 'REDIRECT'. But any valid chain name is allowed."
-    newvalues(/^[a-zA-Z0-9\-_]+$/)
-    defaultto "ACCEPT"
+    desc <<EOS
+The value for the iptables --jump parameter. Normal values are: 
+
+* QUEUE
+* RETURN
+* DNAT
+* SNAT
+* LOG
+* MASQUERADE 
+* REDIRECT. 
+
+But any valid chain name is allowed. 
+
+For the values ACCEPT, DROP and REJECT you must use the generic 
+'action' parameter. This is to enfore the use of generic parameters where
+possible for maximum cross-platform modelling.
+
+If you set both 'accept' and 'jump' parameters, the jump parameter will take
+precedence.
+EOS
+    validate do |value|
+      raise ArgumentError, "Jump destination must consist of alphanumeric characters, an underscore or a hyphen." unless value =~ /^[a-zA-Z0-9\-_]+$/
+      raise ArgumentError, "Jump destination should not be one of ACCEPT, REJECT or DENY. Use the action property instead." if ["accept","reject","drop"].include?(value.downcase)
+    end
   end
 
   # Interface specific matching properties
@@ -283,6 +301,10 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:burst) && ! value(:limit)
       self.fail "burst makes no sense without limit"
+    end
+
+    if value(:action) && value(:jump)
+      self.fail "Only one of the parameters 'action' and 'jump' can be set"
     end
   end
 end

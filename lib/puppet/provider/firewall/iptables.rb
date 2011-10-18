@@ -134,8 +134,17 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     hash[:ensure] = :present
 
     # Munge some vars here ...
-    # proto should equal 'all' if undefined
+
+    # Proto should equal 'all' if undefined
     hash[:proto] = "all" if !hash.include?(:proto)
+
+    # If the jump parameter is set to one of: ACCEPT, REJECT or DROP then
+    # we should set the action parameter instead. 
+    if ['ACCEPT','REJECT','DROP'].include?(hash[:jump]) then
+      hash[:action] = hash[:jump].downcase
+      hash.delete(:jump)
+    end
+
     hash
   end
 
@@ -180,17 +189,31 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def general_args
     debug "Current resource: %s" % resource.class
+
     args = []
-    self.class.instance_variable_get('@resource_list').each do |res|
-      if(resource.value(res))
-        args << self.class.instance_variable_get('@resource_map')[res].split(' ')
-        if resource[res].is_a?(Array)
-          args << resource[res].join(',')
-        else
-          args << resource[res]
-        end
+    resource_list = self.class.instance_variable_get('@resource_list')
+    resource_map = self.class.instance_variable_get('@resource_map')
+
+    resource_list.each do |res|
+      resource_value = nil
+      if (resource[res]) then
+        resource_value = resource[res]
+      elsif res == :jump and resource[:action] then
+        # In this case, we are substituting jump for action
+        resource_value = resource[:action].to_s.upcase
+      else
+        next
+      end
+
+      args << resource_map[res].split(' ')
+
+      if resource_value.is_a?(Array)
+        args << resource_value.join(',')
+      else
+        args << resource_value
       end
     end
+
     args
   end
 
