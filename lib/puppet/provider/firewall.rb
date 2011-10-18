@@ -38,6 +38,7 @@ class Puppet::Provider::Firewall < Puppet::Provider
     dynamic_methods = self.class.instance_variable_get('@resource_map').keys
     dynamic_methods << :chain
     dynamic_methods << :table
+    dynamic_methods << :action
 
     if dynamic_methods.include?(meth.to_sym) then
       if @property_hash[meth.to_sym] then
