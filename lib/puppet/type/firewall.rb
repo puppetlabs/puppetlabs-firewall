@@ -4,8 +4,10 @@ require 'puppet/util/firewall'
 Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
 
-  @doc = "This type provides the capability to manage firewall rules within 
-          puppet."
+  @doc = <<-EOS
+    This type provides the capability to manage firewall rules within 
+    puppet.
+  EOS
 
   feature :rate_limiting, "Rate limiting features."
   feature :snat, "Source NATing"
@@ -21,7 +23,9 @@ Puppet::Type.newtype(:firewall) do
   feature :iptables, "The provider provides iptables features."
 
   ensurable do
-    desc "Manage the state of this rule."
+    desc <<-EOS
+      Manage the state of this rule. The default action is *present*.
+    EOS
 
     newvalue(:present) do
       provider.insert
@@ -35,7 +39,16 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newparam(:name) do
-    desc "The canonical name of the rule."
+    desc <<-EOS
+      The canonical name of the rule. This name is also used for ordering
+      so make sure you prefix the rule with a number:
+
+          000 this runs first
+          999 this runs last
+
+      Depending on the provider, the name of the rule can be stored using
+      the comment feature of the underlying firewall subsystem.
+    EOS
     isnamevar
 
     # Keep rule names simple - they must start with a number
@@ -43,22 +56,45 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:action) do
-    desc "Action to perform on this rule."
+    desc <<-EOS
+      This is the action to perform on a match. Can be one of:
+
+      * accept - the packet is accepted
+      * reject - the packet is rejected with a suitable ICMP response
+      * drop - the packet is dropped
+
+      If you specify no value it will simply match the rule but perform no
+      action unless you provide a provider specific parameter (such as *jump*).
+    EOS
     newvalues(:accept, :reject, :drop)
   end
 
   # Generic matching properties
   newproperty(:source) do
-    desc "The source IP address to match."
+    desc <<-EOS
+      An array of source addresses. For example:
+
+          source => '192.168.2.0/24'
+
+      The source can also be an IPv6 address if your provider supports it.
+    EOS
   end
 
   newproperty(:destination) do
-    desc "The destination IP address to match."
+    desc <<-EOS
+      An array of destination addresses to match. For example:
+
+          destination => '192.168.1.0/24'
+
+      The destination can also be an IPv6 address if your provider supports it.
+    EOS
   end
 
   newproperty(:sport, :array_matching => :all) do
-    desc "The source port to match for this filter (if the protocol supports 
-          ports). Will accept a single element or an array."
+    desc <<-EOS
+      For protocols that support ports, this is a list of source ports 
+      to filter on.
+    EOS
 
     munge do |value|
       @resource.string_to_port(value)
@@ -71,8 +107,10 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:dport, :array_matching => :all) do
-    desc "The destination port to match for this filter (if the protocol 
-          supports ports). Will accept a single element or an array."
+    desc <<-EOS
+      For protocols that support ports, this is a list of destination 
+      ports to filter on.
+    EOS
     
     munge do |value|
       @resource.string_to_port(value)
@@ -85,97 +123,156 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:proto) do
-    desc "The specific protocol to match for this rule."
+    desc <<-EOS
+      The specific protocol to match for this rule. By default this is 
+      *tcp*.
+    EOS
+
     newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :all)
     defaultto "tcp"
   end
 
   # Iptables specific
   newproperty(:chain, :required_features => :iptables) do
-    desc "The value for the iptables -A parameter. Normal values are: 'INPUT', 
-          'FORWARD', 'OUTPUT', 'PREROUTING', 'POSTROUTING' but you can also
-          specify a user created chain."
+    desc <<-EOS
+      Name of the chain to use. Can be one of the built-ins:
+
+      * INPUT
+      * FORWARD
+      * OUTPUT
+      * PREROUTING
+      * POSTROUTING
+
+      Or you can provide a user-based chain.
+
+      The default value is 'INPUT'.
+    EOS
 
     defaultto "INPUT"
     newvalue(/^[a-zA-Z0-9\-_]+$/)
   end
 
   newproperty(:table, :required_features => :iptables) do
-    desc "The value for the iptables -t parameter."
+    desc <<-EOS
+      Table to use. Can be one of:
+
+      * nat
+      * mangle
+      * filter
+      * raw
+      * rawpost
+
+      By default the setting is 'filter'.
+    EOS
+
     newvalues(:nat, :mangle, :filter, :raw, :rawpost)
     defaultto "filter"
   end
 
   newproperty(:jump, :required_features => :iptables) do
-    desc <<EOS
-The value for the iptables --jump parameter. Normal values are: 
+    desc <<-EOS
+      The value for the iptables --jump parameter. Normal values are: 
 
-* QUEUE
-* RETURN
-* DNAT
-* SNAT
-* LOG
-* MASQUERADE 
-* REDIRECT. 
+      * QUEUE
+      * RETURN
+      * DNAT
+      * SNAT
+      * LOG
+      * MASQUERADE 
+      * REDIRECT
 
-But any valid chain name is allowed. 
+      But any valid chain name is allowed. 
 
-For the values ACCEPT, DROP and REJECT you must use the generic 
-'action' parameter. This is to enfore the use of generic parameters where
-possible for maximum cross-platform modelling.
+      For the values ACCEPT, DROP and REJECT you must use the generic 
+      'action' parameter. This is to enfore the use of generic parameters where
+      possible for maximum cross-platform modelling.
 
-If you set both 'accept' and 'jump' parameters, the jump parameter will take
-precedence.
-EOS
+      If you set both 'accept' and 'jump' parameters, you will get an error as
+      only one of the options should be set.
+    EOS
+
     validate do |value|
-      raise ArgumentError, "Jump destination must consist of alphanumeric characters, an underscore or a hyphen." unless value =~ /^[a-zA-Z0-9\-_]+$/
-      raise ArgumentError, "Jump destination should not be one of ACCEPT, REJECT or DENY. Use the action property instead." if ["accept","reject","drop"].include?(value.downcase)
+      unless value =~ /^[a-zA-Z0-9\-_]+$/
+        raise ArgumentError, <<-EOS
+          Jump destination must consist of alphanumeric characters, an 
+          underscore or a yphen.
+        EOS
+      end
+
+      if ["accept","reject","drop"].include?(value.downcase)
+        raise ArgumentError, <<-EOS
+          Jump destination should not be one of ACCEPT, REJECT or DENY. Use 
+          the action property instead.
+        EOS
+      end
+
     end
   end
 
   # Interface specific matching properties
   newproperty(:iniface, :required_features => :interface_match) do
-    desc "Match input interface."
+    desc <<-EOS
+      Input interface to filter on.
+    EOS
     newvalues(/^[a-zA-Z0-9\-_]+$/)
   end
 
   newproperty(:outiface, :required_features => :interface_match) do
-    desc "Match ouput interface."
+    desc <<-EOS
+      Output interface to filter on.
+    EOS
     newvalues(/^[a-zA-Z0-9\-_]+$/)
   end
 
   # NAT specific properties
   newproperty(:tosource, :required_features => :snat) do
-    desc "For SNAT this is the IP address that will replace the source IP 
-          address."
+    desc <<-EOS
+      When using jump => "SNAT" you can specify the new source address using 
+      this parameter.
+    EOS
   end
 
   newproperty(:todest, :required_features => :dnat) do
-    desc "For DNAT this is the IP address that will replace the destination IP 
-          address."
+    desc <<-EOS
+      When using jump => "DNAT" you can specify the new destination address 
+      using this paramter.
+    EOS
   end
 
   newproperty(:toports, :required_features => :dnat) do
-    desc "For DNAT this is the port that will replace the destination port."
+    desc <<-EOS
+      For DNAT this is the port that will replace the destination port.
+    EOS
   end
 
   # Reject ICMP type
   newproperty(:reject, :required_features => :reject_type) do
-    desc "The ICMP response to reject a packet with."
+    desc <<-EOS
+      When combined with jump => "REJECT" you can specify a different icmp 
+      response to be sent back to the packet sender.
+    EOS
   end
 
   # Logging properties
   newproperty(:log_level, :required_features => :log_level) do
-    desc "The syslog level to log to."
+    desc <<-EOS
+      When combined with jump => "LOG" specifies the system log level to log 
+      to.
+    EOS
   end
 
   newproperty(:log_prefix, :required_features => :log_prefix) do
-    desc "The syslog prefix."
+    desc <<-EOS
+      When combined with jump => "LOG" specifies the log prefix to use when 
+      logging.
+    EOS
   end
 
   # ICMP matching property
   newproperty(:icmp, :required_features => :icmp_match) do
-    desc "When matching ICMP packets, this is the type of ICMP packet to match."
+    desc <<-EOS
+      When matching ICMP packets, this is the type of ICMP packet to match.
+    EOS
 
     munge do |value|
       if value.kind_of?(String)
@@ -191,9 +288,18 @@ EOS
     end
   end
 
-  newproperty(:state, :array_matching => :all, :required_features => :state_match) do
-    desc "Matches a packet based on its state in the firewall stateful inspection 
-          table."
+  newproperty(:state, :array_matching => :all, :required_features => 
+    :state_match) do
+
+    desc <<-EOS
+      Matches a packet based on its state in the firewall stateful inspection 
+      table. Values can be:
+
+      * INVALID
+      * ESTABLISHED
+      * NEW
+      * RELATED
+    EOS
 
     newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
 
@@ -205,17 +311,25 @@ EOS
 
   # Rate limiting properties
   newproperty(:limit, :required_features => :rate_limiting) do
-    desc "Rate limiting value. Example values are: '50/sec', '40/min', 
-          '30/hour', '10/day'."
+    desc <<-EOS
+      Rate limiting value for matched packets. The format is: 
+      rate/[/second/|/minute|/hour|/day].
+
+      Example values are: '50/sec', '40/min', '30/hour', '10/day'."
+    EOS
   end
 
   newproperty(:burst, :required_features => :rate_limiting) do
-    desc "Rate limiting burst value (per second)."
+    desc <<-EOS
+      Rate limiting burst value (per second) before limit checks apply.
+    EOS
     newvalue(/^\d+$/)
   end
 
   newparam(:line) do
-    desc 'Read-only property for caching the rule line'
+    desc <<-EOS
+      Read-only property for caching the rule line.
+    EOS
   end
   
   validate do
@@ -230,7 +344,9 @@ EOS
     end
 
     # First we make sure the chains and tables are valid combinations
-    if value(:table).to_s == "filter" && value(:chain) =~ /PREROUTING|POSTROUTING/
+    if value(:table).to_s == "filter" && 
+      value(:chain) =~ /PREROUTING|POSTROUTING/
+
       self.fail "PREROUTING and POSTROUTING cannot be used in table 'filter'"
     end
 
@@ -238,7 +354,9 @@ EOS
       self.fail "INPUT and FORWARD cannot be used in table 'nat'"
     end
 
-    if value(:table).to_s == "raw" && value(:chain) =~ /INPUT|FORWARD|POSTROUTING/
+    if value(:table).to_s == "raw" && 
+      value(:chain) =~ /INPUT|FORWARD|POSTROUTING/
+
       self.fail "INPUT, FORWARD and POSTROUTING cannot be used in table raw"
     end
 
