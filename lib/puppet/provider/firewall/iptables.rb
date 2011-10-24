@@ -131,6 +131,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
     end
 
+    # States should always be sorted. This ensures that the output from
+    # iptables-save and user supplied resources is consistent.
+    hash[:state] = hash[:state].sort unless hash[:state].nil?
+
     # This forces all existing, commentless rules to be moved to the bottom of the stack.
     # Puppet-firewall requires that all rules have comments (resource names) and will fail if
     # a rule in iptables does not have a comment. We get around this by appending a high level
