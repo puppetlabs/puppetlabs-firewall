@@ -121,6 +121,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
+    hash[:state] = hash[:state].sort unless hash[:state].nil?
+
     # This forces all existing, commentless rules to be moved to the bottom of the stack.
     # Puppet-firewall requires that all rules have comments (resource names) and will fail if
     # a rule in iptables does not have a comment. We get around this by appending a high level

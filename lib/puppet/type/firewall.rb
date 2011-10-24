@@ -303,6 +303,10 @@ Puppet::Type.newtype(:firewall) do
 
     newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
 
+    munge do |value|
+      value.to_a.sort
+    end
+
     def should_to_s(value)
       value = [value] unless value.is_a?(Array)
       value.join(',')
