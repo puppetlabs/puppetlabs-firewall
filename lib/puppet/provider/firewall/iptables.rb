@@ -122,9 +122,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
 
     # This forces all existing, commentless rules to be moved to the bottom of the stack.
-    # Puppet-firewall requires that all rules have comments (resource names) and will fail if
-    # a rule in iptables does not have a comment. We get around this by appending a high level
-    if ! hash[:name]
+    # Puppet-firewall requires that all rules have comments (resource names) of a certain
+    # format and will fail if a rule in iptables does not match this criteria. We get around
+    # this by hashing a name and appending a high level.
+    if ! hash[:name] or hash[:name] !~ /^\d+[a-zA-Z0-9\s\-_]+$/
       hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
     end
 
