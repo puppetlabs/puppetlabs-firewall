@@ -57,6 +57,14 @@ ARGS_TO_HASH = {
       :action => nil,
     },
   },
+  'state_returns_sorted_values' => {
+    :line => '-A INPUT -m state --state INVALID,RELATED,ESTABLISHED',
+    :table => 'filter',
+    :params => {
+      :state => ['ESTABLISHED', 'INVALID', 'RELATED'],
+      :action => nil,
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -98,5 +106,14 @@ HASH_TO_ARGS = {
     },  
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", 
       "100 no action"],
+  },
+  'states_set_from_array' => {
+    :params => {
+      :name => "100 states_set_from_array",
+      :table => "filter",
+      :state => ['ESTABLISHED', 'INVALID']
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 states_set_from_array",
+      "-m", "state", "--state", "ESTABLISHED,INVALID"],
   }
 }

@@ -193,6 +193,11 @@ describe firewall do
       @resource[:state] = [:INVALID, :NEW]
       @resource[:state].should == [:INVALID, :NEW]
     end
+
+    it 'should sort values alphabetically' do
+      @resource[:state] = [:NEW, :ESTABLISHED]
+      @resource[:state].should == [:ESTABLISHED, :NEW]
+    end
   end
 
   describe ':burst' do
