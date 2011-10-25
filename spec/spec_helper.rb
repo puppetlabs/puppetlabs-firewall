@@ -54,7 +54,13 @@ RSpec.configure do |config|
     Puppet.settings[:bindaddress] = "127.0.0.1"
 
     @logs = []
-    Puppet::Util::Log.newdestination(Puppet::Test::LogCollector.new(@logs))
+    # This tests allows the spec_helper to be >2.6.7 and >2.7.1 compatible
+    # as the Puppet::Test::LogCollector facility wasn't available until 2.7.x
+    if Puppet.const_defined?("Test") and Puppet::Test.const_defined?("LogCollector")
+      Puppet::Util::Log.newdestination(Puppet::Test::LogCollector.new(@logs))
+    else
+      Puppet::Util::Log.newdestination(@logs)
+    end
 
     @log_level = Puppet::Util::Log.level
   end
