@@ -50,16 +50,22 @@ Then run the module tool:
 
     puppet-module install puppetlabs-firewall
 
-Depending on the version of Puppet, you may need to restart the 
-puppetmasterd (or Apache) process before this module will work.
-
 This module uses both Ruby based providers so your Puppet configuration
 (ie. puppet.conf) must include the following items:
 
     [agent]
     pluginsync = true
-    
-The module will not operate normally without these features enabled.
+
+The module will not operate normally without these features enabled for the
+client.
+
+If you are using environments or with certain versions of Puppet you may
+need to run Puppet on the master first:
+
+    puppet agent -t --pluginsync --environment production
+
+You may also need to restart Apache, although this shouldn't always be the
+case.
 
 ### Examples
 
