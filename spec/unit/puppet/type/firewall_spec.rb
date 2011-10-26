@@ -123,12 +123,37 @@ describe firewall do
     describe port do
       it "should accept a #{port} as string" do
         @resource[port] = '22'
-        @resource[port].should == [22]
+        @resource[port].should == ['22']
       end
 
       it "should accept a #{port} as an array" do
         @resource[port] = ['22','23']
-        @resource[port].should == [22,23]
+        @resource[port].should == ['22','23']
+      end
+
+      it "should accept a #{port} as a hyphen separated range" do
+        @resource[port] = ['22-1000']
+        @resource[port].should == ['22-1000']
+      end
+
+      it "should accept a #{port} as a combination of arrays of single and " \
+        "hyphen separated ranges" do
+
+        @resource[port] = ['22-1000','33','3000-4000']
+        @resource[port].should == ['22-1000','33','3000-4000']
+      end
+
+      it "should convert a port name for #{port} to its number" do
+        @resource[port] = 'ssh'
+        @resource[port].should == ['22']
+      end
+
+      it "should not accept something invalid for #{port}" do
+        expect { @resource[port] = 'something odd' }.should raise_error(Puppet::Error, /^Parameter .+ failed: Munging failed for value ".+" in class .+: no such service/)
+      end
+
+      it "should not accept something invalid in an array for #{port}" do
+        expect { @resource[port] = ['something odd','something even odder'] }.should raise_error(Puppet::Error, /^Parameter .+ failed: Munging failed for value ".+" in class .+: no such service/)
       end
     end
   end

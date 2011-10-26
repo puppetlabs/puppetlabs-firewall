@@ -57,6 +57,34 @@ ARGS_TO_HASH = {
       :action => nil,
     },
   },
+  'dport_range_1' => {
+    :line => '-A INPUT -m multiport --dports 1:1024 -m comment --comment "000 allow foo"',
+    :table => 'filter',
+    :params => {
+      :dport => ["1-1024"],
+    },
+  },
+  'dport_range_2' => {
+    :line => '-A INPUT -m multiport --dports 15,512:1024 -m comment --comment "000 allow foo"',
+    :table => 'filter',
+    :params => {
+      :dport => ["15","512-1024"],
+    },
+  },
+  'sport_range_1' => {
+    :line => '-A INPUT -m multiport --sports 1:1024 -m comment --comment "000 allow foo"',
+    :table => 'filter',
+    :params => {
+      :sport => ["1-1024"],
+    },
+  },
+  'sport_range_2' => {
+    :line => '-A INPUT -m multiport --sports 15,512:1024 -m comment --comment "000 allow foo"',
+    :table => 'filter',
+    :params => {
+      :sport => ["15","512-1024"],
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -98,5 +126,37 @@ HASH_TO_ARGS = {
     },  
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", 
       "100 no action"],
-  }
+  },
+  'sport_range_1' => {
+    :params => {
+      :name => "100 sport range",
+      :sport => ["1-1024"],
+      :table => "filter",
+    },  
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--sports", "1:1024", "-m", "comment", "--comment", "100 sport range"],
+  },
+  'sport_range_2' => {
+    :params => {
+      :name => "100 sport range",
+      :sport => ["15","512-1024"],
+      :table => "filter",
+    },  
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--sports", "15,512:1024", "-m", "comment", "--comment", "100 sport range"],
+  },
+  'dport_range_1' => {
+    :params => {
+      :name => "100 sport range",
+      :dport => ["1-1024"],
+      :table => "filter",
+    },  
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "1:1024", "-m", "comment", "--comment", "100 sport range"],
+  },
+  'dport_range_2' => {
+    :params => {
+      :name => "100 sport range",
+      :dport => ["15","512-1024"],
+      :table => "filter",
+    },  
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "15,512:1024", "-m", "comment", "--comment", "100 sport range"],
+  },
 }
