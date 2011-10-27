@@ -87,6 +87,11 @@ Puppet::Type.newtype(:firewall) do
 
       The source can also be an IPv6 address if your provider supports it.
     EOS
+
+    munge do |value|
+      value = Puppet::Util::IPCidr.new(value)
+      "#{value.to_s}/#{value.netmask}"
+    end
   end
 
   newproperty(:destination) do
@@ -97,6 +102,11 @@ Puppet::Type.newtype(:firewall) do
 
       The destination can also be an IPv6 address if your provider supports it.
     EOS
+
+    munge do |value|
+      value = Puppet::Util::IPCidr.new(value)
+      "#{value.to_s}/#{value.netmask}"
+    end
   end
 
   newproperty(:sport, :array_matching => :all) do
