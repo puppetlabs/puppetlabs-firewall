@@ -22,7 +22,7 @@ require 'ipaddr'
 module Puppet
   module Util
     class IPCidr < IPAddr
-  
+
       def netmask
         _to_string(@mask_addr)
       end

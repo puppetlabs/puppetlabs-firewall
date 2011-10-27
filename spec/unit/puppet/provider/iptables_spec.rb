@@ -109,7 +109,7 @@ describe 'iptables provider' do
 
   describe 'when converting rules without comments to resources' do
     let(:sample_rule) {
-      '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061, 7062 -j ACCEPT'
+      '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -j ACCEPT'
     }
     let(:resource) { provider.rule_to_hash(sample_rule, 'filter', 0) }
     let(:instance) { provider.new(resource) }
@@ -145,7 +145,7 @@ describe 'iptables provider' do
 
   describe 'when deleting resources' do
     let(:sample_rule) {
-      '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061, 7062 -j ACCEPT'
+      '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -j ACCEPT'
     }
     let(:resource) { provider.rule_to_hash(sample_rule, 'filter', 0) }
     let(:instance) { provider.new(resource) }
