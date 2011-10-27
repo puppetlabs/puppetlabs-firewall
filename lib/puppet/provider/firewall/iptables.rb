@@ -117,6 +117,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
 
+    [:source, :destination].each do |prop|
+      if hash.include? prop
+        address = Puppet::Util::IPCidr.new(hash[prop])
+      else
+        address = Puppet::Util::IPCidr.new('0.0.0.0/0')
+      end
+      hash[prop] = "#{address.to_s}/#{address.netmask}"
+    end
+
     [:dport, :sport, :state].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
