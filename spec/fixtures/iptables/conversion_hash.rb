@@ -13,14 +13,14 @@ ARGS_TO_HASH = {
     :params => {
       :action => "accept",
       :chain => "INPUT",
-      :destination => "1.1.1.1/255.255.255.255",
+      :destination => "1.1.1.1/32",
       :dport => ["7061","7062"],
       :ensure => :present,
       :line => '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
       :name => "000 allow foo",
       :proto => "tcp",
       :provider => "iptables",
-      :source => "1.1.1.1/255.255.255.255",
+      :source => "1.1.1.1/32",
       :sport => ["7061","7062"],
       :table => "filter",
     },
@@ -98,11 +98,11 @@ HASH_TO_ARGS = {
       :ensure => :present,
       :name => "000 allow foo",
       :proto => "tcp",
-      :source => "1.1.1.1",
+      :source => "1.1.1.1/255.255.255.0",
       :sport => ["7061","7062"],
       :table => "filter",
     },
-    :args => ["-t", :filter, "-s", "1.1.1.1/255.255.255.255", "-d", "1.1.1.1/255.255.255.255", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-m", "comment", "--comment", "000 allow foo", "-j", "ACCEPT"],
+    :args => ["-t", :filter, "-s", "1.1.1.0/24", "-d", "1.1.1.1/32", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-m", "comment", "--comment", "000 allow foo", "-j", "ACCEPT"],
   },
   'long_rule_2' => {
     :params => {
@@ -117,7 +117,7 @@ HASH_TO_ARGS = {
       :sport => ["7061","7062"],
       :table => "filter",
     },
-    :args => ["-t", :filter, "-s", "1.1.1.1/255.255.255.255", "-d", "2.10.13.0/255.255.255.0", "-p", :udp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061", "-m", "comment", "--comment", "700 allow bar", "-j", "my_custom_chain"],
+    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "2.10.13.0/24", "-p", :udp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061", "-m", "comment", "--comment", "700 allow bar", "-j", "my_custom_chain"],
   },
   'no_action' => {
     :params => {

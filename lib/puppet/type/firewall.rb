@@ -90,7 +90,11 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       value = Puppet::Util::IPCidr.new(value)
-      "#{value.to_s}/#{value.netmask}"
+      if value.to_i == 0 then
+        nil
+      else
+        value.cidr
+      end
     end
   end
 
@@ -105,7 +109,11 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       value = Puppet::Util::IPCidr.new(value)
-      "#{value.to_s}/#{value.netmask}"
+      if value.to_i == 0 then
+        nil
+      else
+        value.cidr
+      end
     end
   end
 

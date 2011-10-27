@@ -120,10 +120,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     [:source, :destination].each do |prop|
       if hash.include? prop
         address = Puppet::Util::IPCidr.new(hash[prop])
-      else
-        address = Puppet::Util::IPCidr.new('0.0.0.0/0')
+        hash[prop] = address.cidr
       end
-      hash[prop] = "#{address.to_s}/#{address.netmask}"
     end
 
     [:dport, :sport, :state].each do |prop|
