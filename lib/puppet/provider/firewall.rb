@@ -32,7 +32,7 @@ class Puppet::Provider::Firewall < Puppet::Provider
     nil
   end
 
-  # Executed if method is missing. In this case we are going to catch 
+  # Executed if method is missing. In this case we are going to catch
   # unqualified property methods for dynamic property setting and getting.
   def method_missing(meth, *args, &block)
     dynamic_methods = self.class.instance_variable_get('@resource_map').keys

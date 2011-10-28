@@ -3,7 +3,7 @@ require 'digest/md5'
 
 Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
-  
+
   @doc = "Iptables type provider"
 
   has_feature :iptables
@@ -45,8 +45,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :tosource => "--to-source",
   }
 
-  @resource_list = [:table, :source, :destination, :iniface, :outiface, 
-    :proto, :sport, :dport, :name, :state, :icmp, :limit, :burst, :jump, 
+  @resource_list = [:table, :source, :destination, :iniface, :outiface,
+    :proto, :sport, :dport, :name, :state, :icmp, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
   def insert
@@ -56,7 +56,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def update
     debug 'Updating rule %s' % resource[:name]
-    iptables update_args 
+    iptables update_args
   end
 
   def delete
@@ -77,7 +77,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
     @property_hash.clear
   end
-  
+
   def self.instances
     debug "[instances]"
     table = nil
@@ -116,7 +116,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     keys << :chain
 
     keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
-    
+
+    [:source, :destination].each do |prop|
+      if hash.include? prop
+        address = Puppet::Util::IPCidr.new(hash[prop])
+        hash[prop] = address.cidr
+      end
+    end
+
     [:dport, :sport, :state].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
@@ -149,7 +156,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     hash[:proto] = "all" if !hash.include?(:proto)
 
     # If the jump parameter is set to one of: ACCEPT, REJECT or DROP then
-    # we should set the action parameter instead. 
+    # we should set the action parameter instead.
     if ['ACCEPT','REJECT','DROP'].include?(hash[:jump]) then
       hash[:action] = hash[:jump].downcase
       hash.delete(:jump)
@@ -175,14 +182,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   def delete_args
     count = []
     line = properties[:line].gsub(/\-A/, '-D').split
-    
+
     # Grab all comment indices
     line.each do |v|
       if v =~ /"/
         count << line.index(v)
       end
     end
-    
+
     if ! count.empty?
       # Remove quotes and set first comment index to full string
       line[count.first] = line[count.first..count.last].join(' ').gsub(/"/, '')
@@ -192,7 +199,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         line[i] = nil
       end
     end
-    
+
     # Return array without nils
     line.compact
   end
@@ -238,7 +245,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   def insert_order
     debug("[insert_order]")
     rules = []
-    
+
     # Find list of current rules based on chain
     self.class.instances.each do |rule|
       rules << rule.name if rule.chain == resource[:chain].to_s
