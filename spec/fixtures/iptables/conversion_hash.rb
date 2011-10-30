@@ -85,6 +85,14 @@ ARGS_TO_HASH = {
       :sport => ["15","512-1024"],
     },
   },
+  'state_returns_sorted_values' => {
+    :line => '-A INPUT -m state --state INVALID,RELATED,ESTABLISHED',
+    :table => 'filter',
+    :params => {
+      :state => ['ESTABLISHED', 'INVALID', 'RELATED'],
+      :action => nil,
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -158,5 +166,14 @@ HASH_TO_ARGS = {
       :table => "filter",
     },  
     :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "15,512:1024", "-m", "comment", "--comment", "100 sport range"],
+  },
+  'states_set_from_array' => {
+    :params => {
+      :name => "100 states_set_from_array",
+      :table => "filter",
+      :state => ['ESTABLISHED', 'INVALID']
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 states_set_from_array",
+      "-m", "state", "--state", "ESTABLISHED,INVALID"],
   },
 }
