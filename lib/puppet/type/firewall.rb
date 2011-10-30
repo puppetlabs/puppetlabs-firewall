@@ -303,6 +303,8 @@ Puppet::Type.newtype(:firewall) do
 
     newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
 
+    # States should always be sorted. This normalizes the resource states to
+    # keep it consistent with the sorted result from iptables-save.
     def should=(values)
       @should = super(values).sort
     end

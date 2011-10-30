@@ -121,6 +121,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
+    # States should always be sorted. This ensures that the output from
+    # iptables-save and user supplied resources is consistent.
     hash[:state] = hash[:state].sort unless hash[:state].nil?
 
     # This forces all existing, commentless rules to be moved to the bottom of the stack.
