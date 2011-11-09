@@ -191,4 +191,12 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :filter, '-s', '192.168.0.1', '-p', :tcp, '-m', 'comment', '--comment', '000 allow from 192.168.0.1, please'],
   },
+  'port_property' => {
+    :params => {
+      :name => '001 port property',
+      :table => 'filter',
+      :port => '80',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--ports', '80', '-m', 'comment', '--comment', '001 port property'],
+  },
 }
