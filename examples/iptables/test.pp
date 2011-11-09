@@ -87,6 +87,12 @@ firewall { '055 INPUT allow DNS':
   sport => 'domain'
 }
 
+firewall { '056 INPUT allow web in and out':
+  action => accept,
+  proto  => 'tcp',
+  port  => 80
+}
+
 firewall { '999 FORWARD drop':
   action => drop,
   chain => 'FORWARD',

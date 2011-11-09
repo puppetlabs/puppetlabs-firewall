@@ -176,4 +176,12 @@ HASH_TO_ARGS = {
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 states_set_from_array",
       "-m", "state", "--state", "ESTABLISHED,INVALID"],
   },
+  'port_property' => {
+    :params => {
+      :name => '001 port property',
+      :table => 'filter',
+      :port => '80',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--ports', '80', '-m', 'comment', '--comment', '001 port property']
+  },
 }
