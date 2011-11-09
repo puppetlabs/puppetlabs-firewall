@@ -34,6 +34,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :log_prefix => "--log-prefix",
     :name => "-m comment --comment",
     :outiface => "-o",
+    :port => '-m multiport --ports',
     :proto => "-p",
     :reject => "--reject-with",
     :source => "-s",
@@ -45,9 +46,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :tosource => "--to-source",
   }
 
-  @resource_list = [:table, :source, :destination, :iniface, :outiface, 
-    :proto, :sport, :dport, :name, :state, :icmp, :limit, :burst, :jump, 
-    :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
+  @resource_list = [:table, :source, :destination, :iniface, :outiface,
+    :proto, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst,
+    :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
@@ -117,14 +118,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
     
-    [:dport, :sport, :state].each do |prop|
+    [:dport, :sport, :port, :state].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
     # Our type prefers hyphens over colons for ranges so ...
     # Iterate across all ports replacing colons with hyphens so that ranges match
     # the types expectations.
-    [:dport, :sport].each do |prop|
+    [:dport, :sport, :port].each do |prop|
       next unless hash[prop]
       hash[prop] = hash[prop].collect do |elem|
         elem.gsub(/:/,'-')
@@ -223,7 +224,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
-      if [:sport, :dport].include?(res) then
+      if [:sport, :dport, :port].include?(res) then
         resource_value = resource_value.collect do |elem|
           elem.gsub(/-/, ':')
         end
