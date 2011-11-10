@@ -87,6 +87,13 @@ firewall { '055 INPUT allow DNS':
   sport => 'domain'
 }
 
+firewall { '057 INPUT limit NTP':
+  action => accept,
+  proto  => 'tcp',
+  dport  => ntp,
+  limit  => '15/hour'
+}
+
 firewall { '999 FORWARD drop':
   action => drop,
   chain => 'FORWARD',
