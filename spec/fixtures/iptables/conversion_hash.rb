@@ -100,6 +100,14 @@ ARGS_TO_HASH = {
       :source => '192.168.0.1',
     },
   },
+  'load_limit_module' => {
+    :line => '-A INPUT -m multiport --dports 123 -m comment --comment "057 INPUT limit NTP" -m limit --limit 15/hour',
+    :table => 'filter',
+    :params => {
+      :dport => ['123'],
+      :limit => '15/hour'
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -198,5 +206,14 @@ HASH_TO_ARGS = {
       :port => '80',
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--ports', '80', '-m', 'comment', '--comment', '001 port property'],
+  },
+  'load_limit_module' => {
+    :params => {
+      :name => '057 INPUT limit NTP',
+      :table => 'filter',
+      :dport => '123',
+      :limit => '15/hour'
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '15/hour'],
   },
 }
