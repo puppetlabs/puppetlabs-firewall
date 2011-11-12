@@ -92,6 +92,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     rules = []
     counter = 1
 
+    self.iptables_init
+    
     # String#lines would be nice, but we need to support Ruby 1.8.5
     iptables_save.split("\n").each do |line|
       unless line =~ /^\#\s+|^\:\S+|^COMMIT/
@@ -108,6 +110,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     rules
   end
 
+  ## Work-around for older vintages of iptables, where iptables-save
+  ## returns error if the kernel modules are not loaded.  Listing
+  ## out the current rules with iptables proper autoloads the kernel modules.
+  def self.iptables_init
+    if ! File.exists?('/proc/net/ip_tables_names') 
+      iptables '-nL'
+    end
+  end
+    
   def self.rule_to_hash(line, table, counter)
     hash = {}
     keys = []
