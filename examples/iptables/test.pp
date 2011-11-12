@@ -93,6 +93,13 @@ firewall { '056 INPUT allow web in and out':
   port  => 80
 }
 
+firewall { '057 INPUT limit NTP':
+  action => accept,
+  proto  => 'tcp',
+  dport  => ntp,
+  limit  => '15/hour'
+}
+
 firewall { '999 FORWARD drop':
   action => drop,
   chain => 'FORWARD',
