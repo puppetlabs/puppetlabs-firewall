@@ -93,6 +93,13 @@ ARGS_TO_HASH = {
       :action => nil,
     },
   },
+  'comment_string_character_validation' => {
+    :line => '-A INPUT -s 192.168.0.1 -m comment --comment "000 allow from 192.168.0.1, please"',
+    :tables => 'filter',
+    :params => {
+      :source => '192.168.0.1',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -175,5 +182,13 @@ HASH_TO_ARGS = {
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 states_set_from_array",
       "-m", "state", "--state", "ESTABLISHED,INVALID"],
+  },
+  'comment_string_character_validation' => {
+    :params => {
+      :name => "000 allow from 192.168.0.1, please",
+      :table => 'filter',
+      :source => '192.168.0.1'
+    },
+    :args => ['-t', :filter, '-s', '192.168.0.1', '-p', :tcp, '-m', 'comment', '--comment', '000 allow from 192.168.0.1, please'],
   },
 }
