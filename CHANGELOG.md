@@ -4,6 +4,45 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
+#### 0.0.3 - 2011/11/12
+
+This release introduces a new parameter 'port' which allows you to set both
+source and destination ports for a match:
+
+    firewall { "500 allow NTP requests":
+      port => "123",
+      proto => "udp",
+      action => "accept",
+    }
+
+We also have the limit parameter finally working:
+
+    firewall { "500 limit HTTP requests":
+      dport => 80,
+      proto => tcp,
+      limit => "60/sec",
+      burst => 30,
+      action => accept,
+    }
+
+State ordering has been fixed now, and more characters are allowed in the
+namevar:
+
+* Alphabetical
+* Numbers
+* Punctuation
+* Whitespace
+
+##### Changes
+
+* (#10693) Ensure -m limit is added for iptables when using 'limit' param
+* (#10690) Create new port property
+* (#10700) allow additional characters in comment string
+* (#9082) Sort iptables --state option values internally to keep it consistent across runs
+* (#10324) Remove extraneous whitespace from iptables rule line in spec tests
+
+---------------------------------------
+
 #### 0.0.2 - 2011/10/26
 
 This is largely a maintanence and cleanup release, but includes the ability to
