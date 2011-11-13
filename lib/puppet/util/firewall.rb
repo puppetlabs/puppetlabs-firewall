@@ -29,7 +29,7 @@ module Puppet::Util::Firewall
 
   # This method takes a string and attempts to convert it to a port number
   # if valid.
-  # 
+  #
   # If the string already contains a port number or perhaps a range of ports
   # in the format 22:1000 for example, it simply returns the string and does
   # nothing.
