@@ -113,6 +113,42 @@ ARGS_TO_HASH = {
     :table => 'filter',
     :params => {
       :proto => 'ipencap',
+    }
+  },
+  'load_uid_owner_filter_module' => {
+    :line => '-A OUTPUT -m owner --uid-owner root -m comment --comment "057 OUTPUT uid root only" -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :uid => 'root',
+      :chain => 'OUTPUT',
+    },
+  },
+  'load_uid_owner_postrouting_module' => {
+    :line => '-t mangle -A POSTROUTING -m owner --uid-owner root -m comment --comment "057 POSTROUTING uid root only" -j ACCEPT',
+    :table => 'mangle',
+    :params => {
+      :action => 'accept',
+      :chain => 'POSTROUTING',
+      :uid => 'root',
+    },
+  },
+  'load_gid_owner_filter_module' => {
+    :line => '-A OUTPUT -m owner --gid-owner root -m comment --comment "057 OUTPUT gid root only" -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :chain => 'OUTPUT',
+      :gid => 'root',
+    },
+  },
+  'load_gid_owner_postrouting_module' => {
+    :line => '-t mangle -A POSTROUTING -m owner --gid-owner root -m comment --comment "057 POSTROUTING gid root only" -j ACCEPT',
+    :table => 'mangle',
+    :params => {
+      :action => 'accept',
+      :chain => 'POSTROUTING',
+      :gid => 'root',
     },
   },
 }
@@ -230,5 +266,49 @@ HASH_TO_ARGS = {
       :proto => 'ipencap',
     },
     :args => ['-t', :filter, '-p', :ipencap, '-m', 'comment', '--comment', '0100 INPUT accept ipencap'],
+  },
+  'load_uid_owner_filter_module' => {
+    :params => {
+      :name => '057 OUTPUT uid root only',
+      :table => 'filter',
+      :uid => 'root',
+      :action => 'accept',
+      :chain => 'OUTPUT',
+      :proto => 'all',
+    },
+    :args => ['-t', :filter, '-p', :all, '-m', 'owner', '--uid-owner', 'root', '-m', 'comment', '--comment', '057 OUTPUT uid root only', '-j', 'ACCEPT'],
+  },
+  'load_uid_owner_postrouting_module' => {
+    :params => {
+      :name => '057 POSTROUTING uid root only',
+      :table => 'mangle',
+      :uid => 'root',
+      :action => 'accept',
+      :chain => 'POSTROUTING',
+      :proto => 'all',
+    },
+    :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--uid-owner', 'root', '-m', 'comment', '--comment', '057 POSTROUTING uid root only', '-j', 'ACCEPT'],
+  },
+  'load_gid_owner_filter_module' => {
+    :params => {
+      :name => '057 OUTPUT gid root only',
+      :table => 'filter',
+      :chain => 'OUTPUT',
+      :gid => 'root',
+      :action => 'accept',
+      :proto => 'all',
+    },
+    :args => ['-t', :filter, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-m', 'comment', '--comment', '057 OUTPUT gid root only', '-j', 'ACCEPT'],
+  },
+  'load_gid_owner_postrouting_module' => {
+    :params => {
+      :name => '057 POSTROUTING gid root only',
+      :table => 'mangle',
+      :gid => 'root',
+      :action => 'accept',
+      :chain => 'POSTROUTING',
+      :proto => 'all',
+    },
+    :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-m', 'comment', '--comment', '057 POSTROUTING gid root only', '-j', 'ACCEPT'],
   },
 }
