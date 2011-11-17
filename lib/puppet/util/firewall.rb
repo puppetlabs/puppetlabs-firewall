@@ -1,4 +1,5 @@
 require 'socket'
+require 'resolv'
 require 'puppet/util/ipcidr'
 
 # Util module for puppetlabs-firewall
@@ -42,6 +43,14 @@ module Puppet::Util::Firewall
       end
     else
       Socket.getservbyname(value)
+    end
+  end
+
+  def host_to_ip(value)
+    begin
+      Puppet::Util::IPCidr.new(value).cidr
+    rescue
+      Puppet::Util::IPCidr.new(Resolv.getaddress(value)).cidr
     end
   end
 end

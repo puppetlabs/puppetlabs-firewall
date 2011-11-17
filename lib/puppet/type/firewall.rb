@@ -88,6 +88,10 @@ Puppet::Type.newtype(:firewall) do
 
       The source can also be an IPv6 address if your provider supports it.
     EOS
+
+    munge do |value|
+      @resource.host_to_ip(value)
+    end
   end
 
   newproperty(:destination) do
@@ -98,6 +102,10 @@ Puppet::Type.newtype(:firewall) do
 
       The destination can also be an IPv6 address if your provider supports it.
     EOS
+
+    munge do |value|
+      @resource.host_to_ip(value)
+    end
   end
 
   newproperty(:sport, :array_matching => :all) do
