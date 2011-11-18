@@ -1,12 +1,12 @@
 firewall { '000 allow foo':
   dport    => [7061, 7062],
-  jump     => 'ACCEPT',
+  action   => accept,
   proto    => 'tcp',
   provider => 'ip6tables'
 }
 
 firewall { '001 allow boo':
-  jump        => 'ACCEPT',
+  action      => accept, 
   iniface     => 'eth0',
   sport       => 123,
   dport       => 123,
@@ -18,27 +18,27 @@ firewall { '001 allow boo':
 firewall { '002 foo':
   dport    => 1233,
   proto    => 'tcp',
-  jump     => 'DROP',
+  action   => drop,
   provider => 'ip6tables'
 }
 
 firewall { '005 INPUT disregard DHCP':
   dport    => ['bootpc', 'bootps'],
-  jump     => 'DROP',
+  action   => drop,
   proto    => 'udp',
   provider => 'ip6tables'
 }
 
 firewall { '006 INPUT disregard netbios':
-  dport    => ['netbios-ns', 'netbios-dgm', 'netbios-ssn'],
-  jump     => 'DROP',
+  port    => ['netbios-ns', 'netbios-dgm', 'netbios-ssn'],
+  action   => drop,
   proto    => 'udp',
   provider => 'ip6tables'
 }
 
 firewall { '006 Disregard CIFS':
   dport    => 'microsoft-ds',
-  jump     => 'DROP',
+  action   => drop,
   proto    => 'tcp',
   provider => 'ip6tables'
 }
@@ -46,59 +46,59 @@ firewall { '006 Disregard CIFS':
 firewall { '010 icmp':
   proto    => 'ipv6-icmp',
   icmp     => 'echo-reply',
-  jump     => 'ACCEPT',
+  action   => accept,
   provider => 'ip6tables'
 }
 
 firewall { '010 INPUT allow loopback':
   iniface  => 'lo',
   chain    => 'INPUT',
-  jump     => 'ACCEPT',
+  action   => accept,
   provider => 'ip6tables'
 }
 
 firewall { '050 INPUT drop invalid':
   state    => 'INVALID',
-  jump     => 'DROP',
+  action   => drop,
   provider => 'ip6tables'
 }
 
 firewall { '051 INPUT allow related and established':
   state    => ['RELATED', 'ESTABLISHED'],
-  jump     => 'ACCEPT',
+  action   => accept,
   provider => 'ip6tables'
 }
 
 firewall { '053 INPUT allow ICMP':
   icmp     => '8',
   proto    => 'ipv6-icmp',
-  jump     => 'ACCEPT',
+  action   => accept,
   provider => 'ip6tables'
 }
 
 firewall { '055 INPUT allow DNS':
   sport    => 'domain',
   proto    => 'udp',
-  jump     => 'ACCEPT',
+  action   => accept,
   provider => 'ip6tables'
 }
 
 firewall { '999 FORWARD drop':
   chain    => 'FORWARD',
-  jump     => 'DROP',
+  action   => drop,
   provider => 'ip6tables'
 }
 
 firewall { '001 OUTPUT allow loopback':
   chain    => 'OUTPUT',
   outiface => 'lo',
-  jump     => 'ACCEPT',
+  action   => accept,
   provider => 'ip6tables'
 }
 
 firewall { '100 OUTPUT drop invalid':
   chain    => 'OUTPUT',
   state    => 'INVALID',
-  jump     => 'DROP',
+  action   => drop,
   provider => 'ip6tables'
 }
