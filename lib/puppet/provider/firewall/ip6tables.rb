@@ -27,6 +27,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :log_prefix => "--log-prefix",
     :name => "-m comment --comment",
     :outiface => "-o",
+    :port => '-m multiport --ports',
     :proto => "-p",
     :reject => "--reject-with",
     :source => "-s",
@@ -39,7 +40,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   }
 
   @resource_list = [:table, :source, :destination, :iniface, :outiface, 
-    :proto, :sport, :dport, :name, :state, :icmp, :limit, :burst, :jump, 
+    :proto, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst, :jump, 
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
 end
