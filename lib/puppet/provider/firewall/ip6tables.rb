@@ -39,8 +39,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :tosource => "--to-source",
   }
 
-  @resource_list = [:table, :source, :destination, :iniface, :outiface, 
-    :proto, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst, :jump, 
+  @resource_list = [:table, :source, :destination, :iniface, :outiface,
+    :proto, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
 end
