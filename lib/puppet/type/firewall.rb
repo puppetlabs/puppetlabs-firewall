@@ -2,7 +2,7 @@
 #
 # This is a workaround for bug: #4248 whereby ruby files outside of the normal
 # provider/type path do not load until pluginsync has occured on the puppetmaster
-# 
+#
 # In this case I'm trying the relative path first, then falling back to normal
 # mechanisms. This should be fixed in future versions of puppet but it looks
 # like we'll need to maintain this for some time perhaps.
@@ -14,7 +14,7 @@ Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
 
   @doc = <<-EOS
-    This type provides the capability to manage firewall rules within 
+    This type provides the capability to manage firewall rules within
     puppet.
   EOS
 
@@ -101,7 +101,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:sport, :array_matching => :all) do
     desc <<-EOS
-      The source port to match for this filter (if the protocol supports 
+      The source port to match for this filter (if the protocol supports
       ports). Will accept a single element or an array.
 
       For some firewall providers you can pass a range of ports in the format:
@@ -127,7 +127,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:dport, :array_matching => :all) do
     desc <<-EOS
-      The destination port to match for this filter (if the protocol supports 
+      The destination port to match for this filter (if the protocol supports
       ports). Will accept a single element or an array.
 
       For some firewall providers you can pass a range of ports in the format:
@@ -140,7 +140,7 @@ Puppet::Type.newtype(:firewall) do
 
       This would cover ports 1 to 1024.
     EOS
-    
+
     munge do |value|
       @resource.string_to_port(value)
     end
@@ -179,7 +179,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:proto) do
     desc <<-EOS
-      The specific protocol to match for this rule. By default this is 
+      The specific protocol to match for this rule. By default this is
       *tcp*.
     EOS
 
@@ -226,19 +226,19 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:jump, :required_features => :iptables) do
     desc <<-EOS
-      The value for the iptables --jump parameter. Normal values are: 
+      The value for the iptables --jump parameter. Normal values are:
 
       * QUEUE
       * RETURN
       * DNAT
       * SNAT
       * LOG
-      * MASQUERADE 
+      * MASQUERADE
       * REDIRECT
 
-      But any valid chain name is allowed. 
+      But any valid chain name is allowed.
 
-      For the values ACCEPT, DROP and REJECT you must use the generic 
+      For the values ACCEPT, DROP and REJECT you must use the generic
       'action' parameter. This is to enfore the use of generic parameters where
       possible for maximum cross-platform modelling.
 
@@ -249,14 +249,14 @@ Puppet::Type.newtype(:firewall) do
     validate do |value|
       unless value =~ /^[a-zA-Z0-9\-_]+$/
         raise ArgumentError, <<-EOS
-          Jump destination must consist of alphanumeric characters, an 
+          Jump destination must consist of alphanumeric characters, an
           underscore or a yphen.
         EOS
       end
 
       if ["accept","reject","drop"].include?(value.downcase)
         raise ArgumentError, <<-EOS
-          Jump destination should not be one of ACCEPT, REJECT or DENY. Use 
+          Jump destination should not be one of ACCEPT, REJECT or DENY. Use
           the action property instead.
         EOS
       end
@@ -282,14 +282,14 @@ Puppet::Type.newtype(:firewall) do
   # NAT specific properties
   newproperty(:tosource, :required_features => :snat) do
     desc <<-EOS
-      When using jump => "SNAT" you can specify the new source address using 
+      When using jump => "SNAT" you can specify the new source address using
       this parameter.
     EOS
   end
 
   newproperty(:todest, :required_features => :dnat) do
     desc <<-EOS
-      When using jump => "DNAT" you can specify the new destination address 
+      When using jump => "DNAT" you can specify the new destination address
       using this paramter.
     EOS
   end
@@ -303,7 +303,7 @@ Puppet::Type.newtype(:firewall) do
   # Reject ICMP type
   newproperty(:reject, :required_features => :reject_type) do
     desc <<-EOS
-      When combined with jump => "REJECT" you can specify a different icmp 
+      When combined with jump => "REJECT" you can specify a different icmp
       response to be sent back to the packet sender.
     EOS
   end
@@ -311,14 +311,14 @@ Puppet::Type.newtype(:firewall) do
   # Logging properties
   newproperty(:log_level, :required_features => :log_level) do
     desc <<-EOS
-      When combined with jump => "LOG" specifies the system log level to log 
+      When combined with jump => "LOG" specifies the system log level to log
       to.
     EOS
   end
 
   newproperty(:log_prefix, :required_features => :log_prefix) do
     desc <<-EOS
-      When combined with jump => "LOG" specifies the log prefix to use when 
+      When combined with jump => "LOG" specifies the log prefix to use when
       logging.
     EOS
   end
@@ -343,11 +343,11 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:state, :array_matching => :all, :required_features => 
+  newproperty(:state, :array_matching => :all, :required_features =>
     :state_match) do
 
     desc <<-EOS
-      Matches a packet based on its state in the firewall stateful inspection 
+      Matches a packet based on its state in the firewall stateful inspection
       table. Values can be:
 
       * INVALID
@@ -373,7 +373,7 @@ Puppet::Type.newtype(:firewall) do
   # Rate limiting properties
   newproperty(:limit, :required_features => :rate_limiting) do
     desc <<-EOS
-      Rate limiting value for matched packets. The format is: 
+      Rate limiting value for matched packets. The format is:
       rate/[/second/|/minute|/hour|/day].
 
       Example values are: '50/sec', '40/min', '30/hour', '10/day'."
@@ -392,7 +392,7 @@ Puppet::Type.newtype(:firewall) do
       Read-only property for caching the rule line.
     EOS
   end
-  
+
   validate do
     debug("[validate]")
 
@@ -405,7 +405,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     # First we make sure the chains and tables are valid combinations
-    if value(:table).to_s == "filter" && 
+    if value(:table).to_s == "filter" &&
       value(:chain) =~ /PREROUTING|POSTROUTING/
 
       self.fail "PREROUTING and POSTROUTING cannot be used in table 'filter'"
@@ -415,7 +415,7 @@ Puppet::Type.newtype(:firewall) do
       self.fail "INPUT and FORWARD cannot be used in table 'nat'"
     end
 
-    if value(:table).to_s == "raw" && 
+    if value(:table).to_s == "raw" &&
       value(:chain) =~ /INPUT|FORWARD|POSTROUTING/
 
       self.fail "INPUT, FORWARD and POSTROUTING cannot be used in table raw"

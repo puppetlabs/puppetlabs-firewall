@@ -6,7 +6,7 @@ firewall { '000 allow foo':
 }
 
 firewall { '001 allow boo':
-  action      => accept, 
+  action      => accept,
   iniface     => 'eth0',
   sport       => 123,
   dport       => 123,
