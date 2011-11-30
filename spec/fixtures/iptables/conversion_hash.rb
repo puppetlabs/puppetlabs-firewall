@@ -108,6 +108,13 @@ ARGS_TO_HASH = {
       :limit => '15/hour'
     },
   },
+  'proto_ipencap' => {
+    :line => '-A INPUT -p ipencap -m comment --comment "0100 INPUT accept ipencap"',
+    :table => 'filter',
+    :params => {
+      :proto => 'ipencap',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -215,5 +222,13 @@ HASH_TO_ARGS = {
       :limit => '15/hour'
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '15/hour'],
+  },
+  'proto_ipencap' => {
+    :params => {
+      :name => '0100 INPUT accept ipencap',
+      :table => 'filter',
+      :proto => 'ipencap',
+    },
+    :args => ['-t', :filter, '-p', :ipencap, '-m', 'comment', '--comment', '0100 INPUT accept ipencap'],
   },
 }
