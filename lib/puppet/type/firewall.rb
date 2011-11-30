@@ -23,6 +23,7 @@ Puppet::Type.newtype(:firewall) do
   feature :dnat, "Destination NATing"
   feature :interface_match, "Interface matching"
   feature :icmp_match, "Matching ICMP types"
+  feature :owner, "Matching owners"
   feature :state_match, "Matching stateful firewall states"
   feature :reject_type, "The ability to control reject messages"
   feature :log_level, "The ability to control the log level"
@@ -387,6 +388,22 @@ Puppet::Type.newtype(:firewall) do
     newvalue(/^\d+$/)
   end
 
+  newproperty(:uid, :array_matching =>:all, :required_features => :owner) do
+    desc <<-EOS
+      UID or Username owner matching rule.  Accepts a string argument
+      only, as iptables does not accept multiple uid in a single
+      statement.
+    EOS
+  end
+
+  newproperty(:gid, :array_matching =>:all, :required_features => :owner) do
+    desc <<-EOS
+      GID or Group owner matching rule.  Accepts a string argument
+      only, as iptables does not accept multiple gid in a single
+      statement.
+    EOS
+  end
+
   newparam(:line) do
     desc <<-EOS
       Read-only property for caching the rule line.
@@ -434,6 +451,20 @@ Puppet::Type.newtype(:firewall) do
       unless value(:chain).to_s =~ /OUTPUT|FORWARD|POSTROUTING/
         self.fail "Parameter outiface only applies to chains " \
           "OUTPUT,FORWARD,POSTROUTING"
+      end
+    end
+
+    if value(:uid)
+      unless value(:chain).to_s =~ /OUTPUT|POSTROUTING/
+        self.fail "Parameter uid only applies to chains " \
+          "OUTPUT,POSTROUTING"
+      end
+    end
+
+    if value(:gid)
+      unless value(:chain).to_s =~ /OUTPUT|POSTROUTING/
+        self.fail "Parameter gid only applies to chains " \
+          "OUTPUT,POSTROUTING"
       end
     end
 
