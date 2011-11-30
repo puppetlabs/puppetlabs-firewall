@@ -247,4 +247,22 @@ describe firewall do
       }.should raise_error(Puppet::Error, /^Only one of the parameters 'action' and 'jump' can be set$/)
     end
   end
+  describe ':gid and :uid' do
+    it 'should allow me to set uid' do
+      @resource[:uid] = 'root'
+      @resource[:uid].should == ['root']
+    end
+    it 'should allow me to set uid as an array, breaking iptables' do
+      @resource[:uid] = ['root', 'bobby']
+      @resource[:uid].should == ['root', 'bobby']
+    end
+    it 'should allow me to set gid' do
+      @resource[:gid] = 'root'
+      @resource[:gid].should == ['root']
+    end
+    it 'should allow me to set gid as an array, breaking iptables' do
+      @resource[:gid] = ['root', 'bobby']
+      @resource[:gid].should == ['root', 'bobby']
+    end
+  end
 end
