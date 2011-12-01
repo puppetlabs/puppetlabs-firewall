@@ -95,9 +95,27 @@ ARGS_TO_HASH = {
   },
   'comment_string_character_validation' => {
     :line => '-A INPUT -s 192.168.0.1 -m comment --comment "000 allow from 192.168.0.1, please"',
-    :tables => 'filter',
+    :table => 'filter',
     :params => {
       :source => '192.168.0.1',
+    },
+  },
+  'log_level_debug' => {
+    :line => '-A INPUT -m comment --comment "956 INPUT log-level" -m state --state NEW -j LOG --log-level 7',
+    :table => 'filter',
+    :params => {
+      :state => ['NEW'],
+      :log_level => '7',
+      :jump => 'LOG'
+    },
+  },
+  'log_level_warn' => {
+    :line => '-A INPUT -m comment --comment "956 INPUT log-level" -m state --state NEW -j LOG',
+    :table => 'filter',
+    :params => {
+      :state => ['NEW'],
+      :log_level => '4',
+      :jump => 'LOG'
     },
   },
   'load_limit_module' => {
@@ -249,6 +267,26 @@ HASH_TO_ARGS = {
       :port => '80',
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--ports', '80', '-m', 'comment', '--comment', '001 port property'],
+  },
+  'log_level_debug' => {
+    :params => {
+      :name => '956 INPUT log-level',
+      :table => 'filter',
+      :state => 'NEW',
+      :jump => 'LOG',
+      :log_level => 'debug'
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '956 INPUT log-level', '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '7'],
+  },
+  'log_level_warn' => {
+    :params => {
+      :name => '956 INPUT log-level',
+      :table => 'filter',
+      :state => 'NEW',
+      :jump => 'LOG',
+      :log_level => 'warn'
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '956 INPUT log-level', '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '4'],
   },
   'load_limit_module' => {
     :params => {

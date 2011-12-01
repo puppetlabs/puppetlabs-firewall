@@ -27,6 +27,29 @@ module Puppet::Util::Firewall
     end
   end
 
+  # Convert log_level names to their respective numbers
+  def log_level_name_to_number(value)
+    #TODO make this 0-7 only
+    if value =~ /\d/
+      value
+    else
+      case value
+        when "panic" then "0"
+        when "alert" then "1"
+        when "crit" then "2"
+        when "err" then "3"
+        when "error" then "3"
+        when "warn" then "4"
+        when "warning" then "4"
+        when "not" then "5"
+        when "notice" then "5"
+        when "info" then "6"
+        when "debug" then "7"
+        else nil
+      end
+    end
+  end
+
   # This method takes a string and attempts to convert it to a port number
   # if valid.
   #
