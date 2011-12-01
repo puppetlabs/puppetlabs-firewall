@@ -4,6 +4,12 @@ firewall { '000 allow foo':
   proto => "tcp",
 }
 
+firewall { '975 log test':
+  state => 'NEW',
+  log_level => 'panic',
+  jump => 'LOG'
+}
+
 firewall { '001 allow boo':
   action => accept,
   iniface => "eth0",
