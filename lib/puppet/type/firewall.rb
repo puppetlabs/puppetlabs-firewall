@@ -9,7 +9,6 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__),"..",".."))
 require 'puppet/util/firewall'
 
-# Puppet Firewall type
 Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
 
@@ -315,6 +314,19 @@ Puppet::Type.newtype(:firewall) do
       When combined with jump => "LOG" specifies the system log level to log
       to.
     EOS
+
+    munge do |value|
+      if value.kind_of?(String)
+        value = @resource.log_level_name_to_number(value)
+      else
+        value
+      end
+
+      if value == nil && value != ""
+        self.fail("Unable to determine log level")
+      end
+      value
+    end
   end
 
   newproperty(:log_prefix, :required_features => :log_prefix) do
