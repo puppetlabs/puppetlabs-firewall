@@ -175,6 +175,35 @@ describe firewall do
     end
   end
 
+  describe ':log_level' do
+    values = {
+      'panic' => '0',
+      'alert' => '1',
+      'crit'  => '2',
+      'err'   => '3',
+      'warn'  => '4',
+      'warning' => '4',
+      'not'  => '5',
+      'notice' => '5',
+      'info' => '6',
+      'debug' => '7'
+    }
+
+    values.each do |k,v|
+      it {
+        @resource[:log_level] = k
+        @resource[:log_level].should == v
+      }
+
+      it {
+        @resource[:log_level] = 3
+        @resource[:log_level].should == 3
+      }
+
+      it { lambda { @resource[:log_level] = 'foo' }.should raise_error(Puppet::Error) }
+    end
+  end
+
   describe ':icmp' do
     values = {
       '0' => 'echo-reply',
