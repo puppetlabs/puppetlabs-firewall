@@ -7,20 +7,20 @@
 # which will be used to create a resource.
 ARGS_TO_HASH = {
   'long_rule_1' => {
-    :line => '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
+    :line => '-A INPUT -s 1.1.1.1/32 -d 1.1.1.1/32 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
     :table => 'filter',
     :compare_all => true,
     :params => {
       :action => "accept",
       :chain => "INPUT",
-      :destination => "1.1.1.1",
+      :destination => "1.1.1.1/32",
       :dport => ["7061","7062"],
       :ensure => :present,
-      :line => '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
+      :line => '-A INPUT -s 1.1.1.1/32 -d 1.1.1.1/32 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
       :name => "000 allow foo",
       :proto => "tcp",
       :provider => "iptables",
-      :source => "1.1.1.1",
+      :source => "1.1.1.1/32",
       :sport => ["7061","7062"],
       :table => "filter",
     },
@@ -185,9 +185,9 @@ HASH_TO_ARGS = {
       :source => "1.1.1.1",
       :sport => ["7061","7062"],
       :table => "filter",
-    },
-    :args => ["-t", :filter, "-s", "1.1.1.1", "-d", "1.1.1.1", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-m", "comment", "--comment", "000 allow foo", "-j", "ACCEPT"],
-  },
+    },  
+    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "1.1.1.1/32", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-m", "comment", "--comment", "000 allow foo", "-j", "ACCEPT"],
+  },  
   'long_rule_2' => {
     :params => {
       :chain => "INPUT",
@@ -200,9 +200,9 @@ HASH_TO_ARGS = {
       :source => "1.1.1.1",
       :sport => ["7061","7062"],
       :table => "filter",
-    },
-    :args => ["-t", :filter, "-s", "1.1.1.1", "-d", "2.10.13.3/24", "-p", :udp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061", "-m", "comment", "--comment", "700 allow bar", "-j", "my_custom_chain"],
-  },
+    },  
+    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "2.10.13.0/24", "-p", :udp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061", "-m", "comment", "--comment", "700 allow bar", "-j", "my_custom_chain"],
+  },  
   'no_action' => {
     :params => {
       :name => "100 no action",
@@ -258,7 +258,7 @@ HASH_TO_ARGS = {
       :table => 'filter',
       :source => '192.168.0.1'
     },
-    :args => ['-t', :filter, '-s', '192.168.0.1', '-p', :tcp, '-m', 'comment', '--comment', '000 allow from 192.168.0.1, please'],
+    :args => ['-t', :filter, '-s', '192.168.0.1/32', '-p', :tcp, '-m', 'comment', '--comment', '000 allow from 192.168.0.1, please'],
   },
   'port_property' => {
     :params => {
