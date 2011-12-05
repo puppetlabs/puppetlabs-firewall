@@ -39,13 +39,13 @@ Additional changes include iptables and ip6tables version facts, general whitesp
 
 ##### Changes
 
-(#10957) add iptables_version and ip6tables_version facts
-(#11093) Improve log_level property so it converts names to numbers
-(#10723) Munge hostnames and IPs to IPs with CIDR
-(#10718) Add owner-match support
-(#10997) Add fixtures for ipencap
-(#11034) Whitespace cleanup
-(#10690) add port property support to ip6tables
+* (#10957) add iptables_version and ip6tables_version facts
+* (#11093) Improve log_level property so it converts names to numbers
+* (#10723) Munge hostnames and IPs to IPs with CIDR
+* (#10718) Add owner-match support
+* (#10997) Add fixtures for ipencap
+* (#11034) Whitespace cleanup
+* (#10690) add port property support to ip6tables
 
 ---------------------------------------
 
