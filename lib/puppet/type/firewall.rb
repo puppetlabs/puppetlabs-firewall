@@ -432,7 +432,7 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      if ! value.include?("0x")
+      if ! value.to_s.include?("0x")
         "0x" + value.to_i.to_s(16)
       else
         super
