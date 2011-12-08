@@ -24,6 +24,7 @@ module Puppet
 
       def cidr
         cidr = sprintf("%s/%s", self.to_s, self.prefixlen)
+        cidr = cidr.gsub(/\/32/, '')
         cidr
       end
     end
