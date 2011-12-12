@@ -92,7 +92,7 @@ describe firewall do
       res.parameters[:jump].should == nil
     end
 
-    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT'].each do |jump|
+    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK'].each do |jump|
       it "should accept jump value #{jump}" do
         @resource[:jump] = jump
         @resource[:jump].should == jump
@@ -292,6 +292,17 @@ describe firewall do
     it 'should allow me to set gid as an array, breaking iptables' do
       @resource[:gid] = ['root', 'bobby']
       @resource[:gid].should == ['root', 'bobby']
+    end
+  end
+
+  describe ':set_mark' do
+    it 'should allow me to set set-mark' do
+      @resource[:set_mark] = '0x3e8'
+      @resource[:set_mark].should == '0x3e8'
+    end
+    it 'should convert int to hex' do
+      @resource[:set_mark] = '1000'
+      @resource[:set_mark].should == '0x3e8'
     end
   end
 end
