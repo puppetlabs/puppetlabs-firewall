@@ -264,7 +264,7 @@ Puppet::Type.newtype(:firewall) do
 
       if ["accept","reject","drop"].include?(value.downcase)
         raise ArgumentError, <<-EOS
-          Jump destination should not be one of ACCEPT, REJECT or DENY. Use
+          Jump destination should not be one of ACCEPT, REJECT or DROP. Use
           the action property instead.
         EOS
       end
