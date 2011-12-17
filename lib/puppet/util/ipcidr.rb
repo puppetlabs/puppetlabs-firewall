@@ -23,8 +23,12 @@ module Puppet
       end
 
       def cidr
-        cidr = sprintf("%s/%s", self.to_s, self.prefixlen)
-        cidr
+        len = self.prefixlen
+        if ( @family == Socket::AF_INET && len == IN4MASK ) || ( @family == Socket::AF_INET6 && len == IN6MASK ) 
+          cidr = self.to_s
+        else
+          cidr = sprintf("%s/%s", self.to_s, len)
+        end
       end
     end
   end
