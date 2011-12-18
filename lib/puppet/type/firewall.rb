@@ -504,9 +504,7 @@ Puppet::Type.newtype(:firewall) do
       unless value(:todest)
         self.fail "Parameter jump => DNAT must have todest parameter"
       end
-    end
-
-    if value(:jump).to_s == "SNAT"
+    elsif value(:jump).to_s == "SNAT"
       unless value(:table).to_s =~ /nat/
         self.fail "Parameter jump => SNAT only applies to table => nat"
       end
@@ -514,16 +512,12 @@ Puppet::Type.newtype(:firewall) do
       unless value(:tosource)
         self.fail "Parameter jump => DNAT must have tosource parameter"
       end
-    end
-
-    if value(:jump).to_s == "REDIRECT"
+    elsif value(:jump).to_s == "REDIRECT"
       unless value(:toports)
         self.fail "Parameter jump => REDIRECT missing mandatory toports " \
           "parameter"
       end
-    end
-
-    if value(:jump).to_s == "MASQUERADE"
+    elsif value(:jump).to_s == "MASQUERADE"
       unless value(:table).to_s =~ /nat/
         self.fail "Parameter jump => MASQUERADE only applies to table => nat"
       end
