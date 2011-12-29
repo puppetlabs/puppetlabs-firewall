@@ -435,7 +435,7 @@ Puppet::Type.newtype(:firewall) do
       if ! value.to_s.include?("0x")
         "0x" + value.to_i.to_s(16)
       else
-        super
+        super(value)
       end
     end
   end
