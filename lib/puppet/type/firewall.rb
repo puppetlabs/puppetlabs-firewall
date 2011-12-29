@@ -27,6 +27,7 @@ Puppet::Type.newtype(:firewall) do
   feature :reject_type, "The ability to control reject messages"
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
+  feature :mark, "Set the netfilter mark value associated with the packet"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -243,6 +244,7 @@ Puppet::Type.newtype(:firewall) do
       * LOG
       * MASQUERADE
       * REDIRECT
+      * MARK
 
       But any valid chain name is allowed.
 
@@ -424,6 +426,20 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:set_mark, :required_features => :mark) do
+    desc <<-EOS
+      Set the Netfilter mark value associated with the packet.
+    EOS
+
+    munge do |value|
+      if ! value.to_s.include?("0x")
+        "0x" + value.to_i.to_s(16)
+      else
+        super
+      end
+    end
+  end
+
   newparam(:line) do
     desc <<-EOS
       Read-only property for caching the rule line.
@@ -485,6 +501,15 @@ Puppet::Type.newtype(:firewall) do
       unless value(:chain).to_s =~ /OUTPUT|POSTROUTING/
         self.fail "Parameter gid only applies to chains " \
           "OUTPUT,POSTROUTING"
+      end
+    end
+
+    if value(:set_mark)
+      unless value(:jump).to_s  =~ /MARK/ &&
+             value(:chain).to_s =~ /PREROUTING/ &&
+             value(:table).to_s =~ /mangle/
+        self.fail "Parameter set_mark only applies to " \
+          "the PREROUTING chain of the mangle table and when jump => MARK"
       end
     end
 
