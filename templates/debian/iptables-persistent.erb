@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+<% version = lsbmajdistrelease.to_i -%>
+### BEGIN INIT INFO
+# Provides:          <% if version <= 5 %>iptables<% else %>ip6tables<%end%>-persistent
+# Required-Start:    mountkernfs $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Start-Before:    $network
+# X-Stop-After:      $network
+# Short-Description: Set up iptables rules
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+rc=0
+IP6TABLES_RULES=<%= ip6tables_rules %>
+<% if version <= 5 -%>
+IPTABLES_RULES=<%= iptables_rules %>
+<% end -%>
+
+case "$1" in
+    start|restart|reload|force-reload)
+        log_action_begin_msg "Loading iptables rules"
+
+<% if version <= 5 -%>
+        if [ -f $IPTABLES_RULES ]; then
+            log_action_cont_msg " IPv4"
+            iptables-restore < $IPTABLES_RULES 2> /dev/null
+            if [ $? -ne 0 ]; then
+                rc=1
+            fi
+        fi
+<% end -%>
+
+        if [ -f $IP6TABLES_RULES ]; then
+            log_action_cont_msg " IPv6"
+            ip6tables-restore < $IP6TABLES_RULES 2> /dev/null
+            if [ $? -ne 0 ]; then
+                rc=1
+            fi
+        fi
+
+        log_action_end_msg $rc
+        ;;
+    stop)
+        ;;
+    *)
+        echo "Usage: $0 {start|restart|reload|force-reload|save}" >&2
+        exit 1
+        ;;
+esac
+
+exit $rc

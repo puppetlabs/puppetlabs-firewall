@@ -50,4 +50,12 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
+  ## Work-around for older vintages of iptables, where iptables-save
+  ## returns error if the kernel modules are not loaded.  Listing
+  ## out the current rules with iptables proper autoloads the kernel modules.
+  def self.iptables_init
+    if ! File.exists?('/proc/net/ip6_tables_names') 
+      iptables '-nL'
+    end
+  end
 end
