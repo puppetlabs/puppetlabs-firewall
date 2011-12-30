@@ -169,6 +169,15 @@ ARGS_TO_HASH = {
       :gid => 'root',
     },
   },
+  'mark_set-mark' => {
+    :line => '-t mangle -A PREROUTING -j MARK --set-mark 1000',
+    :table => 'mangle',
+    :params => {
+      :jump     => 'MARK',
+      :chain    => 'PREROUTING',
+      :set_mark => '1000',
+    }
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -348,5 +357,15 @@ HASH_TO_ARGS = {
       :proto => 'all',
     },
     :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-m', 'comment', '--comment', '057 POSTROUTING gid root only', '-j', 'ACCEPT'],
+  },
+  'mark_set-mark' => {
+    :params => {
+      :name     => '058 set-mark 1000',
+      :table    => 'mangle',
+      :jump     => 'MARK',
+      :chain    => 'PREROUTING',
+      :set_mark => '1000',
+    },
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-mark', '0x3e8'],
   },
 }
