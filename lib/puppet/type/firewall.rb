@@ -354,7 +354,9 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       if value.kind_of?(String)
-        value = @resource.icmp_name_to_number(value)
+        if value != "any"
+          value = @resource.icmp_name_to_number(value)
+        end
       else
         value
       end
