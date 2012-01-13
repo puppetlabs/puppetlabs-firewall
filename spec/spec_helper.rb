@@ -8,7 +8,6 @@ require 'puppet'
 require 'mocha'
 gem 'rspec', '>=2.0.0'
 require 'rspec/expectations'
-require 'rspec-puppet'
 
 # So everyone else doesn't have to include this base constant.
 module PuppetSpec
@@ -32,8 +31,6 @@ end
 RSpec.configure do |config|
   include PuppetSpec::Fixtures
 
-  config.module_path = File.join(File.dirname(__FILE__), '../../')
-
   config.mock_with :mocha
 
   config.before :each do
@@ -50,6 +47,7 @@ RSpec.configure do |config|
 
     # Set the confdir and vardir to gibberish so that tests
     # have to be correctly mocked.
+    Puppet[:confdir] = "/dev/null"
     Puppet[:vardir] = "/dev/null"
 
     # Avoid opening ports to the outside world

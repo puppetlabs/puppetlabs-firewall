@@ -1,8 +1,0 @@
-*filter
-:INPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
--A INPUT -j REJECT --reject-with icmp6-port-unreachable
--A FORWARD -j REJECT --reject-with icmp6-port-unreachable
--A OUTPUT -j REJECT --reject-with icmp6-port-unreachable
-COMMIT

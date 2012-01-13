@@ -1,4 +1,4 @@
-# puppetlabs-firewall module
+## puppetlabs-firewall module
 
 ## User Guide
 
@@ -67,17 +67,6 @@ need to run Puppet on the master first:
 You may also need to restart Apache, although this shouldn't always be the
 case.
 
-Add the following to your site.pp to make sure class firewall can
-persist iptables rules across reboots:
-
-    Firewall {
-        notify  => Exec['firewall-persist'],
-    }
-
-Load the firewall class that provides these helper methods:
-
-    class { 'firewall': }
-
 ### Examples
 
 Basic accept ICMP request example:
@@ -102,6 +91,19 @@ Source NAT example (perfect for a virtualization host):
       outiface => "eth0",
       source => ['10.1.2.0/24'],
       table  => 'nat',
+    }
+
+You can make firewall rules persistent with the following iptables example:
+
+    exec { "persist-firewall":
+      command => $operatingsystem ? {
+        "debian" => "/sbin/iptables-save > /etc/iptables/rules.v4",
+        /(RedHat|CentOS)/ => "/sbin/iptables-save > /etc/sysconfig/iptables",
+      }
+      refreshonly => true,
+    }
+    Firewall {
+      notify => Exec["persist-firewall"]
     }
 
 If you wish to ensure any reject rules are executed last, try using stages.

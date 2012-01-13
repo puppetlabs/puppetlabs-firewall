@@ -1,3 +1,0 @@
-node default {
-  class { 'firewall': }
-}
