@@ -9,6 +9,14 @@ describe 'Puppet::Util::IPCidr' do
     specify { subject.netmask.should == '255.255.255.255' }
   end
 
+  describe 'single ipv4 address with netmask' do
+    before { @ipcidr = Puppet::Util::IPCidr.new('96.126.0.0/255.255.128.0') }
+    subject { @ipcidr }
+    specify { subject.cidr.should == '96.126.0.0/17' }
+    specify { subject.prefixlen.should == 17 }
+    specify { subject.netmask.should == '255.255.128.0' }
+  end
+
   describe 'single ipv4 address with cidr' do
     before { @ipcidr = Puppet::Util::IPCidr.new('96.126.112.51/32') }
     subject { @ipcidr }
