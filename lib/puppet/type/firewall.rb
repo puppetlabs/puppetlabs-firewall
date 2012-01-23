@@ -399,6 +399,10 @@ Puppet::Type.newtype(:firewall) do
       @should = super(values).sort
     end
 
+    def is_to_s(value)
+      value = should_to_s(value)
+    end
+
     def should_to_s(value)
       value = [value] unless value.is_a?(Array)
       value.join(',')
