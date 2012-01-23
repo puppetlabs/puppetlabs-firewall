@@ -24,6 +24,7 @@ Puppet::Type.newtype(:firewall) do
   feature :icmp_match, "Matching ICMP types"
   feature :owner, "Matching owners"
   feature :state_match, "Matching stateful firewall states"
+  feature :recent_match, "Matching recent packets"
   feature :reject_type, "The ability to control reject messages"
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
@@ -438,6 +439,37 @@ Puppet::Type.newtype(:firewall) do
         super(value)
       end
     end
+  end
+
+  
+  newproperty(:recent_name) do
+    desc <<-EOS
+      List name for use with recent commands
+    EOS
+    newvalue(/^\S+$/)
+    
+    defaultto :DEFAULT
+  end
+  
+  newproperty(:recent_command) do
+    desc <<-EOS
+      Command for the recent module
+    EOS
+    newvalues(:set, :update,:remove,:rcheck)
+  end
+
+  newproperty(:recent_seconds) do
+  desc <<-EOS
+    Number of seconds to treat as recent
+  EOS
+    newvalue(/^\d+$/)
+  end
+
+  newproperty(:recent_hitcount) do
+  desc <<-EOS
+    Narrows the recent to those equal or great than this count
+  EOS
+    newvalue(/^\d+$/)
   end
 
   newparam(:line) do

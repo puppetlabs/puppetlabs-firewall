@@ -14,6 +14,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :icmp_match
   has_feature :owner
   has_feature :state_match
+  has_feature :recent_match
   has_feature :reject_type
   has_feature :log_level
   has_feature :log_prefix
@@ -40,6 +41,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :port => '-m multiport --ports',
     :proto => "-p",
     :reject => "--reject-with",
+    :recent_set => "-m recent --set",
+    :recent_update => "-m recent --update",
+    :recent_remove => "-m recent --remove",
+    :recent_rcheck => "-m recent --rcheck",
+    :recent_rsource => "--rsource",
+    :recent_rdest => "--rdest",
+    :recent_seconds => "--seconds",
+    :recent_hitcount => "--hitcount",
+    :recent_rttl => "--rttl",
     :source => "-s",
     :state => "-m state --state",
     :sport => "-m multiport --sports",
@@ -57,6 +67,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
     :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst,
+    :recent_update, :recent_set, :recent_rcheck, :recent_remove, :recent_seconds, :recent_hitcount,
+    :recent_rttl, :recent_name, :recent_rsource, :recent_rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
   def insert
@@ -65,7 +77,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   end
 
   def update
-    debug 'Updating rule %s' % resource[:name]
+    debug 'Updating rule  %s' % resource[:name]
     iptables update_args
   end
 
@@ -158,6 +170,18 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[:log_level] = '4'
     end
 
+    # rsource if the default if rdest isn't set
+    hash[:recent_rsource] = true if ! hash[:recent_rdest]
+
+    hash[:recent_command] = :set if hash.include?(:recent_set)
+    hash[:recent_command] = :update if hash.include?(:recent_update)
+    hash[:recent_command] = :remove if hash.include?(:recent_remove)
+    hash[:recent_command] = :rcheck if hash.include?(:recent_rcheck)
+
+    [:recent_set, :recent_update, :recent_remove, :recent_rcheck].each do |key|
+      hash.delete(key)
+    end
+    
     hash[:line] = line
     hash[:provider] = self.name.to_s
     hash[:table] = table

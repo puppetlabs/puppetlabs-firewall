@@ -123,6 +123,14 @@ firewall { '100 OUTPUT drop invalid':
   state => 'INVALID',
 }
 
+firewall { '100 ssh connection limit':
+  action => drop,
+  recent_command => 'update',
+  recent_seconds => 60,
+  recent_hitcount => 4,
+  recent_name => 'sshlimit',
+}
+
 resources { 'firewall':
   purge => true
 }
