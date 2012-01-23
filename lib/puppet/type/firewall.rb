@@ -128,6 +128,10 @@ Puppet::Type.newtype(:firewall) do
       @resource.string_to_port(value)
     end
 
+    def is_to_s(value)
+      value = should_to_s(value)
+    end
+
     def should_to_s(value)
       value = [value] unless value.is_a?(Array)
       value.join(',')
@@ -154,6 +158,10 @@ Puppet::Type.newtype(:firewall) do
       @resource.string_to_port(value)
     end
 
+    def is_to_s(value)
+      value = should_to_s(value)
+    end
+
     def should_to_s(value)
       value = [value] unless value.is_a?(Array)
       value.join(',')
@@ -178,6 +186,10 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       @resource.string_to_port(value)
+    end
+
+    def is_to_s(value)
+      value = should_to_s(value)
     end
 
     def should_to_s(value)
