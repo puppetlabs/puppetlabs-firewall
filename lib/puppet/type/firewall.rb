@@ -455,7 +455,7 @@ Puppet::Type.newtype(:firewall) do
     desc <<-EOS
       Command for the recent module
     EOS
-    newvalues(:set, :update,:remove,:rcheck)
+    newvalues(:set, :update, :remove, :rcheck)
   end
 
   newproperty(:recent_seconds) do
