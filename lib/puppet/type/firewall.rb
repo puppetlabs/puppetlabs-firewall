@@ -465,7 +465,9 @@ Puppet::Type.newtype(:firewall) do
     Match/save the source address of each packet in the recent list table.
   EOS
     newvalues(true, false)
-    defaultto true
+    # FIXME: this is the default, but setting that explicitly triggers
+    # notice: /Firewall[name]/recent_rsource: recent_rsource changed '' to 'true'
+    # defaultto true
   end
 
   newproperty(:recent_rdest) do
