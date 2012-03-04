@@ -441,16 +441,18 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  
+
   newproperty(:recent_name) do
     desc <<-EOS
       List name for use with recent commands
     EOS
     newvalue(/^\S+$/)
-    
-    defaultto :DEFAULT
+
+    # FIXME: if we set defaultto, then we need to later scrub it
+    # general_args if we're not using recent
+    # defaultto 'DEFAULT'
   end
-  
+
   newproperty(:recent_command) do
     desc <<-EOS
       Command for the recent module
