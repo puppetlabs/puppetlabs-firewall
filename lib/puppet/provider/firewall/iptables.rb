@@ -171,8 +171,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[:log_level] = '4'
     end
 
-    # rsource if the default if rdest isn't set
-    hash[:recent_rsource] = true if ! hash[:recent_rdest]
+    # Handle recent module
 
     hash[:recent_command] = :set if hash.include?(:recent_set)
     hash[:recent_command] = :update if hash.include?(:recent_update)
@@ -181,8 +180,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     [:recent_set, :recent_update, :recent_remove, :recent_rcheck].each do |key|
       hash.delete(key)
+
+    # rsource is the default if rdest isn't set and recent is being used
+    hash[:recent_rsource] = true if \
+        hash.key?:recent_command and ! hash[:recent_rdest]
     end
-    
+
     hash[:line] = line
     hash[:provider] = self.name.to_s
     hash[:table] = table
