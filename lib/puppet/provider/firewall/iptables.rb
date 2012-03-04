@@ -71,6 +71,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :recent_update, :recent_set, :recent_rcheck, :recent_remove, :recent_seconds, :recent_hitcount,
     :recent_rttl, :recent_name, :recent_rsource, :recent_rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
+  @resource_list_noargs = [:recent_set, :recent_update, :recent_rcheck, :recent_remove, :recent_rsource, :recent_rdest]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
@@ -128,15 +129,36 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     keys = []
     values = line.dup
 
+    # instead of slicing out table with the rest of the options, remove it
+    # completely from the line, since it's already passed anyway.
+    # Without this, it trips up the order of keys and values and
+    # exchanges chain and table, since iptables --list-rules lists
+    # tables before chains.
+    values.slice!("-t %s" % table)
+
     @resource_list.reverse.each do |k|
-      if values.slice!(/\s#{@resource_map[k]}/)
+      search = /(.*)#{@resource_map[k]}(.*)/
+      # options that take no arguments should get a placeholder empty ""
+      # so keys and values still match
+      if @resource_list_noargs.include?(k)
+        replace = '""'
+      else
+        replace = ''
+      end
+      new = values.sub(search, "\\1%s\\2" % replace)
+      if values != new
         keys << k
+        values = new
       end
     end
 
     # Manually remove chain
     values.slice!('-A')
     keys << :chain
+
+    # keys now contains a list of the keys present in line,
+    # and values is a string of the matching space-separated option values,
+    # but reversed
 
     # some params don't take a value, for example some recent_
     keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v|
@@ -252,10 +274,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     args = []
     resource_list = self.class.instance_variable_get('@resource_list')
+    resource_list_noargs = self.class.instance_variable_get('@resource_list_noargs')
     resource_map = self.class.instance_variable_get('@resource_map')
     resource_list_recent_commands = [:recent_set, :recent_update, :recent_rcheck, :recent_remove]
-    # FIXME: concat lists ?
-    resource_list_noargs = [:recent_set, :recent_update, :recent_rcheck, :recent_remove, :recent_rsource, :recent_rdest]
 
     resource_list.each do |res|
 

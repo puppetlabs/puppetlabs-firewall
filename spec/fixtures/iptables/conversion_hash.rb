@@ -178,6 +178,15 @@ ARGS_TO_HASH = {
       :set_mark => '1000',
     }
   },
+  'recent-set' => {
+    :line => '-A INPUT -p tcp -m recent --set --name knock --rsource',
+    :params => {
+#      :chain    => 'INPUT',
+      :recent_name => 'knock',
+      :recent_command => :set,
+      :recent_rsource => true,
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -372,9 +381,9 @@ HASH_TO_ARGS = {
     :params => {
       :name     => '059 recent',
       :chain    => 'INPUT',
-      :recent_name => 'recent',
+      :recent_name => 'knock',
       :recent_command => 'set',
     },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '059 recent', '-m', 'recent', '--set', '--name', 'recent', '--rsource'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '059 recent', '-m', 'recent', '--set', '--name', 'knock'],
   },
 }
