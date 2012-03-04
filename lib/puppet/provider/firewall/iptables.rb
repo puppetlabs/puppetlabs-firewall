@@ -44,7 +44,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state => "-m state --state",
     :sport => "-m multiport --sports",
     :table => "-t",
-    :tcp_flags => "--tcp-flags",
+    :tcp_flags => "-m tcp --tcp-flags",
     :todest => "--to-destination",
     :toports => "--to-ports",
     :tosource => "--to-source",
@@ -115,6 +115,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     hash = {}
     keys = []
     values = line.dup
+
+    # --tcp-flags takes two values; we cheat by adding " around it
+    # so it behaves like --comment
+    values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
 
     @resource_list.reverse.each do |k|
       if values.slice!(/\s#{@resource_map[k]}/)
