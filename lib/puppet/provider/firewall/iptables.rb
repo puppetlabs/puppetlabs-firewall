@@ -45,6 +45,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state => "-m state --state",
     :sport => "-m multiport --sports",
     :table => "-t",
+    :tcp_flags => "-m tcp --tcp-flags",
     :todest => "--to-destination",
     :toports => "--to-ports",
     :tosource => "--to-source",
@@ -116,6 +117,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     hash = {}
     keys = []
     values = line.dup
+
+    # --tcp-flags takes two values; we cheat by adding " around it
+    # so it behaves like --comment
+    values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
 
     @resource_list.reverse.each do |k|
       if values.slice!(/\s#{@resource_map[k]}/)
@@ -249,7 +254,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         end
       end
 
-      if resource_value.is_a?(Array)
+      # our tcp_flags takes a single string with comma lists separated
+      # by space
+      # --tcp-flags expects two arguments
+      if res == :tcp_flags
+        one, two = resource_value.split(' ')
+        args << one
+        args << two
+      elsif resource_value.is_a?(Array)
         args << resource_value.join(',')
       else
         args << resource_value
