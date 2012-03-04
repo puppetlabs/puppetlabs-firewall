@@ -460,6 +460,30 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:set, :update, :remove, :rcheck)
   end
 
+  newproperty(:recent_rsource) do
+  desc <<-EOS
+    Match/save the source address of each packet in the recent list table.
+  EOS
+    newvalues(true, false)
+    defaultto true
+  end
+
+  newproperty(:recent_rdest) do
+  desc <<-EOS
+    Match/save the destination address of each packet in the recent list table.
+  EOS
+    newvalues(true, false)
+    defaultto true
+  end
+
+
+  newproperty(:recent_rttl) do
+  desc <<-EOS
+    TTL of the current packet.  Only in conjunction with rcheck or update.
+  EOS
+    newvalue(/^\d+$/)
+  end
+
   newproperty(:recent_seconds) do
   desc <<-EOS
     Number of seconds to treat as recent
@@ -595,5 +619,13 @@ Puppet::Type.newtype(:firewall) do
     if value(:action) && value(:jump)
       self.fail "Only one of the parameters 'action' and 'jump' can be set"
     end
+
+    if value(:recent_rttl)
+      unless value(:recent_command).to_s =~ /rcheck|update/
+        self.fail "Parameter recent_rttl can only used with rcheck and update"
+      end
+    end
+
+
   end
 end
