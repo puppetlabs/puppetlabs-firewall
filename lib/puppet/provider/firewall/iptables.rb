@@ -137,7 +137,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values.slice!("-t %s" % table)
 
     @resource_list.reverse.each do |k|
-      search = /(.*)#{@resource_map[k]}(.*)/
+      # we don't want accidental half-word matches,
+      # like -p in icmp-port-unreachable
+      search = /(^|.*\s)#{@resource_map[k]}(\s.*|$)/
       # options that take no arguments should get a placeholder empty ""
       # so keys and values still match
       if @resource_list_noargs.include?(k)

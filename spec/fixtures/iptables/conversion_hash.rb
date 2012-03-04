@@ -34,11 +34,12 @@ ARGS_TO_HASH = {
     },
   },
   'action_reject_1' => {
-    :line => '-A INPUT -m comment --comment "000 allow foo" -j REJECT',
+    :line => '-A INPUT -m comment --comment "000 allow foo" -j REJECT --reject-with icmp-port-unreachable',
     :table => 'filter',
     :params => {
       :jump => nil,
       :action => "reject",
+      :reject => "icmp-port-unreachable",
     },
   },
   'action_nil_1' => {
