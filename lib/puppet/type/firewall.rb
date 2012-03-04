@@ -208,6 +208,20 @@ Puppet::Type.newtype(:firewall) do
     defaultto "tcp"
   end
 
+  # tcp-specific
+  newproperty(:tcp_flags) do
+    desc <<-EOS
+      Match when the TCP flags are as specified.
+      Is a string with a list of comma-separated flag names for the mask,
+      then a space, then a comma-separated list of flags that should be set.
+      The flags are: SYN ACK FIN RST URG PSH ALL NONE
+      Example: SYN,RST,ACK,FIN SYN matches packets with the SYN bit set and the
+	       ACK,RST and FIN bits cleared.  Such packets are used to request
+               TCP  connection initiation.
+    EOS
+  end
+
+
   # Iptables specific
   newproperty(:chain, :required_features => :iptables) do
     desc <<-EOS
