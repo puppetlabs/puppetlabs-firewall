@@ -251,10 +251,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     args = []
     resource_list = self.class.instance_variable_get('@resource_list')
     resource_map = self.class.instance_variable_get('@resource_map')
+    resource_list_noargs = [:recent_set, :recent_update, :recent_rcheck, :recent_remove, :recent_rsource, :recent_rdest]
 
     resource_list.each do |res|
       resource_value = nil
-      if (resource[res]) then
+      if resource_list_noargs.include?(res) then
+          resource_value = nil
+      elsif (resource[res]) then
         resource_value = resource[res]
       elsif res == :jump and resource[:action] then
         # In this case, we are substituting jump for action
@@ -263,7 +266,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         next
       end
 
-      args << resource_map[res].split(' ')
+      if !resource_list_noargs.include?(res) then
+        args << resource_map[res].split(' ')
+      end
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
@@ -273,10 +278,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         end
       end
 
-      if resource_value.is_a?(Array)
-        args << resource_value.join(',')
-      else
-        args << resource_value
+      if !resource_list_noargs.include?(res) then
+        if resource_value.is_a?(Array)
+          args << resource_value.join(',')
+        else
+          args << resource_value
+        end
       end
     end
 
