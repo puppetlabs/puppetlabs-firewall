@@ -473,7 +473,7 @@ Puppet::Type.newtype(:firewall) do
     Match/save the destination address of each packet in the recent list table.
   EOS
     newvalues(true, false)
-    defaultto true
+    defaultto false
   end
 
 

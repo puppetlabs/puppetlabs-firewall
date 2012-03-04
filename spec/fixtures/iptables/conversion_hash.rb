@@ -368,4 +368,13 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-mark', '0x3e8'],
   },
+  'recent-set' => {
+    :params => {
+      :name     => '059 recent',
+      :chain    => 'INPUT',
+      :recent_name => 'recent',
+      :recent_command => 'set',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '059 recent', '-m', 'recent', '--set', '--name', 'recent', '--rsource'],
+  },
 }

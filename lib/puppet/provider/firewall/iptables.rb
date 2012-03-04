@@ -138,7 +138,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values.slice!('-A')
     keys << :chain
 
-    keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
+    # some params don't take a value, for example some recent_
+    keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v|
+      hash[f] = v ? v.gsub(/"/, '') : nil }
 
     [:dport, :sport, :port, :state].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
@@ -251,24 +253,46 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     args = []
     resource_list = self.class.instance_variable_get('@resource_list')
     resource_map = self.class.instance_variable_get('@resource_map')
+    resource_list_recent_commands = [:recent_set, :recent_update, :recent_rcheck, :recent_remove]
+    # FIXME: concat lists ?
     resource_list_noargs = [:recent_set, :recent_update, :recent_rcheck, :recent_remove, :recent_rsource, :recent_rdest]
 
     resource_list.each do |res|
+
+      # get the additional arguments to put after the resource map snippet
       resource_value = nil
-      if resource_list_noargs.include?(res) then
-          resource_value = nil
-      elsif (resource[res]) then
-        resource_value = resource[res]
-      elsif res == :jump and resource[:action] then
-        # In this case, we are substituting jump for action
-        resource_value = resource[:action].to_s.upcase
-      else
-        next
+      if ! resource_list_noargs.include?(res) then
+        if (resource[res]) then
+          resource_value = resource[res]
+        elsif res == :jump and resource[:action] then
+          # In this case, we are substituting jump for action
+          resource_value = resource[:action].to_s.upcase
+        else
+          next
+        end
       end
 
-      if !resource_list_noargs.include?(res) then
-        args << resource_map[res].split(' ')
-      end
+      what = res.to_s.scan(/^recent_(\w+)/)
+      if !what.empty?
+        # only append recent_ args if there is a recent_command
+        if ! (resource['recent_command'])
+          next
+        end
+        # only append the right recent_ command
+        if resource_list_recent_commands.include?(res) and \
+            resource['recent_command'].to_s != what[0][0]
+          next
+        end
+        # only append rsource/rdest if set
+        if res == :recent_rsource and not resource['recent_rsource']:
+            next
+        end
+        if res == :recent_rdest and not resource['recent_rdest']:
+            next
+        end
+       end
+      
+      args << resource_map[res].split(' ')
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
