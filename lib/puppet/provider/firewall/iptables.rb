@@ -45,6 +45,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :recent_update => "-m recent --update",
     :recent_remove => "-m recent --remove",
     :recent_rcheck => "-m recent --rcheck",
+    :recent_name => "--name",
     :recent_rsource => "--rsource",
     :recent_rdest => "--rdest",
     :recent_seconds => "--seconds",
