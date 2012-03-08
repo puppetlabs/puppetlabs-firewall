@@ -570,6 +570,12 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
+    if value(:log_prefix) || value(:log_level)
+      unless value(:jump).to_s == "LOG"
+        self.fail "Parameter log_prefix and log_level require jump => LOG"
+      end
+    end
+
     if value(:burst) && ! value(:limit)
       self.fail "burst makes no sense without limit"
     end
