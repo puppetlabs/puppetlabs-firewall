@@ -362,7 +362,18 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:icmp, :required_features => :icmp_match) do
     desc <<-EOS
       When matching ICMP packets, this is the type of ICMP packet to match.
+
+      A value of "any" is not supported. To achieve this behaviour the
+      parameter should simply be omitted or undefined.
     EOS
+
+    validate do |value|
+      if value == "any"
+        raise ArgumentError,
+          "Value 'any' is not valid. This behaviour should be achieved " \
+          "by omitting or undefining the ICMP parameter."
+      end
+    end
 
     munge do |value|
       if value.kind_of?(String)
