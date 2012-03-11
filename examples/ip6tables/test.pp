@@ -30,7 +30,7 @@ firewall { '005 INPUT disregard DHCP':
 }
 
 firewall { '006 INPUT disregard netbios':
-  port    => ['netbios-ns', 'netbios-dgm', 'netbios-ssn'],
+  port     => ['netbios-ns', 'netbios-dgm', 'netbios-ssn'],
   action   => drop,
   proto    => 'udp',
   provider => 'ip6tables'
