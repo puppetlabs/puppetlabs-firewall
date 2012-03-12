@@ -38,7 +38,7 @@ describe 'iptables chain provider detection' do
 
     # Create a resource instance and make sure the provider is iptables
     resource = Puppet::Type.type(:firewallchain).new({
-      :name => 'filter:test:IPv4',
+      :name => 'test:filter:IPv4',
     })
     resource.provider.class.to_s.should == "Puppet::Type::Firewallchain::ProviderIptables_chain"
   end

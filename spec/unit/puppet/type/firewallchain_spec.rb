@@ -13,7 +13,7 @@ describe firewallchain do
   }
   let(:resource) {
     Puppet::Type::Firewallchain.stubs(:defaultprovider).returns provider
-    klass.new({:name => 'filter:INPUT:IPv4', :policy => :accept })
+    klass.new({:name => 'INPUT:filter:IPv4', :policy => :accept })
   }
 
   it 'should have :name be its namevar' do
@@ -29,7 +29,7 @@ describe firewallchain do
     }.each_pair do |table, allowedinternalchains|
       ['IPv4', 'IPv6', 'ethernet'].each do |protocol|
         [ 'test', '$5()*&%\'"^$09):' ].each do |chainname|
-          name = "#{table}:#{chainname}:#{protocol}"
+          name = "#{chainname}:#{table}:#{protocol}"
           if table == 'nat' && protocol == 'IPv6'
             it "should fail #{name}" do
               expect { resource[:name] = name }.to raise_error(Puppet::Error)
@@ -48,7 +48,7 @@ describe firewallchain do
       end # protocol
 
       [ 'PREROUTING', 'POSTROUTING', 'BROUTING', 'INPUT', 'FORWARD', 'OUTPUT' ].each do |internalchain|
-        name = table + ':' + internalchain + ':'
+        name = internalchain + ':' + table + ':'
         if internalchain == 'BROUTING'
           name += 'ethernet'
         elsif table == 'nat'
@@ -71,11 +71,11 @@ describe firewallchain do
     end # table, allowedinternalchainnames
 
     it 'should fail with invalid table names' do
-      expect { resource[:name] = 'wrongtablename:test:' }.to raise_error(Puppet::Error)
+      expect { resource[:name] = 'wrongtablename:test:IPv4' }.to raise_error(Puppet::Error)
     end
 
     it 'should fail with invalid protocols names' do
-      expect { resource[:name] = ':test:IPv5' }.to raise_error(Puppet::Error)
+      expect { resource[:name] = 'test:filter:IPv5' }.to raise_error(Puppet::Error)
     end
 
   end
@@ -95,10 +95,10 @@ describe firewallchain do
 
     [:accept, :drop, :queue, :return].each do |policy|
       it "non-inbuilt chains should not accept policy #{policy}" do
-        expect { klass.new({:name => 'filter:testchain:IPv4', :policy => policy }) }.to raise_error(Puppet::Error)
+        expect { klass.new({:name => 'testchain:filter:IPv4', :policy => policy }) }.to raise_error(Puppet::Error)
       end
       it "non-inbuilt chains can accept policies on protocol = ethernet (policy #{policy})" do
-        klass.new({:name => 'filter:testchain:ethernet', :policy => policy }).should be_instance_of(@provider)
+        klass.new({:name => 'testchain:filter:ethernet', :policy => policy }).should be_instance_of(@provider)
       end
     end
 

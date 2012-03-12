@@ -107,7 +107,8 @@ Creating a new rule that forwards to a chain, then adding a rule to this chain:
       jump    => 'MY_CHAIN',
       require => Firewallchain["filter:MY_CHAIN:IPv4"],
     }
-    firewallchain { 'filter:MY_CHAIN:IPv4':
+    # The namevar here is in the format chain_name:table:protocol
+    firewallchain { 'MY_CHAIN:filter:IPv4':
       ensure  => present,
     }
     firewall { '100 my rule':
