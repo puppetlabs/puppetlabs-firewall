@@ -5,41 +5,43 @@ require 'spec_helper'
 firewallchain = Puppet::Type.type(:firewallchain)
 
 describe firewallchain do
-  before :each do
-    @class = firewallchain
-    @provider = stub 'provider'
-    @provider.stubs(:name).returns(:iptables_chain)
-    Puppet::Type::Firewallchain.stubs(:defaultprovider).returns @provider
-    @resource = @class.new({:name => ':INPUT:', :policy => :accept })
-  end
+  let(:klass) { firewallchain }
+  let(:provider) {
+    prov = stub 'provider'
+    prov.stubs(:name).returns(:iptables_chain)
+    prov
+  }
+  let(:resource) {
+    Puppet::Type::Firewallchain.stubs(:defaultprovider).returns provider
+    klass.new({:name => 'filter:INPUT:IPv4', :policy => :accept })
+  }
 
   it 'should have :name be its namevar' do
-    @class.key_attributes.should == [:name]
+    klass.key_attributes.should == [:name]
   end
 
   describe ':name' do
-    {'' => ['INPUT','OUTPUT','FORWARD'],
-     'NAT' => ['PREROUTING', 'POSTROUTING', 'OUTPUT'],
-     'MANGLE' => [ 'PREROUTING', 'POSTROUTING', 'INPUT', 'FORWARD', 'OUTPUT' ],
-     'FILTER' => ['INPUT','OUTPUT','FORWARD'],
-     'RAW' => [ 'PREROUTING', 'OUTPUT'],
-     'BROUTE' => ['BROUTING']
+    {'nat' => ['PREROUTING', 'POSTROUTING', 'OUTPUT'],
+     'mangle' => [ 'PREROUTING', 'POSTROUTING', 'INPUT', 'FORWARD', 'OUTPUT' ],
+     'filter' => ['INPUT','OUTPUT','FORWARD'],
+     'raw' => [ 'PREROUTING', 'OUTPUT'],
+     'broute' => ['BROUTING']
     }.each_pair do |table, allowedinternalchains|
-      ['', 'IPv4', 'IPv6', 'IP', 'ethernet'].each do |protocol|
+      ['IPv4', 'IPv6', 'ethernet'].each do |protocol|
         [ 'test', '$5()*&%\'"^$09):' ].each do |chainname|
           name = "#{table}:#{chainname}:#{protocol}"
-          if table == 'NAT' && ['IPv6','','IP'].include?(protocol)
+          if table == 'nat' && protocol == 'IPv6'
             it "should fail #{name}" do
-              lambda { @resource[:name] = name }.should raise_error(Puppet::Error)
+              expect { resource[:name] = name }.to raise_error(Puppet::Error)
             end
-          elsif protocol != 'ethernet' && table == 'BROUTE'
+          elsif protocol != 'ethernet' && table == 'broute'
             it "should fail #{name}" do
-              lambda { @resource[:name] = name }.should raise_error(Puppet::Error)
+              expect { resource[:name] = name }.to raise_error(Puppet::Error)
             end
           else
             it "should accept name #{name}" do
-              @resource[:name] = name
-              @resource[:name].should == name
+              resource[:name] = name
+              resource[:name].should == name
             end
           end
         end # chainname
@@ -49,17 +51,19 @@ describe firewallchain do
         name = table + ':' + internalchain + ':'
         if internalchain == 'BROUTING'
           name += 'ethernet'
-        elsif table == 'NAT'
+        elsif table == 'nat'
+          name += 'IPv4'
+        else
           name += 'IPv4'
         end
         if allowedinternalchains.include? internalchain
           it "should allow #{name}" do
-            @resource[:name] = name
-            @resource[:name].should == name
+            resource[:name] = name
+            resource[:name].should == name
           end
         else
           it "should fail #{name}" do
-            lambda { @resource[:name] = name }.should raise_error(Puppet::Error)
+            expect { resource[:name] = name }.to raise_error(Puppet::Error)
           end
         end
       end # internalchain
@@ -67,34 +71,34 @@ describe firewallchain do
     end # table, allowedinternalchainnames
 
     it 'should fail with invalid table names' do
-      lambda { @resource[:name] = 'wrongtablename:test:' }.should raise_error(Puppet::Error)
+      expect { resource[:name] = 'wrongtablename:test:' }.to raise_error(Puppet::Error)
     end
 
     it 'should fail with invalid protocols names' do
-      lambda { @resource[:name] = ':test:IPv5' }.should raise_error(Puppet::Error)
+      expect { resource[:name] = ':test:IPv5' }.to raise_error(Puppet::Error)
     end
 
   end
 
   describe ':policy' do
- 
+
     [:accept, :drop, :queue, :return].each do |policy|
       it "should accept policy #{policy}" do
-        @resource[:policy] = policy
-        @resource[:policy].should == policy
+        resource[:policy] = policy
+        resource[:policy].should == policy
       end
     end
 
     it 'should fail when value is not recognized' do
-      lambda { @resource[:policy] = 'not valid' }.should raise_error(Puppet::Error)
+      expect { resource[:policy] = 'not valid' }.to raise_error(Puppet::Error)
     end
 
     [:accept, :drop, :queue, :return].each do |policy|
       it "non-inbuilt chains should not accept policy #{policy}" do
-        lambda { @class.new({:name => ':testchain:', :policy => policy }) }.should raise_error(Puppet::Error)
+        expect { klass.new({:name => 'filter:testchain:IPv4', :policy => policy }) }.to raise_error(Puppet::Error)
       end
       it "non-inbuilt chains can accept policies on protocol = ethernet (policy #{policy})" do
-        @class.new({:name => ':testchain:ethernet', :policy => policy }).should be_instance_of(@provider)
+        klass.new({:name => 'filter:testchain:ethernet', :policy => policy }).should be_instance_of(@provider)
       end
     end
 
