@@ -61,7 +61,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
     if @resource[:name] =~ InternalChains
       self.warn "Attempting to destroy internal chain #{@resource[:name]}"
     end
-    allvalidchains do |t, table, chain|
+    allvalidchains do |t, chain, table|
       debug "Deleting chain #{chain} on table #{table}"
       t.call ['-t',table,'-X',chain]
     end
@@ -73,7 +73,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
 
   def policy=(value)
     return if value == :empty
-    allvalidchains do |t, table, chain|
+    allvalidchains do |t, chain, table|
       p = ['-t',table,'-P',chain,value.to_s.upcase]
       debug "[set policy] #{t} #{p}"
       t.call p
