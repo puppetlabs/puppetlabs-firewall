@@ -4,13 +4,20 @@
 
 ### Overview
 
-This type provides the capability to manage firewall rules within 
-puppet.
+This module provides the resource 'firewall' which provides the capability to
+manage firewall rules within puppet.
 
 Current support includes:
 
 * iptables
 * ip6tables
+
+With the resource 'firewallchain' we also provide a mechanism to manage chains
+for:
+
+* iptables
+* ip6tables
+* ebtables
 
 ### Disclaimer
 
@@ -93,6 +100,25 @@ Source NAT example (perfect for a virtualization host):
       table  => 'nat',
     }
 
+Creating a new rule that forwards to a chain, then adding a rule to this chain:
+
+    firewall { '100 forward to MY_CHAIN':
+      chain   => 'INPUT',
+      jump    => 'MY_CHAIN',
+      require => Firewallchain["MY_CHAIN:filter:IPv4"],
+    }
+    # The namevar here is in the format chain_name:table:protocol
+    firewallchain { 'MY_CHAIN:filter:IPv4':
+      ensure  => present,
+    }
+    firewall { '100 my rule':
+      chain   => 'MY_CHAIN',
+      action  => 'accept',
+      proto   => 'tcp',
+      dport   => 5000,
+      require => Firewallchain["MY_CHAIN:filter:IPv4"],
+    }
+
 You can make firewall rules persistent with the following iptables example:
 
     exec { "persist-firewall":
@@ -103,6 +129,9 @@ You can make firewall rules persistent with the following iptables example:
       refreshonly => true,
     }
     Firewall {
+      notify => Exec["persist-firewall"]
+    }
+    Firewallchain {
       notify => Exec["persist-firewall"]
     }
 
@@ -156,6 +185,7 @@ Currently we support:
 
 * iptables
 * ip6tables
+* ebtables (chains only)
 
 But plans are to support lots of other firewall implementations:
 
