@@ -462,6 +462,24 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  autorequire(:firewallchain) do
+    case value(:provider)
+    when :iptables
+      protocol = "IPv4"
+    when :ip6tables
+      protocol = "IPv6"
+    else
+      return
+    end
+
+    reqs = []
+    [value(:chain), value(:jump)].each do |chain|
+      reqs << "#{chain}:#{value(:table)}:#{protocol}" unless chain.nil?
+    end
+
+    reqs
+  end
+
   validate do
     debug("[validate]")
 

@@ -105,7 +105,6 @@ Creating a new rule that forwards to a chain, then adding a rule to this chain:
     firewall { '100 forward to MY_CHAIN':
       chain   => 'INPUT',
       jump    => 'MY_CHAIN',
-      require => Firewallchain["MY_CHAIN:filter:IPv4"],
     }
     # The namevar here is in the format chain_name:table:protocol
     firewallchain { 'MY_CHAIN:filter:IPv4':
@@ -116,7 +115,6 @@ Creating a new rule that forwards to a chain, then adding a rule to this chain:
       action  => 'accept',
       proto   => 'tcp',
       dport   => 5000,
-      require => Firewallchain["MY_CHAIN:filter:IPv4"],
     }
 
 You can make firewall rules persistent with the following iptables example:
