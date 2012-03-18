@@ -15,6 +15,10 @@ Puppet::Type.newtype(:firewall) do
   @doc = <<-EOS
     This type provides the capability to manage firewall rules within
     puppet.
+
+    **Autorequires:** If Puppet is managing the iptables or ip6tables chains
+    specified in the `chain` or `jump` parameters, the firewall resource
+    will autorequire those firewallchain resources.
   EOS
 
   feature :rate_limiting, "Rate limiting features."
