@@ -305,4 +305,85 @@ describe firewall do
       @resource[:set_mark].should == '0x3e8'
     end
   end
+
+  [:chain, :jump].each do |param|
+    describe param do
+      it 'should autorequire fwchain when table and provider are undefined' do
+        @resource[param] = 'FOO'
+        @resource[:table].should == :filter
+        @resource[:provider].should == :iptables
+
+        chain = Puppet::Type.type(:firewallchain).new(:name => 'FOO:filter:IPv4')
+        catalog = Puppet::Resource::Catalog.new
+        catalog.add_resource @resource
+        catalog.add_resource chain
+        rel = @resource.autorequire[0]
+        rel.source.ref.should == chain.ref
+        rel.target.ref.should == @resource.ref
+      end
+
+      it 'should autorequire fwchain when table is undefined and provider is ip6tables' do
+        @resource[param] = 'FOO'
+        @resource[:table].should == :filter
+        @resource[:provider] = :ip6tables
+
+        chain = Puppet::Type.type(:firewallchain).new(:name => 'FOO:filter:IPv6')
+        catalog = Puppet::Resource::Catalog.new
+        catalog.add_resource @resource
+        catalog.add_resource chain
+        rel = @resource.autorequire[0]
+        rel.source.ref.should == chain.ref
+        rel.target.ref.should == @resource.ref
+      end
+
+      it 'should autorequire fwchain when table is raw and provider is undefined' do
+        @resource[param] = 'FOO'
+        @resource[:table] = :raw
+        @resource[:provider].should == :iptables
+
+        chain = Puppet::Type.type(:firewallchain).new(:name => 'FOO:raw:IPv4')
+        catalog = Puppet::Resource::Catalog.new
+        catalog.add_resource @resource
+        catalog.add_resource chain
+        rel = @resource.autorequire[0]
+        rel.source.ref.should == chain.ref
+        rel.target.ref.should == @resource.ref
+      end
+
+      it 'should autorequire fwchain when table is raw and provider is ip6tables' do
+        @resource[param] = 'FOO'
+        @resource[:table] = :raw
+        @resource[:provider] = :ip6tables
+
+        chain = Puppet::Type.type(:firewallchain).new(:name => 'FOO:raw:IPv6')
+        catalog = Puppet::Resource::Catalog.new
+        catalog.add_resource @resource
+        catalog.add_resource chain
+        rel = @resource.autorequire[0]
+        rel.source.ref.should == chain.ref
+        rel.target.ref.should == @resource.ref
+      end
+    end
+  end
+
+  describe ":chain and :jump" do
+    it 'should autorequire independent fwchains' do
+      @resource[:chain] = 'FOO'
+      @resource[:jump] = 'BAR'
+      @resource[:table].should == :filter
+      @resource[:provider].should == :iptables
+
+      chain_foo = Puppet::Type.type(:firewallchain).new(:name => 'FOO:filter:IPv4')
+      chain_bar = Puppet::Type.type(:firewallchain).new(:name => 'BAR:filter:IPv4')
+      catalog = Puppet::Resource::Catalog.new
+      catalog.add_resource @resource
+      catalog.add_resource chain_foo
+      catalog.add_resource chain_bar
+      rel = @resource.autorequire
+      rel[0].source.ref.should == chain_foo.ref
+      rel[0].target.ref.should == @resource.ref
+      rel[1].source.ref.should == chain_bar.ref
+      rel[1].target.ref.should == @resource.ref
+    end
+  end
 end
