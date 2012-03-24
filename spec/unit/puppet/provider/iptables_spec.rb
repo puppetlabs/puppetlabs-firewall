@@ -34,12 +34,12 @@ describe 'iptables provider detection' do
   end
 
   it "should raise a default provider error when there are no commands" do
-    # Stub all commands lookups so they return nothing 
+    # Stub all commands lookups so they return nothing
     exists.any_instance.stubs(:which).returns false
 
     # Instantiate a resource instance and make sure it raises an exception
-    lambda { resource = Puppet::Type.type(:firewall).new({ 
-      :name => '000 test foo' }) }.should raise_error(Puppet::DevError, 
+    lambda { resource = Puppet::Type.type(:firewall).new({
+      :name => '000 test foo' }) }.should raise_error(Puppet::DevError,
       "Could not find a default provider for firewall")
   end
 end
@@ -57,7 +57,7 @@ describe 'iptables provider' do
     Puppet::Type::Firewall.stubs(:defaultprovider).returns provider
     provider.stubs(:command).with(:iptables_save).returns "/sbin/iptables-save"
   end
-  
+
   it 'should be able to get a list of existing rules' do
     # Pretend to return nil from iptables
     provider.expects(:execute).with(['/sbin/iptables-save']).returns("")
