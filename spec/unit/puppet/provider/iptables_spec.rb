@@ -159,7 +159,8 @@ describe 'iptables provider' do
     end
 
     it 'delete_args is the same as the rule string when joined' do
-      instance.delete_args.join(' ').should == sample_rule.gsub(/\-A/, '-D')
+      instance.delete_args.join(' ').should == sample_rule.gsub(/\-A/,
+        '-t filter -D')
     end
   end
 end
