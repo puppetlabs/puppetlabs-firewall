@@ -39,6 +39,7 @@ class Puppet::Provider::Firewall < Puppet::Provider
     dynamic_methods << :chain
     dynamic_methods << :table
     dynamic_methods << :action
+    dynamic_methods << :recent_command
 
     if dynamic_methods.include?(meth.to_sym) then
       if @property_hash[meth.to_sym] then

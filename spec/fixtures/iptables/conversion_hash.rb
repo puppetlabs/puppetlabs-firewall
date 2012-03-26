@@ -34,11 +34,12 @@ ARGS_TO_HASH = {
     },
   },
   'action_reject_1' => {
-    :line => '-A INPUT -m comment --comment "000 allow foo" -j REJECT',
+    :line => '-A INPUT -m comment --comment "000 allow foo" -j REJECT --reject-with icmp-port-unreachable',
     :table => 'filter',
     :params => {
       :jump => nil,
       :action => "reject",
+      :reject => "icmp-port-unreachable",
     },
   },
   'action_nil_1' => {
@@ -177,6 +178,15 @@ ARGS_TO_HASH = {
       :chain    => 'PREROUTING',
       :set_mark => '1000',
     }
+  },
+  'recent-set' => {
+    :line => '-A INPUT -p tcp -m recent --set --name knock --rsource',
+    :params => {
+#      :chain    => 'INPUT',
+      :recent_name => 'knock',
+      :recent_command => :set,
+      :recent_rsource => true,
+    },
   },
 }
 
@@ -367,5 +377,14 @@ HASH_TO_ARGS = {
       :set_mark => '1000',
     },
     :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-mark', '0x3e8'],
+  },
+  'recent-set' => {
+    :params => {
+      :name     => '059 recent',
+      :chain    => 'INPUT',
+      :recent_name => 'knock',
+      :recent_command => 'set',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '059 recent', '-m', 'recent', '--set', '--name', 'knock'],
   },
 }

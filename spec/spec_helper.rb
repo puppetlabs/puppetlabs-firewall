@@ -6,7 +6,7 @@ ARGV.clear
 
 require 'puppet'
 require 'mocha'
-gem 'rspec', '>=2.0.0'
+gem 'rspec', '>=1.3.1'
 require 'rspec/expectations'
 
 # So everyone else doesn't have to include this base constant.

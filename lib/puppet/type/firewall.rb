@@ -28,6 +28,7 @@ Puppet::Type.newtype(:firewall) do
   feature :icmp_match, "Matching ICMP types"
   feature :owner, "Matching owners"
   feature :state_match, "Matching stateful firewall states"
+  feature :recent_match, "Matching recent packets"
   feature :reject_type, "The ability to control reject messages"
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
@@ -460,6 +461,65 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+
+  newproperty(:recent_name) do
+    desc <<-EOS
+      List name for use with recent commands
+    EOS
+    newvalue(/^\S+$/)
+
+    # FIXME: if we set defaultto, then we need to later scrub it
+    # general_args if we're not using recent
+    # defaultto 'DEFAULT'
+  end
+
+  newproperty(:recent_command) do
+    desc <<-EOS
+      Command for the recent module
+    EOS
+    newvalues(:set, :update, :remove, :rcheck)
+  end
+
+  newproperty(:recent_rsource) do
+  desc <<-EOS
+    Match/save the source address of each packet in the recent list table.
+  EOS
+    newvalues(true, false)
+    # FIXME: this is the default, but setting that explicitly triggers
+    # notice: /Firewall[name]/recent_rsource: recent_rsource changed '' to 'true'
+    # defaultto true
+  end
+
+  newproperty(:recent_rdest) do
+  desc <<-EOS
+    Match/save the destination address of each packet in the recent list table.
+  EOS
+    newvalues(true, false)
+    defaultto false
+  end
+
+
+  newproperty(:recent_rttl) do
+  desc <<-EOS
+    TTL of the current packet.  Only in conjunction with rcheck or update.
+  EOS
+    newvalue(/^\d+$/)
+  end
+
+  newproperty(:recent_seconds) do
+  desc <<-EOS
+    Number of seconds to treat as recent
+  EOS
+    newvalue(/^\d+$/)
+  end
+
+  newproperty(:recent_hitcount) do
+  desc <<-EOS
+    Narrows the recent to those equal or great than this count
+  EOS
+    newvalue(/^\d+$/)
+  end
+
   newparam(:line) do
     desc <<-EOS
       Read-only property for caching the rule line.
@@ -605,5 +665,13 @@ Puppet::Type.newtype(:firewall) do
     if value(:action) && value(:jump)
       self.fail "Only one of the parameters 'action' and 'jump' can be set"
     end
+
+    if value(:recent_rttl)
+      unless value(:recent_command).to_s =~ /rcheck|update/
+        self.fail "Parameter recent_rttl can only used with rcheck and update"
+      end
+    end
+
+
   end
 end
