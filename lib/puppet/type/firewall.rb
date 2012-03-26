@@ -295,14 +295,14 @@ Puppet::Type.newtype(:firewall) do
     desc <<-EOS
       Input interface to filter on.
     EOS
-    newvalues(/^[a-zA-Z0-9\-_]+$/)
+    newvalues(/^[a-zA-Z0-9\-\._]+$/)
   end
 
   newproperty(:outiface, :required_features => :interface_match) do
     desc <<-EOS
       Output interface to filter on.
     EOS
-    newvalues(/^[a-zA-Z0-9\-_]+$/)
+    newvalues(/^[a-zA-Z0-9\-\._]+$/)
   end
 
   # NAT specific properties
