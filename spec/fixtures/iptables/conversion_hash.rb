@@ -178,6 +178,42 @@ ARGS_TO_HASH = {
       :set_mark => '1000',
     }
   },
+  'iniface_1' => {
+    :line => '-A INPUT -i eth0 -m comment --comment "060 iniface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => 'eth0',
+    },
+  },
+  'iniface_with_vlans_1' => {
+    :line => '-A INPUT -i eth0.234 -m comment --comment "060 iniface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => 'eth0.234',
+    },
+  },
+  'outiface_1' => {
+    :line => '-A OUTPUT -o eth0 -m comment --comment "060 iniface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => 'eth0',
+    },
+  },
+  'outiface_with_vlans_1' => {
+    :line => '-A OUTPUT -o eth0.234 -m comment --comment "060 iniface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => 'eth0.234',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -367,5 +403,25 @@ HASH_TO_ARGS = {
       :set_mark => '1000',
     },
     :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-mark', '0x3e8'],
+  },
+  'outiface_1' => {
+    :params => {
+      :name => '060 outiface',
+      :table => 'filter',
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => 'eth0',
+    },
+    :args => ["-t", :filter, "-o", "eth0", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
+  },
+  'outiface_with_vlans_1' => {
+    :params => {
+      :name => '060 outiface',
+      :table => 'filter',
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => 'eth0.234',
+    },
+    :args => ["-t", :filter, "-o", "eth0.234", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
   },
 }
