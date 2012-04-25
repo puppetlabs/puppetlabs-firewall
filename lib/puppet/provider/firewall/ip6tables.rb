@@ -12,6 +12,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :reject_type
   has_feature :log_level
   has_feature :log_prefix
+  has_feature :match
+  has_feature :destination_type
 
   commands :iptables      => '/sbin/ip6tables'
   commands :iptables_save => '/sbin/ip6tables-save'
@@ -40,6 +42,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :toports => "--to-ports",
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
+    :match => "-m",
+    :destination_type => "--dst-type",
   }
 
   # This is the order of resources as they appear in iptables-save output,

@@ -295,6 +295,20 @@ describe firewall do
     end
   end
 
+  describe ':match' do
+    it 'should allow me to set match' do
+      @resource[:match] = 'addrtype'
+      @resource[:match].should == 'addrtype'
+    end
+  end
+
+  describe ':destination_type' do
+    it 'should allow me to set destination_type' do
+      @resource[:destination_type] = 'MULTICAST'
+      @resource[:destination_type].should == 'MULTICAST'
+    end
+  end
+
   describe ':set_mark' do
     it 'should allow me to set set-mark' do
       @resource[:set_mark] = '0x3e8'
