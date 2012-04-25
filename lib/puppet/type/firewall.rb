@@ -470,8 +470,23 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:destination_type, :required_features => :destination_type) do
     desc <<-EOS
-      Sets the destination type for traffic.
+      Sets the destination type for traffic.  Allowed values currently are:
+
+      * UNSPEC
+      * UNICAST
+      * LOCAL
+      * BROADCAST
+      * ANYCAST
+      * MULTICAST
+      * BLACKHOLE
+      * UNREACHABLE
+      * PROHIBIT
+      * THROW
+      * NAT
     EOS
+
+    newvalues(:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
+      :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT)
   end
 
   newparam(:line) do
