@@ -295,6 +295,20 @@ describe firewall do
     end
   end
 
+  describe ':destination_type' do
+    [:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
+      :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT].each do |destination_type|
+      it "should accept destination_type value #{destination_type}" do
+        @resource[:destination_type] = destination_type
+        @resource[:destination_type].should == destination_type
+      end
+    end
+
+    it "should fail when destination_type value is not recognized" do
+      lambda { @resource[:destination_type] = 'foo' }.should raise_error(Puppet::Error)
+    end
+  end
+
   describe ':set_mark' do
     it 'should allow me to set set-mark' do
       @resource[:set_mark] = '0x3e8'

@@ -214,6 +214,14 @@ ARGS_TO_HASH = {
       :outiface => 'eth0.234',
     },
   },
+  'destination_type MULTICAST' => {
+    :line => '-A INPUT -m addrtype --dst-type MULTICAST -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :destination_type => 'MULTICAST',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -423,5 +431,15 @@ HASH_TO_ARGS = {
       :outiface => 'eth0.234',
     },
     :args => ["-t", :filter, "-o", "eth0.234", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
+  },
+  'dst-type MULTICAST' => {
+    :params => {
+      :name => '061 dst-type',
+      :action => 'accept',
+      :chain => 'INPUT',
+      :iniface => 'eth0',
+      :destination_type => 'MULTICAST',
+    },
+    :args => ["-t", :filter, "-m", "addrtype", "--dst-type", :MULTICAST, "-i", "eth0", "-p", :tcp, "-m", "comment", "--comment", "061 dst-type", "-j", "ACCEPT"], 
   },
 }

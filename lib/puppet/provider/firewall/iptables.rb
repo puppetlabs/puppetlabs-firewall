@@ -18,6 +18,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :log_level
   has_feature :log_prefix
   has_feature :mark
+  has_feature :destination_type
 
   commands :iptables => '/sbin/iptables'
   commands :iptables_save => '/sbin/iptables-save'
@@ -49,15 +50,17 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
     :set_mark => "--set-mark",
+    :destination_type => "-m addrtype --dst-type",
   }
 
   # This is the order of resources as they appear in iptables-save output,
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst,
-    :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
+  @resource_list = [:table, :destination_type, :source, :destination, :iniface,
+    :outiface, :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :icmp,
+    :limit, :burst, :jump, :todest, :tosource, :toports, :log_level,
+    :log_prefix, :reject, :set_mark]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
