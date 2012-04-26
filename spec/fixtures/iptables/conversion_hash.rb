@@ -440,6 +440,6 @@ HASH_TO_ARGS = {
       :iniface => 'eth0',
       :destination_type => 'MULTICAST',
     },
-    :args => ["-t", :filter, "--dst-type", :MULTICAST, "-i", "eth0", "-p", :tcp, "-m", "comment", "--comment", "061 dst-type", "-j", "ACCEPT"], 
+    :args => ["-t", :filter, "-m", "addrtype", "--dst-type", :MULTICAST, "-i", "eth0", "-p", :tcp, "-m", "comment", "--comment", "061 dst-type", "-j", "ACCEPT"], 
   },
 }

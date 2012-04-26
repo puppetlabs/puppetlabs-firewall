@@ -295,13 +295,6 @@ describe firewall do
     end
   end
 
-  describe ':match' do
-    it 'should allow me to set match' do
-      @resource[:match] = 'addrtype'
-      @resource[:match].should == 'addrtype'
-    end
-  end
-
   describe ':destination_type' do
     [:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
       :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT].each do |destination_type|
