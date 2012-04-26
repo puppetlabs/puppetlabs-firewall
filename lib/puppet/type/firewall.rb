@@ -32,7 +32,6 @@ Puppet::Type.newtype(:firewall) do
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
   feature :mark, "Set the netfilter mark value associated with the packet"
-  feature :match, "Match a specific type"
   feature :destination_type, "Match a destination type"
 
   # provider specific features
@@ -460,12 +459,6 @@ Puppet::Type.newtype(:firewall) do
         super(value)
       end
     end
-  end
-
-  newproperty(:match, :required_features => :match) do
-    desc <<-EOS
-      Sets the match parameter.
-    EOS
   end
 
   newproperty(:destination_type, :required_features => :destination_type) do

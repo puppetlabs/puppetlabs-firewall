@@ -12,7 +12,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :reject_type
   has_feature :log_level
   has_feature :log_prefix
-  has_feature :match
   has_feature :destination_type
 
   commands :iptables      => '/sbin/ip6tables'
@@ -42,7 +41,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :toports => "--to-ports",
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
-    :match => "-m",
     :destination_type => "--dst-type",
   }
 
@@ -50,8 +48,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst, :jump,
-    :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
+  @resource_list = [:table, :destination,_type, :source, :destination, :iniface,
+    :outiface, :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :icmp,
+    :limit, :burst, :jump, :todest, :tosource, :toports, :log_level,
+    :log_prefix, :reject]
 
 end
