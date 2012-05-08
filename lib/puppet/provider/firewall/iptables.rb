@@ -25,6 +25,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   defaultfor :kernel => :linux
 
+  @persist_commands = {
+    :RedHat => %w{/sbin/service iptables save},
+    :Debian => %w{/sbin/service iptables-persistent save},
+  }
+
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
@@ -87,6 +92,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       notice("Properties changed - updating rule")
       update
     end
+    persist_rules
     @property_hash.clear
   end
 
@@ -290,5 +296,36 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     my_rule = resource[:name].to_s
     rules << my_rule
     rules.sort.index(my_rule) + 1
+  end
+
+  def persist_rules
+    debug("[persist_rules]")
+
+    # Attempt to use :osfamily from Facter >= 1.6.2
+    osfamily = Facter.value(:osfamily)
+    # Else fallback to a much shorter list.
+    osfamily ||= begin
+      case Facter.value(:operatingsystem)
+      when 'RedHat', 'CentOS', 'Scientific'
+        'RedHat'
+      when 'Debian', 'Ubuntu'
+        'Debian'
+      else
+        nil
+      end
+    end
+
+    cmd = self.class.instance_variable_get(:@persist_commands)[osfamily.to_sym]
+
+    if cmd.nil?
+      debug('firewall: Rule persistence is not supported for this OS')
+      return
+    end
+
+    begin
+      execute(cmd)
+    rescue Puppet::ExecutionFailure => detail
+      raise Puppet::Error, "Unable to persist firewall rules: #{detail}"
+    end
   end
 end

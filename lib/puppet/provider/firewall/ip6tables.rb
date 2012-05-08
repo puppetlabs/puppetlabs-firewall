@@ -18,6 +18,11 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   commands :iptables      => '/sbin/ip6tables'
   commands :iptables_save => '/sbin/ip6tables-save'
 
+  @persist_command = {
+    :RedHat => %w{/sbin/service ip6tables save},
+    :Debian => %w{/sbin/service iptables-persistent save},
+  }
+
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",

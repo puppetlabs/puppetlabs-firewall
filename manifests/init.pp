@@ -1,13 +1,20 @@
 # Class: firewall
 #
 # Manages the installation of packages for operating systems that are
-#   currently supported by the firewall type.
+# currently supported by the firewall type.
 #
 class firewall {
   if ($::osfamily =~ /^(RedHat|Debian)$/) \
       or ($::operatingsystem =~ /^(RedHat|CentOS|Scientific|Debian|Ubuntu)$/) {
     package { 'iptables':
       ensure => present,
+    }
+
+    if ($::osfamily == 'Debian') \
+        or ($::operatingsystem =~ /^(Debian|Ubuntu)$/) {
+      package { 'iptables-persistent':
+        ensure => present,
+      }
     }
   } else {
     fail('firewall: This OS is not currently supported')
