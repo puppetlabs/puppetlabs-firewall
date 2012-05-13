@@ -196,8 +196,17 @@ ARGS_TO_HASH = {
       :iniface => 'eth0.234',
     },
   },
+  'iniface_with_plus_1' => {
+    :line => '-A INPUT -i eth+ -m comment --comment "060 iniface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => 'eth+',
+    },
+  },
   'outiface_1' => {
-    :line => '-A OUTPUT -o eth0 -m comment --comment "060 iniface" -j DROP',
+    :line => '-A OUTPUT -o eth0 -m comment --comment "060 outiface" -j DROP',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -206,12 +215,21 @@ ARGS_TO_HASH = {
     },
   },
   'outiface_with_vlans_1' => {
-    :line => '-A OUTPUT -o eth0.234 -m comment --comment "060 iniface" -j DROP',
+    :line => '-A OUTPUT -o eth0.234 -m comment --comment "060 outiface" -j DROP',
     :table => 'filter',
     :params => {
       :action => 'drop',
       :chain => 'OUTPUT',
       :outiface => 'eth0.234',
+    },
+  },
+  'outiface_with_plus_1' => {
+    :line => '-A OUTPUT -o eth+ -m comment --comment "060 outiface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => 'eth+',
     },
   },
 }
@@ -404,6 +422,36 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-mark', '0x3e8'],
   },
+  'iniface_1' => {
+    :params => {
+      :name => '060 iniface',
+      :table => 'filter',
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => 'eth0',
+    },
+    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "comment", "--comment", "060 iniface", "-j", "DROP"],
+  },
+  'iniface_with_vlans_1' => {
+    :params => {
+      :name => '060 iniface',
+      :table => 'filter',
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => 'eth0.234',
+    },
+    :args => ["-t", :filter, "-i", "eth0.234", "-p", :tcp, "-m", "comment", "--comment", "060 iniface", "-j", "DROP"],
+  },
+  'iniface_with_plus_1' => {
+    :params => {
+      :name => '060 iniface',
+      :table => 'filter',
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => 'eth+',
+    },
+    :args => ["-t", :filter, "-i", "eth+", "-p", :tcp, "-m", "comment", "--comment", "060 iniface", "-j", "DROP"],
+  },
   'outiface_1' => {
     :params => {
       :name => '060 outiface',
@@ -423,5 +471,15 @@ HASH_TO_ARGS = {
       :outiface => 'eth0.234',
     },
     :args => ["-t", :filter, "-o", "eth0.234", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
+  },
+  'outiface_with_plus_1' => {
+    :params => {
+      :name => '060 outiface',
+      :table => 'filter',
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => 'eth+',
+    },
+    :args => ["-t", :filter, "-o", "eth+", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
   },
 }
