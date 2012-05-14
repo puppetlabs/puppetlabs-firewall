@@ -163,4 +163,20 @@ describe 'iptables provider' do
         '-t filter -D')
     end
   end
+
+  describe 'when converting rules with netmasks to resources' do
+    let(:sample_rule) {
+      '-A INPUT -s 1.1.0.0/255.255.192.0 -d 1.0.0.0/255.128.0.0 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -j   ACCEPT'
+    }
+    let(:resource) { provider.rule_to_hash(sample_rule, 'filter', 0) }
+    let(:instance) { provider.new(resource) }
+
+    it 'source contains a cidr netmask' do
+      resource[:source].should == "1.1.0.0/18"
+    end
+
+    it 'destination contains a cidr netmask' do
+      resource[:destination].should == "1.0.0.0/9"
+    end
+  end
 end

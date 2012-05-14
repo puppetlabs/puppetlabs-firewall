@@ -141,6 +141,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
     end
 
+    # convert network masks to cidr
+    # iptables-save on el5 outputs rules using network masks
+    [:source, :destination].each do |prop|
+      next unless hash[prop] =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/
+      hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr
+    end
+
     # States should always be sorted. This ensures that the output from
     # iptables-save and user supplied resources is consistent.
     hash[:state] = hash[:state].sort unless hash[:state].nil?
