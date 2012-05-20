@@ -68,6 +68,12 @@ describe 'iptables provider' do
     end
   end
 
+  it 'should ignore lines with fatal errors' do
+    provider.expects(:execute).with(['/sbin/iptables-save']).returns("FATAL: Could not load /lib/modules/2.6.18-028stab095.1/modules.dep: No such file or directory")
+
+    provider.instances.length.should == 0
+  end
+
   # Load in ruby hash for test fixtures.
   load 'spec/fixtures/iptables/conversion_hash.rb'
 
