@@ -32,6 +32,7 @@ Puppet::Type.newtype(:firewall) do
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
   feature :mark, "Set the netfilter mark value associated with the packet"
+  feature :pkttype, "Match a packet type"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -458,6 +459,18 @@ Puppet::Type.newtype(:firewall) do
         super(value)
       end
     end
+  end
+
+  newproperty(:pkttype, :required_features => :pkttype) do
+    desc <<-EOS
+      Sets the packet type for traffic.  Allowed values currently are:
+
+      * HOST
+      * BROADCAST
+      * MULTICAST
+    EOS
+
+    newvalues(:HOST, :BROADCAST, :MULTICAST)
   end
 
   newparam(:line) do
