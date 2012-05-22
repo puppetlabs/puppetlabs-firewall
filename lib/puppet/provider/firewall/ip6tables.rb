@@ -40,6 +40,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :toports => "--to-ports",
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
+    :limit => "-m limit --limit",
   }
 
   # This is the order of resources as they appear in iptables-save output,
