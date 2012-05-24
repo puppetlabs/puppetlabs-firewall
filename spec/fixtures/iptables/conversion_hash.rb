@@ -57,6 +57,38 @@ ARGS_TO_HASH = {
       :action => nil,
     },
   },
+  'source_destination_ipv4_no_cidr' => {
+    :line => '-A INPUT -s 1.1.1.1 -d 2.2.2.2 -m comment --comment "000 source destination ipv4 no cidr"',
+    :table => 'filter',
+    :params => {
+      :source => '1.1.1.1/32',
+      :destination => '2.2.2.2/32',
+    },
+  },
+  'source_destination_ipv6_no_cidr' => {
+    :line => '-A INPUT -s 2001:db8:85a3::8a2e:370:7334 -d 2001:db8:85a3::8a2e:370:7334 -m comment --comment "000 source destination ipv6 no cidr"',
+    :table => 'filter',
+    :params => {
+      :source => '2001:db8:85a3::8a2e:370:7334/128',
+      :destination => '2001:db8:85a3::8a2e:370:7334/128',
+    },
+  },
+  'source_destination_ipv4_netmask' => {
+    :line => '-A INPUT -s 1.1.1.0/255.255.255.0 -d 2.2.0.0/255.255.0.0 -m comment --comment "000 source destination ipv4 netmask"',
+    :table => 'filter',
+    :params => {
+      :source => '1.1.1.0/24',
+      :destination => '2.2.0.0/16',
+    },
+  },
+  'source_destination_ipv6_netmask' => {
+    :line => '-A INPUT -s 2001:db8:1234::/ffff:ffff:ffff:0000:0000:0000:0000:0000 -d 2001:db8:4321::/ffff:ffff:ffff:0000:0000:0000:0000:0000 -m comment --comment "000 source destination ipv6 netmask"',
+    :table => 'filter',
+    :params => {
+      :source => '2001:db8:1234::/48',
+      :destination => '2001:db8:4321::/48',
+    },
+  },
   'dport_range_1' => {
     :line => '-A INPUT -m multiport --dports 1:1024 -m comment --comment "000 allow foo"',
     :table => 'filter',
@@ -308,6 +340,42 @@ HASH_TO_ARGS = {
       :destination => '::/0',
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '100 zero prefix length ipv6'],
+  },
+  'source_destination_ipv4_no_cidr' => {
+    :params => {
+      :name => '000 source destination ipv4 no cidr',
+      :table => 'filter',
+      :source => '1.1.1.1',
+      :destination => '2.2.2.2',
+    },
+    :args => ['-t', :filter, '-s', '1.1.1.1/32', '-d', '2.2.2.2/32', '-p', :tcp, '-m', 'comment', '--comment', '000 source destination ipv4 no cidr'],
+  },
+ 'source_destination_ipv6_no_cidr' => {
+    :params => {
+      :name => '000 source destination ipv6 no cidr',
+      :table => 'filter',
+      :source => '2001:db8:1234::',
+      :destination => '2001:db8:4321::',
+    },
+    :args => ['-t', :filter, '-s', '2001:db8:1234::/128', '-d', '2001:db8:4321::/128', '-p', :tcp, '-m', 'comment', '--comment', '000 source destination ipv6 no cidr'],
+  },
+  'source_destination_ipv4_netmask' => {
+    :params => {
+      :name => '000 source destination ipv4 netmask',
+      :table => 'filter',
+      :source => '1.1.1.0/255.255.255.0',
+      :destination => '2.2.0.0/255.255.0.0',
+    },
+    :args => ['-t', :filter, '-s', '1.1.1.0/24', '-d', '2.2.0.0/16', '-p', :tcp, '-m', 'comment', '--comment', '000 source destination ipv4 netmask'],
+  },
+ 'source_destination_ipv6_netmask' => {
+    :params => {
+      :name => '000 source destination ipv6 netmask',
+      :table => 'filter',
+      :source => '2001:db8:1234::/ffff:ffff:ffff:0000:0000:0000:0000:0000',
+      :destination => '2001:db8:4321::/ffff:ffff:ffff:0000:0000:0000:0000:0000',
+    },
+    :args => ['-t', :filter, '-s', '2001:db8:1234::/48', '-d', '2001:db8:4321::/48', '-p', :tcp, '-m', 'comment', '--comment', '000 source destination ipv6 netmask'],
   },
   'sport_range_1' => {
     :params => {
