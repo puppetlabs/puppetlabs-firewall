@@ -111,10 +111,10 @@ ARGS_TO_HASH = {
     },
   },
   'comment_string_character_validation' => {
-    :line => '-A INPUT -s 192.168.0.1 -m comment --comment "000 allow from 192.168.0.1, please"',
+    :line => '-A INPUT -s 192.168.0.1/32 -m comment --comment "000 allow from 192.168.0.1, please"',
     :table => 'filter',
     :params => {
-      :source => '192.168.0.1',
+      :source => '192.168.0.1/32',
     },
   },
   'log_level_debug' => {
