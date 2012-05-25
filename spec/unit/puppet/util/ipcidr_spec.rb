@@ -25,6 +25,14 @@ describe 'Puppet::Util::IPCidr' do
     specify { subject.netmask.should == '255.255.255.0' }
   end
 
+  describe 'ipv4 open range with cidr' do
+    before { @ipcidr = Puppet::Util::IPCidr.new('0.0.0.0/0') }
+    subject { @ipcidr }
+    specify { subject.cidr.should == '0.0.0.0/0' }
+    specify { subject.prefixlen.should == 0 }
+    specify { subject.netmask.should == '0.0.0.0' }
+  end
+
   describe 'ipv6 address' do
     before { @ipaddr = Puppet::Util::IPCidr.new('2001:db8:85a3:0:0:8a2e:370:7334') }
     subject { @ipaddr }
@@ -47,5 +55,13 @@ describe 'Puppet::Util::IPCidr' do
     specify { subject.cidr.should == '2001:db8:1234::/48' }
     specify { subject.prefixlen.should == 48 }
     specify { subject.netmask.should == 'ffff:ffff:ffff:0000:0000:0000:0000:0000' }
+  end
+
+  describe 'ipv6 open range with cidr' do
+    before { @ipaddr = Puppet::Util::IPCidr.new('::/0') }
+    subject { @ipaddr }
+    specify { subject.cidr.should == '::/0' }
+    specify { subject.prefixlen.should == 0 }
+    specify { subject.netmask.should == '0000:0000:0000:0000:0000:0000:0000:0000' }
   end
 end
