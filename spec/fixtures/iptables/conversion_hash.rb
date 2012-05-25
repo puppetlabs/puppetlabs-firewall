@@ -274,6 +274,24 @@ HASH_TO_ARGS = {
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment",
       "100 no action"],
   },
+  'zero_prefixlen_ipv4' => {
+    :params => {
+      :name => '100 zero prefix length ipv4',
+      :table => 'filter',
+      :source => '0.0.0.0/0',
+      :destination => '0.0.0.0/0',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '100 zero prefix length ipv4'],
+  },
+  'zero_prefixlen_ipv6' => {
+    :params => {
+      :name => '100 zero prefix length ipv6',
+      :table => 'filter',
+      :source => '::/0',
+      :destination => '::/0',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '100 zero prefix length ipv6'],
+  },
   'sport_range_1' => {
     :params => {
       :name => "100 sport range",
