@@ -69,11 +69,31 @@ module Puppet::Util::Firewall
     end
   end
 
+  # Takes an address and returns it in CIDR notation.
+  #
+  # If the address is:
+  #
+  #   - A hostname:
+  #     It will be resolved
+  #   - An IPv4 address:
+  #     It will be qualified with a /32 CIDR notation
+  #   - An IPv6 address:
+  #     It will be qualified with a /128 CIDR notation
+  #   - An IP address with a CIDR notation:
+  #     It will be normalised
+  #   - An IP address with a dotted-quad netmask:
+  #     It will be converted to CIDR notation
+  #   - Any address with a resulting prefix length of zero:
+  #     It will return nil which is equivilent to not specifying an address
+  #
   def host_to_ip(value)
     begin
-      Puppet::Util::IPCidr.new(value).cidr
+      value = Puppet::Util::IPCidr.new(value)
     rescue
-      Puppet::Util::IPCidr.new(Resolv.getaddress(value)).cidr
+      value = Puppet::Util::IPCidr.new(Resolv.getaddress(value))
     end
+
+    return nil if value.prefixlen == 0
+    value.cidr
   end
 end
