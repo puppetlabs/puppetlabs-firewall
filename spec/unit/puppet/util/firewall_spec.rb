@@ -18,6 +18,8 @@ describe 'Puppet::Util::Firewall' do
     specify { subject.host_to_ip('96.126.112.51/32').should == '96.126.112.51/32' }
     specify { subject.host_to_ip('2001:db8:85a3:0:0:8a2e:370:7334').should == '2001:db8:85a3::8a2e:370:7334/128' }
     specify { subject.host_to_ip('2001:db8:1234::/48').should == '2001:db8:1234::/48' }
+    specify { subject.host_to_ip('0.0.0.0/0').should == nil }
+    specify { subject.host_to_ip('::/0').should == nil }
   end
 
   describe '#icmp_name_to_number' do

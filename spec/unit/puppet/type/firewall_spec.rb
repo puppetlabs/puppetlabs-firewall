@@ -116,6 +116,12 @@ describe firewall do
         @resource[addr] = '127.0.0.1'
         @resource[addr].should == '127.0.0.1/32'
       end
+      ['0.0.0.0/0', '::/0'].each do |prefix|
+        it "should be nil for zero prefix length address #{prefix}" do
+          @resource[addr] = prefix
+          @resource[addr].should == nil
+        end
+      end
     end
   end
 
