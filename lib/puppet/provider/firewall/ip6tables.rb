@@ -24,7 +24,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :icmp => "-m icmp6 --icmpv6-type",
     :iniface => "-i",
     :jump => "-j",
-    :limit => "--limit",
+    :limit => "-m limit --limit",
     :log_level => "--log-level",
     :log_prefix => "--log-prefix",
     :name => "-m comment --comment",
