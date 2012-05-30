@@ -460,6 +460,20 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:bridge, :required_features => :iptables) do
+      desc <<-EOS
+        Match if the packet is being bridged.
+      EOS
+
+      munge do |value|
+          if ! value.to_s.start_with?("--")
+              "--" + value.to_s
+          else
+              value
+          end
+      end
+  end
+
   newparam(:line) do
     desc <<-EOS
       Read-only property for caching the rule line.
@@ -604,6 +618,12 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:action) && value(:jump)
       self.fail "Only one of the parameters 'action' and 'jump' can be set"
+    end
+
+    if value(:bridged)
+      unless value(:chain).to_s =~ /FORWARD/
+        self.fail "Parameter isbridged only applies to the FORWARD chain"
+      end
     end
   end
 end

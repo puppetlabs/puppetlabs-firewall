@@ -49,6 +49,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
     :set_mark => "--set-mark",
+    :bridge => "-m physdev",
   }
 
   # This is the order of resources as they appear in iptables-save output,
@@ -56,7 +57,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :icmp, :limit, :burst,
+    :proto, :gid, :uid, :sport, :dport, :port, :name, :state, :bridge, :icmp, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
   def insert
