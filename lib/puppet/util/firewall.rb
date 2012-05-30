@@ -96,4 +96,18 @@ module Puppet::Util::Firewall
     return nil if value.prefixlen == 0
     value.cidr
   end
+
+  # Validates the argument is int or hex, and returns valid hex
+  # conversion of the value or nil otherwise.
+  def to_hex32(value)
+      begin
+        value = Integer(value)
+        if value.between?(0, 0xffffffff)
+            return '0x' + value.to_s(16)
+        end
+      rescue ArgumentError
+        # pass
+      end
+    return nil
+  end
 end
