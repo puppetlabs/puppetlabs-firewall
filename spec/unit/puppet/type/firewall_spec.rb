@@ -34,7 +34,7 @@ describe firewall do
       res = @class.new(:name => "000 test")
       res.parameters[:action].should == nil
     end
- 
+
     [:accept, :drop, :reject].each do |action|
       it "should accept value #{action}" do
         @resource[:action] = action
@@ -277,10 +277,10 @@ describe firewall do
 
   describe ':action and :jump' do
     it 'should allow only 1 to be set at a time' do
-      expect { 
+      expect {
         @class.new(
-          :name => "001-test", 
-          :action => "accept", 
+          :name => "001-test",
+          :action => "accept",
           :jump => "custom_chain"
         )
       }.should raise_error(Puppet::Error, /^Only one of the parameters 'action' and 'jump' can be set$/)
@@ -307,12 +307,38 @@ describe firewall do
 
   describe ':set_mark' do
     it 'should allow me to set set-mark' do
-      @resource[:set_mark] = '0x3e8'
-      @resource[:set_mark].should == '0x3e8'
+      @resource[:set_mark] = '0x3e8/0xffffffff'
+      @resource[:set_mark].should == '0x3e8/0xffffffff'
     end
-    it 'should convert int to hex' do
+    it 'should convert int to hex and add a 32 bit mask' do
       @resource[:set_mark] = '1000'
-      @resource[:set_mark].should == '0x3e8'
+      @resource[:set_mark].should == '0x3e8/0xffffffff'
+    end
+    it 'should add a 32 bit mask' do
+      @resource[:set_mark] = '0x32'
+      @resource[:set_mark].should == '0x32/0xffffffff'
+    end
+    it 'should use the mask provided' do
+      @resource[:set_mark] = '0x32/0x4'
+      @resource[:set_mark].should == '0x32/0x4'
+    end
+    it 'should use the mask provided and convert int to hex' do
+      @resource[:set_mark] = '1000/0x4'
+      @resource[:set_mark].should == '0x3e8/0x4'
+    end
+    ['/', '1000/', 'pwnie'].each do |bad_mark|
+      it "should fail with malformed mark '#{bad_mark}'" do
+        lambda { @resource[:set_mark] = bad_mark}.should raise_error(Puppet::Error)
+      end
+    end
+    it 'should fail if mask is malformed' do
+      lambda { @resource[:set_mark] = '1000/0xq4'}.should raise_error(Puppet::Error)
+    end
+    it 'should fail if mark value is more than 32 bits' do
+      lambda { @resource[:set_mark] = '4294967296'}.should raise_error(Puppet::Error)
+    end
+    it 'should fail if mask value is more than 32 bits' do
+      lambda { @resource[:set_mark] = '1/4294967296'}.should raise_error(Puppet::Error)
     end
   end
 
