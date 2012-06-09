@@ -85,6 +85,23 @@ ARGS_TO_HASH = {
       :sport => ["15","512-1024"],
     },
   },
+  'tcp_flags_1' => {
+    :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST,ACK,FIN SYN -m comment --comment "000 initiation"',
+    :table => 'filter',
+    :compare_all => true,
+    :chain => 'INPUT',
+    :proto => 'tcp',
+    :params => {
+      :chain => "INPUT",
+      :ensure => :present,
+      :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST,ACK,FIN SYN -m comment --comment "000 initiation"',
+      :name => "000 initiation",
+      :proto => "tcp",
+      :provider => "iptables",
+      :table => "filter",
+      :tcp_flags => "SYN,RST,ACK,FIN SYN",
+    },
+  },
   'state_returns_sorted_values' => {
     :line => '-A INPUT -m state --state INVALID,RELATED,ESTABLISHED',
     :table => 'filter',
@@ -323,6 +340,15 @@ HASH_TO_ARGS = {
       :table => "filter",
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "15,512:1024", "-m", "comment", "--comment", "100 sport range"],
+  },
+  'tcp_flags_1' => {
+    :params => {
+      :name => "000 initiation",
+      :tcp_flags => "SYN,RST,ACK,FIN SYN",
+      :table => "filter",
+    },
+
+    :args => ["-t", :filter, "-p", :tcp, "-m", "tcp", "--tcp-flags", "SYN,RST,ACK,FIN", "SYN", "-m", "comment", "--comment", "000 initiation",]
   },
   'states_set_from_array' => {
     :params => {
