@@ -32,6 +32,7 @@ Puppet::Type.newtype(:firewall) do
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
   feature :mark, "Set the netfilter mark value associated with the packet"
+  feature :tcp_flags, "The ability to match on particular TCP flag settings"
   feature :pkttype, "Match a packet type"
 
   # provider specific features
@@ -214,7 +215,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   # tcp-specific
-  newproperty(:tcp_flags) do
+  newproperty(:tcp_flags, :required_features => :tcp_flags) do
     desc <<-EOS
       Match when the TCP flags are as specified.
       Is a string with a list of comma-separated flag names for the mask,

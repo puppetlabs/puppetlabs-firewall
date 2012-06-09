@@ -12,6 +12,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :reject_type
   has_feature :log_level
   has_feature :log_prefix
+  has_feature :mark
+  has_feature :tcp_flags
   has_feature :pkttype
 
   commands :iptables      => '/sbin/ip6tables'

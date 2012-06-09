@@ -18,6 +18,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :log_level
   has_feature :log_prefix
   has_feature :mark
+  has_feature :tcp_flags
   has_feature :pkttype
 
   commands :iptables => '/sbin/iptables'
