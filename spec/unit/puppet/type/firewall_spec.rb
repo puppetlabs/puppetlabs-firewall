@@ -238,7 +238,11 @@ describe firewall do
       @resource[:icmp].should == 9
     end
 
-    it 'should fail if icmp type is not recognized' do
+    it 'should fail if icmp type is "any"' do
+      lambda { @resource[:icmp] = 'any' }.should raise_error(Puppet::Error)
+    end
+
+    it 'should fail if icmp type cannot be mapped to a numeric' do
       lambda { @resource[:icmp] = 'foo' }.should raise_error(Puppet::Error)
     end
   end
