@@ -133,6 +133,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
 
+    # Normalise all rules to CIDR notation.
+    [:source, :destination].each do |prop|
+      hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
+    end
+
     [:dport, :sport, :port, :state].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
