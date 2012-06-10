@@ -219,6 +219,17 @@ Bugs can be reported in the Puppetlabs Redmine project:
 
     <http://projects.puppetlabs.com/projects/modules/>
 
+Please note, we only aim support for the following distributions and versions:
+
+* Redhat 5.8 or greater
+* Debian 6.0 or greater
+* Ubuntu 11.04 or greater
+
+If you want a new distribution supported feel free to raise a ticket and we'll
+consider it. If you want an older revision supported we'll also consider it,
+but don't get insulted if we reject it. Specifically, we will not consider
+Redhat 4.x support - its just too old.
+
 ## Developer Guide
 
 ### Contributing
