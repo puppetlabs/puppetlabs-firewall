@@ -32,16 +32,6 @@ describe 'iptables provider detection' do
     })
     resource.provider.class.to_s.should == "Puppet::Type::Firewall::ProviderIptables"
   end
-
-  it "should raise a default provider error when there are no commands" do
-    # Stub all commands lookups so they return nothing
-    exists.any_instance.stubs(:which).returns false
-
-    # Instantiate a resource instance and make sure it raises an exception
-    lambda { resource = Puppet::Type.type(:firewall).new({
-      :name => '000 test foo' }) }.should raise_error(Puppet::DevError,
-      "Could not find a default provider for firewall")
-  end
 end
 
 describe 'iptables provider' do
@@ -85,7 +75,7 @@ describe 'iptables provider' do
         # If this option is enabled, make sure the parameters exactly match
         if data[:compare_all] then
           it "the parameter hash keys should be the same as returned by rules_to_hash" do
-            resource.keys.sort.should == data[:params].keys.sort
+            resource.keys.should =~ data[:params].keys
           end
         end
 
