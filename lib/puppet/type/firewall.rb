@@ -428,7 +428,7 @@ Puppet::Type.newtype(:firewall) do
     # States should always be sorted. This normalizes the resource states to
     # keep it consistent with the sorted result from iptables-save.
     def should=(values)
-      @should = super(values).sort
+      @should = super(values).sort_by {|sym| sym.to_s}
     end
 
     def is_to_s(value)

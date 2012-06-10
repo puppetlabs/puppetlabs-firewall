@@ -1,11 +1,67 @@
 ---
 language: ruby
-rvm:
-  - 1.8.7
-  - 1.9.2
-  - 1.9.3
 script: rake spec
 notifications:
   email: false
 gemfile:
   - gemfiles/gemfile.ci
+rvm:
+  - 1.8.7
+  - 1.9.2
+  - 1.9.3
+env:
+  # Latest 2.7.x & Facter 1.6.x
+  - BUILD_PUPPET_VER=2.7.14 BUILD_FACTER_VER=1.6.9
+  # Latest 2.6.x & Facter 1.6.x
+  - BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.9
+
+  # Mageia 2
+  - BUILD_PUPPET_VER=2.7.11 BUILD_FACTER_VER=1.6.6
+  # Ubuntu 12.04
+  - BUILD_PUPPET_VER=2.7.11 BUILD_FACTER_VER=1.6.5
+  # openSUSE 12.1
+  - BUILD_PUPPET_VER=2.7.6 BUILD_FACTER_VER=1.6.0
+  # Ubuntu 11.10 & Mandriva 2011 Contrib
+  - BUILD_PUPPET_VER=2.7.1 BUILD_FACTER_VER=1.5.9
+
+  # RHEL 5/6 EPEL
+  - BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.6
+  # Mageia 1
+  - BUILD_PUPPET_VER=2.6.8 BUILD_FACTER_VER=1.5.8
+  # Ubuntu 11.04 & openSUSE 11.4
+  - BUILD_PUPPET_VER=2.6.4 BUILD_FACTER_VER=1.5.8
+  # Debian 6 Main & Mandriva 2010 Contrib Backports
+  - BUILD_PUPPET_VER=2.6.2 BUILD_FACTER_VER=1.5.7
+matrix:
+  exclude:
+    # Puppet 2.6.x is not compatible with Ruby 1.9.x
+    - rvm: 1.9.2
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.9
+    - rvm: 1.9.3
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.9
+    - rvm: 1.9.2
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.6
+    - rvm: 1.9.3
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.6
+    - rvm: 1.9.2
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.8 BUILD_FACTER_VER=1.5.8
+    - rvm: 1.9.3
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.8 BUILD_FACTER_VER=1.5.8
+    - rvm: 1.9.2
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.4 BUILD_FACTER_VER=1.5.8
+    - rvm: 1.9.3
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.4 BUILD_FACTER_VER=1.5.8
+    - rvm: 1.9.2
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.2 BUILD_FACTER_VER=1.5.7
+    - rvm: 1.9.3
+      gemfile: gemfiles/gemfile.ci
+      env: BUILD_PUPPET_VER=2.6.2 BUILD_FACTER_VER=1.5.7
