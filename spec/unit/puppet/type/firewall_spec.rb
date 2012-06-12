@@ -309,39 +309,74 @@ describe firewall do
   end
 
   describe ':set_mark' do
-    it 'should allow me to set set-mark' do
-      @resource[:set_mark] = '0x3e8/0xffffffff'
-      @resource[:set_mark].should == '0x3e8/0xffffffff'
-    end
-    it 'should convert int to hex and add a 32 bit mask' do
-      @resource[:set_mark] = '1000'
-      @resource[:set_mark].should == '0x3e8/0xffffffff'
-    end
-    it 'should add a 32 bit mask' do
-      @resource[:set_mark] = '0x32'
-      @resource[:set_mark].should == '0x32/0xffffffff'
-    end
-    it 'should use the mask provided' do
-      @resource[:set_mark] = '0x32/0x4'
-      @resource[:set_mark].should == '0x32/0x4'
-    end
-    it 'should use the mask provided and convert int to hex' do
-      @resource[:set_mark] = '1000/0x4'
-      @resource[:set_mark].should == '0x3e8/0x4'
-    end
-    ['/', '1000/', 'pwnie'].each do |bad_mark|
-      it "should fail with malformed mark '#{bad_mark}'" do
-        lambda { @resource[:set_mark] = bad_mark}.should raise_error(Puppet::Error)
+    ['1.3.2', '1.4.2'].each do |iptables_version|
+      describe "with iptables #{iptables_version}" do
+        before {
+          Facter.clear
+          Facter.fact(:iptables_version).stubs(:value).returns(iptables_version)
+          Facter.fact(:ip6tables_version).stubs(:value).returns(iptables_version)
+        }
+
+        if iptables_version == '1.3.2'
+          it 'should allow me to set set-mark without mask' do
+            @resource[:set_mark] = '0x3e8'
+            @resource[:set_mark].should == '0x3e8'
+          end
+          it 'should convert int to hex without mask' do
+            @resource[:set_mark] = '1000'
+            @resource[:set_mark].should == '0x3e8'
+          end
+          it 'should fail if mask is present' do
+            lambda { @resource[:set_mark] = '0x3e8/0xffffffff'}.should raise_error(
+              Puppet::Error, /iptables version #{iptables_version} does not support masks on MARK rules$/
+            )
+          end
+        end
+
+        if iptables_version == '1.4.2'
+          it 'should allow me to set set-mark with mask' do
+            @resource[:set_mark] = '0x3e8/0xffffffff'
+            @resource[:set_mark].should == '0x3e8/0xffffffff'
+          end
+          it 'should convert int to hex and add a 32 bit mask' do
+            @resource[:set_mark] = '1000'
+            @resource[:set_mark].should == '0x3e8/0xffffffff'
+          end
+          it 'should add a 32 bit mask' do
+            @resource[:set_mark] = '0x32'
+            @resource[:set_mark].should == '0x32/0xffffffff'
+          end
+          it 'should use the mask provided' do
+            @resource[:set_mark] = '0x32/0x4'
+            @resource[:set_mark].should == '0x32/0x4'
+          end
+          it 'should use the mask provided and convert int to hex' do
+            @resource[:set_mark] = '1000/0x4'
+            @resource[:set_mark].should == '0x3e8/0x4'
+          end
+          it 'should fail if mask value is more than 32 bits' do
+            lambda { @resource[:set_mark] = '1/4294967296'}.should raise_error(
+              Puppet::Error, /MARK mask must be integer or hex between 0 and 0xffffffff$/
+            )
+          end
+          it 'should fail if mask is malformed' do
+            lambda { @resource[:set_mark] = '1000/0xq4'}.should raise_error(
+              Puppet::Error, /MARK mask must be integer or hex between 0 and 0xffffffff$/
+            )
+          end
+        end
+
+        ['/', '1000/', 'pwnie'].each do |bad_mark|
+          it "should fail with malformed mark '#{bad_mark}'" do
+            lambda { @resource[:set_mark] = bad_mark}.should raise_error(Puppet::Error)
+          end
+        end
+        it 'should fail if mark value is more than 32 bits' do
+          lambda { @resource[:set_mark] = '4294967296'}.should raise_error(
+            Puppet::Error, /MARK value must be integer or hex between 0 and 0xffffffff$/
+          )
+        end
       end
-    end
-    it 'should fail if mask is malformed' do
-      lambda { @resource[:set_mark] = '1000/0xq4'}.should raise_error(Puppet::Error)
-    end
-    it 'should fail if mark value is more than 32 bits' do
-      lambda { @resource[:set_mark] = '4294967296'}.should raise_error(Puppet::Error)
-    end
-    it 'should fail if mask value is more than 32 bits' do
-      lambda { @resource[:set_mark] = '1/4294967296'}.should raise_error(Puppet::Error)
     end
   end
 
