@@ -209,7 +209,7 @@ Puppet::Type.newtype(:firewall) do
       *tcp*.
     EOS
 
-    newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :all)
+    newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :gre, :all)
     defaultto "tcp"
   end
 
