@@ -25,6 +25,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   defaultfor :kernel => :linux
 
+  iptables_version = Facter.fact('iptables_version').value
+  if (iptables_version and Puppet::Util::Package.versioncmp(iptables_version, '1.4.1') < 0)
+    mark_flag = '--set-mark'
+  else
+    mark_flag = '--set-xmark'
+  end
+
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
@@ -41,16 +48,16 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :port => '-m multiport --ports',
     :proto => "-p",
     :reject => "--reject-with",
+    :set_mark => mark_flag,
     :source => "-s",
-    :state => "-m state --state",
     :sport => "-m multiport --sports",
+    :state => "-m state --state",
     :table => "-t",
     :tcp_flags => "-m tcp --tcp-flags",
     :todest => "--to-destination",
     :toports => "--to-ports",
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
-    :set_mark => "--set-mark",
   }
 
   # This is the order of resources as they appear in iptables-save output,
