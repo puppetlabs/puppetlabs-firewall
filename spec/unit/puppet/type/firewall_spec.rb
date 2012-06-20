@@ -398,7 +398,7 @@ describe firewall do
   end
 
   describe ':pkttype' do
-    [:MULTICAST, :BROADCAST, :HOST].each do |pkttype|
+    [:multicast, :broadcast, :host].each do |pkttype|
       it "should accept pkttype value #{pkttype}" do
         @resource[:pkttype] = pkttype
         @resource[:pkttype].should == pkttype

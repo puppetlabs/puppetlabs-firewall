@@ -281,12 +281,12 @@ ARGS_TO_HASH = {
       :outiface => 'eth+',
     },
   },
-  'pkttype MULTICAST' => {
-    :line => '-A INPUT -m pkttype --pkt-type MULTICAST -j ACCEPT',
+  'pkttype multicast' => {
+    :line => '-A INPUT -m pkttype --pkt-type multicast -j ACCEPT',
     :table => 'filter',
     :params => {
       :action => 'accept',
-      :pkttype => 'MULTICAST',
+      :pkttype => 'multicast',
     },
   },
 }
@@ -609,8 +609,8 @@ HASH_TO_ARGS = {
       :action => 'accept',
       :chain => 'INPUT',
       :iniface => 'eth0',
-      :pkttype => 'MULTICAST',
+      :pkttype => 'multicast',
     },
-    :args => ["-t", :filter, "-m", "pkttype", "--pkt-type", :MULTICAST, "-i", "eth0", "-p", :tcp, "-m", "comment", "--comment", "062 pkttype multicast", "-j", "ACCEPT"],
+    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "pkttype", "--pkt-type", :multicast, "-m", "comment", "--comment", "062 pkttype multicast", "-j", "ACCEPT"],
   },
 }

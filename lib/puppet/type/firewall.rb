@@ -493,12 +493,12 @@ Puppet::Type.newtype(:firewall) do
     desc <<-EOS
       Sets the packet type for traffic.  Allowed values currently are:
 
-      * HOST
-      * BROADCAST
-      * MULTICAST
+      * host
+      * broadcast
+      * multicast
     EOS
 
-    newvalues(:HOST, :BROADCAST, :MULTICAST)
+    newvalues(:host, :broadcast, :multicast)
   end
 
   newparam(:line) do
