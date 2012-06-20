@@ -396,4 +396,17 @@ describe firewall do
       rel[1].target.ref.should == @resource.ref
     end
   end
+
+  describe ':pkttype' do
+    [:multicast, :broadcast, :unicast].each do |pkttype|
+      it "should accept pkttype value #{pkttype}" do
+        @resource[:pkttype] = pkttype
+        @resource[:pkttype].should == pkttype
+      end
+    end
+
+    it 'should fail when the pkttype value is not recognized' do
+      lambda { @resource[:pkttype] = 'not valid' }.should raise_error(Puppet::Error)
+    end
+  end
 end
