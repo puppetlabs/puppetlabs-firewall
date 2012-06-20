@@ -477,15 +477,43 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:set_mark, :required_features => :mark) do
     desc <<-EOS
-      Set the Netfilter mark value associated with the packet.
+      Set the Netfilter mark value associated with the packet.  Accepts either of:
+      mark/mask or mark.  These will be converted to hex if they are not already.
     EOS
 
     munge do |value|
-      if ! value.to_s.include?("0x")
-        "0x" + value.to_i.to_s(16)
-      else
-        super(value)
+      int_or_hex = '[a-fA-F0-9x]'
+      match = value.to_s.match("(#{int_or_hex}+)(/)?(#{int_or_hex}+)?")
+      mark = @resource.to_hex32(match[1])
+
+      # Values that can't be converted to hex.
+      # Or contain a trailing slash with no mask.
+      if mark.nil? or (mark and match[2] and match[3].nil?)
+        raise ArgumentError, "MARK value must be integer or hex between 0 and 0xffffffff"
       end
+
+      # Old iptables does not support a mask. New iptables will expect one.
+      iptables_version = Facter.fact('iptables_version').value
+      mask_required = (iptables_version and Puppet::Util::Package.versioncmp(iptables_version, '1.4.1') >= 0)
+
+      if mask_required
+        if match[3].nil?
+          value = "#{mark}/0xffffffff"
+        else
+          mask = @resource.to_hex32(match[3])
+          if mask.nil?
+            raise ArgumentError, "MARK mask must be integer or hex between 0 and 0xffffffff"
+          end
+          value = "#{mark}/#{mask}"
+        end
+      else
+        unless match[3].nil?
+          raise ArgumentError, "iptables version #{iptables_version} does not support masks on MARK rules"
+        end
+        value = mark
+      end
+
+      value
     end
   end
 

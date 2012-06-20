@@ -219,12 +219,12 @@ ARGS_TO_HASH = {
     },
   },
   'mark_set-mark' => {
-    :line => '-t mangle -A PREROUTING -j MARK --set-mark 1000',
+    :line => '-t mangle -A PREROUTING -j MARK --set-xmark 0x3e8/0xffffffff',
     :table => 'mangle',
     :params => {
       :jump     => 'MARK',
       :chain    => 'PREROUTING',
-      :set_mark => '1000',
+      :set_mark => '0x3e8/0xffffffff',
     }
   },
   'iniface_1' => {
@@ -532,7 +532,7 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-m', 'comment', '--comment', '057 POSTROUTING gid root only', '-j', 'ACCEPT'],
   },
-  'mark_set-mark' => {
+  'mark_set-mark_int' => {
     :params => {
       :name     => '058 set-mark 1000',
       :table    => 'mangle',
@@ -540,9 +540,39 @@ HASH_TO_ARGS = {
       :chain    => 'PREROUTING',
       :set_mark => '1000',
     },
-    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-mark', '0x3e8'],
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-xmark', '0x3e8/0xffffffff'],
   },
-  'iniface_1' => {
+  'mark_set-mark_hex' => {
+    :params => {
+      :name     => '058 set-mark 0x32',
+      :table    => 'mangle',
+      :jump     => 'MARK',
+      :chain    => 'PREROUTING',
+      :set_mark => '0x32',
+    },
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 0x32', '-j', 'MARK', '--set-xmark', '0x32/0xffffffff'],
+  },
+  'mark_set-mark_hex_with_hex_mask' => {
+    :params => {
+      :name     => '058 set-mark 0x32/0xffffffff',
+      :table    => 'mangle',
+      :jump     => 'MARK',
+      :chain    => 'PREROUTING',
+      :set_mark => '0x32/0xffffffff',
+    },
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 0x32/0xffffffff', '-j', 'MARK', '--set-xmark', '0x32/0xffffffff'],
+    },
+  'mark_set-mark_hex_with_mask' => {
+    :params => {
+      :name     => '058 set-mark 0x32/4',
+      :table    => 'mangle',
+      :jump     => 'MARK',
+      :chain    => 'PREROUTING',
+      :set_mark => '0x32/4',
+    },
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 0x32/4', '-j', 'MARK', '--set-xmark', '0x32/0x4'],
+    },
+    'iniface_1' => {
     :params => {
       :name => '060 iniface',
       :table => 'filter',

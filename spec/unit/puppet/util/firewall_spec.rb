@@ -44,4 +44,15 @@ describe 'Puppet::Util::Firewall' do
     specify { subject.string_to_port('80').should == '80' }
     specify { subject.string_to_port('http').should == '80' }
   end
+
+  describe '#to_hex32' do
+    subject { resource }
+    specify { subject.to_hex32('0').should == '0x0' }
+    specify { subject.to_hex32('0x32').should == '0x32' }
+    specify { subject.to_hex32('42').should == '0x2a' }
+    specify { subject.to_hex32('4294967295').should == '0xffffffff' }
+    specify { subject.to_hex32('4294967296').should == nil }
+    specify { subject.to_hex32('-1').should == nil }
+    specify { subject.to_hex32('bananas').should == nil }
+  end
 end

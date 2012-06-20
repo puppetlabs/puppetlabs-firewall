@@ -1,8 +1,8 @@
 require 'spec_helper'
-require 'facter/iptables'
 
 describe "Facter::Util::Fact" do
   before {
+    Facter.clear
     Facter.fact(:kernel).stubs(:value).returns("Linux")
     Facter.fact(:kernelrelease).stubs(:value).returns("2.6")
   }
