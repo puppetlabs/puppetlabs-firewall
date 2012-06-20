@@ -12,6 +12,9 @@ describe firewall do
     Puppet::Type::Firewall.stubs(:defaultprovider).returns @provider
 
     @resource = @class.new({:name  => '000 test foo'})
+
+    # Stub iptables version
+    Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
   end
 
   it 'should have :name be its namevar' do
