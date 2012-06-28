@@ -158,7 +158,7 @@ And an example of a post class:
 Basic accept ICMP request example:
 
     firewall { "000 accept all icmp requests":
-      proto => "icmp",
+      proto  => "icmp",
       action => "accept",
     }
 
@@ -171,12 +171,12 @@ Drop all:
 Source NAT example (perfect for a virtualization host):
 
     firewall { '100 snat for network foo2':
-      chain  => 'POSTROUTING',
-      jump   => 'MASQUERADE',
-      proto  => 'all',
+      chain    => 'POSTROUTING',
+      jump     => 'MASQUERADE',
+      proto    => 'all',
       outiface => "eth0",
-      source => ['10.1.2.0/24'],
-      table  => 'nat',
+      source   => ['10.1.2.0/24'],
+      table    => 'nat',
     }
 
 Creating a new rule that forwards to a chain, then adding a rule to this chain:
