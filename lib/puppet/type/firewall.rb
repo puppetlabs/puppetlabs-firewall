@@ -399,7 +399,17 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       if value.kind_of?(String)
-        value = @resource.icmp_name_to_number(value)
+        # ICMP codes differ between IPv4 and IPv6.
+        case @resource[:provider]
+        when :iptables
+          protocol = 'inet'
+        when :ip6tables
+          protocol = 'inet6'
+        else
+          self.fail("cannot work out protocol family")
+        end
+
+        value = @resource.icmp_name_to_number(value, protocol)
       else
         value
       end
