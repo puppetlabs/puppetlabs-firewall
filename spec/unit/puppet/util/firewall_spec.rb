@@ -23,20 +23,47 @@ describe 'Puppet::Util::Firewall' do
   end
 
   describe '#icmp_name_to_number' do
-    subject { resource }
-    specify { subject.icmp_name_to_number('echo-reply').should == '0' }
-    specify { subject.icmp_name_to_number('destination-unreachable').should == '3' }
-    specify { subject.icmp_name_to_number('source-quench').should == '4' }
-    specify { subject.icmp_name_to_number('redirect').should == '6' }
-    specify { subject.icmp_name_to_number('echo-request').should == '8' }
-    specify { subject.icmp_name_to_number('router-advertisement').should == '9' }
-    specify { subject.icmp_name_to_number('router-solicitation').should == '10' }
-    specify { subject.icmp_name_to_number('time-exceeded').should == '11' }
-    specify { subject.icmp_name_to_number('parameter-problem').should == '12' }
-    specify { subject.icmp_name_to_number('timestamp-request').should == '13' }
-    specify { subject.icmp_name_to_number('timestamp-reply').should == '14' }
-    specify { subject.icmp_name_to_number('address-mask-request').should == '17' }
-    specify { subject.icmp_name_to_number('address-mask-reply').should == '18' }
+    describe 'proto unsupported' do
+      subject { resource }
+
+      %w{inet5 inet8 foo}.each do |proto|
+        it "should reject invalid proto #{proto}" do
+          expect { subject.icmp_name_to_number('echo-reply', proto) }.should
+            raise_error(ArgumentError, "unsupported protocol family '#{proto}'")
+        end
+      end
+    end
+
+    describe 'proto IPv4' do
+      proto = 'inet'
+      subject { resource }
+      specify { subject.icmp_name_to_number('echo-reply', proto).should == '0' }
+      specify { subject.icmp_name_to_number('destination-unreachable', proto).should == '3' }
+      specify { subject.icmp_name_to_number('source-quench', proto).should == '4' }
+      specify { subject.icmp_name_to_number('redirect', proto).should == '6' }
+      specify { subject.icmp_name_to_number('echo-request', proto).should == '8' }
+      specify { subject.icmp_name_to_number('router-advertisement', proto).should == '9' }
+      specify { subject.icmp_name_to_number('router-solicitation', proto).should == '10' }
+      specify { subject.icmp_name_to_number('time-exceeded', proto).should == '11' }
+      specify { subject.icmp_name_to_number('parameter-problem', proto).should == '12' }
+      specify { subject.icmp_name_to_number('timestamp-request', proto).should == '13' }
+      specify { subject.icmp_name_to_number('timestamp-reply', proto).should == '14' }
+      specify { subject.icmp_name_to_number('address-mask-request', proto).should == '17' }
+      specify { subject.icmp_name_to_number('address-mask-reply', proto).should == '18' }
+    end
+
+    describe 'proto IPv6' do
+      proto = 'inet6'
+      subject { resource }
+      specify { subject.icmp_name_to_number('destination-unreachable', proto).should == '1' }
+      specify { subject.icmp_name_to_number('time-exceeded', proto).should == '3' }
+      specify { subject.icmp_name_to_number('parameter-problem', proto).should == '4' }
+      specify { subject.icmp_name_to_number('echo-request', proto).should == '128' }
+      specify { subject.icmp_name_to_number('echo-reply', proto).should == '129' }
+      specify { subject.icmp_name_to_number('router-solicitation', proto).should == '133' }
+      specify { subject.icmp_name_to_number('router-advertisement', proto).should == '134' }
+      specify { subject.icmp_name_to_number('redirect', proto).should == '137' }
+    end
   end
 
   describe '#string_to_port' do

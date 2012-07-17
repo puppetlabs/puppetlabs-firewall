@@ -214,25 +214,43 @@ describe firewall do
   end
 
   describe ':icmp' do
-    values = {
-      '0' => 'echo-reply',
-      '3' => 'destination-unreachable',
-      '4' => 'source-quench',
-      '6' => 'redirect',
-      '8' => 'echo-request',
-      '9' => 'router-advertisement',
-      '10' => 'router-solicitation',
-      '11' => 'time-exceeded',
-      '12' => 'parameter-problem',
-      '13' => 'timestamp-request',
-      '14' => 'timestamp-reply',
-      '17' => 'address-mask-request',
-      '18' => 'address-mask-reply'
+    icmp_codes = {
+      :iptables => {
+        '0' => 'echo-reply',
+        '3' => 'destination-unreachable',
+        '4' => 'source-quench',
+        '6' => 'redirect',
+        '8' => 'echo-request',
+        '9' => 'router-advertisement',
+        '10' => 'router-solicitation',
+        '11' => 'time-exceeded',
+        '12' => 'parameter-problem',
+        '13' => 'timestamp-request',
+        '14' => 'timestamp-reply',
+        '17' => 'address-mask-request',
+        '18' => 'address-mask-reply'
+      },
+      :ip6tables => {
+        '1' => 'destination-unreachable',
+        '3' => 'time-exceeded',
+        '4' => 'parameter-problem',
+        '128' => 'echo-request',
+        '129' => 'echo-reply',
+        '133' => 'router-solicitation',
+        '134' => 'router-advertisement',
+        '137' => 'redirect'
+      }
     }
-    values.each do |k,v|
-      it 'should convert icmp string to number' do
-        @resource[:icmp] = v
-        @resource[:icmp].should == k
+    icmp_codes.each do |provider, values|
+      describe provider do
+        values.each do |k,v|
+          it 'should convert icmp string to number' do
+            @resource[:provider] = provider
+            @resource[:provider].should == provider
+            @resource[:icmp] = v
+            @resource[:icmp].should == k
+          end
+        end
       end
     end
 

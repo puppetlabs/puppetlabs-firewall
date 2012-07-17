@@ -5,10 +5,10 @@ require 'puppet/util/ipcidr'
 # Util module for puppetlabs-firewall
 module Puppet::Util::Firewall
   # Translate the symbolic names for icmp packet types to integers
-  def icmp_name_to_number(value_icmp)
+  def icmp_name_to_number(value_icmp, protocol)
     if value_icmp =~ /\d{1,2}$/
       value_icmp
-    else
+    elsif protocol == 'inet'
       case value_icmp
         when "echo-reply" then "0"
         when "destination-unreachable" then "3"
@@ -25,6 +25,20 @@ module Puppet::Util::Firewall
         when "address-mask-reply" then "18"
         else nil
       end
+    elsif protocol == 'inet6'
+      case value_icmp
+        when "destination-unreachable" then "1"
+        when "time-exceeded" then "3"
+        when "parameter-problem" then "4"
+        when "echo-request" then "128"
+        when "echo-reply" then "129"
+        when "router-solicitation" then "133"
+        when "router-advertisement" then "134"
+        when "redirect" then "137"
+        else nil
+      end
+    else
+      raise ArgumentError, "unsupported protocol family '#{protocol}'"
     end
   end
 
