@@ -1,6 +1,5 @@
 require 'puppet/provider/firewall'
 require 'digest/md5'
-require 'pp'
 
 Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
@@ -157,65 +156,65 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   end
 
   def self.rule_to_hash(line, table, counter)
-      hash = {}
-      keys = []
-      row = []
-      values = line.dup
+    hash = {}
+    keys = []
+    row = []
+    values = line.dup
 
-      row = values.split(%r{\s+})
-      i = 0
-      invertnext = false
+    row = values.split(%r{\s+})
+    i = 0
+    invertnext = false
 
-      hash[:modules] = []
-      hash[:invert] = {}
+    hash[:modules] = []
+    hash[:invert] = {}
 
-      while i < row.length
-          case row[i]
-          when /-m/
-              hash[:modules] << row[i+1]
-          when /--comment/
-              name = []
-              while not row[i] =~ /"$/
-                  i += 1
-                  name << row[i]
-              end
-              name = name.join(' ')
-              name = name.gsub(/"/, '')
-              hash[:name] = name
-          when /--tcp-flags/
-              hash[:tcp_flags] = row[i] + " " + row[i+1]
-              i += 1
-          when /!/
-              # TODO handle inverse matches
-              invertnext = true
-          else
-              if @args_map[row[i]]
-                  hash[ @args_map[row[i]] ] = row[i+1]
-                  if invertnext
-                      hash[:invert][ @args_map[row[i]] ] = true
-                      invertnext = false
-                  end
-              end
-          end
+    while i < row.length
+      case row[i]
+      when /-m/
+        hash[:modules] << row[i+1]
+      when /--comment/
+        name = []
+        while not row[i] =~ /"$/
           i += 1
-      end 
-
-      [:source, :destination].each do |prop|
-          hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
+          name << row[i]
+        end
+        name = name.join(' ')
+        name = name.gsub(/"/, '')
+        hash[:name] = name
+      when /--tcp-flags/
+        hash[:tcp_flags] = row[i] + " " + row[i+1]
+        i += 1
+      when /!/
+        # TODO handle inverse matches
+        invertnext = true
+      else
+        if @args_map[row[i]]
+          hash[ @args_map[row[i]] ] = row[i+1]
+          if invertnext
+            hash[:invert][ @args_map[row[i]] ] = true
+            invertnext = false
+          end
+        end
       end
+      i += 1
+    end 
+
+    [:source, :destination].each do |prop|
+      hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
+    end
 
     [:dport, :sport, :port, :state].each do |prop|
-        hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
+      hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
     # Our type prefers hyphens over colons for ranges so ...
     # Iterate across all ports replacing colons with hyphens so that ranges match
     # the types expectations.
     [:dport, :sport, :port].each do |prop|
-        next unless hash[prop]
-        hash[prop] = hash[prop].collect do |elem|
-            elem.gsub(/:/,'-')
-        end
+      next unless hash[prop]
+      hash[prop] = hash[prop].collect do |elem|
+        elem.gsub(/:/,'-')
+      end
     end
 
     # States should always be sorted. This ensures that the output from
@@ -226,13 +225,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Puppet-firewall requires that all rules have comments (resource names) and will fail if
     # a rule in iptables does not have a comment. We get around this by appending a high level
     if ! hash[:name]
-        hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
+      hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
     end
 
     # Iptables defaults to log_level '4', so it is omitted from the output of iptables-save.
     # If the :jump value is LOG and you don't have a log-level set, we assume it to be '4'.
     if hash[:jump] == 'LOG' && ! hash[:log_level]
-        hash[:log_level] = '4'
+      hash[:log_level] = '4'
     end
 
     hash[:line] = line
@@ -248,8 +247,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # If the jump parameter is set to one of: ACCEPT, REJECT or DROP then
     # we should set the action parameter instead.
     if ['ACCEPT','REJECT','DROP'].include?(hash[:jump]) then
-        hash[:action] = hash[:jump].downcase
-        hash.delete(:jump)
+      hash[:action] = hash[:jump].downcase
+      hash.delete(:jump)
     end
       
     hash
