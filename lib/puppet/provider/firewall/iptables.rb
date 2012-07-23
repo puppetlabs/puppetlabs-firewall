@@ -182,7 +182,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
               name = name.join(' ')
               name = name.gsub(/"/, '')
               hash[:name] = name
-
+          when /--tcp-flags/
+              hash[:tcp_flags] = row[i] + " " + row[i+1]
+              i += 1
           when /!/
               # TODO handle inverse matches
               invertnext = true
