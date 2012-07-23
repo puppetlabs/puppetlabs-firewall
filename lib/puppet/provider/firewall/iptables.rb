@@ -1,5 +1,6 @@
 require 'puppet/provider/firewall'
 require 'digest/md5'
+require 'pp'
 
 Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
@@ -62,6 +63,40 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :pkttype => "-m pkttype --pkt-type"
   }
 
+  @args_map = {
+      '-A'              => :chain,
+      '-t'              => :table,
+      '--limit-burst'   => :burst,
+      '-d'              => :destination,
+      '--dport'         => :dport,
+      '--dports'        => :dport,
+      '--gid-owner'     => :gid,
+      '--icmp-type'     => :icmp,
+      '-i'              => :iniface,
+      '-j'              => :jump,
+      '--log-level'     => :log_level,
+      '--log-prefix'    => :log_prefix,
+      '--limit'         => :limit,
+      '--comment'       => :name,
+      '-o'              => :outiface,
+      '--ports'         => :port,
+      '--port'          => :port,
+      '-p'              => :proto,
+      '--reject-with'   => :reject,
+      mark_flag         => :set_mark,
+      '-s'              => :source,
+      '--sport'         => :sport,
+      '--sports'        => :sport,
+      '--state'         => :state,
+      '--tcp-flags'     => :tcp_flags,
+      '--to-destination'=> :todest,
+      '--to-ports'      => :toports,
+      '--to-port'       => :toports,
+      '--to-source'     => :tosource,
+      '--uid-owner'     => :uid,
+      '--pkt-type'      => :pkttype,
+  }
+
   # This is the order of resources as they appear in iptables-save output,
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
@@ -122,43 +157,63 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   end
 
   def self.rule_to_hash(line, table, counter)
-    hash = {}
-    keys = []
-    values = line.dup
+      hash = {}
+      keys = []
+      row = []
+      values = line.dup
 
-    # --tcp-flags takes two values; we cheat by adding " around it
-    # so it behaves like --comment
-    values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+      row = values.split(%r{\s+})
+      i = 0
+      invertnext = false
 
-    @resource_list.reverse.each do |k|
-      if values.slice!(/\s#{@resource_map[k]}/)
-        keys << k
+      hash[:modules] = []
+      hash[:invert] = {}
+
+      while i < row.length
+          case row[i]
+          when /-m/
+              hash[:modules] << row[i+1]
+          when /--comment/
+              name = []
+              while not row[i] =~ /"$/
+                  i += 1
+                  name << row[i]
+              end
+              name = name.join(' ')
+              name = name.gsub(/"/, '')
+              hash[:name] = name
+
+          when /!/
+              # TODO handle inverse matches
+              invertnext = true
+          else
+              if @args_map[row[i]]
+                  hash[ @args_map[row[i]] ] = row[i+1]
+                  if invertnext
+                      hash[:invert][ @args_map[row[i]] ] = true
+                      invertnext = false
+                  end
+              end
+          end
+          i += 1
+      end 
+
+      [:source, :destination].each do |prop|
+          hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
       end
-    end
-
-    # Manually remove chain
-    values.slice!('-A')
-    keys << :chain
-
-    keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
-
-    # Normalise all rules to CIDR notation.
-    [:source, :destination].each do |prop|
-      hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
-    end
 
     [:dport, :sport, :port, :state].each do |prop|
-      hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
+        hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
     # Our type prefers hyphens over colons for ranges so ...
     # Iterate across all ports replacing colons with hyphens so that ranges match
     # the types expectations.
     [:dport, :sport, :port].each do |prop|
-      next unless hash[prop]
-      hash[prop] = hash[prop].collect do |elem|
-        elem.gsub(/:/,'-')
-      end
+        next unless hash[prop]
+        hash[prop] = hash[prop].collect do |elem|
+            elem.gsub(/:/,'-')
+        end
     end
 
     # States should always be sorted. This ensures that the output from
@@ -169,13 +224,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Puppet-firewall requires that all rules have comments (resource names) and will fail if
     # a rule in iptables does not have a comment. We get around this by appending a high level
     if ! hash[:name]
-      hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
+        hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
     end
 
     # Iptables defaults to log_level '4', so it is omitted from the output of iptables-save.
     # If the :jump value is LOG and you don't have a log-level set, we assume it to be '4'.
     if hash[:jump] == 'LOG' && ! hash[:log_level]
-      hash[:log_level] = '4'
+        hash[:log_level] = '4'
     end
 
     hash[:line] = line
@@ -191,10 +246,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # If the jump parameter is set to one of: ACCEPT, REJECT or DROP then
     # we should set the action parameter instead.
     if ['ACCEPT','REJECT','DROP'].include?(hash[:jump]) then
-      hash[:action] = hash[:jump].downcase
-      hash.delete(:jump)
+        hash[:action] = hash[:jump].downcase
+        hash.delete(:jump)
     end
-
+      
     hash
   end
 
