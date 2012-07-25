@@ -288,9 +288,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     debug("[insert_order]")
     rules = []
 
-    # Find list of current rules based on chain
+    # Find list of current rules based on chain and table
     self.class.instances.each do |rule|
-      rules << rule.name if rule.chain == resource[:chain].to_s
+      if rule.chain == resource[:chain].to_s and rule.table == resource[:table].to_s
+        rules << rule.name
+      end
     end
 
     # No rules at all? Just bail now.
