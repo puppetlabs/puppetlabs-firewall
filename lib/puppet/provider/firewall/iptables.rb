@@ -33,6 +33,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     mark_flag = '--set-xmark'
   end
 
+  @comment_supported = Facter.fact('kernelmajversion').value > '2.6'
+
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
@@ -66,9 +68,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst,
-    :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
+  if @comment_supported
+    @resource_list = [:table, :source, :destination, :iniface, :outiface,
+      :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst,
+      :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
+  else
+    @resource_list = [:table, :source, :destination, :iniface, :outiface,
+      :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :pkttype, :state, :icmp, :limit, :burst,
+      :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
+  end
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
@@ -200,7 +208,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def insert_args
     args = []
-    args << ["-I", resource[:chain], insert_order]
+    if @comment_supported
+      args << ["-I", resource[:chain], insert_order]
+    else
+      args << ["-A", resource[:chain]]
+    end
     args << general_args
     args
   end
