@@ -90,7 +90,7 @@ ARGS_TO_HASH = {
     },
   },
   'source_destination_negate_source' => {
-    :line => '-A INPUT -s ! 1.1.1.1 -d 2.2.2.2 -m comment --comment "000 negated source address"',
+    :line => '-A INPUT ! -s 1.1.1.1 -d 2.2.2.2 -m comment --comment "000 negated source address"',
     :table => 'filter',
     :params => {
       :source => '! 1.1.1.1/32',
@@ -98,7 +98,7 @@ ARGS_TO_HASH = {
     },
   },
   'source_destination_negate_destination' => {
-    :line => '-A INPUT -s 1.1.1.1 -d ! 2.2.2.2 -m comment --comment "000 negated destination address"',
+    :line => '-A INPUT -s 1.1.1.1 ! -d 2.2.2.2 -m comment --comment "000 negated destination address"',
     :table => 'filter',
     :params => {
       :source => '1.1.1.1/32',
