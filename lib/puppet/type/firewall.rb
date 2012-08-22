@@ -92,11 +92,15 @@ Puppet::Type.newtype(:firewall) do
 
           source => '192.168.2.0/24'
 
+      You can also negate a mask by putting ! in front. For example:
+
+          source => '! 192.168.2.0/24'
+
       The source can also be an IPv6 address if your provider supports it.
     EOS
 
     munge do |value|
-      @resource.host_to_ip(value)
+      @resource.host_to_mask(value)
     end
   end
 
@@ -106,11 +110,15 @@ Puppet::Type.newtype(:firewall) do
 
           destination => '192.168.1.0/24'
 
+      You can also negate a mask by putting ! in front. For example:
+
+          destination  => '! 192.168.2.0/24'
+
       The destination can also be an IPv6 address if your provider supports it.
     EOS
 
     munge do |value|
-      @resource.host_to_ip(value)
+      @resource.host_to_mask(value)
     end
   end
 
