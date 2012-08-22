@@ -128,10 +128,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
-    # we do a simular thing for negated address masks (source and destination).
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+    # we do a simular thing for negated address masks (source and destination).
     values = values.sub(/-s (!)\s?(\S*)/, '-s "\1 \2"')
     values = values.sub(/-d (!)\s?(\S*)/,'-d "\1 \2"')
+    # the actual rule will have the ! mark before the option.
+    values = values.sub(/(!)\s*-s\s*(\S*)/, '-s "\1 \2"')
+    values = values.sub(/(!)\s*-d\s*(\S*)/, '-d "\1 \2"')
 
     @resource_list.reverse.each do |k|
       if values.slice!(/\s#{@resource_map[k]}/)
@@ -280,6 +283,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         one, two = resource_value.split(' ')
         args << one
         args << two
+      elsif res == :source or res == :destination
+        one, two = resource_value.split(' ')
+        args << one
+        args << two unless two == nil
       elsif resource_value.is_a?(Array)
         args << resource_value.join(',')
       else
