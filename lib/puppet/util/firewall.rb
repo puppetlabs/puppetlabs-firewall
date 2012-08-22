@@ -116,6 +116,20 @@ module Puppet::Util::Firewall
     value.cidr
   end
 
+  # Takes an address mask and converts the host portion to CIDR notation.
+  #
+  # This takes into account you can negate a mask but follows all rules
+  # defined in host_to_ip for the host/address part.
+  #
+  def host_to_mask(value)
+    match = value.match /(!)\s?(.*)$/
+    return host_to_ip(value) unless match
+
+    cidr = host_to_ip(match[2])
+    return nil if cidr == nil
+    "#{match[1]} #{cidr}"
+  end
+
   # Validates the argument is int or hex, and returns valid hex
   # conversion of the value or nil otherwise.
   def to_hex32(value)
