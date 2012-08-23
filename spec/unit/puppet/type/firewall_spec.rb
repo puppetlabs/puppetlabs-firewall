@@ -125,6 +125,10 @@ describe firewall do
           @resource[addr].should == nil
         end
       end
+      it "should accept a negated #{addr} as a string" do
+        @resource[addr] = '! 127.0.0.1'
+        @resource[addr].should == '! 127.0.0.1/32'
+      end
     end
   end
 

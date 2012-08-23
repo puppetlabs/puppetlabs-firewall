@@ -129,6 +129,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+    # we do a simular thing for negated address masks (source and destination).
+    values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
+    # the actual rule will have the ! mark before the option.
+    values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
 
     @resource_list.reverse.each do |k|
       if values.slice!(/\s#{@resource_map[k]}/)
@@ -144,7 +148,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Normalise all rules to CIDR notation.
     [:source, :destination].each do |prop|
-      hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
+      next if hash[prop].nil?
+      m = hash[prop].match(/(!?)\s?(.*)/)
+      neg = "! " if m[1] == "!"
+      hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
     end
 
     [:dport, :sport, :port, :state].each do |prop|
@@ -255,6 +262,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         resource_value = resource[:action].to_s.upcase
       else
         next
+      end
+
+      ## Generic negating of rules
+      if resource_value =~ /!\s?(.*)/
+        resource_value = $1
+        args << "!"
       end
 
       args << resource_map[res].split(' ')
