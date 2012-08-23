@@ -130,11 +130,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
     # we do a simular thing for negated address masks (source and destination).
-    values = values.sub(/-s (!)\s?(\S*)/, '-s "\1 \2"')
-    values = values.sub(/-d (!)\s?(\S*)/,'-d "\1 \2"')
+    values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
-    values = values.sub(/(!)\s*-s\s*(\S*)/, '-s "\1 \2"')
-    values = values.sub(/(!)\s*-d\s*(\S*)/, '-d "\1 \2"')
+    values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
 
     @resource_list.reverse.each do |k|
       if values.slice!(/\s#{@resource_map[k]}/)
