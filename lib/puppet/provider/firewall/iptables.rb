@@ -357,6 +357,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         next
       end
 
+      ## Generic negating of rules
+      if resource_value =~ /!\s?(.*)/
+        resource_value = $1
+        args << "!"
+      end
+
       args << [resource_map[res]].flatten.first.split(' ')
 
       # For sport and dport, convert hyphens to colons since the type
@@ -374,10 +380,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         one, two = resource_value.split(' ')
         args << one
         args << two
-      elsif res == :source or res == :destination
-        one, two = resource_value.split(' ')
-        args << one
-        args << two unless two == nil
       elsif resource_value.is_a?(Array)
         args << resource_value.join(',')
       elsif !resource_value.nil?
