@@ -96,7 +96,11 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      @resource.host_to_ip(value)
+      begin
+        @resource.host_to_ip(value)
+      rescue Exception => e
+        self.fail("host_to_ip failed for #{value}, exception #{e}")
+      end
     end
   end
 
@@ -131,6 +135,9 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
+      if value.kind_of? Fixnum
+        value = value.to_s
+      end
       @resource.string_to_port(value)
     end
 
