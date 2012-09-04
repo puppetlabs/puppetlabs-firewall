@@ -131,6 +131,9 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
+      if value.kind_of? Fixnum
+        value = value.to_s
+      end
       @resource.string_to_port(value)
     end
 
