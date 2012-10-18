@@ -72,17 +72,20 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
-    iptables insert_args
+    cmd = [command(:iptables)] + insert_args
+    execfail(cmd, Puppet::Error)
   end
 
   def update
     debug 'Updating rule %s' % resource[:name]
-    iptables update_args
+    cmd = [command(:iptables)] + update_args
+    execfail(cmd, Puppet::Error)
   end
 
   def delete
     debug 'Deleting rule %s' % resource[:name]
-    iptables delete_args
+    cmd = [command(:iptables)] + delete_args
+    execfail(cmd, Puppet::Error)
   end
 
   def exists?
@@ -106,7 +109,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     counter = 1
 
     # String#lines would be nice, but we need to support Ruby 1.8.5
-    iptables_save.split("\n").each do |line|
+    execfail(command(:iptables_save), Puppet::Error).split("\n").each do |line|
       unless line =~ /^\#\s+|^\:\S+|^COMMIT|^FATAL/
         if line =~ /^\*/
           table = line.sub(/\*/, "")
