@@ -109,7 +109,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     counter = 1
 
     # String#lines would be nice, but we need to support Ruby 1.8.5
-    execfail(command(:iptables_save), Puppet::Error).split("\n").each do |line|
+    self.execute([command(:iptables_save)]).split("\n").each do |line|
       unless line =~ /^\#\s+|^\:\S+|^COMMIT|^FATAL/
         if line =~ /^\*/
           table = line.sub(/\*/, "")
