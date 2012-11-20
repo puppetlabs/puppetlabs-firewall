@@ -27,7 +27,8 @@ Puppet::Type.newtype(:firewall) do
   feature :interface_match, "Interface matching"
   feature :icmp_match, "Matching ICMP types"
   feature :owner, "Matching owners"
-  feature :state_match, "Matching stateful firewall states"
+  feature :state_match, "Matching stateful firewall states with ip_conntrack"
+  feature :ctstate_match, "Matching stateful firewall states with nf_conntrack"
   feature :reject_type, "The ability to control reject messages"
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
@@ -423,6 +424,37 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:state, :array_matching => :all, :required_features =>
     :state_match) do
+
+    desc <<-EOS
+      Matches a packet based on its state in the firewall stateful inspection
+      table. Values can be:
+
+      * INVALID
+      * ESTABLISHED
+      * NEW
+      * RELATED
+    EOS
+
+    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
+
+    # States should always be sorted. This normalizes the resource states to
+    # keep it consistent with the sorted result from iptables-save.
+    def should=(values)
+      @should = super(values).sort_by {|sym| sym.to_s}
+    end
+
+    def is_to_s(value)
+      should_to_s(value)
+    end
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
+  end
+
+  newproperty(:ctstate, :array_matching => :all, :required_features =>
+    :ctstate_match) do
 
     desc <<-EOS
       Matches a packet based on its state in the firewall stateful inspection

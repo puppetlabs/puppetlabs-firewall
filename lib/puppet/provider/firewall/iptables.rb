@@ -14,6 +14,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :icmp_match
   has_feature :owner
   has_feature :state_match
+# This is like state_match but using the nf_conntrack module
+  has_feature :ctstate_match
   has_feature :reject_type
   has_feature :log_level
   has_feature :log_prefix
@@ -53,6 +55,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :source => "-s",
     :sport => "-m multiport --sports",
     :state => "-m state --state",
+    :ctstate => "-m conntrack --ctstate",
     :table => "-t",
     :tcp_flags => "-m tcp --tcp-flags",
     :todest => "--to-destination",
@@ -67,7 +70,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst,
+    :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :ctstate, :icmp, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
   def insert
@@ -147,7 +150,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
     end
 
-    [:dport, :sport, :port, :state].each do |prop|
+    [:dport, :sport, :port, :state, :ctstate].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
@@ -164,6 +167,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # States should always be sorted. This ensures that the output from
     # iptables-save and user supplied resources is consistent.
     hash[:state] = hash[:state].sort unless hash[:state].nil?
+    hash[:ctstate] = hash[:ctstate].sort unless hash[:ctstate].nil?
 
     # This forces all existing, commentless rules to be moved to the bottom of the stack.
     # Puppet-firewall requires that all rules have comments (resource names) and will fail if
