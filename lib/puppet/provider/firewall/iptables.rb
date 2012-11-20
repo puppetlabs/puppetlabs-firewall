@@ -172,6 +172,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
     end
 
+    # For the same reason, we also append the rule level to commented rules that do not have one
+    # In this case, we can however preserve the comment
+
+    if ! hash[:name].match(/^[\d]+$/)
+        hash[:name] = "9999 "+hash[:name]
+    end
+
     # Iptables defaults to log_level '4', so it is omitted from the output of iptables-save.
     # If the :jump value is LOG and you don't have a log-level set, we assume it to be '4'.
     if hash[:jump] == 'LOG' && ! hash[:log_level]
