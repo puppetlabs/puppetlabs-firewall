@@ -71,15 +71,16 @@ module Puppet::Util::Firewall
   # If the string already contains a port number or perhaps a range of ports
   # in the format 22:1000 for example, it simply returns the string and does
   # nothing.
-  def string_to_port(value)
+  def string_to_port(value, proto)
+    proto = proto.to_s
     if value.kind_of?(String)
       if value.match(/^\d+(-\d+)?$/)
         return value
       else
-        return Socket.getservbyname(value).to_s
+        return Socket.getservbyname(value, proto).to_s
       end
     else
-      Socket.getservbyname(value)
+      Socket.getservbyname(value.to_s, proto)
     end
   end
 

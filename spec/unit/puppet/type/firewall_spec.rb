@@ -140,6 +140,11 @@ describe firewall do
         @resource[port].should == ['22','23']
       end
 
+      it "should accept a #{port} as a number" do
+        @resource[port] = 22
+        @resource[port].should == ['22']
+      end
+
       it "should accept a #{port} as a hyphen separated range" do
         @resource[port] = ['22-1000']
         @resource[port].should == ['22-1000']
