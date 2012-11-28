@@ -73,7 +73,7 @@ module Puppet::Util::Firewall
   # nothing.
   def string_to_port(value, proto)
     proto = proto.to_s
-    unless proto =~ /^tcp|udp$/
+    unless proto =~ /^(tcp|udp)$/
       proto = 'tcp'
     end
 
