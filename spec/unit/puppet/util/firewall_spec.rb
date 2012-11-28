@@ -71,6 +71,7 @@ describe 'Puppet::Util::Firewall' do
     specify { subject.string_to_port('80','tcp').should == '80' }
     specify { subject.string_to_port(80,'tcp').should == '80' }
     specify { subject.string_to_port('http','tcp').should == '80' }
+    specify { subject.string_to_port('domain','udp').should == '53' }
   end
 
   describe '#to_hex32' do
