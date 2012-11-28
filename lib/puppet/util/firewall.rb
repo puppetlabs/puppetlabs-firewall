@@ -65,21 +65,26 @@ module Puppet::Util::Firewall
     end
   end
 
-  # This method takes a string and attempts to convert it to a port number
-  # if valid.
+  # This method takes a string and a protocol and attempts to convert
+  # it to a port number if valid.
   #
   # If the string already contains a port number or perhaps a range of ports
   # in the format 22:1000 for example, it simply returns the string and does
   # nothing.
-  def string_to_port(value)
+  def string_to_port(value, proto)
+    proto = proto.to_s
+    unless proto =~ /^(tcp|udp)$/
+      proto = 'tcp'
+    end
+
     if value.kind_of?(String)
       if value.match(/^\d+(-\d+)?$/)
         return value
       else
-        return Socket.getservbyname(value).to_s
+        return Socket.getservbyname(value, proto).to_s
       end
     else
-      Socket.getservbyname(value)
+      Socket.getservbyname(value.to_s, proto).to_s
     end
   end
 
