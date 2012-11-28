@@ -22,8 +22,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
-    :dports => "-m multiport --dports",
-    :dport => "--dport",
+    :dport => "-m multiport --dports",
+    :dport_udp => "-m udp --dport",
+    :dport_tcp => "-m tcp --dport",
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp6 --icmpv6-type",
     :iniface => "-i",
@@ -38,8 +39,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :reject => "--reject-with",
     :source => "-s",
     :state => "-m state --state",
-    :sports => "-m multiport --sports",
-    :sport => "--sport",
+    :sport => "-m multiport --sports",
+    :sport_udp => "-m udp --sport",
+    :sport_tcp => "-m tcp --sport",
     :table => "-t",
     :todest => "--to-destination",
     :toports => "--to-ports",
@@ -53,7 +55,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :gid, :uid, :sports, :sport, :dports, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
+    :proto, :gid, :uid, :sport, :sport_udp, :sport_tcp, :dport, :dport_udp, :dport_tcp, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
 end
