@@ -39,6 +39,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :burst => "--limit-burst",
     :destination => "-d",
     :dport => "-m multiport --dports",
+    :dport_udp => "-m udp --dport",
+    :dport_tcp => "-m tcp --dport",
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
     :iniface => "-i",
@@ -54,6 +56,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :set_mark => mark_flag,
     :source => "-s",
     :sport => "-m multiport --sports",
+    :sport_udp => "-m udp --sport",
+    :sport_tcp => "-m tcp --sport",
     :state => "-m state --state",
     :ctstate => "-m conntrack --ctstate",
     :table => "-t",
@@ -70,7 +74,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :ctstate, :icmp, :limit, :burst,
+    :proto, :tcp_flags, :gid, :uid, :sport, :sport_udp, :sport_tcp, :dport, :dport_udp, :dport_tcp, :port, :pkttype, :name, :state, :ctstate, :icmp, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
   def insert
@@ -153,14 +157,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
     end
 
-    [:dport, :sport, :port, :state, :ctstate].each do |prop|
+    [:dport, :dport_udp, :dport_tcp, :sport, :sport_udp, :sport_tcp, :port, :state, :ctstate].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
     # Our type prefers hyphens over colons for ranges so ...
     # Iterate across all ports replacing colons with hyphens so that ranges match
     # the types expectations.
-    [:dport, :sport, :port].each do |prop|
+    [:dport, :dport_udp, :dport_cp, :sport, :sport_udp, :sport_tcp, :port].each do |prop|
       next unless hash[prop]
       hash[prop] = hash[prop].collect do |elem|
         elem.gsub(/:/,'-')
@@ -267,9 +271,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
       args << resource_map[res].split(' ')
 
-      # For sport and dport, convert hyphens to colons since the type
+      # For sport, sport_{udp,tcp} and dport, dport_{udp,tcp}, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
-      if [:sport, :dport, :port].include?(res) then
+      if [:sport, :sport_udp, :sport_tcp, :dport, :dport_udp, :dport_tcp, :port].include?(res) then
         resource_value = resource_value.collect do |elem|
           elem.gsub(/-/, ':')
         end
