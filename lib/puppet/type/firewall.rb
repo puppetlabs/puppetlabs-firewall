@@ -145,6 +145,37 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:sports, :array_matching => :all) do
+    desc <<-EOS
+      The source port to match for this filter (if the protocol supports
+      ports). Will accept a single element or an array.
+
+      For some firewall providers you can pass a range of ports in the format:
+
+          <start_number>-<ending_number>
+
+      For example:
+
+          1-1024
+
+      This would cover ports 1 to 1024.
+    EOS
+
+    munge do |value|
+      @resource.string_to_port(value)
+    end
+
+    def is_to_s(value)
+      should_to_s(value)
+    end
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
+  end
+
+
   newproperty(:dports, :array_matching => :all) do
     desc <<-EOS
       The destination port to match for this filter (if the protocol supports

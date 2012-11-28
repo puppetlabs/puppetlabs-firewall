@@ -38,7 +38,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :reject => "--reject-with",
     :source => "-s",
     :state => "-m state --state",
-    :sport => "-m multiport --sports",
+    :sports => "-m multiport --sports",
+    :sport => "--sport",
     :table => "-t",
     :todest => "--to-destination",
     :toports => "--to-ports",
@@ -52,7 +53,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :gid, :uid, :sport, :dports, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
+    :proto, :gid, :uid, :sports, :sport, :dports, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
 end
