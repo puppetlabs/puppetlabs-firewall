@@ -180,7 +180,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Puppet-firewall requires that all rules have comments (resource names) and will fail if
     # a rule in iptables does not have a comment. We get around this by appending a high level
     # This also works for rules with actual comments
-    if ! hash[:name] or ! hash[:name].match(/^[\d]+$/)
+    if ! hash[:name] or ! hash[:name].match(/^[\d]*\ /)
       hash[:name] = "9999 #{Digest::MD5.hexdigest(line)}"
     end
 
