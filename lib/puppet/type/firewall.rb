@@ -131,7 +131,7 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      @resource.string_to_port(value)
+      @resource.string_to_port(value, :proto)
     end
 
     def is_to_s(value)
@@ -161,7 +161,7 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      @resource.string_to_port(value)
+      @resource.string_to_port(value, :proto)
     end
 
     def is_to_s(value)
@@ -191,7 +191,7 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      @resource.string_to_port(value)
+      @resource.string_to_port(value, :proto)
     end
 
     def is_to_s(value)
