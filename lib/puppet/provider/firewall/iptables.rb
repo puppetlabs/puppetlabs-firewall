@@ -22,6 +22,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :mark
   has_feature :tcp_flags
   has_feature :pkttype
+  has_feature :addrtype
 
   commands :iptables => '/sbin/iptables'
   commands :iptables_save => '/sbin/iptables-save'
@@ -67,6 +68,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
     :pkttype => "-m pkttype --pkt-type"
+    :addrtype => "-m addrtype --src-type"
   }
 
   # This is the order of resources as they appear in iptables-save output,
@@ -74,7 +76,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :tcp_flags, :gid, :uid, :sport, :sport_udp, :sport_tcp, :dport, :dport_udp, :dport_tcp, :port, :pkttype, :name, :state, :ctstate, :icmp, :limit, :burst,
+    :proto, :tcp_flags, :gid, :uid, :sport, :sport_udp, :sport_tcp, :dport, :dport_udp, :dport_tcp, :port, :pkttype, :addrtype, :name, :state, :ctstate, :icmp, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
   def insert

@@ -289,6 +289,14 @@ ARGS_TO_HASH = {
       :pkttype => 'multicast',
     },
   },
+  'addrtype multicast' => {
+    :line => '-A INPUT -m addrtype --src-type multicast -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :addrtype => 'multicast',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -642,5 +650,16 @@ HASH_TO_ARGS = {
       :pkttype => 'multicast',
     },
     :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "pkttype", "--pkt-type", :multicast, "-m", "comment", "--comment", "062 pkttype multicast", "-j", "ACCEPT"],
+  },
+  'addrtype multicast' => {
+    :params => {
+      :name => '063 addrtype multicast',
+      :table => "filter",
+      :action => 'accept',
+      :chain => 'INPUT',
+      :iniface => 'eth0',
+      :addrtype => 'multicast',
+    },
+    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "addrtype", "--pkt-type", :multicast, "-m", "comment", "--comment", "063 addrtype multicast", "-j", "ACCEPT"],
   },
 }
