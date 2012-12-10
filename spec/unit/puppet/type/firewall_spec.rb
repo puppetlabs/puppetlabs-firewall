@@ -491,4 +491,18 @@ describe firewall do
       lambda { @resource[:pkttype] = 'not valid' }.should raise_error(Puppet::Error)
     end
   end
+
+  describe ':addrtype' do
+    [:multicast, :broadcast, :unicast].each do |addrtype|
+      it "should accept addrtype value #{addrtype}" do
+        @resource[:addrtype] = addrtype
+        @resource[:addrtype].should == addrtype
+      end
+    end
+
+    it 'should fail when the addrtype value is not recognized' do
+      lambda { @resource[:addrtype] = 'not valid' }.should raise_error(Puppet::Error)
+    end
+  end
+
 end
