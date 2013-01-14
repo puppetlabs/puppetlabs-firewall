@@ -21,8 +21,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :tcp_flags
   has_feature :pkttype
 
-  commands :iptables => '/sbin/iptables'
-  commands :iptables_save => '/sbin/iptables-save'
+  optional_commands({
+    :iptables => '/sbin/iptables',
+    :iptables_save => '/sbin/iptables-save',
+  })
 
   defaultfor :kernel => :linux
 

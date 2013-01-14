@@ -28,8 +28,8 @@ describe 'Puppet::Util::Firewall' do
 
       %w{inet5 inet8 foo}.each do |proto|
         it "should reject invalid proto #{proto}" do
-          expect { subject.icmp_name_to_number('echo-reply', proto) }.should
-            raise_error(ArgumentError, "unsupported protocol family '#{proto}'")
+          expect { subject.icmp_name_to_number('echo-reply', proto) }.
+            to raise_error(ArgumentError, "unsupported protocol family '#{proto}'")
         end
       end
     end

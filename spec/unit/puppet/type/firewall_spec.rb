@@ -163,11 +163,11 @@ describe firewall do
       end
 
       it "should not accept something invalid for #{port}" do
-        expect { @resource[port] = 'something odd' }.to raise_error(Puppet::Error, /^Parameter .+ failed: Munging failed for value ".+" in class .+: no such service/)
+        expect { @resource[port] = 'something odd' }.to raise_error(Puppet::Error, /^Parameter .+ failed.+Munging failed for value ".+" in class .+: no such service/)
       end
 
       it "should not accept something invalid in an array for #{port}" do
-        expect { @resource[port] = ['something odd','something even odder'] }.to raise_error(Puppet::Error, /^Parameter .+ failed: Munging failed for value ".+" in class .+: no such service/)
+        expect { @resource[port] = ['something odd','something even odder'] }.to raise_error(Puppet::Error, /^Parameter .+ failed.+Munging failed for value ".+" in class .+: no such service/)
       end
     end
   end
