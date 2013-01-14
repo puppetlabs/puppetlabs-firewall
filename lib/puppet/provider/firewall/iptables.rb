@@ -21,8 +21,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :tcp_flags
   has_feature :pkttype
 
-  commands :iptables => '/sbin/iptables'
-  commands :iptables_save => '/sbin/iptables-save'
+  commands :iptables => case Facter.fact('operatingsystem').value 
+    when 'Archlinux' then '/usr/sbin/iptables'
+    else '/sbin/iptables'
+  end
+  commands :iptables_save => case Facter.fact('operatingsystem').value
+    when 'Archlinux' then '/usr/sbin/iptables-save'
+    else '/sbin/iptables-save'
+  end
 
   defaultfor :kernel => :linux
 

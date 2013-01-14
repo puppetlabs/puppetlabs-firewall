@@ -5,8 +5,14 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
   has_feature :policy
 
   optional_commands({
-    :iptables       => '/sbin/iptables',
-    :iptables_save  => '/sbin/iptables-save',
+    :iptables       => case Facter.fact('operatingsystem').value
+      when 'Archlinux' then '/usr/sbin/iptables'
+      else '/sbin/iptables'
+    end,
+    :iptables_save  => case Facter.fact('operatingsystem').value
+      when 'Archlinux' then '/usr/sbin/iptables-save'
+      else '/sbin/iptables-save'
+    end,
     :ip6tables      => '/sbin/ip6tables',
     :ip6tables_save => '/sbin/ip6tables-save',
     :ebtables       => '/sbin/ebtables',
