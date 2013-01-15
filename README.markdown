@@ -1,5 +1,7 @@
 ## puppetlabs-firewall module
 
+[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-firewall.png?branch=master)](https://travis-ci.org/puppetlabs/puppetlabs-firewall)
+
 ## User Guide
 
 ### Overview

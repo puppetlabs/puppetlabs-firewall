@@ -1,0 +1,39 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    diff-lcs (1.1.3)
+    facter (1.6.17)
+    hiera (1.0.0)
+    metaclass (0.0.1)
+    mocha (0.13.1)
+      metaclass (~> 0.0.1)
+    puppet (3.0.2)
+      facter (~> 1.6.11)
+      hiera (~> 1.0.0)
+    puppetlabs_spec_helper (0.4.0)
+      mocha (>= 0.10.5)
+      rake
+      rspec (>= 2.9.0)
+      rspec-puppet (>= 0.1.1)
+    rake (10.0.3)
+    rspec (2.12.0)
+      rspec-core (~> 2.12.0)
+      rspec-expectations (~> 2.12.0)
+      rspec-mocks (~> 2.12.0)
+    rspec-core (2.12.2)
+    rspec-expectations (2.12.1)
+      diff-lcs (~> 1.1.3)
+    rspec-mocks (2.12.1)
+    rspec-puppet (0.1.5)
+      rspec
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  facter
+  mocha (~> 0.13.1)
+  puppet
+  puppetlabs_spec_helper (~> 0.4.0)
+  rake (~> 10.0.3)
+  rspec (~> 2.12.0)

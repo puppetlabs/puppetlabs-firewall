@@ -16,8 +16,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :tcp_flags
   has_feature :pkttype
 
-  commands :iptables      => '/sbin/ip6tables'
-  commands :iptables_save => '/sbin/ip6tables-save'
+  optional_commands({
+    :iptables      => '/sbin/ip6tables',
+    :iptables_save => '/sbin/ip6tables-save',
+  })
 
   @resource_map = {
     :burst => "--limit-burst",
