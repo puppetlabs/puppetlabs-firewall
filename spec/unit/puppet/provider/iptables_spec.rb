@@ -46,6 +46,7 @@ describe 'iptables provider' do
   before :each do
     Puppet::Type::Firewall.stubs(:defaultprovider).returns provider
     provider.stubs(:command).with(:iptables_save).returns "/sbin/iptables-save"
+    provider.stubs(:execute).with(['/sbin/iptables-save']).returns("")
 
     # Stub iptables version
     Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
