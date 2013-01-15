@@ -98,7 +98,7 @@ describe firewallchain do
         expect { klass.new({:name => 'testchain:filter:IPv4', :policy => policy }) }.to raise_error(Puppet::Error)
       end
       it "non-inbuilt chains can accept policies on protocol = ethernet (policy #{policy})" do
-        klass.new({:name => 'testchain:filter:ethernet', :policy => policy }).should be_instance_of(@provider)
+        klass.new({:name => 'testchain:filter:ethernet', :policy => policy })
       end
     end
 
