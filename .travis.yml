@@ -1,40 +1,25 @@
----
 language: ruby
-script: rake spec
-notifications:
-  email: false
+bundler_args: --without development
+script: "bundle exec rake spec SPEC_OPTS='--format documentation'"
 rvm:
   - 1.8.7
   - 1.9.3
+  - ruby-head
 env:
-  # Latest 3.0.x & Facter 1.6.x
-  - BUILD_PUPPET_VER=3.0.2 BUILD_FACTER_VER=1.6.17
-  # Latest 2.7.x & Facter 1.6.x
-  - BUILD_PUPPET_VER=2.7.20 BUILD_FACTER_VER=1.6.17
-  # Latest 2.6.x & Facter 1.6.x
-  - BUILD_PUPPET_VER=2.6.17 BUILD_FACTER_VER=1.6.17
-
-  # Ubuntu 12.04
-  - BUILD_PUPPET_VER=2.7.11 BUILD_FACTER_VER=1.6.5
-  # Ubuntu 11.10
-  - BUILD_PUPPET_VER=2.7.1 BUILD_FACTER_VER=1.5.9
-
-  # RHEL 5/6 EPEL
-  - BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.6
-  # Ubuntu 11.04
-  - BUILD_PUPPET_VER=2.6.4 BUILD_FACTER_VER=1.5.8
-  # Debian 6 Main
-  - BUILD_PUPPET_VER=2.6.2 BUILD_FACTER_VER=1.5.7
+  - PUPPET_GEM_VERSION="~> 2.6"
+  - PUPPET_GEM_VERSION="~> 2.7"
+  - PUPPET_GEM_VERSION="~> 3.0"
 matrix:
+  allow_failures:
+    - rvm: ruby-head
   exclude:
-    # Puppet 2.6.x is not compatible with Ruby 1.9.x
     - rvm: 1.9.3
-      env: BUILD_PUPPET_VER=2.6.17 BUILD_FACTER_VER=1.6.17
+      env: PUPPET_GEM_VERSION="~> 2.7"
+    - rvm: ruby-head
+      env: PUPPET_GEM_VERSION="~> 2.7"
     - rvm: 1.9.3
-      env: BUILD_PUPPET_VER=2.6.16 BUILD_FACTER_VER=1.6.6
-    - rvm: 1.9.3
-      env: BUILD_PUPPET_VER=2.6.8 BUILD_FACTER_VER=1.5.8
-    - rvm: 1.9.3
-      env: BUILD_PUPPET_VER=2.6.4 BUILD_FACTER_VER=1.5.8
-    - rvm: 1.9.3
-      env: BUILD_PUPPET_VER=2.6.2 BUILD_FACTER_VER=1.5.7
+      env: PUPPET_GEM_VERSION="~> 2.6"
+    - rvm: ruby-head
+      env: PUPPET_GEM_VERSION="~> 2.6"
+notifications:
+  email: false
