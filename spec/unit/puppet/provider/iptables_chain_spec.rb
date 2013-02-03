@@ -1,7 +1,7 @@
 #!/usr/bin/env rspec
 
 require 'spec_helper'
-require 'puppet/provider/confine/exists'
+require 'puppet'
 
 describe 'iptables chain provider detection' do
   let(:exists) {
