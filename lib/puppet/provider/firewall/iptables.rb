@@ -76,7 +76,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :tcp_flags, :gid, :uid, :sport, :sport_udp, :sport_tcp, :dport, :dport_udp, :dport_tcp, :port, :pkttype, :addrtype, :name, :state, :ctstate, :icmp, :limit, :burst,
+    :proto, :tcp_flags, :gid, :uid, :sport, :dport, :sport_udp, :sport_tcp, :dport_udp, :dport_tcp, :port, :pkttype, :addrtype, :name, :state, :ctstate, :icmp, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
   def insert
