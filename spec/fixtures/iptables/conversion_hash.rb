@@ -298,6 +298,50 @@ ARGS_TO_HASH = {
       :socket => true,
     },
   },
+  'single_tcp_sport' => {
+    :line => '-A OUTPUT -s 10.94.100.46/32 -p tcp -m tcp --sport 20443 -j ACCEPT',
+    :table => 'mangle',
+    :params => {
+      :action => 'accept',
+      :chain => 'OUTPUT',
+      :source => "10.94.100.46/32",
+      :proto => "tcp",
+      :sport => ["20443"],
+    },
+  },
+  'single_udp_sport' => {
+    :line => '-A OUTPUT -s 10.94.100.46/32 -p udp -m udp --sport 20443 -j ACCEPT',
+    :table => 'mangle',
+    :params => {
+      :action => 'accept',
+      :chain => 'OUTPUT',
+      :source => "10.94.100.46/32",
+      :proto => "udp",
+      :sport => ["20443"],
+    },
+  },
+  'single_tcp_dport' => {
+    :line => '-A OUTPUT -s 10.94.100.46/32 -p tcp -m tcp --dport 20443 -j ACCEPT',
+    :table => 'mangle',
+    :params => {
+      :action => 'accept',
+      :chain => 'OUTPUT',
+      :source => "10.94.100.46/32",
+      :proto => "tcp",
+      :dport => ["20443"],
+    },
+  },
+  'single_udp_dport' => {
+    :line => '-A OUTPUT -s 10.94.100.46/32 -p udp -m udp --dport 20443 -j ACCEPT',
+    :table => 'mangle',
+    :params => {
+      :action => 'accept',
+      :chain => 'OUTPUT',
+      :source => "10.94.100.46/32",
+      :proto => "udp",
+      :dport => ["20443"],
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
