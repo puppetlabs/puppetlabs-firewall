@@ -289,6 +289,15 @@ ARGS_TO_HASH = {
       :pkttype => 'multicast',
     },
   },
+  'socket_option' => {
+    :line => '-A PREROUTING -m socket -j ACCEPT',
+    :table => 'mangle',
+    :params => {
+      :action => 'accept',
+      :chain => 'PREROUTING',
+      :socket => true,
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -642,5 +651,15 @@ HASH_TO_ARGS = {
       :pkttype => 'multicast',
     },
     :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "pkttype", "--pkt-type", :multicast, "-m", "comment", "--comment", "062 pkttype multicast", "-j", "ACCEPT"],
+  },
+  'socket_option' => {
+    :params => {
+      :name => '050 socket option',
+      :table => 'mangle',
+      :action => 'accept',
+      :chain => 'PREROUTING',
+      :socket => true,
+    },
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'socket', '-m', 'comment', '--comment', '050 socket option', '-j', 'ACCEPT'],
   },
 }

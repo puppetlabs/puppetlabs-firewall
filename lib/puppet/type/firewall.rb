@@ -34,6 +34,7 @@ Puppet::Type.newtype(:firewall) do
   feature :mark, "Set the netfilter mark value associated with the packet"
   feature :tcp_flags, "The ability to match on particular TCP flag settings"
   feature :pkttype, "Match a packet type"
+  feature :socket, "Match open sockets"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -533,6 +534,15 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     newvalues(:unicast, :broadcast, :multicast)
+  end
+
+  newproperty(:socket, :required_features => :socket) do
+    desc <<-EOS
+      If true, matches if an open socket can be found by doing a coket lookup
+      on the packet.
+    EOS
+
+    newvalues(:true, :false)
   end
 
   newparam(:line) do
