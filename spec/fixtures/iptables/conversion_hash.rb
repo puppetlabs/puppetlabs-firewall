@@ -660,6 +660,6 @@ HASH_TO_ARGS = {
       :chain => 'PREROUTING',
       :socket => true,
     },
-    :args => ['-t', :mangle, '-m', 'socket', '-j', 'ACCEPT'],
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'socket', '-m', 'comment', '--comment', '050 socket option', '-j', 'ACCEPT'],
   },
 }
