@@ -61,6 +61,7 @@ describe 'iptables provider' do
     end
   end
 
+
   it 'should ignore lines with fatal errors' do
     provider.expects(:execute).with(['/sbin/iptables-save']).returns("FATAL: Could not load /lib/modules/2.6.18-028stab095.1/modules.dep: No such file or directory")
 
@@ -89,6 +90,44 @@ describe 'iptables provider' do
           end
         end
       end
+    end
+  end
+  describe 'when confirming the order' do
+    let(:resource) {
+        Puppet::Type.type(:firewall).new({
+        :name  => '000 test foo',
+        :action  => 'accept',
+        })
+    }
+    let(:resource2) {
+        Puppet::Type.type(:firewall).new({
+        :name  => '999 test foo',
+        :action  => 'drop',
+        })
+    }
+    let(:resource3) {
+        Puppet::Type.type(:firewall).new({
+        :name  => '100 test foo',
+        :action  => 'reject',
+        })
+    }
+    let(:provider) { Puppet::Type.type(:firewall).provider(:iptables) }
+    let(:instance) { provider.new([resource, resource2, resource3]) }
+    it 'there should be 3 resources with correct names' do
+        resource[:name].should == '000 test foo'
+        resource[:action].should == :accept
+        resource2[:name].should == '999 test foo'
+        resource2[:action].should == :drop
+        resource3[:name].should == '100 test foo'
+        resource3[:action].should == :reject
+    end
+    it 'there should be 3 resources in the instance' do
+        instance.resource.length.should == 3
+    end
+    it 'there should be 3 resources in the instance' do
+        #require 'debugger'; debugger
+        #puts instance
+
     end
   end
 
