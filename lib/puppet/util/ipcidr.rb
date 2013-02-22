@@ -4,6 +4,17 @@ require 'ipaddr'
 module Puppet
   module Util
     class IPCidr < IPAddr
+      def initialize(ipaddr)
+        begin
+          super(ipaddr)
+        rescue ArgumentError => e
+          if e.message =~ /invalid address/
+            raise ArgumentError, "Invalid address from IPAddr.new: #{ipaddr}"
+          else
+            raise e
+          end
+        end
+      end
 
       def netmask
         _to_string(@mask_addr)

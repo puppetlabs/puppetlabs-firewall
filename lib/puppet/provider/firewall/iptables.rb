@@ -39,7 +39,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
-    :dport => "-m multiport --dports",
+    :dport => ["-m multiport --dports", "-m (udp|tcp) --dport"],
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
     :iniface => "-i",
@@ -55,7 +55,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :set_mark => mark_flag,
     :socket => "-m socket",
     :source => "-s",
-    :sport => "-m multiport --sports",
+    :sport => ["-m multiport --sports", "-m (udp|tcp) --sport"],
     :state => "-m state --state",
     :table => "-t",
     :tcp_flags => "-m tcp --tcp-flags",
@@ -153,8 +153,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Here we iterate across our values to generate an array of keys
     @resource_list.reverse.each do |k|
-      if values.slice!(/\s#{@resource_map[k]}/)
-        keys << k
+      resource_map_key = @resource_map[k]
+      resource_map_key.each do |opt|
+        if values.slice!(/\s#{opt}/)
+          keys << k
+          break
+        end
       end
     end
 
@@ -301,7 +305,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         next
       end
 
-      args << resource_map[res].split(' ')
+      args << resource_map[res].first.split(' ')
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
