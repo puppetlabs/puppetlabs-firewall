@@ -32,6 +32,16 @@ class Puppet::Provider::Firewall < Puppet::Provider
     nil
   end
 
+  %w(chain table action burst destination dport gid icmp iniface jump limit log_level log_prefix name outiface pkttype port proto reject source sport state todest toports tosource uid).each do |property|
+    define_method "#{property}" do
+      @property_hash[property.to_sym]
+    end
+
+    define_method "#{property}=" do |value|
+      @property_hash[:needs_change] = true
+    end
+  end
+
   # Executed if method is missing. In this case we are going to catch
   # unqualified property methods for dynamic property setting and getting.
   def method_missing(meth, *args, &block)
