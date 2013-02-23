@@ -46,6 +46,7 @@ describe 'iptables provider' do
   before :each do
     Puppet::Type::Firewall.stubs(:defaultprovider).returns provider
     provider.stubs(:command).with(:iptables_save).returns "/sbin/iptables-save"
+    provider.stubs(:execute).with(['/sbin/iptables-save']).returns("")
 
     # Stub iptables version
     Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
@@ -63,7 +64,7 @@ describe 'iptables provider' do
   end
 
   it 'should ignore lines with fatal errors' do
-    Puppet::Util::Execution.stubs(:execute).with(['/sbin/iptables-save']).
+    provider.expects(:execute).with(['/sbin/iptables-save']).
       returns("FATAL: Could not load /lib/modules/2.6.18-028stab095.1/modules.dep: No such file or directory")
 
     provider.instances.length.should == 0
