@@ -189,7 +189,7 @@ Source NAT example (perfect for a virtualization host):
       jump     => 'MASQUERADE',
       proto    => 'all',
       outiface => "eth0",
-      source   => ['10.1.2.0/24'],
+      source   => '10.1.2.0/24',
       table    => 'nat',
     }
 
