@@ -154,7 +154,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Here we iterate across our values to generate an array of keys
     @resource_list.reverse.each do |k|
       resource_map_key = @resource_map[k]
-      resource_map_key.each do |opt|
+      [resource_map_key].flatten.each do |opt|
         if values.slice!(/\s#{opt}/)
           keys << k
           break
@@ -305,7 +305,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         next
       end
 
-      args << resource_map[res].first.split(' ')
+      args << [resource_map[res]].flatten.first.split(' ')
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
