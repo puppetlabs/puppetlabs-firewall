@@ -13,7 +13,10 @@ describe 'Puppet::Util::Firewall' do
 
   describe '#host_to_ip' do
     subject { resource }
-    specify { subject.host_to_ip('puppetlabs.com').should == '96.126.112.51/32' }
+    specify {
+      Resolv.expects(:getaddress).with('puppetlabs.com').returns('96.126.112.51')
+      subject.host_to_ip('puppetlabs.com').should == '96.126.112.51/32'
+    }
     specify { subject.host_to_ip('96.126.112.51').should == '96.126.112.51/32' }
     specify { subject.host_to_ip('96.126.112.51/32').should == '96.126.112.51/32' }
     specify { subject.host_to_ip('2001:db8:85a3:0:0:8a2e:370:7334').should == '2001:db8:85a3::8a2e:370:7334/128' }
