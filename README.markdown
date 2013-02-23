@@ -114,6 +114,18 @@ So It is recommended that you provide the following in top scope somewhere
       purge => true
     }
 
+You also need to declare the 'my_fw::pre' & 'my_fw::post' classes so that 
+dependencies are satisfied. This can be achieved using an External Node 
+Classifier or the following::
+
+    class { 'my_fw::pre': }
+    class { 'my_fw::post': }
+
+or:
+
+    include my_fw::pre, my_fw:post
+
+
 In this case, it uses classes called 'my_fw::pre' & 'my_fw::post' to define
 default pre and post rules. These rules are required to run in catalog order
 to avoid locking yourself out of your own boxes when Puppet runs, as
