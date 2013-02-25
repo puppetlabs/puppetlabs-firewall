@@ -303,9 +303,17 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     rules = []
 
     # Find list of current rules based on chain and table
+    # Sometimes rules don't have a table
+    # Comparing will never match if there is no table
     self.class.instances.each do |rule|
-      if rule.chain == resource[:chain].to_s and rule.table == resource[:table].to_s
-        rules << rule.name
+      if rule.table
+        if rule.chain == resource[:chain].to_s and rule.table == resource[:table].to_s
+            rules << rule.name
+        end
+      elsif !rule.table
+        if rule.chain == resource[:chain].to_s
+            rules << rule.name
+        end
       end
     end
 
