@@ -60,6 +60,34 @@ describe 'iptables provider' do
       rule.properties[:provider].to_s.should == provider.name.to_s
     end
   end
+  it 'should be handle addrtype' do
+    insert_rules = []
+    insert_rules << "-A INPUT -m addrtype --src-type MULTICAST -m comment --comment \"330 on input chain\" -j ACCEPT "
+    
+    #
+    # This resource has a name of 100
+    # Based on this it and the insert rules
+    # We should get back an index of 3
+    #
+    
+    resource = Puppet::Type.type(:firewall).new({
+        :name  => '340 test multicast',
+        :ensure   => 'present',
+        :action   => 'accept',
+        :addrtype => 'MULTICAST',                                                                                                                                                                                                           
+        :chain    => 'INPUT',
+        :proto    => 'all',
+        :table    => 'filter',
+
+        })
+    provider.stubs(:execute).with(['/sbin/iptables-save']).returns(insert_rules.join("\n"))
+    instance = provider.new(resource)
+    instance.insert_args
+
+    # Confirm that we're getting the :MULTICAST symbol correctly
+    instance.general_args[5].should == :MULTICAST
+
+  end
 
   it 'should be able to insert a rule at the proper index' do
     insert_rules = []

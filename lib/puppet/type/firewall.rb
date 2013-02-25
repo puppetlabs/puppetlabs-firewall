@@ -684,9 +684,12 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:addrtype, :required_features => :addrtype) do
     desc <<-EOS
     	Sets the address type to match
+        The proper value here is MULTICAST, but will work
+        with multicast, although will restart the firewall
+        everytime puppet runs
     EOS
 
-    newvalues(:unicast, :broadcast, :multicast)
+    newvalues(:unicast, :broadcast, :multicast, :MULTICAST)
   end
 
   newproperty(:pkttype, :required_features => :pkttype) do
