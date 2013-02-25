@@ -90,6 +90,16 @@ Puppet::Type.newtype(:firewallchain) do
     end
   end
 
+  newparam(:managed) do
+      desc <<-EOS
+        This is a parameter to set if you want a chain to be ignored from the plugin and 
+        not deleted.
+      EOS
+
+      newvalues(:true, :false)
+      defaultto :true
+  end
+  
   validate do
     debug("[validate]")
 
