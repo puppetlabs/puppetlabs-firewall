@@ -1,7 +1,7 @@
 # Class: firewall
 #
 # Manages the installation of packages for operating systems that are
-#   currently supported by the firewall type.
+# currently supported by the firewall type.
 #
 class firewall {
   case $::kernel {

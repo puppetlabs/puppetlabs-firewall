@@ -29,6 +29,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     ip6tables_save(*args)
   end
 
+  @protocol = "IPv6"
+
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
