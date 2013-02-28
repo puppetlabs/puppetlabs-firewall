@@ -4,6 +4,18 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
+#### 0.1.1 - 2012/2/28
+
+This release primarily fixes changing parameters in 3.x
+
+##### Changes
+
+* (GH-128) Change method_missing usage to define_method for 3.x compatibility
+* Update travis.yml gem specifications to actually test 2.6
+* Change source in Gemfile to use a specific URL for Ruby 2.0.0 compatibility
+
+---------------------------------------
+
 #### 0.1.0 - 2012/2/24
 
 This release is somewhat belated, so no summary as there are far too many changes this time around. Hopefully we won't fall this far behind again :-).
