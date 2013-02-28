@@ -36,6 +36,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     mark_flag = '--set-xmark'
   end
 
+  @protocol = "IPv4"
+
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
@@ -111,6 +113,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       notice("Properties changed - updating rule")
       update
     end
+    persist_iptables(self.class.instance_variable_get(:@protocol))
     @property_hash.clear
   end
 
