@@ -72,7 +72,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       @property_hash[property.to_sym]
     end
 
-    define_method "#{property}=" do
+    define_method "#{property}=" do |value|
       @property_hash[:needs_change] = true
     end
   end

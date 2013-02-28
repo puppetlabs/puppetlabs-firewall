@@ -62,7 +62,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
       @property_hash[property.to_sym]
     end
 
-    define_method "#{property}=" do
+    define_method "#{property}=" do |value|
       @property_hash[:needs_change] = true
     end
   end
