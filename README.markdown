@@ -78,6 +78,11 @@ case.
 
 ### Recommended Setup
 
+There are a basic set of classes which manage packages and services for the
+currently supported operating systems:
+
+    include firewall
+
 At the moment you need to provide some setup outside of what we provide in the 
 module to support proper ordering and purging.
 
