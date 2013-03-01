@@ -16,6 +16,11 @@ Puppet::Type.newtype(:firewallchain) do
     Currently this supports only iptables, ip6tables and ebtables on Linux. And
     provides support for setting the default policy on chains and tables that
     allow it.
+
+    **Autorequires:**
+    If Puppet is managing the iptables or iptables-persistent packages, and
+    the provider is iptables_chain, the firewall resource will autorequire
+    those packages to ensure that any required binaries are installed.
   EOS
 
   feature :iptables_chain, "The provider provides iptables chain features."
@@ -97,6 +102,17 @@ Puppet::Type.newtype(:firewallchain) do
       else
         nil
       end
+    end
+  end
+
+  # Classes would be a better abstraction, pending:
+  # http://projects.puppetlabs.com/issues/19001
+  autorequire(:package) do
+    case value(:provider)
+    when :iptables_chain
+      %w{iptables iptables-persistent}
+    else
+      []
     end
   end
 
