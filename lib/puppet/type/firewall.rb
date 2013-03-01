@@ -16,9 +16,16 @@ Puppet::Type.newtype(:firewall) do
     This type provides the capability to manage firewall rules within
     puppet.
 
-    **Autorequires:** If Puppet is managing the iptables or ip6tables chains
-    specified in the `chain` or `jump` parameters, the firewall resource
-    will autorequire those firewallchain resources.
+    **Autorequires:**
+
+    If Puppet is managing the iptables or ip6tables chains specified in the
+    `chain` or `jump` parameters, the firewall resource will autorequire
+    those firewallchain resources.
+
+    If Puppet is managing the iptables or iptables-persistent packages, and
+    the provider is iptables or ip6tables, the firewall resource will
+    autorequire those packages to ensure that any required binaries are
+    installed.
   EOS
 
   feature :rate_limiting, "Rate limiting features."
@@ -567,6 +574,17 @@ Puppet::Type.newtype(:firewall) do
     end
 
     reqs
+  end
+
+  # Classes would be a better abstraction, pending:
+  # http://projects.puppetlabs.com/issues/19001
+  autorequire(:package) do
+    case value(:provider)
+    when :iptables, :ip6tables
+      %w{iptables iptables-persistent}
+    else
+      []
+    end
   end
 
   validate do
