@@ -496,4 +496,38 @@ describe firewall do
       lambda { @resource[:pkttype] = 'not valid' }.should raise_error(Puppet::Error)
     end
   end
+
+  describe 'autorequire packages' do
+    [:iptables, :ip6tables].each do |provider|
+      it "provider #{provider} should autorequire package iptables" do
+        @resource[:provider] = provider
+        @resource[:provider].should == provider
+        package = Puppet::Type.type(:package).new(:name => 'iptables')
+        catalog = Puppet::Resource::Catalog.new
+        catalog.add_resource @resource
+        catalog.add_resource package
+        rel = @resource.autorequire[0]
+        rel.source.ref.should == package.ref
+        rel.target.ref.should == @resource.ref
+      end
+
+      it "provider #{provider} should autorequire packages iptables and iptables-persistent" do
+        @resource[:provider] = provider
+        @resource[:provider].should == provider
+        packages = [
+          Puppet::Type.type(:package).new(:name => 'iptables'),
+          Puppet::Type.type(:package).new(:name => 'iptables-persistent')
+        ]
+        catalog = Puppet::Resource::Catalog.new
+        catalog.add_resource @resource
+        packages.each do |package|
+          catalog.add_resource package
+        end
+        packages.zip(@resource.autorequire) do |package, rel|
+          rel.source.ref.should == package.ref
+          rel.target.ref.should == @resource.ref
+        end
+      end
+    end
+  end
 end
