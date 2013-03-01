@@ -129,4 +129,59 @@ module Puppet::Util::Firewall
       end
     return nil
   end
+
+  def persist_iptables(proto)
+    debug("[persist_iptables]")
+
+    # Basic normalisation for older Facter
+    os_key = Facter.value(:osfamily)
+    os_key ||= case Facter.value(:operatingsystem)
+    when 'RedHat', 'CentOS', 'Fedora'
+      'RedHat'
+    when 'Debian', 'Ubuntu'
+      'Ubuntu'
+    else
+      Facter.value(:operatingsystem)
+    end
+
+    # Older iptables-persistent doesn't provide save action.
+    if os_key == 'Debian'
+      persist_ver = Facter.value(:iptables_persistent_version)
+      if (persist_ver and Puppet::Util::Package.versioncmp(persist_ver, '0.5.0') < 0)
+        os_key = 'Debian_manual'
+      end
+    end
+
+    cmd = case os_key.to_sym
+    when :RedHat
+      case proto.to_sym
+      when :IPv4
+        %w{/sbin/service iptables save}
+      when :IPv6
+        %w{/sbin/service ip6tables save}
+      end
+    when :Debian
+      case proto.to_sym
+      when :IPv4, :IPv6
+        %w{/usr/sbin/service iptables-persistent save}
+      end
+    when :Debian_manual
+      case proto.to_sym
+      when :IPv4
+        ["/bin/sh", "-c", "/sbin/iptables-save > /etc/iptables/rules"]
+      end
+    end
+
+    # Catch unsupported OSs from the case statement above.
+    if cmd.nil?
+      debug('firewall: Rule persistence is not supported for this type/OS')
+      return
+    end
+
+    begin
+      execute(cmd)
+    rescue Puppet::ExecutionFailure => detail
+      warning("Unable to persist firewall rules: #{detail}")
+    end
+  end
 end

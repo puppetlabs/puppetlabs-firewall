@@ -79,39 +79,29 @@ case.
 ### Recommended Setup
 
 At the moment you need to provide some setup outside of what we provide in the 
-module to support proper ordering, purging and firewall peristence.
+module to support proper ordering and purging.
 
-So It is recommended that you provide the following in top scope somewhere
+Persistence of rules between reboots is handled automatically for the
+supported distributions listed below. Although there are known issues with
+ip6tables on older Debian/Ubuntu and ebtables.
+
+It is recommended that you provide the following in top scope somewhere
 (such as your site.pp):
 
-    # Always persist firewall rules
-    exec { 'persist-firewall':
-      command     => $operatingsystem ? {
-        'debian'          => '/sbin/iptables-save > /etc/iptables/rules.v4',
-        /(RedHat|CentOS)/ => '/sbin/iptables-save > /etc/sysconfig/iptables',
-      },
-      refreshonly => true,
-    }
-
-    # These defaults ensure that the persistence command is executed after 
-    # every change to the firewall, and that pre & post classes are run in the
-    # right order to avoid potentially locking you out of your box during the
-    # first puppet run.
-    Firewall {
-      notify  => Exec['persist-firewall'],
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
-    Firewallchain {
-      notify  => Exec['persist-firewall'],
-    }
-    
     # Purge unmanaged firewall resources
     #
     # This will clear any existing rules, and make sure that only rules
     # defined in puppet exist on the machine
     resources { "firewall":
       purge => true
+    }
+    
+    # These defaults ensure that the pre & post classes are run in the right
+    # order to avoid potentially locking you out of your box during the
+    # first puppet run.
+    Firewall {
+      before  => Class['my_fw::post'],
+      require => Class['my_fw::pre'],
     }
 
 You also need to declare the 'my_fw::pre' & 'my_fw::post' classes so that 

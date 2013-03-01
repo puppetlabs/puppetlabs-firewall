@@ -1,4 +1,6 @@
 Puppet::Type.type(:firewallchain).provide :iptables_chain do
+  include Puppet::Util::Firewall
+
   @doc = "Iptables chain provider"
 
   has_feature :iptables_chain
@@ -96,6 +98,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
 
   def flush
     debug("[flush]")
+    persist_iptables(@resource[:name].match(Nameformat)[3])
     # Clear the property hash so we re-initialize with updated values
     @property_hash.clear
   end
