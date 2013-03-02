@@ -139,7 +139,7 @@ module Puppet::Util::Firewall
     when 'RedHat', 'CentOS', 'Fedora'
       'RedHat'
     when 'Debian', 'Ubuntu'
-      'Ubuntu'
+      'Debian'
     else
       Facter.value(:operatingsystem)
     end
