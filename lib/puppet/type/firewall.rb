@@ -559,18 +559,20 @@ Puppet::Type.newtype(:firewall) do
   end
 
   autorequire(:firewallchain) do
+    reqs = []
+    protocol = nil
+
     case value(:provider)
     when :iptables
       protocol = "IPv4"
     when :ip6tables
       protocol = "IPv6"
-    else
-      return
     end
 
-    reqs = []
-    [value(:chain), value(:jump)].each do |chain|
-      reqs << "#{chain}:#{value(:table)}:#{protocol}" unless chain.nil?
+    unless protocol.nil?
+      [value(:chain), value(:jump)].each do |chain|
+        reqs << "#{chain}:#{value(:table)}:#{protocol}" unless chain.nil?
+      end
     end
 
     reqs
