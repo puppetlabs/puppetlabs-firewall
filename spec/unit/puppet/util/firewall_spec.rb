@@ -87,4 +87,60 @@ describe 'Puppet::Util::Firewall' do
     specify { subject.to_hex32('-1').should == nil }
     specify { subject.to_hex32('bananas').should == nil }
   end
+
+  describe '#persist_iptables' do
+    before { Facter.clear }
+    subject { resource }
+
+    describe 'when proto is IPv4' do
+      let(:proto) { 'IPv4' }
+
+      it 'should exec for RedHat identified from osfamily' do
+        Facter.fact(:osfamily).stubs(:value).returns('RedHat')
+        subject.expects(:execute).with(%w{/sbin/service iptables save})
+        subject.persist_iptables(proto)
+      end
+
+      it 'should exec for CentOS identified from operatingsystem' do
+        Facter.fact(:osfamily).stubs(:value).returns(nil)
+        Facter.fact(:operatingsystem).stubs(:value).returns('CentOS')
+        subject.expects(:execute).with(%w{/sbin/service iptables save})
+        subject.persist_iptables(proto)
+      end
+
+      it 'should raise a warning when exec fails' do
+        Facter.fact(:osfamily).stubs(:value).returns('RedHat')
+        subject.expects(:execute).with(%w{/sbin/service iptables save}).
+          raises(Puppet::ExecutionFailure, 'some error')
+        subject.expects(:warning).with('Unable to persist firewall rules: some error')
+        subject.persist_iptables(proto)
+      end
+    end
+
+    describe 'when proto is IPv6' do
+      let(:proto) { 'IPv6' }
+
+      it 'should exec for newer Ubuntu' do
+        Facter.fact(:osfamily).stubs(:value).returns(nil)
+        Facter.fact(:operatingsystem).stubs(:value).returns('Ubuntu')
+        Facter.fact(:iptables_persistent_version).stubs(:value).returns('0.5.3ubuntu2')
+        subject.expects(:execute).with(%w{/usr/sbin/service iptables-persistent save})
+        subject.persist_iptables(proto)
+      end
+
+      it 'should not exec for older Ubuntu which does not support IPv6' do
+        Facter.fact(:osfamily).stubs(:value).returns(nil)
+        Facter.fact(:operatingsystem).stubs(:value).returns('Ubuntu')
+        Facter.fact(:iptables_persistent_version).stubs(:value).returns('0.0.20090701')
+        subject.expects(:execute).never
+        subject.persist_iptables(proto)
+      end
+
+      it 'should not exec for Suse which is not supported' do
+        Facter.fact(:osfamily).stubs(:value).returns('Suse')
+        subject.expects(:execute).never
+        subject.persist_iptables(proto)
+      end
+    end
+  end
 end
