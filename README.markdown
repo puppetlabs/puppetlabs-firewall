@@ -38,7 +38,7 @@ you read the release notes before upgrading.
 If you are intending to use this module it is recommended you obtain this from the
 forge and not Github:
 
-    http://forge.puppetlabs.com/puppetlabs/firewall
+<http://forge.puppetlabs.com/puppetlabs/firewall>
 
 The forge releases are vetted releases. Using code from Github means you are
 accessing a development version or early release of the code.
@@ -224,9 +224,9 @@ Or:
 
 ### Bugs
 
-Bugs can be reported in the Puppetlabs Redmine project:
+Bugs can be reported using Github Issues:
 
-    <http://projects.puppetlabs.com/projects/modules/>
+<http://github.com/puppetlabs/puppetlabs-firewall/issues>
 
 Please note, we only aim support for the following distributions and versions:
 
