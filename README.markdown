@@ -45,8 +45,8 @@ accessing a development version or early release of the code.
 
 ### Installation
 
-Using the puppet-module gem, you can install it into your Puppet's 
-module path. If you are not sure where your module path is try 
+Using the puppet-module gem, you can install it into your Puppet's
+module path. If you are not sure where your module path is try
 this command:
 
     puppet --configprint modulepath
@@ -83,7 +83,7 @@ currently supported operating systems:
 
     include firewall
 
-At the moment you need to provide some setup outside of what we provide in the 
+At the moment you need to provide some setup outside of what we provide in the
 module to support proper ordering and purging.
 
 Persistence of rules between reboots is handled automatically for the
@@ -100,7 +100,7 @@ It is recommended that you provide the following in top scope somewhere
     resources { "firewall":
       purge => true
     }
-    
+
     # These defaults ensure that the pre & post classes are run in the right
     # order to avoid potentially locking you out of your box during the
     # first puppet run.
@@ -109,8 +109,8 @@ It is recommended that you provide the following in top scope somewhere
       require => Class['my_fw::pre'],
     }
 
-You also need to declare the 'my_fw::pre' & 'my_fw::post' classes so that 
-dependencies are satisfied. This can be achieved using an External Node 
+You also need to declare the 'my_fw::pre' & 'my_fw::post' classes so that
+dependencies are satisfied. This can be achieved using an External Node
 Classifier or the following::
 
     class { 'my_fw::pre': }
@@ -133,7 +133,7 @@ An example of the pre class would be:
       Firewall {
         require => undef,
       }
-    
+
       # Default firewall rules
       firewall { '000 accept all icmp':
         proto   => 'icmp',
@@ -258,7 +258,7 @@ But plans are to support lots of other firewall implementations:
 * OpenBSD (pf)
 * Cisco (ASA and basic access lists)
 
-If you have knowledge in these technology, know how to code and wish to contribute 
+If you have knowledge in these technology, know how to code and wish to contribute
 to this project we would welcome the help.
 
 ### Testing
