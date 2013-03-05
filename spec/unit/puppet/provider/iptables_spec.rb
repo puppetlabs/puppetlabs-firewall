@@ -60,15 +60,70 @@ describe 'iptables provider' do
       rule.properties[:provider].to_s.should == provider.name.to_s
     end
   end
-  it 'should be handle multiport for source and destination ports' do
+
+  it 'it should handle multiport dports' do
+    insert_rules = []
+    insert_rules << "-A IN-OUTSIDE -p tcp -m multiport --dports 22,53 -j ACCEPT"
+    
+    
+    resource = Puppet::Type.type(:firewall).new({
+        :name  => '340 test multicast',
+        :ensure   => 'present',
+        :action   => 'accept',
+        :addrtype => 'MULTICAST',                                                                                                                                                                                                           
+        :chain    => 'INPUT',
+        :proto    => 'all',
+        :table    => 'filter',
+
+        })
+    provider.stubs(:execute).with(['/sbin/iptables-save']).returns(insert_rules.join("\n"))
+    instance = provider.new(resource)
+    instance.insert_args
+    check_rule = provider.instances[0].properties
+    check_rule[:dport].should == ["22", "53"]
+    check_rule[:proto].should == "tcp"
+    check_rule[:chain].should == "IN-OUTSIDE"
+    check_rule[:action].should == "accept"
+
+    # Confirm that we're getting the :MULTICAST symbol correctly
+    instance.general_args[5].should == :MULTICAST
+
+  end
+  it 'should be handle negation operator for destination port' do
+    insert_rules = []
+    insert_rules << "-A PREROUTING -i tun0 -d 63.245.217.0/255.255.255.0 -p tcp -m tcp ! --dport 22 -j MARK --set-mark 0x1"
+    
+    
+    resource = Puppet::Type.type(:firewall).new({
+        :name  => '340 test multicast',
+        :ensure   => 'present',
+        :action   => 'accept',
+        :addrtype => 'MULTICAST',                                                                                                                                                                                                           
+        :chain    => 'INPUT',
+        :proto    => 'all',
+        :table    => 'filter',
+
+        })
+    provider.stubs(:execute).with(['/sbin/iptables-save']).returns(insert_rules.join("\n"))
+    instance = provider.new(resource)
+    instance.insert_args
+    check_rule = provider.instances[0].properties
+    check_rule[:dport].should == ["67", "68"]
+    check_rule[:sport].should == ["99", "100"]
+    check_rule[:proto].should == "udp"
+    check_rule[:source].should == "10.0.0.0/8"
+    check_rule[:chain].should == "INSIDE-NETS"
+    check_rule[:action].should == "accept"
+
+    # Confirm that we're getting the :MULTICAST symbol correctly
+    instance.general_args[5].should == :MULTICAST
+
+  end
+
+  it 'should handle multiport sports udp with multiport dports' do
     insert_rules = []
     insert_rules << "-A INSIDE-NETS -s 10.0.0.0/255.0.0.0 -p udp -m multiport --sports 99,100 -m multiport --dports 67,68 -j ACCEPT"
     
-    #
-    # This resource has a name of 100
-    # Based on this it and the insert rules
-    # We should get back an index of 3
-    #
     
     resource = Puppet::Type.type(:firewall).new({
         :name  => '340 test multicast',
