@@ -48,7 +48,7 @@ describe 'iptables provider' do
     provider.stubs(:command).with(:iptables_save).returns "/sbin/iptables-save"
 
     # Stub iptables version
-    Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
+    Facter.fact(:iptables_version).stubs(:value).returns("1.4.1")
   end
 
   it 'should be able to get a list of existing rules' do
@@ -91,7 +91,7 @@ describe 'iptables provider' do
   end
   it 'should be handle negation operator for destination port' do
     insert_rules = []
-    insert_rules << "-A PREROUTING -i tun0 -d 63.245.217.0/255.255.255.0 -p tcp -m tcp ! --dport 22 -j MARK --set-mark 0x1"
+    insert_rules << "-A PREROUTING -i tun0 -d 9.9.9.9/255.255.255.0 -p tcp -m tcp --dport !22 -j MARK --set-xmark 0x1"
     
     
     resource = Puppet::Type.type(:firewall).new({
@@ -108,12 +108,10 @@ describe 'iptables provider' do
     instance = provider.new(resource)
     instance.insert_args
     check_rule = provider.instances[0].properties
-    check_rule[:dport].should == ["67", "68"]
-    check_rule[:sport].should == ["99", "100"]
-    check_rule[:proto].should == "udp"
-    check_rule[:source].should == "10.0.0.0/8"
-    check_rule[:chain].should == "INSIDE-NETS"
-    check_rule[:action].should == "accept"
+    check_rule[:dport_tcp].should == ["!22"]
+    check_rule[:proto].should == "tcp"
+    check_rule[:chain].should == "PREROUTING"
+    check_rule[:jump].should == "MARK"
 
     # Confirm that we're getting the :MULTICAST symbol correctly
     instance.general_args[5].should == :MULTICAST
