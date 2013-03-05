@@ -60,7 +60,7 @@ describe 'iptables provider' do
       rule.properties[:provider].to_s.should == provider.name.to_s
     end
   end
-  it 'should be handle addrtype' do
+  it 'should be handle multiport for source and destination ports' do
     insert_rules = []
     insert_rules << "-A INSIDE-NETS -s 10.0.0.0/255.0.0.0 -p udp -m multiport --sports 99,100 -m multiport --dports 67,68 -j ACCEPT"
     
