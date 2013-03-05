@@ -62,6 +62,41 @@ describe 'iptables provider' do
   end
   it 'should be handle addrtype' do
     insert_rules = []
+    insert_rules << "-A INSIDE-NETS -s 10.0.0.0/255.0.0.0 -p udp -m multiport --sports 99,100 -m multiport --dports 67,68 -j ACCEPT"
+    
+    #
+    # This resource has a name of 100
+    # Based on this it and the insert rules
+    # We should get back an index of 3
+    #
+    
+    resource = Puppet::Type.type(:firewall).new({
+        :name  => '340 test multicast',
+        :ensure   => 'present',
+        :action   => 'accept',
+        :addrtype => 'MULTICAST',                                                                                                                                                                                                           
+        :chain    => 'INPUT',
+        :proto    => 'all',
+        :table    => 'filter',
+
+        })
+    provider.stubs(:execute).with(['/sbin/iptables-save']).returns(insert_rules.join("\n"))
+    instance = provider.new(resource)
+    instance.insert_args
+    check_rule = provider.instances[0].properties
+    check_rule[:dport].should == ["67", "68"]
+    check_rule[:sport].should == ["99", "100"]
+    check_rule[:proto].should == "udp"
+    check_rule[:source].should == "10.0.0.0/8"
+    check_rule[:chain].should == "INSIDE-NETS"
+    check_rule[:action].should == "accept"
+
+    # Confirm that we're getting the :MULTICAST symbol correctly
+    instance.general_args[5].should == :MULTICAST
+
+  end
+  it 'should be handle addrtype' do
+    insert_rules = []
     insert_rules << "-A INPUT -m addrtype --src-type MULTICAST -m comment --comment \"330 on input chain\" -j ACCEPT "
     
     #
