@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "Facter::Util::Fact iptables_persistent_version" do
   before { Facter.clear }
-  let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' iptables-persistent" }
+  let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' iptables-persistent 2>/dev/null" }
 
   {
     "Debian" => "0.0.20090701",
