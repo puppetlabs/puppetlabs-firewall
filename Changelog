@@ -4,6 +4,18 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
+#### 0.2.1 - 2012/3/13
+
+This maintenance release introduces the new README layout, and fixes a bug with iptables_persistent_version.
+
+##### Changes
+
+* (GH-139) Throw away STDERR from dpkg-query in Fact
+* Update README to be consistent with module documentation template
+* Fix failing spec tests due to dpkg change in iptables_persistent_version
+
+---------------------------------------
+
 #### 0.2.0 - 2012/3/3
 
 This release introduces automatic persistence, removing the need for the previous manual dependency requirement for persistent the running rules to the OS persistence file.
