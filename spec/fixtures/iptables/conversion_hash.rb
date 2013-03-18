@@ -660,6 +660,6 @@ HASH_TO_ARGS = {
       :iniface => 'eth0',
       :addrtype => 'multicast',
     },
-    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "addrtype", "--pkt-type", :multicast, "-m", "comment", "--comment", "063 addrtype multicast", "-j", "ACCEPT"],
+    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "addrtype", "--src-type", :multicast, "-m", "comment", "--comment", "063 addrtype multicast", "-j", "ACCEPT"],
   },
 }

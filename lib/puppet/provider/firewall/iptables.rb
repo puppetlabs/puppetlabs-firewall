@@ -67,17 +67,28 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :toports => "--to-ports",
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
-    :pkttype => "-m pkttype --pkt-type"
+    :pkttype => "-m pkttype --pkt-type",
     :addrtype => "-m addrtype --src-type"
   }
+
+  # Create property methods dynamically
+  (@resource_map.keys << :chain << :table << :action).each do |property|
+    define_method "#{property}" do
+      @property_hash[property.to_sym]
+    end
+
+    define_method "#{property}=" do
+      @property_hash[:needs_change] = true
+    end
+  end
 
   # This is the order of resources as they appear in iptables-save output,
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :tcp_flags, :gid, :uid, :sport, :sport_udp, :sport_tcp, :dport, :dport_udp, :dport_tcp, :port, :pkttype, :addrtype, :name, :state, :ctstate, :icmp, :limit, :burst,
-    :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
+    :proto, :tcp_flags, :gid, :uid, :sport, :dport, :sport_udp, :sport_tcp, :dport_udp, :dport_tcp, :port, :pkttype, :addrtype, :name, :state, :ctstate, :icmp, :limit, :burst,
+    :jump, :todest, :tosource, :toports, :log_prefix, :log_level, :reject, :set_mark]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
@@ -303,9 +314,17 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     rules = []
 
     # Find list of current rules based on chain and table
+    # Sometimes rules don't have a table
+    # Comparing will never match if there is no table
     self.class.instances.each do |rule|
-      if rule.chain == resource[:chain].to_s and rule.table == resource[:table].to_s
-        rules << rule.name
+      if rule.table
+        if rule.chain == resource[:chain].to_s and rule.table == resource[:table].to_s
+            rules << rule.name
+        end
+      elsif !rule.table
+        if rule.chain == resource[:chain].to_s
+            rules << rule.name
+        end
       end
     end
 

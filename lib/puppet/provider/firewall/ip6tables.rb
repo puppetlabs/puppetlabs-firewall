@@ -48,9 +48,20 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :toports => "--to-ports",
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
-    :pkttype => "-m pkttype --pkt-type"
+    :pkttype => "-m pkttype --pkt-type",
     :addrtype => "-m addrtype --src-type"
   }
+
+  # Create property methods dynamically
+  (@resource_map.keys << :chain << :table << :action).each do |property|
+    define_method "#{property}" do
+      @property_hash[property.to_sym]
+    end
+
+    define_method "#{property}=" do
+      @property_hash[:needs_change] = true
+    end
+  end
 
   # This is the order of resources as they appear in iptables-save output,
   # we need it to properly parse and apply rules, if the order of resource
