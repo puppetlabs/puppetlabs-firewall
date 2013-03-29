@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'firewall::linux' do
+describe 'firewall::linux', :type => :class do
   let(:facts_default) {{ :kernel => 'Linux' }}
   it { should contain_package('iptables').with_ensure('present') }
 
