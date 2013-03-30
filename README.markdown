@@ -381,3 +381,10 @@ Install the necessary gems:
 And run the tests from the root of the source code:
 
     rake test
+
+If you have a copy of Vagrant 1.1.0 you can also run the system tests:
+
+    RSPEC_SET=debian-606-x64 rake spec:system
+    RSPEC_SET=centos-58-x64 rake spec:system
+
+*Note:* system testing is fairly alpha at this point, your mileage may vary.
