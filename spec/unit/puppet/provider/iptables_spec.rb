@@ -15,15 +15,15 @@ describe 'iptables provider detection' do
 
   it "should default to iptables provider if /sbin/iptables[-save] exists" do
     # Stub lookup for /sbin/iptables & /sbin/iptables-save
-    exists.any_instance.stubs(:which).with("/sbin/iptables").
+    exists.any_instance.stubs(:which).with("iptables").
       returns "/sbin/iptables"
-    exists.any_instance.stubs(:which).with("/sbin/iptables-save").
+    exists.any_instance.stubs(:which).with("iptables-save").
       returns "/sbin/iptables-save"
 
     # Every other command should return false so we don't pick up any
     # other providers
     exists.any_instance.stubs(:which).with() { |value|
-      ! ["/sbin/iptables","/sbin/iptables-save"].include?(value)
+      ! ["iptables","iptables-save"].include?(value)
     }.returns false
 
     # Create a resource instance and make sure the provider is iptables
@@ -51,7 +51,7 @@ describe 'iptables provider' do
     Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
 
     Puppet::Util::Execution.stubs(:execute).returns ""
-    Puppet::Util.stubs(:which).with("/sbin/iptables-save").
+    Puppet::Util.stubs(:which).with("iptables-save").
       returns "/sbin/iptables-save"
   end
 
