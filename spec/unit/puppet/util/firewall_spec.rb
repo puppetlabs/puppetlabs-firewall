@@ -108,6 +108,12 @@ describe 'Puppet::Util::Firewall' do
         subject.persist_iptables(proto)
       end
 
+      it 'should exec for Archlinux identified from osfamily' do
+        Facter.fact(:osfamily).stubs(:value).returns('Archlinux')
+        subject.expects(:execute).with(['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/iptables/iptables.rules'])
+        subject.persist_iptables(proto)
+      end
+
       it 'should raise a warning when exec fails' do
         Facter.fact(:osfamily).stubs(:value).returns('RedHat')
         subject.expects(:execute).with(%w{/sbin/service iptables save}).
