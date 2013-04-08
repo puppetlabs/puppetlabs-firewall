@@ -14,6 +14,11 @@ class firewall::linux {
         require => Package['iptables'],
       }
     }
+    'Archlinux': {
+      class { "${title}::archlinux":
+        require => Package['iptables'],
+      }
+    }
     default: {}
   }
 }
