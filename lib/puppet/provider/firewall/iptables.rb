@@ -20,6 +20,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :mark
   has_feature :tcp_flags
   has_feature :pkttype
+  has_feature :isfragment
   has_feature :socket
 
   optional_commands({
@@ -65,7 +66,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :toports => "--to-ports",
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
-    :pkttype => "-m pkttype --pkt-type"
+    :pkttype => "-m pkttype --pkt-type",
+    :isfragment => "-f",
   }
 
   # Create property methods dynamically
@@ -83,7 +85,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
+  @resource_list = [:table, :source, :destination, :iniface, :outiface, :isfragment,
     :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
@@ -146,7 +148,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # These are known booleans that do not take a value, but we want to munge
     # to true if they exist.
-    known_booleans = [:socket]
+    known_booleans = [:socket, :isfragment]
 
     ####################
     # PRE-PARSE CLUDGING
@@ -158,7 +160,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Trick the system for booleans
     known_booleans.each do |bool|
-      values = values.sub(/#{@resource_map[bool]}/, '-m socket true')
+      if bool == :socket then
+        values = values.sub(/#{@resource_map[bool]}/, '-m socket true')
+      end
+      if bool == :isfragment then
+        values = values.sub(/#{@resource_map[bool]}/, '-f true')
+      end
     end
 
     ############
@@ -310,6 +317,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         resource_value = resource[res]
         # If socket is true then do not add the value as -m socket is standalone
         if res == :socket then
+          resource_value = nil
+        end
+        if res == :isfragment then
           resource_value = nil
         end
       elsif res == :jump and resource[:action] then
