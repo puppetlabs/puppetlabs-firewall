@@ -298,6 +298,14 @@ ARGS_TO_HASH = {
       :socket => true,
     },
   },
+  'isfragment_option' => {
+    :line => '-A INPUT -f -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :isfragment => true,
+    },
+  },
   'single_tcp_sport' => {
     :line => '-A OUTPUT -s 10.94.100.46/32 -p tcp -m tcp --sport 20443 -j ACCEPT',
     :table => 'mangle',
@@ -705,5 +713,14 @@ HASH_TO_ARGS = {
       :socket => true,
     },
     :args => ['-t', :mangle, '-p', :tcp, '-m', 'socket', '-m', 'comment', '--comment', '050 socket option', '-j', 'ACCEPT'],
+  },
+  'isfragment_option' => {
+    :params => {
+      :name => '050 isfragment option',
+      :table => 'filter',
+      :action => 'accept',
+      :isfragment => true,
+    },
+    :args => ['-t', :filter, '-t', '-p', all, '-m', 'comment', '--comment', '050 isfragment option', '-j', 'ACCEPT'],
   },
 }
