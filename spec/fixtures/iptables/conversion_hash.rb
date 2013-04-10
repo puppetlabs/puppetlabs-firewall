@@ -718,9 +718,10 @@ HASH_TO_ARGS = {
     :params => {
       :name => '050 isfragment option',
       :table => 'filter',
+      :proto => :all,
       :action => 'accept',
       :isfragment => true,
     },
-    :args => ['-t', :filter, '-t', '-p', :all, '-m', 'comment', '--comment', '050 isfragment option', '-j', 'ACCEPT'],
+    :args => ['-t', :filter, '-f', '-p', :all, '-m', 'comment', '--comment', '050 isfragment option', '-j', 'ACCEPT'],
   },
 }
