@@ -75,8 +75,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface, :isfragment,
-    :proto, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
+  @resource_list = [:table, :source, :destination, :iniface, :outiface,
+    :proto, :isfragment, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
 end

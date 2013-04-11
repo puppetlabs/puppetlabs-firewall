@@ -85,8 +85,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface, :isfragment,
-    :proto, :tcp_flags, :gid, :uid, :sport, :dport, :port, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
+  @resource_list = [:table, :source, :destination, :iniface, :outiface,
+    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark]
 
   def insert
@@ -164,7 +164,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         values = values.sub(/#{@resource_map[bool]}/, '-m socket true')
       end
       if bool == :isfragment then
-        values = values.sub(/#{@resource_map[bool]}/, '-f true')
+        # only replace those -f that are not followed by an l to 
+        # distinguish between -f and the '-f' inside of --tcp-flags.
+        values = values.sub(/-f(?=[^l])/, '-f true')
       end
     end
 
