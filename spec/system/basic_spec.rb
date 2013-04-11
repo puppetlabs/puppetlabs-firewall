@@ -7,9 +7,9 @@ describe "basic tests:" do
   # It checks that the flush command returns with no errors.
   def iptables_flush_all_tables
     ['filter', 'nat', 'mangle', 'raw'].each do |t|
-      system_run("iptables -t #{t} -F") do |s, o, e|
-        s.exitstatus.should == 0
-        e.should == ''
+      system_run("iptables -t #{t} -F") do |r|
+        r[:exit_code].should == 0
+        r[:stderr].should == ''
       end
     end
   end
@@ -17,10 +17,10 @@ describe "basic tests:" do
   context 'prelim:' do
     it 'make sure we have copied the module across' do
       # No point diagnosing any more if the module wasn't copied properly
-      system_run("ls /etc/puppet/modules/firewall") do |s, o, e|
-        s.exitstatus.should == 0
-        o.should =~ /Modulefile/
-        e.should == ''
+      system_run("ls /etc/puppet/modules/firewall") do |r|
+        r[:exit_code].should == 0
+        r[:stdout].should =~ /Modulefile/
+        r[:stderr].should == ''
       end
     end
   end
@@ -29,20 +29,20 @@ describe "basic tests:" do
     it 'make sure it returns no errors when executed on a clean machine' do
       # Except for the absence of iptables, it should run perfectly usually
       # most hosts have iptables at least.
-      system_run('puppet resource firewall') do |s, o, e|
-        s.exitstatus.should == 0
+      puppet_resource('firewall') do |r|
+        r[:exit_code].should == 0
         # don't check stdout, some boxes come with rules, that is normal
-        e.should == ''
+        r[:stderr].should == ''
       end
     end
 
     it 'flush iptables and make sure it returns nothing afterwards' do
       iptables_flush_all_tables
       # No rules, means no output thanks. And no errors as well.
-      system_run('puppet resource firewall') do |s, o, e|
-        s.exitstatus.should == 0
-        e.should == ''
-        o.should == "\n"
+      puppet_resource('firewall') do |r|
+        r[:exit_code].should == 0
+        r[:stderr].should == ''
+        r[:stdout].should == "\n"
       end
     end
   end

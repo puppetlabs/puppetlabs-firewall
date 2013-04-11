@@ -13,9 +13,9 @@ RSpec.configure do |c|
     include RSpecSystemPuppet::Helpers
 
     # Install puppet
-    system_puppet_install
+    puppet_install
 
     # Copy this module into the module path of the test node
-    system_puppet_module_from_path(:source => proj_root, :module_name => 'firewall')
+    puppet_module_install(:source => proj_root, :module_name => 'firewall')
   end
 end
