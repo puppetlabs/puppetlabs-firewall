@@ -87,7 +87,7 @@ describe 'iptables provider' do
         # Iterate across each parameter, creating an example for comparison
         data[:params].each do |param_name, param_value|
           it "the parameter '#{param_name.to_s}' should match #{param_value.inspect}" do
-            # booleans get cludged to string 'true'
+            # booleans get cludged to string "true"
             if param_value == true then
               resource[param_name].should == "true"
             else
