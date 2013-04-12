@@ -7,7 +7,7 @@ describe "basic tests:" do
   # It checks that the flush command returns with no errors.
   def iptables_flush_all_tables
     ['filter', 'nat', 'mangle', 'raw'].each do |t|
-      system_run("iptables -t #{t} -F") do |r|
+      system_run("/sbin/iptables -t #{t} -F") do |r|
         r[:exit_code].should == 0
         r[:stderr].should == ''
       end
