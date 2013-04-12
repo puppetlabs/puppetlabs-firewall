@@ -45,6 +45,9 @@ Puppet::Type.newtype(:firewall) do
   feature :isfragment, "Match fragments"
   feature :address_type, "The ability match on source or destination address type"
   feature :iprange, "The ability match on source or destination IP range "
+  feature :ishasmorefrags, "Match a non-last fragment of a fragmented ipv6 packet - might be first"
+  feature :islastfrag, "Match the last fragment of an ipv6 packet"
+  feature :isfirstfrag, "Match the first fragment of a fragmented ipv6 packet"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -644,6 +647,31 @@ Puppet::Type.newtype(:firewall) do
     desc <<-EOS
       If true, matches if an open socket can be found by doing a coket lookup
       on the packet.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:ishasmorefrags, :required_features => :ishasmorefrags) do
+    desc <<-EOS
+      If true, matches if the packet has it's 'more fragments' bit set. ipv6.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:islastfrag, :required_features => :islastfrag) do
+    desc <<-EOS
+      If true, matches if the packet is the last fragment. ipv6.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:isfirstfrag, :required_features => :isfirstfrag) do
+    desc <<-EOS
+      If true, matches if the packet is the first fragment. 
+      Sadly cannot be negated. ipv6.
     EOS
 
     newvalues(:true, :false)
