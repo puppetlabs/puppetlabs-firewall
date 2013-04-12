@@ -23,8 +23,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :socket
 
   optional_commands({
-    :iptables => '/sbin/iptables',
-    :iptables_save => '/sbin/iptables-save',
+    :iptables => 'iptables',
+    :iptables_save => 'iptables-save',
   })
 
   defaultfor :kernel => :linux
