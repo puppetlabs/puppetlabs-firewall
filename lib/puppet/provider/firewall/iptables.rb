@@ -68,6 +68,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :pkttype => "-m pkttype --pkt-type"
   }
 
+  # These are known booleans that do not take a value, but we want to munge
+  # to true if they exist.
+  @known_booleans = [:socket]
+
+
   # Create property methods dynamically
   (@resource_map.keys << :chain << :table << :action).each do |property|
     define_method "#{property}" do
@@ -144,10 +149,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     keys = []
     values = line.dup
 
-    # These are known booleans that do not take a value, but we want to munge
-    # to true if they exist.
-    known_booleans = [:socket]
-
     ####################
     # PRE-PARSE CLUDGING
     ####################
@@ -157,8 +158,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
 
     # Trick the system for booleans
-    known_booleans.each do |bool|
-      values = values.sub(/#{@resource_map[bool]}/, '-m socket true')
+    @known_booleans.each do |bool|
+      # append "true" because all params are expected to have values
+      values = values.sub(/#{@resource_map[bool]}/, "#{@resource_map[bool]} true")
     end
 
     ############
@@ -197,7 +199,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
 
     # Convert booleans removing the previous cludge we did
-    known_booleans.each do |bool|
+    @known_booleans.each do |bool|
       if hash[bool] != nil then
         if hash[bool] == "true" then
           hash[bool] = true
@@ -303,13 +305,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     args = []
     resource_list = self.class.instance_variable_get('@resource_list')
     resource_map = self.class.instance_variable_get('@resource_map')
+    known_booleans = self.class.instance_variable_get('@known_booleans')
 
     resource_list.each do |res|
       resource_value = nil
       if (resource[res]) then
         resource_value = resource[res]
         # If socket is true then do not add the value as -m socket is standalone
-        if res == :socket then
+        if known_booleans.include?(res) then
           resource_value = nil
         end
       elsif res == :jump and resource[:action] then
