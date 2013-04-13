@@ -232,7 +232,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Puppet-firewall requires that all rules have comments (resource names) and will fail if
     # a rule in iptables does not have a comment. We get around this by appending a high level
     if ! hash[:name]
-      hash[:name] = "999#{counter} #{Digest::MD5.hexdigest(line)}"
+      num = 9000 + counter
+      hash[:name] = "#{num} #{Digest::MD5.hexdigest(line)}"
     end
 
     # Iptables defaults to log_level '4', so it is omitted from the output of iptables-save.
