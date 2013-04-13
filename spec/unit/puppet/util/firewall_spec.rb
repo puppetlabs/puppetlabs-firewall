@@ -97,7 +97,18 @@ describe 'Puppet::Util::Firewall' do
 
       it 'should exec for RedHat identified from osfamily' do
         Facter.fact(:osfamily).stubs(:value).returns('RedHat')
+        Facter.fact(:operatingsystem).stubs(:value).returns('RedHat')
+
         subject.expects(:execute).with(%w{/sbin/service iptables save})
+        subject.persist_iptables(proto)
+      end
+
+      it 'should exec for systemd if running Fedora 15 or greater' do
+        Facter.fact(:osfamily).stubs(:value).returns('RedHat')
+        Facter.fact(:operatingsystem).stubs(:value).returns('Fedora')
+        Facter.fact(:operatingsystemrelease).stubs(:value).returns('15')
+
+        subject.expects(:execute).with(%w{/usr/libexec/iptables.init save})
         subject.persist_iptables(proto)
       end
 
@@ -116,6 +127,8 @@ describe 'Puppet::Util::Firewall' do
 
       it 'should raise a warning when exec fails' do
         Facter.fact(:osfamily).stubs(:value).returns('RedHat')
+        Facter.fact(:operatingsystem).stubs(:value).returns('RedHat')
+
         subject.expects(:execute).with(%w{/sbin/service iptables save}).
           raises(Puppet::ExecutionFailure, 'some error')
         subject.expects(:warning).with('Unable to persist firewall rules: some error')
