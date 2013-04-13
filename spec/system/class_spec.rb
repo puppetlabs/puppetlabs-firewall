@@ -1,10 +1,13 @@
 require 'spec_helper_system'
 
 describe "firewall class:" do
-  it "should run without event" do
+  let(:pp) do
     pp = <<-EOS
       class { 'firewall': }
     EOS
+  end
+
+  it "should run without event" do
     puppet_apply(pp) do |r|
       r[:stderr].should == ''
       r[:exit_code].should_not eq(1)
@@ -12,9 +15,6 @@ describe "firewall class:" do
   end
 
   it "should be idempotent" do
-    pp = <<-EOS
-      class { 'firewall': }
-    EOS
     puppet_apply(pp) do |r|
       r[:stderr].should == ''
       r[:exit_code].should == 0
