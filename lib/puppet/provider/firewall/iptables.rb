@@ -208,9 +208,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Convert booleans removing the previous cludge we did
     known_booleans.each do |bool|
       if hash[bool] != nil then
-        if hash[bool] == "true" then
-          hash[bool] = true
-        else
+        unless hash[bool] == "true" then
           raise "Parser error: #{bool} was meant to be a boolean but received value: #{hash[bool]}."
         end
       end
