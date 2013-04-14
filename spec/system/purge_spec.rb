@@ -4,9 +4,10 @@ describe "purge tests:" do
   it 'make sure duplicate existing rules get purged' do
     iptables_flush_all_tables
 
-    system_run('iptables -A INPUT -s 1.2.1.2')
-    system_run('iptables -A INPUT -s 1.2.1.2')
+    system_run('/sbin/iptables -A INPUT -s 1.2.1.2')
+    system_run('/sbin/iptables -A INPUT -s 1.2.1.2')
     pp = <<-EOS
+class { 'firewall': }
 resources { 'firewall':
   purge => true,
 }
@@ -16,7 +17,7 @@ resources { 'firewall':
       r[:exit_code].should == 2
     end
 
-    system_run('iptables-save') do |r|
+    system_run('/sbin/iptables-save') do |r|
       r[:stdout].should_not =~ /1\.2\.1\.2/
       r[:stderr].should == ''
     end

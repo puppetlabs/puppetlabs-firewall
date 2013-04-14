@@ -31,6 +31,7 @@ RSpec.configure do |c|
 
   # Import in our local helpers
   c.include ::LocalHelpers
+  c.extend RSpecSystemPuppet::Helpers
 
   # This is where we 'setup' the nodes before running our tests
   c.system_setup_block = proc do
