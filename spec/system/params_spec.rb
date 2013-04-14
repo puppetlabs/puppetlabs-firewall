@@ -6,7 +6,7 @@ describe "param based tests:" do
 firewall { '100 test':
     EOS
 
-    params.each do |k,v| 
+    params.each do |k,v|
       pm += <<-EOS
   #{k} => #{v},
       EOS
@@ -18,14 +18,15 @@ firewall { '100 test':
     pm
   end
 
-  [
-    {
-      'table' => "'raw'",
-      'socket' => 'true',
-      'chain' => "'PREROUTING'",
-    },
-  ].each do |param|
-    it 'test param' do
+  it 'test param socket' do
+    facts = system_node.facts
+    unless facts['operatingsystem'] == 'CentOS' and \
+      facts['operatingsystemrelease'] =~ /^5\./ then
+      param = {
+        'table' => "'raw'",
+        'socket' => 'true',
+        'chain' => "'PREROUTING'",
+      }
       iptables_flush_all_tables
 
       ppm = pp(param)
@@ -41,5 +42,4 @@ firewall { '100 test':
       end
     end
   end
-
 end
