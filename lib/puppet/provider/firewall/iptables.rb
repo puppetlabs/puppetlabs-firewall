@@ -72,7 +72,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
-  @known_booleans = [:socket]
+  @known_booleans = [:socket, :isfragment]
 
 
   # Create property methods dynamically
