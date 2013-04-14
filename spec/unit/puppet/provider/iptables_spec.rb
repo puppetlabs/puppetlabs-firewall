@@ -121,7 +121,7 @@ describe 'iptables provider' do
     let(:instance) { provider.new(resource) }
 
     it 'rule name contains a MD5 sum of the line' do
-      resource[:name].should == "9999 #{Digest::MD5.hexdigest(resource[:line])}"
+      resource[:name].should == "9000 #{Digest::MD5.hexdigest(resource[:line])}"
     end
   end
 
