@@ -20,6 +20,7 @@ firewall { '100 test':
 
   facts = system_node.facts
 
+  puts facts.inspect
   unless facts['operatingsystem'] == 'CentOS' and \
     facts['operatingsystemrelease'] =~ /^5\./ then
 
