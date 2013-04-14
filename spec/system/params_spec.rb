@@ -18,13 +18,10 @@ firewall { '100 test':
     pm
   end
 
-  facts = system_node.facts
-
-  puts "Facts are: #{facts.pretty_inspect}"
-  unless facts['operatingsystem'] == 'CentOS' and \
-    facts['operatingsystemrelease'] =~ /^5\./ then
-
-    it 'test param socket' do
+  it 'test param socket' do
+    facts = system_node.facts
+    unless facts['operatingsystem'] == 'CentOS' and \
+      facts['operatingsystemrelease'] =~ /^5\./ then
       param = {
         'table' => "'raw'",
         'socket' => 'true',
@@ -44,6 +41,5 @@ firewall { '100 test':
         r[:exit_code].should == 0
       end
     end
-
   end
 end
