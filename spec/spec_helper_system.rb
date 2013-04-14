@@ -29,6 +29,9 @@ RSpec.configure do |c|
   # Project root for the firewall code
   proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
+  # Enable colour in Jenkins
+  c.tty = true
+
   # Import in our local helpers
   c.include ::LocalHelpers
   c.extend RSpecSystemPuppet::Helpers
