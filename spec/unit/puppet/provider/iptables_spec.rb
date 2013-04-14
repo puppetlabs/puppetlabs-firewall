@@ -181,7 +181,7 @@ describe 'ip6tables provider' do
     Facter.fact(:ip6tables_version).stubs(:value).returns("1.4.7")
 
     Puppet::Util::Execution.stubs(:execute).returns ""
-    Puppet::Util.stubs(:which).with("/sbin/ip6tables-save").
+    Puppet::Util.stubs(:which).with("ip6tables-save").
       returns "/sbin/ip6tables-save"
   end
 
