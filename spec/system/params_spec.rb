@@ -18,16 +18,19 @@ firewall { '100 test':
     pm
   end
 
-  [
-    {
-      'table' => "'raw'",
-      'socket' => 'true',
-      'chain' => "'PREROUTING'",
-    },
-  ].each do |param|
-    pending 'test param' do
+  it 'test socket param' do
+    facts = system_node.facts
+
+    unless (facts['operatingsystem'] == 'CentOS') && \
+      facts['operatingsystemrelease'] =~ /^5\./ then
+
       iptables_flush_all_tables
 
+      param = {
+        'table' => "'raw'",
+        'socket' => 'true',
+        'chain' => "'PREROUTING'",
+      }
       ppm = pp(param)
       puppet_apply(ppm) do |r|
         r[:stderr].should == ''
