@@ -1,4 +1,7 @@
-class firewall::linux::debian {
+class firewall::linux::debian (
+  $ensure = running,
+  $enable = true
+) {
   package { 'iptables-persistent':
     ensure => present,
   }
@@ -7,7 +10,7 @@ class firewall::linux::debian {
   # needs to be called on system boot.
   service { 'iptables-persistent':
     ensure  => undef,
-    enable  => true,
+    enable  => $enable,
     require => Package['iptables-persistent'],
   }
 }

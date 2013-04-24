@@ -1,12 +1,15 @@
-class firewall::linux::archlinux {
+class firewall::linux::archlinux (
+  $ensure = 'running',
+  $enable = true
+) {
   service { 'iptables':
-    ensure => running,
-    enable => true,
+    ensure => $ensure,
+    enable => $enable,
   }
 
   service { 'ip6tables':
-    ensure => running,
-    enable => true,
+    ensure => $ensure,
+    enable => $enable,
   }
 
   file { '/etc/iptables/iptables.rules':
