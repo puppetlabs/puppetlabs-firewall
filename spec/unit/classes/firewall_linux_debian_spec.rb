@@ -9,4 +9,11 @@ describe 'firewall::linux::debian', :type => :class do
     :enable   => 'true',
     :require  => 'Package[iptables-persistent]'
   )}
+
+  context 'enable => false' do
+    let(:params) {{ :enable => 'false' }}
+    it { should contain_service('iptables-persistent').with(
+      :enable   => 'false'
+    )}
+  end
 end
