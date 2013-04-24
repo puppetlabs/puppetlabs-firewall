@@ -282,7 +282,7 @@ Facts:
 * [iptables_version](#fact-iptablesversion)
 * [iptables_persistent_version](#fact-iptablespersistentversion)
 
-####Class: firewall
+###Class: firewall
 
 This class is provided to do the basic setup tasks required for using the firewall resources.
 
@@ -294,7 +294,13 @@ You should include the class for nodes that need to use the resources in this mo
 
     class { 'firewall': }
 
-####Type: firewall
+####`ensure`
+
+Indicates the state of `iptables` on your system, allowing you to disable `iptables` if desired.
+
+Can either be `running` or `stopped`. Default to `running`.
+
+###Type: firewall
 
 This type provides the capability to manage firewall rules within puppet.
 
@@ -302,7 +308,7 @@ For more documentation on the type, access the 'Types' tab on the Puppet Labs Fo
 
 <http://forge.puppetlabs.com/puppetlabs/firewall#types>
 
-####Type:: firewallchain
+###Type:: firewallchain
 
 This type provides the capability to manage rule chains for firewalls.
 
@@ -310,15 +316,15 @@ For more documentation on the type, access the 'Types' tab on the Puppet Labs Fo
 
 <http://forge.puppetlabs.com/puppetlabs/firewall#types>
 
-####Fact: ip6tables_version
+###Fact: ip6tables_version
 
 The module provides a Facter fact that can be used to determine what the default version of ip6tables is for your operating system/distribution.
 
-####Fact: iptables_version
+###Fact: iptables_version
 
 The module provides a Facter fact that can be used to determine what the default version of iptables is for your operating system/distribution.
 
-####Fact: iptables_persistent_version
+###Fact: iptables_persistent_version
 
 Retrieves the version of iptables-persistent from your OS. This is a Debian/Ubuntu specific fact.
 
