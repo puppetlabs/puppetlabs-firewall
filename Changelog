@@ -4,6 +4,24 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
+#### 0.3.0 - 2013/4/25
+
+This release introduces support for Arch Linux and extends support for Fedora 15 and up. There are also lots of bugs fixed and improved testing to prevent regressions.
+
+##### Changes
+
+* Fix error reporting for insane hostnames (Tomas Doran)
+* Support systemd on Fedora 15 and up (Eduardo Gutierrez)
+* Move examples to docs (Ken Barber)
+* Add support for Arch Linux platform (Ingmar Steen)
+* Add match rule for fragments (Georg Koester)
+* Fix boolean rules being recognized as changed (Georg Koester)
+* Same rules now get deleted (Anastasis Andronidis)
+* Socket params test (Ken Barber)
+* Ensure parameter can disable firewall (Marc Tardif)
+
+---------------------------------------
+
 #### 0.2.1 - 2012/3/13
 
 This maintenance release introduces the new README layout, and fixes a bug with iptables_persistent_version.
