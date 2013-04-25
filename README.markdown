@@ -330,16 +330,17 @@ Retrieves the version of iptables-persistent from your OS. This is a Debian/Ubun
 
 ##Limitations
 
-Please note, we only aim support for the following distributions and versions
+While we aim to support as low as Puppet 2.6.x (for now), we recommend installing the latest Puppet version from the Puppetlabs official repos.
 
-* Redhat 5.8 or greater
-* Debian 6.0 or greater
-* Ubuntu 11.04 or greater
+Please note, we only aim support for the following distributions and versions - that is, we actually do ongoing system tests on these platforms:
 
-If you want a new distribution supported feel free to raise a ticket and we'll
-consider it. If you want an older revision supported we'll also consider it,
-but don't get insulted if we reject it. Specifically, we will not consider
-Redhat 4.x support - its just too old.
+* Redhat 5.9 and 6.4
+* Debian 6.0 and 7.0
+* Ubuntu 10.04 and 12.04
+
+If you want a new distribution supported feel free to raise a ticket and we'll consider it. If you want an older revision supported we'll also consider it, but don't get insulted if we reject it. Specifically, we will not consider Redhat 4.x support - its just too old.
+
+If you really want to get support for your OS we suggest writing any patch fix yourself, and for continual system testing if you can provide a sufficient trusted Veewee template we could consider adding such an OS to our ongoing continuous integration tests.
 
 Also, as this is a 0.x release the API is still in flux and may change. Make sure
 you read the release notes before upgrading.
