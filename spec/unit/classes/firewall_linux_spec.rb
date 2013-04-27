@@ -11,6 +11,11 @@ describe 'firewall::linux', :type => :class do
         it { should contain_class('firewall::linux::redhat').with_require('Package[iptables]') }
       end
     end
+
+    describe 'on Fedora 18' do
+      let(:facts) { facts_default.merge(:operatingsystem => 'Fedora', :operatingsystemrelease => '18') }
+      it { should contain_class('firewall::linux::redhat').with_require('Package[iptables-services]') }
+    end
   end
 
   context 'Debian like' do
