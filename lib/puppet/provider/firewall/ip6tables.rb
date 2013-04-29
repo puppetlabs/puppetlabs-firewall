@@ -21,6 +21,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ip6tables_save => 'ip6tables-save',
   })
 
+  defaultfor :kernel => :linux
+
   def self.iptables(*args)
     ip6tables(*args)
   end
