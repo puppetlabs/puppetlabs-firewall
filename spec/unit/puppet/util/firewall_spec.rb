@@ -103,12 +103,24 @@ describe 'Puppet::Util::Firewall' do
         subject.persist_iptables(proto)
       end
 
-      it 'should exec for systemd if running Fedora 15 or greater' do
+      it 'should exec for systemd if running Fedora 15-17 or greater' do
         Facter.fact(:osfamily).stubs(:value).returns('RedHat')
         Facter.fact(:operatingsystem).stubs(:value).returns('Fedora')
-        Facter.fact(:operatingsystemrelease).stubs(:value).returns('15')
 
-        subject.expects(:execute).with(%w{/usr/libexec/iptables.init save})
+        %w{ 15 16 17 }.each do |version|
+          Facter.fact(:operatingsystemrelease).stubs(:value).returns(version)
+
+          subject.expects(:execute).with(%w{/usr/libexec/iptables.init save})
+          subject.persist_iptables(proto)
+        end
+      end
+
+      it 'should exec for systemd with iptables-services package for Fedora 18' do
+        Facter.fact(:osfamily).stubs(:value).returns('RedHat')
+        Facter.fact(:operatingsystem).stubs(:value).returns('Fedora')
+        Facter.fact(:operatingsystemrelease).stubs(:value).returns('18')
+
+        subject.expects(:execute).with(%w{/usr/libexec/iptables/iptables.init save})
         subject.persist_iptables(proto)
       end
 
@@ -120,7 +132,7 @@ describe 'Puppet::Util::Firewall' do
       end
 
       it 'should exec for Archlinux identified from osfamily' do
-        Facter.fact(:osfamily).stubs(:value).returns('Archlinux')
+        Facter.fact(:operatingsystem).stubs(:value).returns('Archlinux')
         subject.expects(:execute).with(['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/iptables/iptables.rules'])
         subject.persist_iptables(proto)
       end

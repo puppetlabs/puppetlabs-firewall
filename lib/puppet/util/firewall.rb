@@ -131,58 +131,39 @@ module Puppet::Util::Firewall
   end
 
   def persist_iptables(proto)
+    proto = proto.to_sym
     debug("[persist_iptables]")
 
-    # Basic normalisation for older Facter
-    os_key = Facter.value(:osfamily)
-    os_key ||= case Facter.value(:operatingsystem)
-    when 'RedHat', 'CentOS', 'Fedora'
-      'RedHat'
-    when 'Debian', 'Ubuntu'
-      'Debian'
-    else
-      Facter.value(:operatingsystem)
-    end
-
-    # Older iptables-persistent doesn't provide save action.
-    if os_key == 'Debian'
-      persist_ver = Facter.value(:iptables_persistent_version)
-      if (persist_ver and Puppet::Util::Package.versioncmp(persist_ver, '0.5.0') < 0)
-        os_key = 'Debian_manual'
-      end
-    end
-
-    # Fedora 15 and newer use systemd for to persist iptable rules
-    if os_key == 'RedHat' && Facter.value(:operatingsystem) == 'Fedora' && Facter.value(:operatingsystemrelease).to_i >= 15
-      os_key = 'Fedora'
-    end
-
-    cmd = case os_key.to_sym
-    when :RedHat
-      case proto.to_sym
-      when :IPv4
-        %w{/sbin/service iptables save}
-      when :IPv6
-        %w{/sbin/service ip6tables save}
-      end
-    when :Fedora
-      case proto.to_sym
+    cmd = case "#{Facter.value(:operatingsystem)}-#{Facter.value(:operatingsystemrelease)}"
+    when /Fedora-(15|16|17)/
+      case proto
       when :IPv4
         %w{/usr/libexec/iptables.init save}
       when :IPv6
         %w{/usr/libexec/ip6tables.init save}
       end
-    when :Debian
-      case proto.to_sym
-      when :IPv4, :IPv6
+    when 'Fedora-18'
+      case proto
+      when :IPv4
+        %w{/usr/libexec/iptables/iptables.init save}
+      when :IPv6
+        %w{/usr/libexec/iptables/ip6tables.init save}
+      end
+    when /RedHat|Fedora|CentOS/
+      case proto
+      when :IPv4
+        %w{/sbin/service iptables save}
+      when :IPv6
+        %w{/sbin/service ip6tables save}
+      end
+    when /Debian|Ubuntu/
+      iptables_version = Facter.value(:iptables_persistent_version)
+      if Puppet::Util::Package.versioncmp(iptables_version, '0.5.0') < 0
+        ["/bin/sh", "-c", "/sbin/iptables-save > /etc/iptables/rules"] if proto == :IPv4
+      else
         %w{/usr/sbin/service iptables-persistent save}
       end
-    when :Debian_manual
-      case proto.to_sym
-      when :IPv4
-        ["/bin/sh", "-c", "/sbin/iptables-save > /etc/iptables/rules"]
-      end
-    when :Archlinux
+    when /Archlinux/
       case proto.to_sym
       when :IPv4
         ["/bin/sh", "-c", "/usr/sbin/iptables-save > /etc/iptables/iptables.rules"]
