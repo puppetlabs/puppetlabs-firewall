@@ -239,27 +239,63 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def delete_args
     count = []
-    line = properties[:line].gsub(/\-A/, '-D').split
-
-    # Grab all comment indices
-    line.each do |v|
-      if v =~ /"/
-        count << line.index(v)
+    line = properties[:line].gsub(/\-A/, '-D')
+    line = line.split
+    # Get a copy of the line array to iterate over to find comments
+    tmp_line = line
+    counter = 0
+    # Somewhat simple state machine to track the start and end of
+    # comment sections that are found
+    found_comment_start = false
+    found_comment_end = false
+    set_comment_start = false
+    set_comment_end = false
+        
+    # Here we want to iterate over each segement of the array
+    # if we find the start of the comment as denoted by --comment
+    # take the next item in the array and prepend a " to it
+    # Once we know we've found the start of a comment, find the next
+    # command operator which will start with a - and append a " to the
+    # preceeding segment of the array
+    #
+    # This will probably barf if there is a comment that includes a -X in it
+    #
+    # It might make sense to iterate over the @resource_map here
+    #
+    # I'm not positive if the comment allows a - in it either
+    #
+    # Going to test/confirm that this fixes the issue, then look into iterating over
+    # the @resource_map if - is allowed in the comment
+    tmp_line.each do |line_segment|
+      if found_comment_start and line_segment=~ /^"/
+          found_comment_start = false
       end
+      if found_comment_start and not set_comment_start and not line_segment=~ /^"/
+          # We've found the start of the comment
+          # Prepend " to the element in the original array
+          # Set a marker that we've found the start comment
+          # We want this code to come int the loop before the 
+          # comment detection as to not have to track additional state
+          line[counter] = '"' + line[counter]
+          set_comment_start = true
+      end
+      if line_segment == '--comment'
+          # Confirm that we're starting a comment and set flag
+          found_comment_start = true
+          found_comment_index = counter
+      end
+      if found_comment_start and not found_comment_end and set_comment_start and line_segment=~/^-/
+          # Confirm that we've set the start flag
+          # We've confirmed that we're at the end of the comment
+          line[counter - 1] = line[counter - 1] + '"'
+          found_comment_end = true
+      end
+      counter += 1
     end
 
-    if ! count.empty?
-      # Remove quotes and set first comment index to full string
-      line[count.first] = line[count.first..count.last].join(' ').gsub(/"/, '')
-
-      # Make all remaining comment indices nil
-      ((count.first + 1)..count.last).each do |i|
-        line[i] = nil
-      end
-    end
 
     line.unshift("-t", properties[:table])
-
+  
     # Return array without nils
     line.compact
   end
