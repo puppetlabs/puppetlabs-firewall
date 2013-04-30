@@ -313,4 +313,43 @@ describe 'iptables provider' do
         '-t filter -D')
     end
   end
+  describe 'when deleting resources with comment make sure that comment is quoted when input comment is quoted' do
+    let(:sample_rule) {
+      '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m comment --comment "123 this is a test comment" -m multiport --sports 7061,7062 -j ACCEPT'
+    }
+    let(:resource) { provider.rule_to_hash(sample_rule, 'filter', 0) }
+    let(:instance) { provider.new(resource) }
+
+    it 'resource[:line] looks like the original rule' do
+      resource[:line] == sample_rule
+    end
+
+    it 'delete_args is an array' do
+      instance.delete_args.class.should == Array
+    end
+
+    it 'delete_args is the same as the rule string when joined' do
+      instance.delete_args.join(' ').should == '-t filter -D INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m comment --comment "123 this is a test comment" -m multiport --sports 7061,7062 -j ACCEPT'
+    end
+  end
+  describe 'when deleting resources with comment make sure that comment is quoted when input comment is not quoted' do
+    let(:sample_rule) {
+      '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m comment --comment 123 this is a test comment -m multiport --sports 7061,7062 -j ACCEPT'
+    }
+    let(:resource) { provider.rule_to_hash(sample_rule, 'filter', 0) }
+    let(:instance) { provider.new(resource) }
+
+    it 'resource[:line] looks like the original rule' do
+      resource[:line] == sample_rule
+    end
+
+    it 'delete_args is an array' do
+      instance.delete_args.class.should == Array
+    end
+
+    it 'delete_args is the same as the rule string when joined' do
+      instance.delete_args.join(' ').should == '-t filter -D INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m comment --comment "123 this is a test comment" -m multiport --sports 7061,7062 -j ACCEPT'
+    end
+  end
 end
+
