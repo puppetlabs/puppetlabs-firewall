@@ -27,12 +27,51 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
     :ip6tables => 'ip6tables',
     :ip6tables_save => 'ip6tables-save',
   })
-  commands({
-    :foo => 'bar'
-  })
 
-#  defaultfor :kernel => :foo
-#  defaultfor :iptables_ng => :true
+  defaultfor :kernel => :linux
+  defaultfor :iptables_ng => :true
+
+  @resource_map = [
+    :burst,
+    :destination,
+    :dport,
+    :gid,
+    :icmp,
+    :iniface,
+    :jump,
+    :limit,
+    :log_level,
+    :log_prefix,
+    :name,
+    :outiface,
+    :port,
+    :proto,
+    :reject,
+    :set_mark,
+    :socket,
+    :source,
+    :sport,
+    :state,
+    :table,
+    :tcp_flags,
+    :todest,
+    :toports,
+    :tosource,
+    :uid,
+    :pkttype,
+    :isfragment,
+  ]
+
+  # Create property methods dynamically
+  (@resource_map << :chain << :table << :action).each do |property|
+    define_method "#{property}" do
+      @property_hash[property.to_sym]
+    end
+
+    define_method "#{property}=" do |value|
+      @property_hash[:needs_change] = true
+    end
+  end
 
   def insert
   end
@@ -40,20 +79,20 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
   def delete
   end
 
-  def method_missing(method)
-    debug 'method_missing called: ' + method.to_s
-    'foo'
-  end
-
   def exists?
-    debug 'exists? called'
-    true
+    @property_hash[:ensure] != :absent
   end
 
   def flush
     debug 'flush called'
   end
 
+  def self.prefetch
+    debug 'prefetch'
+  end
+
+  # @return [Array<Puppet::Provider::Provider::IptablesNg>] returns array of
+  #   provider objects
   def self.instances
     # Iptables compatibility
     iptables_version = Facter.fact('iptables_version').value
@@ -70,8 +109,37 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
     rules6 = Iptables.decode(ip6tables_save,
       :iptables_compatibility => iptables_compat)
 
-    puts rules4.inspect
+    require 'pp'
+    debug "iptables gem output:\n#{rules4.pretty_inspect}"
 
-    [new(:name => '000 foo')]
+    results = []
+    rules4[:result].each do |k,v|
+      table = k
+      v.each do |k,v|
+        chain = k
+        v[:rules].each do |rule|
+          # Grab the name from the first comment matcher
+          name = nil
+          rule[:rule][:matches].each do |match|
+            if match[:name] == 'comment'
+              name = match[:options]['comment'][0]
+              break
+            end
+          end
+          name = '000 foo' if name.nil?
+
+          hash = {
+            :name => name,
+            :ensure => 'present',
+            :table => table,
+            :chain => chain,
+          }
+          debug "Creating hash with:\n#{hash.pretty_inspect}"
+          results << new(hash)
+        end
+      end
+    end
+
+    results
   end
 end
