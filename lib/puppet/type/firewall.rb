@@ -233,7 +233,7 @@ Puppet::Type.newtype(:firewall) do
     defaultto "tcp"
   end
 
-  newproperty(:network_proto) do
+  newproperty(:network_protocol) do
     desc <<-EOS
       The network protocol to apply this rule to.
     EOS

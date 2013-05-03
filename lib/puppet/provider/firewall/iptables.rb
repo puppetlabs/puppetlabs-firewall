@@ -29,6 +29,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   })
 
   defaultfor :kernel => :linux
+  confine :iptables_ng => :false
 
   iptables_version = Facter.fact('iptables_version').value
   if (iptables_version and Puppet::Util::Package.versioncmp(iptables_version, '1.4.1') < 0)

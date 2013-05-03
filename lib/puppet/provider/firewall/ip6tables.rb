@@ -20,6 +20,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ip6tables      => 'ip6tables',
     :ip6tables_save => 'ip6tables-save',
   })
+  # Just while I code up iptables_ng
+  commands({
+    :dummy => 'dummy-foo',
+  })
 
   def self.iptables(*args)
     ip6tables(*args)
