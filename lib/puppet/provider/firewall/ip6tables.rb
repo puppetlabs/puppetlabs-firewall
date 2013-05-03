@@ -16,8 +16,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :tcp_flags
   has_feature :pkttype
 
-  defaultfor :kernel => :linux
-
   optional_commands({
     :ip6tables      => 'ip6tables',
     :ip6tables_save => 'ip6tables-save',
