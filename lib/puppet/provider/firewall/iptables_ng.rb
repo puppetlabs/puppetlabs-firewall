@@ -1,6 +1,11 @@
 require 'digest/md5'
 require 'iptables'
 
+# Next generation iptables/ip6tables provider.
+#
+# This 'next generation' version of the iptables provider tries to provide a
+# better parsing and encoding capability by moving that part of the function-
+# ality into an independant library.
 Puppet::Type.type(:firewall).provide :iptables_ng do
   @doc = "Iptables type provider - next generation"
 
@@ -29,6 +34,7 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
   })
 
   defaultfor :kernel => :linux
+  # This is just here while we are developing the idea, so it can be disabled.
   defaultfor :iptables_ng => :true
 
   @resource_map = [
@@ -73,12 +79,22 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
     end
   end
 
+  # @!group Ensurable Methods
+
   def insert
   end
 
   def delete
   end
 
+  # @!group Other Provider Methods
+
+  # Checks for the existance of the iptables rule this resource represents.
+  #
+  # Since we work this out during self.instances, we just return the state of
+  # the 'ensure' property here, no other steps necessary.
+  #
+  # @return [Boolean] true if iptables rule exists
   def exists?
     @property_hash[:ensure] != :absent
   end
@@ -87,10 +103,14 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
     debug 'flush called'
   end
 
-  def self.prefetch
-    debug 'prefetch'
-  end
+  # @!group Static Methods
 
+  # Get iptables_ng resource instances.
+  #
+  # This is called early, to determine what base iptables_ng resources there
+  # are. Our goal is to introspect all existing iptables and ip6tables rules
+  # returning an array of new Iptables_ng objects, one for each rule.
+  #
   # @return [Array<Puppet::Provider::Provider::IptablesNg>] returns array of
   #   provider objects
   def self.instances
@@ -133,6 +153,37 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
             :ensure => 'present',
             :table => table,
             :chain => chain,
+            :netproto => 'ipv4',
+            :rule_data => rule,
+          }
+          debug "Creating hash with:\n#{hash.pretty_inspect}"
+          results << new(hash)
+        end
+      end
+    end
+
+    rules6[:result].each do |k,v|
+      table = k
+      v.each do |k,v|
+        chain = k
+        v[:rules].each do |rule|
+          # Grab the name from the first comment matcher
+          name = nil
+          rule[:rule][:matches].each do |match|
+            if match[:name] == 'comment'
+              name = match[:options]['comment'][0]
+              break
+            end
+          end
+          name = '000 foo' if name.nil?
+
+          hash = {
+            :name => name,
+            :ensure => 'present',
+            :table => table,
+            :chain => chain,
+            :network_protocol => 'ipv6',
+            :rule_data => rule,
           }
           debug "Creating hash with:\n#{hash.pretty_inspect}"
           results << new(hash)
@@ -141,5 +192,11 @@ Puppet::Type.type(:firewall).provide :iptables_ng do
     end
 
     results
+  end
+
+  # @!group Property Methods
+
+  def network_protocol
+    @property_hash[:network_protocol]
   end
 end
