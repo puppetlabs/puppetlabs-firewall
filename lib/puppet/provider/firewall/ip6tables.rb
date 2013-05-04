@@ -15,9 +15,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :mark
   has_feature :tcp_flags
   has_feature :pkttype
-  has_feature :ishasmorefrags6
-  has_feature :islastfrag6
-  has_feature :isfirstfrag6
+  has_feature :ishasmorefrags
+  has_feature :islastfrag
+  has_feature :isfirstfrag
 
   optional_commands({
     :ip6tables      => 'ip6tables',
@@ -59,9 +59,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :tosource => "--to-source",
     :uid => "-m owner --uid-owner",
     :pkttype => "-m pkttype --pkt-type",
-    :ishasmorefrags6 => "-m frag --fragmore",
-    :islastfrag6 => "-m frag --fraglast",
-    :isfirstfrag6 => "-m frag --fragfirst",
+    :ishasmorefrags => "-m frag --fragmore",
+    :islastfrag => "-m frag --fraglast",
+    :isfirstfrag => "-m frag --fragfirst",
   }
 
   # Create property methods dynamically
@@ -83,11 +83,11 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :ishasmorefrags6, :islastfrag6, :isfirstfrag6, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
+    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
-  @known_booleans = [:ishasmorefrags6, :islastfrag6, :isfirstfrag6]
+  @known_booleans = [:ishasmorefrags, :islastfrag, :isfirstfrag]
 
 end

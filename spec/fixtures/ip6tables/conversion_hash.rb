@@ -71,7 +71,7 @@ HASH_TO_ARGS6 = {
   'frag_ishasmorefrags' => {
     :params => {
       :name => "100 has more fragments",
-      :ishasmorefrags6 => true,
+      :ishasmorefrags => true,
       :provider => 'ip6tables',
       :table => "filter",
     },
@@ -80,7 +80,7 @@ HASH_TO_ARGS6 = {
   'frag_islastfrag' => {
     :params => {
       :name => "100 last fragment",
-      :islastfrag6 => true,
+      :islastfrag => true,
       :provider => 'ip6tables',
       :table => "filter",
     },
@@ -89,7 +89,7 @@ HASH_TO_ARGS6 = {
   'frag_isfirstfrags' => {
     :params => {
       :name => "100 first fragment",
-      :isfirstfrag6 => true,
+      :isfirstfrag => true,
       :provider => 'ip6tables',
       :table => "filter",
     },
