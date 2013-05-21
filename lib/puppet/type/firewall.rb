@@ -106,7 +106,12 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       begin
-        @resource.host_to_ip(value)
+        #ensure ip normalisation works when property negated
+        if value =~ /^! / then
+          @resource.host_to_ip(value.sub(/^! /,'')).sub(/^/,'! ')
+        else
+          @resource.host_to_ip(value)
+        end
       rescue Exception => e
         self.fail("host_to_ip failed for #{value}, exception #{e}")
       end
@@ -124,7 +129,12 @@ Puppet::Type.newtype(:firewall) do
 
     munge do |value|
       begin
-        @resource.host_to_ip(value)
+        #ensure ip normalisation works when property negated
+        if value =~ /^! / then
+          @resource.host_to_ip(value.sub(/^! /,'')).sub(/^/,'! ')
+        else
+          @resource.host_to_ip(value)
+        end
       rescue Exception => e
         self.fail("host_to_ip failed for #{value}, exception #{e}")
       end

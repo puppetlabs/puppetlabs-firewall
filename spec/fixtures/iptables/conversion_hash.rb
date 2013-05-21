@@ -724,4 +724,28 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :filter, '-p', :all, '-f', '-m', 'comment', '--comment', '050 isfragment option', '-j', 'ACCEPT'],
   },
+  'destination_negation' => {
+    :params => {
+      :name        => '051 destination negation',
+      :chain       => 'POSTROUTING',
+      :destination => '! 192.168.122.0/24',
+      :jump        => 'MASQUERADE',
+      :proto       => 'all',
+      :source      => '192.168.122.0/24',
+      :table       => 'nat',
+    },
+    :args => ["-t", :nat, "-s", "192.168.122.0/24", "-d", "!", "192.168.122.0/24", "-p", :all, "-m", "comment", "--comment", "051 destination negation", "-j", "MASQUERADE"]
+  },
+    'source_negation' => {
+    :params => {
+      :name        => '051 source negation',
+      :chain       => 'POSTROUTING',
+      :destination => '192.168.122.0/24',
+      :jump        => 'MASQUERADE',
+      :proto       => 'all',
+      :source      => '! 192.168.122.0/24',
+      :table       => 'nat',
+    },
+    :args => ["-t", :nat, "-s", "!", "192.168.122.0/24", "-d", "192.168.122.0/24", "-p", :all, "-m", "comment", "--comment", "051 source negation", "-j", "MASQUERADE"]
+  },
 }
