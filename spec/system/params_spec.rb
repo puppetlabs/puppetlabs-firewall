@@ -68,4 +68,46 @@ firewall { '#{name}':
     end
   end
 
+  it 'test log rule - changing names' do
+    iptables_flush_all_tables
+
+    ppm1 = pp({
+      'name' => '004 log all INVALID packets',
+      'chain' => 'INPUT',
+      'proto' => 'all',
+      'state' => 'INVALID',
+      'jump' => 'LOG',
+      'log_level' => 'debug',
+    })
+
+    ppm2 = pp({
+      'name' => '003 log all INVALID packets',
+      'chain' => 'INPUT',
+      'proto' => 'all',
+      'state' => 'INVALID',
+      'jump' => 'LOG',
+      'log_level' => 'debug',
+    })
+
+    puppet_apply(ppm1) do |r|
+      r.stderr.should == ''
+      r.exit_code.should == 2
+    end
+
+    puppet_apply(ppm1) do |r|
+      r.stderr.should == ''
+      r.exit_code.should == 0
+    end
+
+    # check idempotency
+    ppm = <<-EOS + "\n" + ppm2
+      resources { 'firewall':
+        purge => true,
+      }
+    EOS
+    puppet_apply(ppm) do |r|
+      r.stderr.should == ''
+      r.exit_code.should == 2
+    end
+  end
 end
