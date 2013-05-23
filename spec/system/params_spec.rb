@@ -2,8 +2,9 @@ require 'spec_helper_system'
 
 describe "param based tests:" do
   def pp(params)
+    name = params.delete('name') || '100 test'
     pm = <<-EOS
-firewall { '100 test':
+firewall { '#{name}':
     EOS
 
     params.each do |k,v| 
@@ -18,7 +19,7 @@ firewall { '100 test':
     pm
   end
 
-  it 'test socket param' do
+  it 'test various params' do
     facts = system_node.facts
 
     unless (facts['operatingsystem'] == 'CentOS') && \
@@ -26,12 +27,13 @@ firewall { '100 test':
 
       iptables_flush_all_tables
 
-      param = {
+      ppm = pp({
         'table' => "'raw'",
         'socket' => 'true',
         'chain' => "'PREROUTING'",
-      }
-      ppm = pp(param)
+        'jump' => 'LOG',
+        'log_level' => 'debug',
+      })
       puppet_apply(ppm) do |r|
         r[:stderr].should == ''
         r[:exit_code].should == 2
@@ -42,6 +44,27 @@ firewall { '100 test':
         r[:stderr].should == ''
         r[:exit_code].should == 0
       end
+    end
+  end
+
+  it 'test log rule' do
+    iptables_flush_all_tables
+
+    ppm = pp({
+      'name' => '998 log all',
+      'proto' => 'all',
+      'jump' => 'LOG',
+      'log_level' => 'debug',
+    })
+    puppet_apply(ppm) do |r|
+      r.stderr.should == ''
+      r.exit_code.should == 2
+    end
+
+    # check idempotency
+    puppet_apply(ppm) do |r|
+      r.stderr.should == ''
+      r.exit_code.should == 0
     end
   end
 
