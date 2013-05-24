@@ -277,30 +277,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   end
 
   def delete_args
-    count = []
-    line = properties[:line].gsub(/\-A/, '-D').split
-
-    # Grab all comment indices
-    line.each do |v|
-      if v =~ /"/
-        count << line.index(v)
-      end
-    end
-
-    if ! count.empty?
-      # Remove quotes and set first comment index to full string
-      line[count.first] = line[count.first..count.last].join(' ').gsub(/"/, '')
-
-      # Make all remaining comment indices nil
-      ((count.first + 1)..count.last).each do |i|
-        line[i] = nil
-      end
-    end
-
+    # Split into arguments
+    line = properties[:line].split(/\s(?=(?:[^"]|"[^"]*")*$)/).map{|v| v.gsub(/"/, '')}
     line.unshift("-t", properties[:table])
-
-    # Return array without nils
-    line.compact
   end
 
   # This method takes the resource, and attempts to generate the command line
