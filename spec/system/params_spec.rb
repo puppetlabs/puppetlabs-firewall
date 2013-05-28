@@ -77,7 +77,8 @@ firewall { '#{name}':
       'proto' => 'all',
       'state' => 'INVALID',
       'jump' => 'LOG',
-      'log_level' => 'debug',
+      'log_level' => '3',
+      'log_prefix' => '"IPTABLES dropped invalid: "',
     })
 
     ppm2 = pp({
@@ -86,27 +87,22 @@ firewall { '#{name}':
       'proto' => 'all',
       'state' => 'INVALID',
       'jump' => 'LOG',
-      'log_level' => 'debug',
+      'log_level' => '3',
+      'log_prefix' => '"IPTABLES dropped invalid: "',
     })
 
     puppet_apply(ppm1) do |r|
-      r.stderr.should == ''
+      r.stderr.should be_empty
       r.exit_code.should == 2
     end
 
-    puppet_apply(ppm1) do |r|
-      r.stderr.should == ''
-      r.exit_code.should == 0
-    end
-
-    # check idempotency
     ppm = <<-EOS + "\n" + ppm2
       resources { 'firewall':
         purge => true,
       }
     EOS
     puppet_apply(ppm) do |r|
-      r.stderr.should == ''
+      r.stderr.should be_empty
       r.exit_code.should == 2
     end
   end
