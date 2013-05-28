@@ -106,4 +106,33 @@ firewall { '#{name}':
       r.exit_code.should == 2
     end
   end
+
+  it 'test log rule - no change' do
+    iptables_flush_all_tables
+
+    ppm1 = pp({
+      'name' => '004 log all INVALID packets',
+      'chain' => 'INPUT',
+      'proto' => 'all',
+      'state' => 'INVALID',
+      'jump' => 'LOG',
+      'log_level' => '3',
+      'log_prefix' => '"IPTABLES dropped invalid: "',
+    })
+
+    puppet_apply(ppm1) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should == 2
+    end
+
+    ppm = <<-EOS + "\n" + ppm2
+      resources { 'firewall':
+        purge => true,
+      }
+    EOS
+    puppet_apply(ppm) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should == 0
+    end
+  end
 end
