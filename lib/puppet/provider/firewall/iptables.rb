@@ -228,9 +228,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # iptables-save and user supplied resources is consistent.
     hash[:state] = hash[:state].sort unless hash[:state].nil?
 
-    # This forces all existing, commentless rules to be moved to the bottom of the stack.
-    # Puppet-firewall requires that all rules have comments (resource names) and will fail if
-    # a rule in iptables does not have a comment. We get around this by appending a high level
+    # This forces all existing, commentless rules or rules with invalid comments to be moved 
+    # to the bottom of the stack.
+    # Puppet-firewall requires that all rules have comments (resource names) and match this 
+    # regex and will fail if a rule in iptables does not have a comment. We get around this 
+    # by appending a high level
+    if not /^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/ =~ hash[:name]
+      num = 9000 + counter
+      hash[:name] = "#{num} #{/([[:alpha:][:digit:][:punct:][:space:]]+)/.match(hash[:name])[1]}"
+    end
     if ! hash[:name]
       num = 9000 + counter
       hash[:name] = "#{num} #{Digest::MD5.hexdigest(line)}"
