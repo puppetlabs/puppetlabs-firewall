@@ -22,4 +22,26 @@ describe 'puppet resource firewall command:' do
       r[:stdout].should == "\n"
     end
   end
+  
+  it 'accepts rules without comments' do
+    iptables_flush_all_tables
+    system_run('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80')
+
+    puppet_resource('firewall') do |r|
+      r[:exit_code].should == 0
+      # don't check stdout, testing preexisting rules, output is normal
+      r[:stderr].should == ''
+    end
+  end
+
+  it 'accepts rules with invalid comments' do
+    iptables_flush_all_tables
+    system_run('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http"')
+
+    puppet_resource('firewall') do |r|
+      r[:exit_code].should == 0
+      # don't check stdout, testing preexisting rules, output is normal
+      r[:stderr].should == ''
+    end
+  end
 end

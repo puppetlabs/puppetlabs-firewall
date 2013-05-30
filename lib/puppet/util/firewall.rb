@@ -152,8 +152,8 @@ module Puppet::Util::Firewall
       end
     end
 
-    # Fedora 15 and newer use systemd for to persist iptable rules
-    if os_key == 'RedHat' && Facter.value(:operatingsystem) == 'Fedora' && Facter.value(:operatingsystemrelease).to_i >= 15
+    # Fedora 15 and newer use systemd for to persist iptable rules. Fedora 18 reverts the behavior to match RedHat.
+    if os_key == 'RedHat' && Facter.value(:operatingsystem) == 'Fedora' && Facter.value(:operatingsystemrelease).to_i.between(15,17)
       os_key = 'Fedora'
     end
 
