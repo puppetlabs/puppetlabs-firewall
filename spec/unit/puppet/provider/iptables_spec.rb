@@ -162,3 +162,80 @@ describe 'iptables provider' do
     end
   end
 end
+
+describe 'ip6tables provider' do
+  let(:provider6) { Puppet::Type.type(:firewall).provider(:ip6tables) }
+  let(:resource) {
+    Puppet::Type.type(:firewall).new({
+      :name  => '000 test foo',
+      :action  => 'accept',
+      :provider => "ip6tables",
+    })
+  }
+
+  before :each do
+    Puppet::Type::Firewall.stubs(:ip6tables).returns provider6
+    provider6.stubs(:command).with(:ip6tables_save).returns "/sbin/ip6tables-save"
+
+    # Stub iptables version
+    Facter.fact(:ip6tables_version).stubs(:value).returns("1.4.7")
+
+    Puppet::Util::Execution.stubs(:execute).returns ""
+    Puppet::Util.stubs(:which).with("ip6tables-save").
+      returns "/sbin/ip6tables-save"
+  end
+
+  it 'should be able to get a list of existing rules' do
+    provider6.instances.each do |rule|
+      rule.should be_instance_of(provider6)
+      rule.properties[:provider6].to_s.should == provider6.name.to_s
+    end
+  end
+
+  it 'should ignore lines with fatal errors' do
+    Puppet::Util::Execution.stubs(:execute).with(['/sbin/ip6tables-save']).
+      returns("FATAL: Could not load /lib/modules/2.6.18-028stab095.1/modules.dep: No such file or directory")
+
+    provider6.instances.length.should == 0
+  end
+
+  # Load in ruby hash for test fixtures.
+  load 'spec/fixtures/ip6tables/conversion_hash.rb'
+
+  describe 'when converting rules to resources' do
+    ARGS_TO_HASH6.each do |test_name,data|
+      describe "for test data '#{test_name}'" do
+        let(:resource) { provider6.rule_to_hash(data[:line], data[:table], 0) }
+
+        # If this option is enabled, make sure the parameters exactly match
+        if data[:compare_all] then
+          it "the parameter hash keys should be the same as returned by rules_to_hash" do
+            resource.keys.should =~ data[:params].keys
+          end
+        end
+
+        # Iterate across each parameter, creating an example for comparison
+        data[:params].each do |param_name, param_value|
+          it "the parameter '#{param_name.to_s}' should match #{param_value.inspect}" do
+            resource[param_name].should == data[:params][param_name]
+          end
+        end
+      end
+    end
+  end
+
+  describe 'when working out general_args' do
+    HASH_TO_ARGS6.each do |test_name,data|
+      describe "for test data '#{test_name}'" do
+        let(:resource) { Puppet::Type.type(:firewall).new(data[:params]) }
+        let(:provider6) { Puppet::Type.type(:firewall).provider(:ip6tables) }
+        let(:instance) { provider6.new(resource) }
+
+        it 'general_args should be valid' do
+          instance.general_args.flatten.should == data[:args]
+        end
+      end
+    end
+  end
+end
+
