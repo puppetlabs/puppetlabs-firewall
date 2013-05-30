@@ -28,6 +28,7 @@ Puppet::Type.newtype(:firewall) do
     installed.
   EOS
 
+  feature :hop_limiting, "Hop limiting features."
   feature :rate_limiting, "Rate limiting features."
   feature :snat, "Source NATing"
   feature :dnat, "Destination NATing"
@@ -470,6 +471,14 @@ Puppet::Type.newtype(:firewall) do
       value = [value] unless value.is_a?(Array)
       value.join(',')
     end
+  end
+
+  # Hop limiting properties
+  newproperty(:hop_limit, :required_features => :hop_limiting) do
+    desc <<-EOS
+      Hop limiting value for matched packets.
+    EOS
+    newvalue(/^\d+$/)
   end
 
   # Rate limiting properties

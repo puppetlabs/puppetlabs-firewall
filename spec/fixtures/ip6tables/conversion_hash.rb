@@ -95,4 +95,13 @@ HASH_TO_ARGS6 = {
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "frag", "--fragfirst", "-m", "comment", "--comment", "100 first fragment"],
   },
+  'hop_limit' => {
+    :params => {
+      :name => "100 hop limit",
+      :hop_limit => 255,
+      :provider => 'ip6tables',
+      :table => "filter",
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 hop limit", "-m", "hl", "--hl-eq", 255],
+  },
 }
