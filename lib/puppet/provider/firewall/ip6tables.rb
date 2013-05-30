@@ -2,6 +2,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   @doc = "Ip6tables type provider"
 
   has_feature :iptables
+  has_feature :hop_limiting
   has_feature :rate_limiting
   has_feature :snat
   has_feature :dnat
@@ -42,6 +43,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :icmp => "-m icmp6 --icmpv6-type",
     :iniface => "-i",
     :jump => "-j",
+    :hop_limit => "-m hl --hl-eq",
     :limit => "-m limit --limit",
     :log_level => "--log-level",
     :log_prefix => "--log-prefix",
@@ -83,7 +85,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
+    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport,
+    :port, :pkttype, :name, :state, :icmp, :hop_limit, :limit, :burst, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
   # These are known booleans that do not take a value, but we want to munge
