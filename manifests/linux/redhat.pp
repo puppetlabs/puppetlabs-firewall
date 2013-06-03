@@ -5,5 +5,6 @@ class firewall::linux::redhat (
   service { 'iptables':
     ensure => $ensure,
     enable => $enable,
+    hasstatus => true,
   }
 }

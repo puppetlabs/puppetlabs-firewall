@@ -5,11 +5,13 @@ class firewall::linux::archlinux (
   service { 'iptables':
     ensure => $ensure,
     enable => $enable,
+    hasstatus => true,
   }
 
   service { 'ip6tables':
     ensure => $ensure,
     enable => $enable,
+    hasstatus => true,
   }
 
   file { '/etc/iptables/iptables.rules':
