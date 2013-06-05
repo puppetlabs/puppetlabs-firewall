@@ -6,9 +6,9 @@ require 'spec_helper_system'
 describe 'puppet resource firewall command:' do
   it 'make sure it returns no errors when executed on a clean machine' do
     puppet_resource('firewall') do |r|
-      r[:exit_code].should == 0
+      r.exit_code.should be_zero
       # don't check stdout, some boxes come with rules, that is normal
-      r[:stderr].should == ''
+      r.stderr.should be_empty
     end
   end
 
@@ -17,31 +17,31 @@ describe 'puppet resource firewall command:' do
 
     # No rules, means no output thanks. And no errors as well.
     puppet_resource('firewall') do |r|
-      r[:exit_code].should == 0
-      r[:stderr].should == ''
-      r[:stdout].should == "\n"
+      r.exit_code.should be_zero
+      r.stderr.should be_empty
+      r.stdout.should == "\n"
     end
   end
-  
+
   it 'accepts rules without comments' do
     iptables_flush_all_tables
-    system_run('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80')
+    shell('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80')
 
     puppet_resource('firewall') do |r|
-      r[:exit_code].should == 0
+      r.exit_code.should be_zero
       # don't check stdout, testing preexisting rules, output is normal
-      r[:stderr].should == ''
+      r.stderr.should be_empty
     end
   end
 
   it 'accepts rules with invalid comments' do
     iptables_flush_all_tables
-    system_run('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http"')
+    shell('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http"')
 
     puppet_resource('firewall') do |r|
-      r[:exit_code].should == 0
+      r.exit_code.should be_zero
       # don't check stdout, testing preexisting rules, output is normal
-      r[:stderr].should == ''
+      r.stderr.should be_empty
     end
   end
 end
