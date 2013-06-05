@@ -1,73 +1,53 @@
 require 'spec_helper_system'
 
 describe "firewall class:" do
-  context 'no params:' do
-    let(:pp) do
-      pp = <<-EOS.gsub(/^\s{8}/,'')
-        class { 'firewall': }
-      EOS
+  it 'should run successfully' do
+    pp = "class { 'firewall': }"
+
+    puppet_apply(pp) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should_not == 1
     end
 
-    it "should run without event" do
-      puppet_apply(pp) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should_not eq(1)
-      end
-    end
-
-    it "should be idempotent" do
-      puppet_apply(pp) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should == 0
-      end
+    puppet_apply(pp) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should be_zero
     end
   end
 
-  context 'ensure => stopped:' do
-    let(:pp) do
-      pp = <<-EOS.gsub(/^\s{8}/,'')
-        class { 'firewall':
-          ensure => stopped,
-        }
-      EOS
+  it 'ensure => stopped:' do
+    pp = <<-EOS
+      class { 'firewall':
+        ensure => stopped,
+      }
+    EOS
+
+    puppet_apply(pp) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should_not == 1
     end
 
-    it "should run without event" do
-      puppet_apply(pp) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should_not eq(1)
-      end
-    end
-
-    it "should be idempotent" do
-      puppet_apply(pp) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should == 0
-      end
+    puppet_apply(pp) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should be_zero
     end
   end
 
-  context 'ensure => running:' do
-    let(:pp) do
-      pp = <<-EOS.gsub(/^\s{8}/,'')
-        class { 'firewall':
-          ensure => running,
-        }
-      EOS
+  it 'ensure => running:' do
+    pp = <<-EOS
+      class { 'firewall':
+        ensure => running,
+      }
+    EOS
+
+    puppet_apply(pp) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should_not == 1
     end
 
-    it "should run without event" do
-      puppet_apply(pp) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should_not eq(1)
-      end
-    end
-
-    it "should be idempotent" do
-      puppet_apply(pp) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should == 0
-      end
+    puppet_apply(pp) do |r|
+      r.stderr.should be_empty
+      r.exit_code.should be_zero
     end
   end
 end

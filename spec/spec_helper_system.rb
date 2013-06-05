@@ -17,13 +17,15 @@ module LocalHelpers
    #   end
    def iptables_flush_all_tables
      ['filter', 'nat', 'mangle', 'raw'].each do |t|
-       system_run("/sbin/iptables -t #{t} -F") do |r|
-         r[:exit_code].should == 0
-         r[:stderr].should == ''
+       shell "/sbin/iptables -t #{t} -F" do |r|
+         r.stderr.should be_empty
+         r.exit_code.should be_zero
        end
      end
    end
 end
+
+include RSpecSystemPuppet::Helpers
 
 RSpec.configure do |c|
   # Project root for the firewall code
@@ -34,12 +36,10 @@ RSpec.configure do |c|
 
   # Import in our local helpers
   c.include ::LocalHelpers
+  c.include RSpecSystemPuppet::Helpers
 
   # This is where we 'setup' the nodes before running our tests
-  c.system_setup_block = proc do
-    # TODO: find a better way of importing this into this namespace
-    include RSpecSystemPuppet::Helpers
-
+  c.before :suite do
     # Install puppet
     puppet_install
 

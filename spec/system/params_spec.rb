@@ -1,6 +1,7 @@
 require 'spec_helper_system'
 
 describe "param based tests:" do
+  # Takes a hash and converts it into a firewall resource
   def pp(params)
     name = params.delete('name') || '100 test'
     pm = <<-EOS
@@ -20,7 +21,7 @@ firewall { '#{name}':
   end
 
   it 'test various params' do
-    facts = system_node.facts
+    facts = node.facts
 
     unless (facts['operatingsystem'] == 'CentOS') && \
       facts['operatingsystemrelease'] =~ /^5\./ then
@@ -35,14 +36,14 @@ firewall { '#{name}':
         'log_level' => 'debug',
       })
       puppet_apply(ppm) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should == 2
+        r.stderr.should be_empty
+        r.exit_code.should == 2
       end
 
       # check idempotency
       puppet_apply(ppm) do |r|
-        r[:stderr].should == ''
-        r[:exit_code].should == 0
+        r.stderr.should be_empty
+        r.exit_code.should be_zero
       end
     end
   end
@@ -57,14 +58,14 @@ firewall { '#{name}':
       'log_level' => 'debug',
     })
     puppet_apply(ppm) do |r|
-      r.stderr.should == ''
+      r.stderr.should be_empty
       r.exit_code.should == 2
     end
 
     # check idempotency
     puppet_apply(ppm) do |r|
-      r.stderr.should == ''
-      r.exit_code.should == 0
+      r.stderr.should be_empty
+      r.exit_code.should be_zero
     end
   end
 
@@ -127,7 +128,7 @@ firewall { '#{name}':
 
     puppet_apply(ppm1) do |r|
       r.stderr.should be_empty
-      r.exit_code.should == 0
+      r.exit_code.should be_zero
     end
   end
 end
