@@ -8,6 +8,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   has_feature :iptables
   has_feature :rate_limiting
+  has_feature :recent_limiting
   has_feature :snat
   has_feature :dnat
   has_feature :interface_match
@@ -61,7 +62,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :outiface => "-o",
     :port => '-m multiport --ports',
     :proto => "-p",
+    :rdest => "--rdest",
+    :reap => "--reap",
+    :recent => "-m recent",
     :reject => "--reject-with",
+    :rhitcount => "--hitcount",
+    :rname => "--name",
+    :rseconds => "--seconds",
+    :rsource => "--rsource",
+    :rttl => "--rttl",
     :set_mark => mark_flag,
     :socket => "-m socket",
     :source => "-s",
@@ -120,7 +129,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @resource_list = [:table, :source, :src_range, :destination, :dst_range, :iniface, :outiface,
     :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state, :ctstate, :icmp,
-    :limit, :burst, :jump, :todest, :tosource, :toports, :log_prefix,
+    :limit, :burst, :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
+    :jump, :todest, :tosource, :toports, :log_prefix,
     :log_level, :reject, :set_mark]
 
   def insert
@@ -191,6 +201,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
     values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
+
+    # rsource, rdest, reap and rttl take no values. Cheat by adding "" after them.
+    values = values.sub(/--rsource/, '--rsource ""')
+    values = values.sub(/--rdest/, '--rdest ""')
+    values = values.sub(/--reap/, '--reap ""')
+    values = values.sub(/--rttl/, '--rttl ""')
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
@@ -370,6 +386,18 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
             # to the args list
             next
           end
+        end
+        if res == :rsource then
+          resource_value = nil
+        end
+        if res == :rdest then
+          resource_value = nil
+        end
+        if res == :reap then
+          resource_value = nil
+        end
+        if res == :rttl then
+          resource_value = nil
         end
       elsif res == :jump and resource[:action] then
         # In this case, we are substituting jump for action
