@@ -8,6 +8,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   has_feature :iptables
   has_feature :rate_limiting
+  has_feature :recent_limiting
   has_feature :snat
   has_feature :dnat
   has_feature :interface_match
@@ -54,7 +55,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :outiface => "-o",
     :port => '-m multiport --ports',
     :proto => "-p",
+    :rdest => "--rdest",
+    :reap => "--reap",
+    :recent => "-m recent",
     :reject => "--reject-with",
+    :rhitcount => "--hitcount",
+    :rname => "--name",
+    :rseconds => "--seconds",
+    :rsource => "--rsource",
+    :rttl => "--rttl",
     :set_mark => mark_flag,
     :socket => "-m socket",
     :source => "-s",
@@ -87,6 +96,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
     :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
+    :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_prefix, :log_level, :reject, :set_mark]
 
   def insert
@@ -157,6 +167,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+
+    # rsource, rdest, reap and rttl take no values. Cheat by adding "" after them.
+    values = values.sub(/--rsource/, '--rsource ""')
+    values = values.sub(/--rdest/, '--rdest ""')
+    values = values.sub(/--reap/, '--reap ""')
+    values = values.sub(/--rttl/, '--rttl ""')
 
     # Trick the system for booleans
     known_booleans.each do |bool|
@@ -305,6 +321,18 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
           resource_value = nil
         end
         if res == :isfragment then
+          resource_value = nil
+        end
+        if res == :rsource then
+          resource_value = nil
+        end
+        if res == :rdest then
+          resource_value = nil
+        end
+        if res == :reap then
+          resource_value = nil
+        end
+        if res == :rttl then
           resource_value = nil
         end
       elsif res == :jump and resource[:action] then

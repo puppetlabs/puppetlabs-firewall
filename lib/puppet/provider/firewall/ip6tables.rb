@@ -3,6 +3,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   has_feature :iptables
   has_feature :rate_limiting
+  has_feature :recent_limiting
   has_feature :snat
   has_feature :dnat
   has_feature :interface_match
@@ -46,7 +47,15 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :outiface => "-o",
     :port => '-m multiport --ports',
     :proto => "-p",
+    :rdest => "--rdest",
+    :reap => "--reap",
+    :recent => "-m recent",
     :reject => "--reject-with",
+    :rhitcount => "--hitcount",
+    :rname => "--name",
+    :rseconds => "--seconds",
+    :rsource => "--rsource",
+    :rttl => "--rttl",
     :source => "-s",
     :state => "-m state --state",
     :sport => "-m multiport --sports",
@@ -74,7 +83,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst, :jump,
+    :proto, :gid, :uid, :sport, :dport, :port, :pkttype, :name, :state, :icmp, :limit, :burst,
+    :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest, :jump,
     :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
 end
