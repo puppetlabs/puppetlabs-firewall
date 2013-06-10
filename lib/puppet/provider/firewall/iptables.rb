@@ -158,6 +158,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
 
+    # destination and source may take two values if negated
+    values = values.gsub(/-([ds]) (! )?(\S*)/, '-\1 "\2\3"')
+
     # Trick the system for booleans
     known_booleans.each do |bool|
       if bool == :socket then
@@ -198,7 +201,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Normalise all rules to CIDR notation.
     [:source, :destination].each do |prop|
-      hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
+      if hash[prop] != nil then
+        ip_negated = hash[prop].include? "!"
+        hash[prop] = hash[prop].sub(/^! /, '')
+        hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr
+        hash[prop] = hash[prop].sub(/^/, '! ') if ip_negated
+      end
     end
 
     [:dport, :sport, :port, :state].each do |prop|
@@ -327,7 +335,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       # our tcp_flags takes a single string with comma lists separated
       # by space
       # --tcp-flags expects two arguments
-      if res == :tcp_flags
+      #destination and source can take two arguments if the first is an
+      #exclamation mark. In this way the ip is negated.
+      if res == :tcp_flags \
+       or ([:source, :destination].include?(res) and resource_value =~ /^! /)
         one, two = resource_value.split(' ')
         args << one
         args << two
