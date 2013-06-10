@@ -309,7 +309,7 @@ describe firewall do
           :action => "accept",
           :jump => "custom_chain"
         )
-      }.to raise_error(Puppet::Error, /^Only one of the parameters 'action' and 'jump' can be set$/)
+      }.to raise_error(Puppet::Error, /Only one of the parameters 'action' and 'jump' can be set$/)
     end
   end
   describe ':gid and :uid' do

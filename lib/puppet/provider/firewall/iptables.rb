@@ -182,7 +182,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       if bool == :isfragment then
         # only replace those -f that are not followed by an l to
         # distinguish between -f and the '-f' inside of --tcp-flags.
-        values = values.sub(/-f(?=[^l])/, '-f true')
+        values = values.sub(/-f(?!l)(?=.*--comment)/, '-f true')
       end
     end
 
