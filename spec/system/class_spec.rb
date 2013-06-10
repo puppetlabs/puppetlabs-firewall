@@ -1,53 +1,39 @@
 require 'spec_helper_system'
 
 describe "firewall class:" do
-  it 'should run successfully' do
+  context 'should run successfully' do
     pp = "class { 'firewall': }"
 
-    puppet_apply(pp) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should_not == 1
-    end
-
-    puppet_apply(pp) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should be_zero
+    context puppet_apply(pp) do
+      its(:stderr) { should be_empty }
+      its(:exit_code) { should_not == 1 }
+      its(:refresh) { should be_nil }
+      its(:stderr) { should be_empty }
+      its(:exit_code) { should be_zero }
     end
   end
 
-  it 'ensure => stopped:' do
-    pp = <<-EOS
-      class { 'firewall':
-        ensure => stopped,
-      }
-    EOS
+  context 'ensure => stopped:' do
+    pp = "class { 'firewall': ensure => stopped }"
 
-    puppet_apply(pp) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should_not == 1
-    end
-
-    puppet_apply(pp) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should be_zero
+    context puppet_apply(pp) do
+      its(:stderr) { should be_empty }
+      its(:exit_code) { should_not == 1 }
+      its(:refresh) { should be_nil }
+      its(:stderr) { should be_empty }
+      its(:exit_code) { should be_zero }
     end
   end
 
-  it 'ensure => running:' do
-    pp = <<-EOS
-      class { 'firewall':
-        ensure => running,
-      }
-    EOS
+  context 'ensure => running:' do
+    pp = "class { 'firewall': ensure => running }"
 
-    puppet_apply(pp) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should_not == 1
-    end
-
-    puppet_apply(pp) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should be_zero
+    context puppet_apply(pp) do |r|
+      its(:stderr) { should be_empty }
+      its(:exit_code) { should_not == 1 }
+      its(:refresh) { should be_nil }
+      its(:stderr) { should be_empty }
+      its(:exit_code) { should be_zero }
     end
   end
 end
