@@ -299,9 +299,10 @@ ARGS_TO_HASH = {
     },
   },
   'isfragment_option' => {
-    :line => '-A INPUT -f -j ACCEPT',
+    :line => '-A INPUT -f -m comment --comment "010 a-f comment with dashf" -j ACCEPT',
     :table => 'filter',
     :params => {
+      :name => '010 a-f comment with dashf',
       :action => 'accept',
       :isfragment => true,
     },
@@ -723,5 +724,14 @@ HASH_TO_ARGS = {
       :isfragment => true,
     },
     :args => ['-t', :filter, '-p', :all, '-f', '-m', 'comment', '--comment', '050 isfragment option', '-j', 'ACCEPT'],
+  },
+  'isfragment_option not changing -f in comment' => {
+    :params => {
+      :name => '050 testcomment-with-fdashf',
+      :table => 'filter',
+      :proto => :all,
+      :action => 'accept',
+    },
+    :args => ['-t', :filter, '-p', :all, '-m', 'comment', '--comment', '050 testcomment-with-fdashf', '-j', 'ACCEPT'],
   },
 }
