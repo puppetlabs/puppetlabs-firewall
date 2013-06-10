@@ -21,12 +21,12 @@ firewall { '#{name}':
   end
 
   it 'test various params' do
+    iptables_flush_all_tables
+
     facts = node.facts
 
     unless (facts['operatingsystem'] == 'CentOS') && \
       facts['operatingsystemrelease'] =~ /^5\./ then
-
-      iptables_flush_all_tables
 
       ppm = pp({
         'table' => "'raw'",
@@ -35,13 +35,11 @@ firewall { '#{name}':
         'jump' => 'LOG',
         'log_level' => 'debug',
       })
-      puppet_apply(ppm) do |r|
-        r.stderr.should be_empty
-        r.exit_code.should == 2
-      end
 
-      # check idempotency
       puppet_apply(ppm) do |r|
+        r.exit_code.should == 2
+        r.stderr.should be_empty
+        r.refresh
         r.stderr.should be_empty
         r.exit_code.should be_zero
       end
@@ -58,12 +56,9 @@ firewall { '#{name}':
       'log_level' => 'debug',
     })
     puppet_apply(ppm) do |r|
-      r.stderr.should be_empty
       r.exit_code.should == 2
-    end
-
-    # check idempotency
-    puppet_apply(ppm) do |r|
+      r.stderr.should be_empty
+      r.refresh
       r.stderr.should be_empty
       r.exit_code.should be_zero
     end
@@ -122,11 +117,9 @@ firewall { '#{name}':
     })
 
     puppet_apply(ppm1) do |r|
-      r.stderr.should be_empty
       r.exit_code.should == 2
-    end
-
-    puppet_apply(ppm1) do |r|
+      r.stderr.should be_empty
+      r.refresh
       r.stderr.should be_empty
       r.exit_code.should be_zero
     end
