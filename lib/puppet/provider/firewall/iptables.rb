@@ -247,6 +247,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[:log_level] = '4'
     end
 
+    # Iptables defaults to burst '5', so it is ommitted from the output of iptables-save.
+    # If the :limit value is set and you don't have a burst set, we assume it to be '5'.
+    if hash[:limit] && ! hash[:burst]
+      hash[:burst] = '5'
+    end
+
     hash[:line] = line
     hash[:provider] = self.name.to_s
     hash[:table] = table
