@@ -221,14 +221,25 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  # TODO: technically even 'port' designates a protocol. Should we switch this
+  # to something more in line with iso, such as 'transport', or
+  # 'transport_proto'?
   newproperty(:proto) do
     desc <<-EOS
-      The specific protocol to match for this rule. By default this is
-      *tcp*.
+      The specific Transport/Layer 4 protocol to match for this rule.
     EOS
 
     newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :gre, :all)
     defaultto "tcp"
+  end
+
+  newproperty(:network_protocol) do
+    desc <<-EOS
+      The network protocol to apply this rule to.
+    EOS
+
+    newvalues(:ipv4, :ipv6, :all)
+    defaultto "all"
   end
 
   # tcp-specific
