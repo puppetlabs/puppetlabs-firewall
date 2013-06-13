@@ -167,12 +167,22 @@ ARGS_TO_HASH = {
       :jump => 'LOG'
     },
   },
-  'load_limit_module' => {
+  'load_limit_module_and_implicit_burst' => {
     :line => '-A INPUT -m multiport --dports 123 -m comment --comment "057 INPUT limit NTP" -m limit --limit 15/hour',
     :table => 'filter',
     :params => {
       :dport => ['123'],
-      :limit => '15/hour'
+      :limit => '15/hour',
+      :burst => '5'
+    },
+  },
+  'limit_with_explicit_burst' => {
+    :line => '-A INPUT -m multiport --dports 123 -m comment --comment "057 INPUT limit NTP" -m limit --limit 30/hour --limit-burst 10',
+    :table => 'filter',
+    :params => {
+      :dport => ['123'],
+      :limit => '30/hour',
+      :burst => '10'
     },
   },
   'proto_ipencap' => {
@@ -533,7 +543,7 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '956 INPUT log-level', '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '4'],
   },
-  'load_limit_module' => {
+  'load_limit_module_and_implicit_burst' => {
     :params => {
       :name => '057 INPUT limit NTP',
       :table => 'filter',
@@ -541,6 +551,16 @@ HASH_TO_ARGS = {
       :limit => '15/hour'
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '15/hour'],
+  },
+  'limit_with_explicit_burst' => {
+    :params => {
+      :name => '057 INPUT limit NTP',
+      :table => 'filter',
+      :dport => '123',
+      :limit => '30/hour',
+      :burst => '10'
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '30/hour', '--limit-burst', '10'],
   },
   'proto_ipencap' => {
     :params => {
