@@ -43,6 +43,7 @@ Puppet::Type.newtype(:firewall) do
   feature :pkttype, "Match a packet type"
   feature :socket, "Match open sockets"
   feature :isfragment, "Match fragments"
+  feature :address_type, "The ability match on source or destination address type"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -219,6 +220,58 @@ Puppet::Type.newtype(:firewall) do
       value = [value] unless value.is_a?(Array)
       value.join(',')
     end
+  end
+
+  newproperty(:destination_type, :required_features => :address_type) do
+    desc <<-EOS
+      The destination address type. For example:
+
+          destination_type => 'LOCAL'
+
+      Can be one of:
+
+      * UNSPEC - an unspecified address
+      * UNICAST - a unicast address
+      * LOCAL - a local address
+      * BROADCAST - a broadcast address
+      * ANYCAST - an anycast packet
+      * MULTICAST - a multicast address
+      * BLACKHOLE - a blackhole address
+      * UNREACHABLE - an unreachable address
+      * PROHIBIT - a prohibited address
+      * THROW - undocumented
+      * NAT - undocumented
+      * XRESOLVE - undocumented
+    EOS
+
+    newvalues(:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
+              :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE)
+  end
+
+  newproperty(:source_type, :required_features => :address_type) do
+    desc <<-EOS
+      The source address type. For example:
+
+          source_type => 'LOCAL'
+
+      Can be one of:
+
+      * UNSPEC - an unspecified address
+      * UNICAST - a unicast address
+      * LOCAL - a local address
+      * BROADCAST - a broadcast address
+      * ANYCAST - an anycast packet
+      * MULTICAST - a multicast address
+      * BLACKHOLE - a blackhole address
+      * UNREACHABLE - an unreachable address
+      * PROHIBIT - a prohibited address
+      * THROW - undocumented
+      * NAT - undocumented
+      * XRESOLVE - undocumented
+    EOS
+
+    newvalues(:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
+              :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE)
   end
 
   newproperty(:proto) do

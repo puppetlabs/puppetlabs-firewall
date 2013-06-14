@@ -172,6 +172,27 @@ describe firewall do
     end
   end
 
+  [:destination_type, :source_type].each do |addrtype|
+    describe addrtype do
+      it "should have no default" do
+        res = @class.new(:name => "000 test")
+        res.parameters[addrtype].should == nil
+      end
+    end
+
+    [:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST, :BLACKHOLE,
+     :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].each do |type|
+      it "should accept #{addrtype} value #{type}" do
+        @resource[addrtype] = type
+        @resource[addrtype].should == type
+      end
+    end
+
+    it "should fail when #{addrtype} value is not recognized" do
+      lambda { @resource[addrtype] = 'foo' }.should raise_error(Puppet::Error)
+    end
+  end
+
   [:iniface, :outiface].each do |iface|
     describe iface do
       it "should accept #{iface} value as a string" do
