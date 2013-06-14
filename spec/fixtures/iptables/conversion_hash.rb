@@ -117,18 +117,18 @@ ARGS_TO_HASH = {
       :sport => ["15","512-1024"],
     },
   },
-  'destination_type_1' => {
+  'dst_type_1' => {
     :line => '-A INPUT -m addrtype --dst-type LOCAL',
     :table => 'filter',
     :params => {
-      :destination_type => 'LOCAL',
+      :dst_type => 'LOCAL',
     },
   },
-  'source_type_1' => {
+  'src_type_1' => {
     :line => '-A INPUT -m addrtype --src-type LOCAL',
     :table => 'filter',
     :params => {
-      :source_type => 'LOCAL',
+      :src_type => 'LOCAL',
     },
   },
   'tcp_flags_1' => {
@@ -503,21 +503,21 @@ HASH_TO_ARGS = {
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "15,512:1024", "-m", "comment", "--comment", "100 sport range"],
   },
-  'destination_type_1' => {
+  'dst_type_1' => {
     :params => {
-      :name => '000 destination_type',
+      :name => '000 dst_type',
       :table => 'filter',
-      :destination_type => 'LOCAL',
+      :dst_type => 'LOCAL',
     },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', :LOCAL, '-m', 'comment', '--comment', '000 destination_type'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', :LOCAL, '-m', 'comment', '--comment', '000 dst_type'],
   },
-  'source_type_1' => {
+  'src_type_1' => {
     :params => {
-      :name => '000 source_type',
+      :name => '000 src_type',
       :table => 'filter',
-      :source_type => 'LOCAL',
+      :src_type => 'LOCAL',
     },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', :LOCAL, '-m', 'comment', '--comment', '000 source_type'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', :LOCAL, '-m', 'comment', '--comment', '000 src_type'],
   },
   'tcp_flags_1' => {
     :params => {

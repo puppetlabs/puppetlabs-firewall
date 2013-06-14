@@ -172,7 +172,7 @@ describe firewall do
     end
   end
 
-  [:destination_type, :source_type].each do |addrtype|
+  [:dst_type, :src_type].each do |addrtype|
     describe addrtype do
       it "should have no default" do
         res = @class.new(:name => "000 test")

@@ -222,11 +222,11 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:destination_type, :required_features => :address_type) do
+  newproperty(:dst_type, :required_features => :address_type) do
     desc <<-EOS
       The destination address type. For example:
 
-          destination_type => 'LOCAL'
+          dst_type => 'LOCAL'
 
       Can be one of:
 
@@ -248,11 +248,11 @@ Puppet::Type.newtype(:firewall) do
               :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE)
   end
 
-  newproperty(:source_type, :required_features => :address_type) do
+  newproperty(:src_type, :required_features => :address_type) do
     desc <<-EOS
       The source address type. For example:
 
-          source_type => 'LOCAL'
+          src_type => 'LOCAL'
 
       Can be one of:
 

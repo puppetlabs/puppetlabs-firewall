@@ -43,7 +43,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
-    :destination_type => "-m addrtype --dst-type",
+    :dst_type => "-m addrtype --dst-type",
     :dport => ["-m multiport --dports", "-m (udp|tcp) --dport"],
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
@@ -60,7 +60,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :set_mark => mark_flag,
     :socket => "-m socket",
     :source => "-s",
-    :source_type => "-m addrtype --src-type",
+    :src_type => "-m addrtype --src-type",
     :sport => ["-m multiport --sports", "-m (udp|tcp) --sport"],
     :state => "-m state --state",
     :table => "-t",
@@ -90,7 +90,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
     :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
-    :destination_type, :source_type, :socket, :pkttype, :name, :state, :icmp,
+    :dst_type, :src_type, :socket, :pkttype, :name, :state, :icmp,
     :limit, :burst, :jump, :todest, :tosource, :toports, :log_prefix,
     :log_level, :reject, :set_mark]
 
