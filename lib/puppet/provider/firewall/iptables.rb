@@ -22,6 +22,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :pkttype
   has_feature :isfragment
   has_feature :socket
+  has_feature :address_type
 
   optional_commands({
     :iptables => 'iptables',
@@ -42,6 +43,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
+    :dst_type => "-m addrtype --dst-type",
     :dport => ["-m multiport --dports", "-m (udp|tcp) --dport"],
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
@@ -58,6 +60,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :set_mark => mark_flag,
     :socket => "-m socket",
     :source => "-s",
+    :src_type => "-m addrtype --src-type",
     :sport => ["-m multiport --sports", "-m (udp|tcp) --sport"],
     :state => "-m state --state",
     :table => "-t",
@@ -86,8 +89,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
-    :jump, :todest, :tosource, :toports, :log_prefix, :log_level, :reject, :set_mark]
+    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
+    :dst_type, :src_type, :socket, :pkttype, :name, :state, :icmp,
+    :limit, :burst, :jump, :todest, :tosource, :toports, :log_prefix,
+    :log_level, :reject, :set_mark]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
