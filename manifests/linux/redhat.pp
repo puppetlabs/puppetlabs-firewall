@@ -21,4 +21,11 @@ class firewall::linux::redhat (
     enable    => $enable,
     hasstatus => true,
   }
+
+  if $::operatingsystem == 'Fedora' and $::operatingsystemrelease == '18' {
+    service { 'firewalld':
+      ensure => stopped,
+      enable => false,
+    }
+  }
 }
