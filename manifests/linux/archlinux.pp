@@ -1,5 +1,18 @@
+# = Class: firewall::linux::archlinux
 #
-#This class manages iptables on archlinux
+# Manages `iptables` and `ip6tables` services, and creates files used for
+# persistence, on Arch Linux systems.
+#
+# == Parameters:
+#
+# [*ensure*]
+#   Ensure parameter passed onto Service[] resources.
+#   Default: running
+#
+# [*enable*]
+#   Enable parameter passed onto Service[] resources.
+#   Default: true
+#
 class firewall::linux::archlinux (
   $ensure = 'running',
   $enable = true

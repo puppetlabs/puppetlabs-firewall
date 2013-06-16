@@ -1,5 +1,17 @@
+# = Class: firewall::linux::redhat
 #
-#This class manages iptables on redhat
+# Manages the `iptables` service on RedHat-alike systems.
+#
+# == Parameters:
+#
+# [*ensure*]
+#   Ensure parameter passed onto Service[] resources.
+#   Default: running
+#
+# [*enable*]
+#   Enable parameter passed onto Service[] resources.
+#   Default: true
+#
 class firewall::linux::redhat (
   $ensure = running,
   $enable = true

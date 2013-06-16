@@ -1,5 +1,18 @@
+# = Class: firewall::linux::debian
 #
-#This class manages iptables on debian
+# Installs the `iptables-persistent` package for Debian-alike systems. This
+# allows rules to be stored to file and restored on boot.
+#
+# == Parameters:
+#
+# [*ensure*]
+#   Ensure parameter passed onto Service[] resources.
+#   Default: running
+#
+# [*enable*]
+#   Enable parameter passed onto Service[] resources.
+#   Default: true
+#
 class firewall::linux::debian (
   $ensure = running,
   $enable = true

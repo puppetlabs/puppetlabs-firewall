@@ -1,5 +1,16 @@
+# = Class: firewall::linux
 #
-#This class includes the proper sub-class for the distro being run
+# Installs the `iptables` package for Linux operating systems and includes
+# the appropriate sub-class for any distribution specific services and
+# additional packages.
+#
+# == Parameters:
+#
+# [*ensure*]
+#   Ensure parameter passed onto Service[] resources. When `running` the
+#   service will be started on boot, and when `stopped` it will not.
+#   Default: running
+#
 class firewall::linux (
   $ensure = running
 ) {
