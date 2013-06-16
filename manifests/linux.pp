@@ -1,3 +1,5 @@
+#
+#This class includes the proper sub-class for the distro being run
 class firewall::linux (
   $ensure = running
 ) {
