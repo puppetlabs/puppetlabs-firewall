@@ -7,7 +7,7 @@ firewall = Puppet::Type.type(:firewall)
 describe firewall do
   before :each do
     @class = firewall
-    @provider = stub 'provider'
+    @provider = double 'provider'
     @provider.stubs(:name).returns(:iptables)
     Puppet::Type::Firewall.stubs(:defaultprovider).returns @provider
 
@@ -15,6 +15,11 @@ describe firewall do
 
     # Stub iptables version
     Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
+    Facter.fact(:ip6tables_version).stubs(:value).returns("1.4.2")
+
+    # Stub confine facts
+    Facter.fact(:kernel).stubs(:value).returns("Linux")
+    Facter.fact(:operatingsystem).stubs(:value).returns("Debian")
   end
 
   it 'should have :name be its namevar' do
