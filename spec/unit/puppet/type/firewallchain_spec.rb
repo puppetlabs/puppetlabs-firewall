@@ -5,9 +5,14 @@ require 'spec_helper'
 firewallchain = Puppet::Type.type(:firewallchain)
 
 describe firewallchain do
+  before do
+    # Stub confine facts
+    Facter.fact(:kernel).stubs(:value).returns("Linux")
+    Facter.fact(:operatingsystem).stubs(:value).returns("Debian")
+  end
   let(:klass) { firewallchain }
   let(:provider) {
-    prov = stub 'provider'
+    prov = double 'provider'
     prov.stubs(:name).returns(:iptables_chain)
     prov
   }
