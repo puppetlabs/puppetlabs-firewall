@@ -124,4 +124,43 @@ firewall { '#{name}':
       r.exit_code.should be_zero
     end
   end
+
+  it 'test src_range rule' do
+    iptables_flush_all_tables
+
+    ppm = pp({
+      'name'      => '997 block src ip range',
+      'chain'     => 'INPUT',
+      'proto'     => 'all',
+      'action'    => 'drop',
+      'src_range' => '"10.0.0.1-10.0.0.10"',
+    })
+    puppet_apply(ppm) do |r|
+      r.exit_code.should == 2
+      r.stderr.should be_empty
+      r.refresh
+      r.stderr.should be_empty
+      r.exit_code.should be_zero
+    end
+  end
+
+  it 'test dst_range rule' do
+    iptables_flush_all_tables
+
+    ppm = pp({
+      'name'      => '998 block dst ip range',
+      'chain'     => 'INPUT',
+      'proto'     => 'all',
+      'action'    => 'drop',
+      'dst_range' => '"10.0.0.2-10.0.0.20"',
+    })
+    puppet_apply(ppm) do |r|
+      r.exit_code.should == 2
+      r.stderr.should be_empty
+      r.refresh
+      r.stderr.should be_empty
+      r.exit_code.should be_zero
+    end
+  end
+
 end
