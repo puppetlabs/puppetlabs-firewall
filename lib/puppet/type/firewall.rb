@@ -44,6 +44,7 @@ Puppet::Type.newtype(:firewall) do
   feature :socket, "Match open sockets"
   feature :isfragment, "Match fragments"
   feature :address_type, "The ability match on source or destination address type"
+  feature :iprange, "The ability match on source or destination IP range "
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -114,6 +115,19 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  # Source IP range
+  newproperty(:src_range, :required_features => :iprange) do
+    desc <<-EOS
+      The source IP range. For example:
+
+          src_range => '192.168.1.1-192.168.1.10'
+
+      The source IP range is must in 'IP1-IP2' format.
+    EOS
+
+    newvalues(/^((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)-((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)/)
+  end
+
   newproperty(:destination) do
     desc <<-EOS
       The destination address to match. For example:
@@ -130,6 +144,19 @@ Puppet::Type.newtype(:firewall) do
         self.fail("host_to_ip failed for #{value}, exception #{e}")
       end
     end
+  end
+
+  # Destination IP range
+  newproperty(:dst_range, :required_features => :iprange) do
+    desc <<-EOS
+      The destination IP range. For example:
+
+          dst_range => '192.168.1.1-192.168.1.10'
+
+      The destination IP range is must in 'IP1-IP2' format.
+    EOS
+
+    newvalues(/^((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)-((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)/)
   end
 
   newproperty(:sport, :array_matching => :all) do
