@@ -131,6 +131,20 @@ ARGS_TO_HASH = {
       :src_type => 'LOCAL',
     },
   },
+  'dst_range_1' => {
+    :line => '-A INPUT -m iprange --dst-range 10.0.0.2-10.0.0.20',
+    :table => 'filter',
+    :params => {
+      :dst_range => '10.0.0.2-10.0.0.20',
+    },
+  },
+  'src_range_1' => {
+    :line => '-A INPUT -m iprange --src-range 10.0.0.2-10.0.0.20',
+    :table => 'filter',
+    :params => {
+      :src_range => '10.0.0.2-10.0.0.20',
+    },
+  },
   'tcp_flags_1' => {
     :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST,ACK,FIN SYN -m comment --comment "000 initiation"',
     :table => 'filter',
@@ -518,6 +532,22 @@ HASH_TO_ARGS = {
       :src_type => 'LOCAL',
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', :LOCAL, '-m', 'comment', '--comment', '000 src_type'],
+  },
+  'dst_range_1' => {
+    :params => {
+      :name => '000 dst_range',
+      :table => 'filter',
+      :dst_range => '10.0.0.1-10.0.0.10',
+    },
+    :args => ['-t', :filter, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-p', :tcp, '-m', 'comment', '--comment', '000 dst_range'],
+  },
+  'src_range_1' => {
+    :params => {
+      :name => '000 src_range',
+      :table => 'filter',
+      :dst_range => '10.0.0.1-10.0.0.10',
+    },
+    :args => ['-t', :filter, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-p', :tcp, '-m', 'comment', '--comment', '000 src_range'],
   },
   'tcp_flags_1' => {
     :params => {
