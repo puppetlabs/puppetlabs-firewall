@@ -136,7 +136,7 @@ module Puppet::Util::Firewall
     # Basic normalisation for older Facter
     os_key = Facter.value(:osfamily)
     os_key ||= case Facter.value(:operatingsystem)
-    when 'RedHat', 'CentOS', 'Fedora'
+    when 'RedHat', 'CentOS', 'Fedora', 'SL', 'SLC'
       'RedHat'
     when 'Debian', 'Ubuntu'
       'Debian'
