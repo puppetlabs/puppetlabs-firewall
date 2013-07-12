@@ -4,6 +4,24 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
+#### 0.4.0 - 2013-07-11
+
+This release adds support for address type, src/dest ip ranges, and adds
+additional testing and bugfixes.
+
+#### Features
+* Add `src_type` and `dst_type` attributes (Nick Stenning)
+* Add `src_range` and `dst_range` attributes (Lei Zhang)
+* Add SL and SLC operatingsystems as supported (Steve Traylen)
+
+#### Bugfixes
+* Fix parser for bursts other than 5 (Chris Rutter)
+* Fix parser for -f in --comment (Georg Koester)
+* Add doc headers to class files (Dan Carley)
+* Fix lint warnings/errors (Wolf Noble)
+
+---------------------------------------
+
 #### 0.3.1 - 2013/6/10
 
 This minor release provides some bugfixes and additional tests.
