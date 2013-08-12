@@ -4,6 +4,13 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
+#### 0.4.1 - 2013-08-09
+
+Bugfix release to fix a packaging issue that may have caused puppet module
+install commands to fail.
+
+---------------------------------------
+
 #### 0.4.0 - 2013-07-11
 
 This release adds support for address type, src/dest ip ranges, and adds
