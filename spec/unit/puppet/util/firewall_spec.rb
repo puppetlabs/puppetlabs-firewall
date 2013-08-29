@@ -3,9 +3,9 @@ require 'spec_helper'
 describe 'Puppet::Util::Firewall' do
   let(:resource) {
     type = Puppet::Type.type(:firewall)
-    provider = stub 'provider'
-    provider.stubs(:name).returns(:iptables)
-    Puppet::Type::Firewall.stubs(:defaultprovider).returns(provider)
+    provider = double 'provider'
+    allow(provider).to receive(:name).and_return(:iptables)
+    allow(Puppet::Type::Firewall).to receive(:defaultprovider).and_return(provider)
     type.new({:name => '000 test foo'})
   }
 
@@ -14,7 +14,7 @@ describe 'Puppet::Util::Firewall' do
   describe '#host_to_ip' do
     subject { resource }
     specify {
-      Resolv.expects(:getaddress).with('puppetlabs.com').returns('96.126.112.51')
+      expect(Resolv).to receive(:getaddress).with('puppetlabs.com').and_return('96.126.112.51')
       subject.host_to_ip('puppetlabs.com').should == '96.126.112.51/32'
     }
     specify { subject.host_to_ip('96.126.112.51').should == '96.126.112.51/32' }
@@ -96,42 +96,42 @@ describe 'Puppet::Util::Firewall' do
       let(:proto) { 'IPv4' }
 
       it 'should exec for RedHat identified from osfamily' do
-        Facter.fact(:osfamily).stubs(:value).returns('RedHat')
-        Facter.fact(:operatingsystem).stubs(:value).returns('RedHat')
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return('RedHat')
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('RedHat')
 
-        subject.expects(:execute).with(%w{/sbin/service iptables save})
+        expect(subject).to receive(:execute).with(%w{/sbin/service iptables save})
         subject.persist_iptables(proto)
       end
 
       it 'should exec for systemd if running Fedora 15 or greater' do
-        Facter.fact(:osfamily).stubs(:value).returns('RedHat')
-        Facter.fact(:operatingsystem).stubs(:value).returns('Fedora')
-        Facter.fact(:operatingsystemrelease).stubs(:value).returns('15')
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return('RedHat')
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Fedora')
+        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('15')
 
-        subject.expects(:execute).with(%w{/usr/libexec/iptables.init save})
+        expect(subject).to receive(:execute).with(%w{/usr/libexec/iptables.init save})
         subject.persist_iptables(proto)
       end
 
       it 'should exec for CentOS identified from operatingsystem' do
-        Facter.fact(:osfamily).stubs(:value).returns(nil)
-        Facter.fact(:operatingsystem).stubs(:value).returns('CentOS')
-        subject.expects(:execute).with(%w{/sbin/service iptables save})
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('CentOS')
+        expect(subject).to receive(:execute).with(%w{/sbin/service iptables save})
         subject.persist_iptables(proto)
       end
 
       it 'should exec for Archlinux identified from osfamily' do
-        Facter.fact(:osfamily).stubs(:value).returns('Archlinux')
-        subject.expects(:execute).with(['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/iptables/iptables.rules'])
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return('Archlinux')
+        expect(subject).to receive(:execute).with(['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/iptables/iptables.rules'])
         subject.persist_iptables(proto)
       end
 
       it 'should raise a warning when exec fails' do
-        Facter.fact(:osfamily).stubs(:value).returns('RedHat')
-        Facter.fact(:operatingsystem).stubs(:value).returns('RedHat')
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return('RedHat')
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('RedHat')
 
-        subject.expects(:execute).with(%w{/sbin/service iptables save}).
-          raises(Puppet::ExecutionFailure, 'some error')
-        subject.expects(:warning).with('Unable to persist firewall rules: some error')
+        expect(subject).to receive(:execute).with(%w{/sbin/service iptables save}).
+          and_raise(Puppet::ExecutionFailure, 'some error')
+        expect(subject).to receive(:warning).with('Unable to persist firewall rules: some error')
         subject.persist_iptables(proto)
       end
     end
@@ -140,24 +140,24 @@ describe 'Puppet::Util::Firewall' do
       let(:proto) { 'IPv6' }
 
       it 'should exec for newer Ubuntu' do
-        Facter.fact(:osfamily).stubs(:value).returns(nil)
-        Facter.fact(:operatingsystem).stubs(:value).returns('Ubuntu')
-        Facter.fact(:iptables_persistent_version).stubs(:value).returns('0.5.3ubuntu2')
-        subject.expects(:execute).with(%w{/usr/sbin/service iptables-persistent save})
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
+        allow(Facter.fact(:iptables_persistent_version)).to receive(:value).and_return('0.5.3ubuntu2')
+        expect(subject).to receive(:execute).with(%w{/usr/sbin/service iptables-persistent save})
         subject.persist_iptables(proto)
       end
 
       it 'should not exec for older Ubuntu which does not support IPv6' do
-        Facter.fact(:osfamily).stubs(:value).returns(nil)
-        Facter.fact(:operatingsystem).stubs(:value).returns('Ubuntu')
-        Facter.fact(:iptables_persistent_version).stubs(:value).returns('0.0.20090701')
-        subject.expects(:execute).never
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
+        allow(Facter.fact(:iptables_persistent_version)).to receive(:value).and_return('0.0.20090701')
+        expect(subject).to receive(:execute).never
         subject.persist_iptables(proto)
       end
 
       it 'should not exec for Suse which is not supported' do
-        Facter.fact(:osfamily).stubs(:value).returns('Suse')
-        subject.expects(:execute).never
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return('Suse')
+        expect(subject).to receive(:execute).never
         subject.persist_iptables(proto)
       end
     end

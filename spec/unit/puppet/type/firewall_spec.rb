@@ -7,7 +7,7 @@ firewall = Puppet::Type.type(:firewall)
 describe firewall do
   before :each do
     @class = firewall
-    @provider = stub 'provider'
+    @provider = double 'provider'
     @provider.stubs(:name).returns(:iptables)
     Puppet::Type::Firewall.stubs(:defaultprovider).returns @provider
 
@@ -15,6 +15,11 @@ describe firewall do
 
     # Stub iptables version
     Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
+    Facter.fact(:ip6tables_version).stubs(:value).returns("1.4.2")
+
+    # Stub confine facts
+    Facter.fact(:kernel).stubs(:value).returns("Linux")
+    Facter.fact(:operatingsystem).stubs(:value).returns("Debian")
   end
 
   it 'should have :name be its namevar' do
@@ -169,6 +174,27 @@ describe firewall do
       it "should not accept something invalid in an array for #{port}" do
         expect { @resource[port] = ['something odd','something even odder'] }.to raise_error(Puppet::Error, /^Parameter .+ failed.+Munging failed for value ".+" in class .+: no such service/)
       end
+    end
+  end
+
+  [:dst_type, :src_type].each do |addrtype|
+    describe addrtype do
+      it "should have no default" do
+        res = @class.new(:name => "000 test")
+        res.parameters[addrtype].should == nil
+      end
+    end
+
+    [:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST, :BLACKHOLE,
+     :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].each do |type|
+      it "should accept #{addrtype} value #{type}" do
+        @resource[addrtype] = type
+        @resource[addrtype].should == type
+      end
+    end
+
+    it "should fail when #{addrtype} value is not recognized" do
+      lambda { @resource[addrtype] = 'foo' }.should raise_error(Puppet::Error)
     end
   end
 

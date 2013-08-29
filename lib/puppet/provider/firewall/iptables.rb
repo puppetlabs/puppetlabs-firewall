@@ -23,6 +23,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :pkttype
   has_feature :isfragment
   has_feature :socket
+  has_feature :address_type
+  has_feature :iprange
 
   optional_commands({
     :iptables => 'iptables',
@@ -43,6 +45,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @resource_map = {
     :burst => "--limit-burst",
     :destination => "-d",
+    :dst_type => "-m addrtype --dst-type",
+    :dst_range => "-m iprange --dst-range",
     :dport => ["-m multiport --dports", "-m (udp|tcp) --dport"],
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
@@ -67,6 +71,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :set_mark => mark_flag,
     :socket => "-m socket",
     :source => "-s",
+    :src_type => "-m addrtype --src-type",
+    :src_range => "-m iprange --src-range",
     :sport => ["-m multiport --sports", "-m (udp|tcp) --sport"],
     :state => "-m state --state",
     :table => "-t",
@@ -94,8 +100,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
+  @resource_list = [:table, :source, :src_range, :destination, :dst_range, :iniface, :outiface,
+    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
+    :dst_type, :src_type, :socket, :pkttype, :name, :state, :icmp, :limit, :burst,
     :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_prefix, :log_level, :reject, :set_mark]
 
@@ -261,6 +268,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # If the :jump value is LOG and you don't have a log-level set, we assume it to be '4'.
     if hash[:jump] == 'LOG' && ! hash[:log_level]
       hash[:log_level] = '4'
+    end
+
+    # Iptables defaults to burst '5', so it is ommitted from the output of iptables-save.
+    # If the :limit value is set and you don't have a burst set, we assume it to be '5'.
+    if hash[:limit] && ! hash[:burst]
+      hash[:burst] = '5'
     end
 
     hash[:line] = line

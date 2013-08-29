@@ -1,7 +1,15 @@
-# Class: firewall
+# = Class: firewall
 #
-# Manages the installation of packages for operating systems that are
-# currently supported by the firewall type.
+# Manages packages and services required by the firewall type/provider.
+#
+# This class includes the appropriate sub-class for your operating system,
+# where supported.
+#
+# == Parameters:
+#
+# [*ensure*]
+#   Ensure parameter passed onto Service[] resources.
+#   Default: running
 #
 class firewall (
   $ensure = running
