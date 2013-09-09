@@ -21,7 +21,8 @@ class firewall::linux::debian (
     ensure => present,
   }
 
-  if($::operatingsystemrelease =~ /^6\./ and $enable == true) {
+  if($::operatingsystemrelease =~ /^6\./ and $enable == true
+  and versioncmp($::iptables_persistent_version, '0.5.0') < 0 ) {
     # This fixes a bug in the iptables-persistent LSB headers in 6.x, without it
     # we lose idempotency
     exec { 'iptables-persistent-enable':
