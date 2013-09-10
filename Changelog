@@ -4,6 +4,13 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
+#### 0.4.2 - 2013-09-10
+
+Another attempt to fix the packaging issue.  We think we understand exactly
+what is failing and this should work properly for the first time.
+
+---------------------------------------
+
 #### 0.4.1 - 2013-08-09
 
 Bugfix release to fix a packaging issue that may have caused puppet module
