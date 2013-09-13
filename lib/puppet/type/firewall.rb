@@ -704,8 +704,9 @@ Puppet::Type.newtype(:firewall) do
     end
 
     unless protocol.nil?
+      table = value(:table)
       [value(:chain), value(:jump)].each do |chain|
-        reqs << "#{chain}:#{value(:table)}:#{protocol}" unless chain.nil?
+        reqs << "#{chain}:#{table}:#{protocol}" unless ( chain.nil? || (['INPUT', 'OUTPUT', 'FORWARD'].include?(chain) && table == :filter) )
       end
     end
 
