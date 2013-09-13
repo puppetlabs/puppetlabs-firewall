@@ -109,7 +109,7 @@ The `post` class should be located in `my_fw/manifests/post.pp` and include any 
       }
     }
 
-To put it all together: the `before` parameter in `Firewall {}` ensures `my_fw::post` is run before any other rules and the the `require` parameter ensures `my_fw::pre` is run after any other rules. So the run order is:
+To put it all together: the `require` parameter in `Firewall {}` ensures `my_fw::pre` is run before any other rules and the `before` parameter ensures `my_fw::post` is run after any other rules. So the run order is:
 
 * run the rules in `my_fw::pre`
 * run your rules (defined in code)
