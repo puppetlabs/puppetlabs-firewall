@@ -181,11 +181,26 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
 
     ############
+    # Populate parser_list with used value, in the correct order
+    ############
+    map_index={}
+    @resource_map.each_pair do |map_k,map_v|
+      [map_v].flatten.each do |v|
+        ind=values.index(/\s#{v}/)
+        next unless ind
+        map_index[map_k]=ind
+     end
+    end
+    # Generate parser_list based on the index of the found option
+    parser_list=[]
+    map_index.sort_by{|k,v| v}.each{|mapi| parser_list << mapi.first }
+
+    ############
     # MAIN PARSE
     ############
 
     # Here we iterate across our values to generate an array of keys
-    @resource_list.reverse.each do |k|
+    parser_list.reverse.each do |k|
       resource_map_key = @resource_map[k]
       [resource_map_key].flatten.each do |opt|
         if values.slice!(/\s#{opt}/)
