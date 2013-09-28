@@ -486,6 +486,67 @@ describe firewall do
         rel.source.ref.should == chain.ref
         rel.target.ref.should == @resource.ref
       end
+
+      # test where autorequire is still needed (table != filter)
+      ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
+        it "should autorequire fwchain #{test_chain} when table is mangle and provider is undefined" do
+          @resource[param] = test_chain
+          @resource[:table] = :mangle
+          @resource[:provider].should == :iptables
+
+          chain = Puppet::Type.type(:firewallchain).new(:name => "#{test_chain}:mangle:IPv4")
+          catalog = Puppet::Resource::Catalog.new
+          catalog.add_resource @resource
+          catalog.add_resource chain
+          rel = @resource.autorequire[0]
+          rel.source.ref.should == chain.ref
+          rel.target.ref.should == @resource.ref
+        end
+
+        it "should autorequire fwchain #{test_chain} when table is mangle and provider is ip6tables" do
+          @resource[param] = test_chain
+          @resource[:table] = :mangle
+          @resource[:provider] = :ip6tables
+
+          chain = Puppet::Type.type(:firewallchain).new(:name => "#{test_chain}:mangle:IPv6")
+          catalog = Puppet::Resource::Catalog.new
+          catalog.add_resource @resource
+          catalog.add_resource chain
+          rel = @resource.autorequire[0]
+          rel.source.ref.should == chain.ref
+          rel.target.ref.should == @resource.ref
+        end
+      end
+
+      # test of case where autorequire should not happen
+      ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
+
+        it "should not autorequire fwchain #{test_chain} when table and provider are undefined" do
+          @resource[param] = test_chain
+          @resource[:table].should == :filter
+          @resource[:provider].should == :iptables
+
+          chain = Puppet::Type.type(:firewallchain).new(:name => "#{test_chain}:filter:IPv4")
+          catalog = Puppet::Resource::Catalog.new
+          catalog.add_resource @resource
+          catalog.add_resource chain
+          rel = @resource.autorequire[0]
+          rel.should == nil
+        end
+
+        it "should not autorequire fwchain #{test_chain} when table is undefined and provider is ip6tables" do
+          @resource[param] = test_chain
+          @resource[:table].should == :filter
+          @resource[:provider] = :ip6tables
+
+          chain = Puppet::Type.type(:firewallchain).new(:name => "#{test_chain}:filter:IPv6")
+          catalog = Puppet::Resource::Catalog.new
+          catalog.add_resource @resource
+          catalog.add_resource chain
+          rel = @resource.autorequire[0]
+          rel.should == nil
+        end
+      end
     end
   end
 
