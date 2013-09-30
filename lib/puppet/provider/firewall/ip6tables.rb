@@ -101,6 +101,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
-  @known_booleans = [:ishasmorefrags, :islastfrag, :isfirstfrag]
+  @known_booleans = [:ishasmorefrags, :islastfrag, :isfirstfrag, :rsource, :rdest, :reap, :rttl]
 
 end

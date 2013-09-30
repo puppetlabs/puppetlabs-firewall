@@ -656,7 +656,12 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:recent, :required_features => :recent_limiting) do
     desc <<-EOS
       Enable the recent module. Takes as an argument one of set, update,
-      rcheck or remove.
+      rcheck or remove. For example:
+
+          recent => 'update',
+          rseconds => 60,
+          rhitcount => 4,
+          rsource => true,
     EOS
 
     newvalues(:set, :update, :rcheck, :remove)
@@ -668,14 +673,14 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:rdest, :required_features => :recent_limiting) do
     desc <<-EOS
       Recent module; add the destination IP address to the list.
-      Takes no argument.
+      Must be boolean true.
     EOS
   end
 
   newproperty(:rsource, :required_features => :recent_limiting) do
     desc <<-EOS
       Recent module; add the source IP address to the list.
-      Takes no argument.
+      Must be boolean true.
     EOS
   end
 
@@ -698,6 +703,7 @@ Puppet::Type.newtype(:firewall) do
     desc <<-EOS
       Recent module; can only be used in conjunction with --seconds. When
       used, this will cause entries older then 'seconds' to be purged.
+      Must be boolean true.
     EOS
   end
 
@@ -719,6 +725,7 @@ Puppet::Type.newtype(:firewall) do
       useful if you have problems with people faking their source
       address in order to DoS you via this module by disallowing others
       access to your site by sending bogus packets to you.
+      Must be boolean true.
     EOS
   end
 

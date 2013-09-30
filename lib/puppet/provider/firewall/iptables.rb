@@ -87,7 +87,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
-  @known_booleans = [:socket, :isfragment]
+  @known_booleans = [:socket, :isfragment, :rsource, :rdest, :reap, :rttl]
 
 
   # Create property methods dynamically
@@ -175,12 +175,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
-
-    # rsource, rdest, reap and rttl take no values. Cheat by adding "" after them.
-    values = values.sub(/--rsource/, '--rsource ""')
-    values = values.sub(/--rdest/, '--rdest ""')
-    values = values.sub(/--reap/, '--reap ""')
-    values = values.sub(/--rttl/, '--rttl ""')
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
@@ -337,18 +331,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
           resource_value = nil
         end
         if res == :isfragment then
-          resource_value = nil
-        end
-        if res == :rsource then
-          resource_value = nil
-        end
-        if res == :rdest then
-          resource_value = nil
-        end
-        if res == :reap then
-          resource_value = nil
-        end
-        if res == :rttl then
           resource_value = nil
         end
       elsif res == :jump and resource[:action] then
