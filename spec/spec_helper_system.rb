@@ -36,7 +36,6 @@ RSpec.configure do |c|
 
   # Import in our local helpers
   c.include ::LocalHelpers
-  c.include RSpecSystemPuppet::Helpers
 
   # This is where we 'setup' the nodes before running our tests
   c.before :suite do
