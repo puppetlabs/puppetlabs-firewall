@@ -170,6 +170,14 @@ ARGS_TO_HASH = {
       :action => nil,
     },
   },
+  'ctstate_returns_sorted_values' => {
+    :line => '-A INPUT -m conntrack --ctstate INVALID,RELATED,ESTABLISHED',
+    :table => 'filter',
+    :params => {
+      :ctstate => ['ESTABLISHED', 'INVALID', 'RELATED'],
+      :action => nil,
+    },
+  },
   'comment_string_character_validation' => {
     :line => '-A INPUT -s 192.168.0.1/32 -m comment --comment "000 allow from 192.168.0.1, please"',
     :table => 'filter',
@@ -566,6 +574,15 @@ HASH_TO_ARGS = {
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 states_set_from_array",
       "-m", "state", "--state", "ESTABLISHED,INVALID"],
+  },
+  'ctstates_set_from_array' => {
+    :params => {
+      :name => "100 ctstates_set_from_array",
+      :table => "filter",
+      :ctstate => ['ESTABLISHED', 'INVALID']
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 ctstates_set_from_array",
+      "-m", "conntrack", "--ctstate", "ESTABLISHED,INVALID"],
   },
   'comment_string_character_validation' => {
     :params => {
