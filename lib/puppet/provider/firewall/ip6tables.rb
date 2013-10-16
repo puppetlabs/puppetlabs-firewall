@@ -37,6 +37,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   @resource_map = {
     :burst => "--limit-burst",
+    :ctstate => "-m conntrack --ctstate",
     :destination => "-d",
     :dport => "-m multiport --dports",
     :gid => "-m owner --gid-owner",
@@ -86,8 +87,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport,
-    :port, :pkttype, :name, :state, :icmp, :hop_limit, :limit, :burst, :jump,
-    :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
+    :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
+    :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
