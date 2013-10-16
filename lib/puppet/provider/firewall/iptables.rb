@@ -43,6 +43,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   @resource_map = {
     :burst => "--limit-burst",
+    :ctstate => "-m conntrack --ctstate",
     :destination => "-d",
     :dst_type => "-m addrtype --dst-type",
     :dst_range => "-m iprange --dst-range",
@@ -98,7 +99,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :src_range, :destination, :dst_range, :iniface, :outiface,
     :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
-    :dst_type, :src_type, :socket, :pkttype, :name, :state, :icmp,
+    :dst_type, :src_type, :socket, :pkttype, :name, :state, :ctstate, :icmp,
     :limit, :burst, :jump, :todest, :tosource, :toports, :log_prefix,
     :log_level, :reject, :set_mark]
 
@@ -211,7 +212,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
     end
 
-    [:dport, :sport, :port, :state].each do |prop|
+    [:dport, :sport, :port, :state, :ctstate].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
@@ -236,7 +237,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # States should always be sorted. This ensures that the output from
     # iptables-save and user supplied resources is consistent.
-    hash[:state] = hash[:state].sort unless hash[:state].nil?
+    hash[:state]   = hash[:state].sort   unless hash[:state].nil?
+    hash[:ctstate] = hash[:ctstate].sort unless hash[:ctstate].nil?
 
     # This forces all existing, commentless rules or rules with invalid comments to be moved 
     # to the bottom of the stack.

@@ -553,6 +553,38 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:ctstate, :array_matching => :all, :required_features =>
+    :state_match) do
+
+    desc <<-EOS
+      Matches a packet based on its state in the firewall stateful inspection
+      table, using the conntrack module. Values can be:
+
+      * INVALID
+      * ESTABLISHED
+      * NEW
+      * RELATED
+    EOS
+
+    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
+
+    # States should always be sorted. This normalizes the resource states to
+    # keep it consistent with the sorted result from iptables-save.
+    def should=(values)
+      @should = super(values).sort_by {|sym| sym.to_s}
+    end
+
+    def is_to_s(value)
+      should_to_s(value)
+    end
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
+  end
+
+
   # Hop limiting properties
   newproperty(:hop_limit, :required_features => :hop_limiting) do
     desc <<-EOS

@@ -316,6 +316,23 @@ describe firewall do
     end
   end
 
+  describe ':ctstate' do
+    it 'should accept value as a string' do
+      @resource[:ctstate] = :INVALID
+      @resource[:ctstate].should == [:INVALID]
+    end
+
+    it 'should accept value as an array' do
+      @resource[:ctstate] = [:INVALID, :NEW]
+      @resource[:ctstate].should == [:INVALID, :NEW]
+    end
+
+    it 'should sort values alphabetically' do
+      @resource[:ctstate] = [:NEW, :ESTABLISHED]
+      @resource[:ctstate].should == [:ESTABLISHED, :NEW]
+    end
+  end
+
   describe ':burst' do
     it 'should accept numeric values' do
       @resource[:burst] = 12
