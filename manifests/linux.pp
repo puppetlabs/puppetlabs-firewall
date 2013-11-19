@@ -32,6 +32,12 @@ class firewall::linux (
       }
     }
     'Debian', 'Ubuntu': {
+      package { 'iptables-persistent':
+        ensure  => $ensure,
+        enable  => $enable,
+        require => Package['iptables'],
+      }
+      
       class { "${title}::debian":
         ensure  => $ensure,
         enable  => $enable,
