@@ -355,13 +355,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         next
       end
 
-      ## Generic negating of rules
-      if resource_value =~ /!\s?(.*)/
-        resource_value = $1
-        args << "!"
+      args << [resource_map[res]].flatten.first.split(' ')
+
+      # On negations, the '!' has to be before the option (eg: "! -d 1.2.3.4")
+      if resource_value.is_a?(String) and resource_value.sub!(/^!\s*/, '') then
+        # we do this after adding the 'dash' argument because of ones like "-m multiport --dports", where we want it before the "--dports" but after "-m multiport".
+        # so we insert before whatever the last argument is
+        args.insert(-2, '!')
       end
 
-      args << [resource_map[res]].flatten.first.split(' ')
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
