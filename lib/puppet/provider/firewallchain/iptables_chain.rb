@@ -41,11 +41,11 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
   Nameformat = /^(.+):(#{Tables}):(IP(v[46])?|ethernet)$/
 
   def create
-    # can't create internal chains
-    if @resource[:name] =~ InternalChains
-      self.warn "Attempting to create internal chain #{@resource[:name]}"
-    end
     allvalidchains do |t, chain, table, protocol|
+      if chain =~ InternalChains
+        # can't create internal chains
+        warning "Attempting to create internal chain #{@resource[:name]}"
+      end
       if properties[:ensure] == protocol
         debug "Skipping Inserting chain #{chain} on table #{table} (#{protocol}) already exists"
       else
@@ -59,17 +59,28 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
   end
 
   def destroy
-    # can't delete internal chains
-    if @resource[:name] =~ InternalChains
-      self.warn "Attempting to destroy internal chain #{@resource[:name]}"
-    end
     allvalidchains do |t, chain, table|
+      if chain =~ InternalChains
+        # can't delete internal chains
+        warning "Attempting to destroy internal chain #{@resource[:name]}"
+      end
       debug "Deleting chain #{chain} on table #{table}"
       t.call ['-t',table,'-X',chain]
     end
   end
 
   def exists?
+    allvalidchains do |t, chain|
+      if chain =~ InternalChains
+        # If the chain isn't present, it's likely because the module isn't loaded.
+        # If this is true, then we fall into 2 cases
+        # 1) It'll be loaded on demand
+        # 2) It won't be loaded on demand, and we throw an error
+        #    This is the intended behavior as it's not the provider's job to load kernel modules
+        # So we pretend it exists...
+        return true
+      end
+    end
     properties[:ensure] == :present
   end
 
