@@ -24,6 +24,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :socket
   has_feature :address_type
   has_feature :iprange
+  has_feature :ipsec_dir
+  has_feature :ipsec_policy
 
   optional_commands({
     :iptables => 'iptables',
@@ -75,6 +77,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :uid => "-m owner --uid-owner",
     :pkttype => "-m pkttype --pkt-type",
     :isfragment => "-f",
+    :ipsec_dir => "-m policy --dir",
+    :ipsec_policy => "--pol",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -99,7 +103,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [:table, :source, :src_range, :destination, :dst_range, :iniface, :outiface,
     :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
-    :dst_type, :src_type, :socket, :pkttype, :name, :state, :ctstate, :icmp,
+    :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state, :ctstate, :icmp,
     :limit, :burst, :jump, :todest, :tosource, :toports, :log_prefix,
     :log_level, :reject, :set_mark]
 
