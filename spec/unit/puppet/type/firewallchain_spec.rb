@@ -26,7 +26,7 @@ describe firewallchain do
   end
 
   describe ':name' do
-    {'nat' => ['PREROUTING', 'POSTROUTING', 'OUTPUT'],
+    {'nat' => ['PREROUTING', 'POSTROUTING', 'INPUT', 'OUTPUT'],
      'mangle' => [ 'PREROUTING', 'POSTROUTING', 'INPUT', 'FORWARD', 'OUTPUT' ],
      'filter' => ['INPUT','OUTPUT','FORWARD'],
      'raw' => [ 'PREROUTING', 'OUTPUT'],
