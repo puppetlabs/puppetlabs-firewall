@@ -1,12 +1,22 @@
 #!/usr/bin/env rspec
 
 require 'spec_helper'
-#require 'puppet/provider/confine/exists'
+if Puppet.version < '3.4.0'
+  require 'puppet/provider/confine/exists'
+else
+  require 'puppet/confine/exists'
+end
 
 describe 'iptables provider detection' do
-  let(:exists) {
-    Puppet::Provider::Confine::Exists
-  }
+  if Puppet.version < '3.4.0'
+    let(:exists) {
+      Puppet::Provider::Confine::Exists
+    }
+  else
+    let(:exists) {
+      Puppet::Confine::Exists
+    }
+  end
 
   before :each do
     # Reset the default provider
