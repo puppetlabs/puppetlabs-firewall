@@ -10,8 +10,9 @@ describe "Facter::Util::Fact iptables_persistent_version" do
   }.each do |os, ver|
     describe "#{os} package installed" do
       before {
-        Facter.fact(:operatingsystem).stubs(:value).returns(os)
-        Facter::Util::Resolution.stubs(:exec).with(dpkg_cmd).returns(ver)
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return(os)
+        allow(Facter::Util::Resolution).to receive(:exec).with(dpkg_cmd).
+          and_return(ver)
       }
       it { Facter.fact(:iptables_persistent_version).value.should == ver }
     end
@@ -19,14 +20,16 @@ describe "Facter::Util::Fact iptables_persistent_version" do
 
   describe 'Ubuntu package not installed' do
     before {
-      Facter.fact(:operatingsystem).stubs(:value).returns("Ubuntu")
-      Facter::Util::Resolution.stubs(:exec).with(dpkg_cmd).returns(nil)
+      allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
+      allow(Facter::Util::Resolution).to receive(:exec).with(dpkg_cmd).
+        and_return(nil)
     }
     it { Facter.fact(:iptables_persistent_version).value.should be_nil }
   end
 
   describe 'CentOS not supported' do
-    before { Facter.fact(:operatingsystem).stubs(:value).returns("CentOS") }
+    before { allow(Facter.fact(:operatingsystem)).to receive(:value).
+               and_return("CentOS") }
     it { Facter.fact(:iptables_persistent_version).value.should be_nil }
   end
 end

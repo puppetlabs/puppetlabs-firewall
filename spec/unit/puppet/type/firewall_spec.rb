@@ -8,18 +8,18 @@ describe firewall do
   before :each do
     @class = firewall
     @provider = double 'provider'
-    @provider.stubs(:name).returns(:iptables)
-    Puppet::Type::Firewall.stubs(:defaultprovider).returns @provider
+    allow(@provider).to receive(:name).and_return(:iptables)
+    allow(Puppet::Type::Firewall).to receive(:defaultprovider).and_return @provider
 
     @resource = @class.new({:name  => '000 test foo'})
 
     # Stub iptables version
-    Facter.fact(:iptables_version).stubs(:value).returns("1.4.2")
-    Facter.fact(:ip6tables_version).stubs(:value).returns("1.4.2")
+    allow(Facter.fact(:iptables_version)).to receive(:value).and_return('1.4.2')
+    allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return('1.4.2')
 
     # Stub confine facts
-    Facter.fact(:kernel).stubs(:value).returns("Linux")
-    Facter.fact(:operatingsystem).stubs(:value).returns("Debian")
+    allow(Facter.fact(:kernel)).to receive(:value).and_return('Linux')
+    allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Debian')
   end
 
   it 'should have :name be its namevar' do
@@ -379,8 +379,8 @@ describe firewall do
       describe "with iptables #{iptables_version}" do
         before {
           Facter.clear
-          Facter.fact(:iptables_version).stubs(:value).returns(iptables_version)
-          Facter.fact(:ip6tables_version).stubs(:value).returns(iptables_version)
+          allow(Facter.fact(:iptables_version)).to receive(:value).and_return iptables_version
+          allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return iptables_version
         }
 
         if iptables_version == '1.3.2'

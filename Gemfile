@@ -2,8 +2,10 @@ source 'https://rubygems.org'
 
 group :development, :test do
   gem 'puppetlabs_spec_helper', :require => false
-  gem 'rspec-system-puppet', '~>2.0'
-  gem 'puppet-lint'
+  gem 'rspec-puppet',           :require => false
+  gem 'serverspec',             :require => false
+  gem 'beaker-rspec',           :require => false
+  gem 'puppet-lint',            :require => false
 end
 
 if puppetversion = ENV['PUPPET_GEM_VERSION']
