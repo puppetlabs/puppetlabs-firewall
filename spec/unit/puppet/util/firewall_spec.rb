@@ -25,6 +25,27 @@ describe 'Puppet::Util::Firewall' do
     specify { subject.host_to_ip('::/0').should == nil }
   end
 
+  describe '#host_to_mask' do
+    subject { resource }
+    specify {
+      expect(Resolv).to receive(:getaddress).any_number_of_times.with('puppetlabs.com').and_return('96.126.112.51')
+      subject.host_to_mask('puppetlabs.com').should == '96.126.112.51/32'
+      subject.host_to_mask('!puppetlabs.com').should == '! 96.126.112.51/32'
+    }
+    specify { subject.host_to_mask('96.126.112.51').should == '96.126.112.51/32' }
+    specify { subject.host_to_mask('!96.126.112.51').should == '! 96.126.112.51/32' }
+    specify { subject.host_to_mask('96.126.112.51/32').should == '96.126.112.51/32' }
+    specify { subject.host_to_mask('! 96.126.112.51/32').should == '! 96.126.112.51/32' }
+    specify { subject.host_to_mask('2001:db8:85a3:0:0:8a2e:370:7334').should == '2001:db8:85a3::8a2e:370:7334/128' }
+    specify { subject.host_to_mask('!2001:db8:85a3:0:0:8a2e:370:7334').should == '! 2001:db8:85a3::8a2e:370:7334/128' }
+    specify { subject.host_to_mask('2001:db8:1234::/48').should == '2001:db8:1234::/48' }
+    specify { subject.host_to_mask('! 2001:db8:1234::/48').should == '! 2001:db8:1234::/48' }
+    specify { subject.host_to_mask('0.0.0.0/0').should == nil }
+    specify { subject.host_to_mask('!0.0.0.0/0').should == nil }
+    specify { subject.host_to_mask('::/0').should == nil }
+    specify { subject.host_to_mask('! ::/0').should == nil }
+  end
+
   describe '#icmp_name_to_number' do
     describe 'proto unsupported' do
       subject { resource }

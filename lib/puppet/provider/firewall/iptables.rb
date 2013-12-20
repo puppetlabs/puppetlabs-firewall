@@ -171,6 +171,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+    # we do a similar thing for negated address masks (source and destination).
+    values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
+    # the actual rule will have the ! mark before the option.
+    values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
@@ -228,7 +232,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Normalise all rules to CIDR notation.
     [:source, :destination].each do |prop|
-      hash[prop] = Puppet::Util::IPCidr.new(hash[prop]).cidr unless hash[prop].nil?
+      next if hash[prop].nil?
+      m = hash[prop].match(/(!?)\s?(.*)/)
+      neg = "! " if m[1] == "!"
+      hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
     end
 
     [:dport, :sport, :port, :state, :ctstate].each do |prop|
@@ -353,6 +360,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
 
       args << [resource_map[res]].flatten.first.split(' ')
+
+      # On negations, the '!' has to be before the option (eg: "! -d 1.2.3.4")
+      if resource_value.is_a?(String) and resource_value.sub!(/^!\s*/, '') then
+        # we do this after adding the 'dash' argument because of ones like "-m multiport --dports", where we want it before the "--dports" but after "-m multiport".
+        # so we insert before whatever the last argument is
+        args.insert(-2, '!')
+      end
+
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.

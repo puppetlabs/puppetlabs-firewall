@@ -89,6 +89,30 @@ ARGS_TO_HASH = {
       :destination => '2001:db8:4321::/48',
     },
   },
+  'source_destination_negate_source' => {
+    :line => '-A INPUT ! -s 1.1.1.1 -d 2.2.2.2 -m comment --comment "000 negated source address"',
+    :table => 'filter',
+    :params => {
+      :source => '! 1.1.1.1/32',
+      :destination => '2.2.2.2/32',
+    },
+  },
+  'source_destination_negate_destination' => {
+    :line => '-A INPUT -s 1.1.1.1 ! -d 2.2.2.2 -m comment --comment "000 negated destination address"',
+    :table => 'filter',
+    :params => {
+      :source => '1.1.1.1/32',
+      :destination => '! 2.2.2.2/32',
+    },
+  },
+  'source_destination_negate_destination_alternative' => {
+    :line => '-A INPUT -s 1.1.1.1 -d ! 2.2.2.2 -m comment --comment "000 negated destination address alternative"',
+    :table => 'filter',
+    :params => {
+      :source => '1.1.1.1/32',
+      :destination => '! 2.2.2.2/32',
+    },
+  },
   'dport_range_1' => {
     :line => '-A INPUT -m multiport --dports 1:1024 -m comment --comment "000 allow foo"',
     :table => 'filter',
