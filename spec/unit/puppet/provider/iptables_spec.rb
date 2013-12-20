@@ -1,12 +1,22 @@
 #!/usr/bin/env rspec
 
 require 'spec_helper'
-require 'puppet/provider/confine/exists'
+if Puppet.version < '3.4.0'
+  require 'puppet/provider/confine/exists'
+else
+  require 'puppet/confine/exists'
+end
 
 describe 'iptables provider detection' do
-  let(:exists) {
-    Puppet::Provider::Confine::Exists
-  }
+  if Puppet.version < '3.4.0'
+    let(:exists) {
+      Puppet::Provider::Confine::Exists
+    }
+  else
+    let(:exists) {
+      Puppet::Confine::Exists
+    }
+  end
 
   before :each do
     # Reset the default provider
@@ -44,7 +54,7 @@ describe 'iptables provider' do
   }
 
   before :each do
-    Puppet::Type::Firewall.stubs(:defaultprovider).returns provider
+    allow(Puppet::Type::Firewall).to receive(:defaultprovider).and_return provider
     allow(provider).to receive(:command).with(:iptables_save).and_return "/sbin/iptables-save"
 
     # Stub iptables version
@@ -205,15 +215,15 @@ describe 'ip6tables provider' do
   }
 
   before :each do
-    Puppet::Type::Firewall.stubs(:ip6tables).returns provider6
-    provider6.stubs(:command).with(:ip6tables_save).returns "/sbin/ip6tables-save"
+    allow(Puppet::Type::Firewall).to receive(:ip6tables).and_return provider6
+    allow(provider6).to receive(:command).with(:ip6tables_save).and_return "/sbin/ip6tables-save"
 
     # Stub iptables version
-    Facter.fact(:ip6tables_version).stubs(:value).returns("1.4.7")
+    allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return '1.4.7'
 
-    Puppet::Util::Execution.stubs(:execute).returns ""
-    Puppet::Util.stubs(:which).with("ip6tables-save").
-      returns "/sbin/ip6tables-save"
+    allow(Puppet::Util::Execution).to receive(:execute).and_return ''
+    allow(Puppet::Util).to receive(:which).with("ip6tables-save").
+      and_return "/sbin/ip6tables-save"
   end
 
   it 'should be able to get a list of existing rules' do
@@ -224,9 +234,8 @@ describe 'ip6tables provider' do
   end
 
   it 'should ignore lines with fatal errors' do
-    Puppet::Util::Execution.stubs(:execute).with(['/sbin/ip6tables-save']).
-      returns("FATAL: Could not load /lib/modules/2.6.18-028stab095.1/modules.dep: No such file or directory")
-
+    allow(Puppet::Util::Execution).to receive(:execute).with(['/sbin/ip6tables-save']).
+      and_return("FATAL: Could not load /lib/modules/2.6.18-028stab095.1/modules.dep: No such file or directory")
     provider6.instances.length.should == 0
   end
 
