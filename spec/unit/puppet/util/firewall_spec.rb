@@ -27,8 +27,11 @@ describe 'Puppet::Util::Firewall' do
 
   describe '#host_to_mask' do
     subject { resource }
-    specify { subject.host_to_mask('puppetlabs.com').should == '96.126.112.51/32' }
-    specify { subject.host_to_mask('!puppetlabs.com').should == '! 96.126.112.51/32' }
+    specify {
+      expect(Resolv).to receive(:getaddress).any_number_of_times.with('puppetlabs.com').and_return('96.126.112.51')
+      subject.host_to_mask('puppetlabs.com').should == '96.126.112.51/32'
+      subject.host_to_mask('!puppetlabs.com').should == '! 96.126.112.51/32'
+    }
     specify { subject.host_to_mask('96.126.112.51').should == '96.126.112.51/32' }
     specify { subject.host_to_mask('!96.126.112.51').should == '! 96.126.112.51/32' }
     specify { subject.host_to_mask('96.126.112.51/32').should == '96.126.112.51/32' }

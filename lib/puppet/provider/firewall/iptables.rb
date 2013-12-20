@@ -167,7 +167,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
-    # we do a simular thing for negated address masks (source and destination).
+    # we do a similar thing for negated address masks (source and destination).
     values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
     values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
