@@ -1,4 +1,4 @@
-require 'spec_helper_system'
+require 'spec_helper_acceptance'
 
 describe "param based tests:" do
   # Takes a hash and converts it into a firewall resource
@@ -8,7 +8,7 @@ describe "param based tests:" do
 firewall { '#{name}':
     EOS
 
-    params.each do |k,v| 
+    params.each do |k,v|
       pm += <<-EOS
   #{k} => #{v},
       EOS
@@ -23,10 +23,8 @@ firewall { '#{name}':
   it 'test various params' do
     iptables_flush_all_tables
 
-    facts = node.facts
-
-    unless (facts['operatingsystem'] == 'CentOS') && \
-      facts['operatingsystemrelease'] =~ /^5\./ then
+    unless (fact('operatingsystem') == 'CentOS') && \
+      fact('operatingsystemrelease') =~ /^5\./ then
 
       ppm = pp({
         'table' => "'raw'",
@@ -36,13 +34,8 @@ firewall { '#{name}':
         'log_level' => 'debug',
       })
 
-      puppet_apply(ppm) do |r|
-        r.exit_code.should == 2
-        r.stderr.should be_empty
-        r.refresh
-        r.stderr.should be_empty
-        r.exit_code.should be_zero
-      end
+      expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
+      expect(apply_manifest(ppm, :catch_failures => true).exit_code).to be_zero
     end
   end
 
@@ -55,13 +48,8 @@ firewall { '#{name}':
       'jump' => 'LOG',
       'log_level' => 'debug',
     })
-    puppet_apply(ppm) do |r|
-      r.exit_code.should == 2
-      r.stderr.should be_empty
-      r.refresh
-      r.stderr.should be_empty
-      r.exit_code.should be_zero
-    end
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to be_zero
   end
 
   it 'test log rule - changing names' do
@@ -87,20 +75,14 @@ firewall { '#{name}':
       'log_prefix' => '"IPTABLES dropped invalid: "',
     })
 
-    puppet_apply(ppm1) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should == 2
-    end
+    expect(apply_manifest(ppm1, :catch_failures => true).exit_code).to eq(2)
 
     ppm = <<-EOS + "\n" + ppm2
       resources { 'firewall':
         purge => true,
       }
     EOS
-    puppet_apply(ppm) do |r|
-      r.stderr.should be_empty
-      r.exit_code.should == 2
-    end
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
   end
 
   it 'test log rule - idempotent' do
@@ -116,13 +98,8 @@ firewall { '#{name}':
       'log_prefix' => '"IPTABLES dropped invalid: "',
     })
 
-    puppet_apply(ppm1) do |r|
-      r.exit_code.should == 2
-      r.stderr.should be_empty
-      r.refresh
-      r.stderr.should be_empty
-      r.exit_code.should be_zero
-    end
+    expect(apply_manifest(ppm1, :catch_failures => true).exit_code).to eq(2)
+    expect(apply_manifest(ppm1, :catch_failures => true).exit_code).to be_zero
   end
 
   it 'test src_range rule' do
@@ -135,13 +112,8 @@ firewall { '#{name}':
       'action'    => 'drop',
       'src_range' => '"10.0.0.1-10.0.0.10"',
     })
-    puppet_apply(ppm) do |r|
-      r.exit_code.should == 2
-      r.stderr.should be_empty
-      r.refresh
-      r.stderr.should be_empty
-      r.exit_code.should be_zero
-    end
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to be_zero
   end
 
   it 'test dst_range rule' do
@@ -154,13 +126,8 @@ firewall { '#{name}':
       'action'    => 'drop',
       'dst_range' => '"10.0.0.2-10.0.0.20"',
     })
-    puppet_apply(ppm) do |r|
-      r.exit_code.should == 2
-      r.stderr.should be_empty
-      r.refresh
-      r.stderr.should be_empty
-      r.exit_code.should be_zero
-    end
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to be_zero
   end
 
 end
