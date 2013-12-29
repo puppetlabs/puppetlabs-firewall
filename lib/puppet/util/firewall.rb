@@ -182,9 +182,9 @@ module Puppet::Util::Firewall
     when :Fedora
       case proto.to_sym
       when :IPv4
-        %w{/usr/libexec/iptables.init save}
+        %w{iptables-save > /etc/sysconfig/iptables}
       when :IPv6
-        %w{/usr/libexec/ip6tables.init save}
+        %w{ip6tables-save > /etc/sysconfig/ip6tables}
       end
     when :Debian
       case proto.to_sym
