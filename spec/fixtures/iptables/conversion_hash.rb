@@ -6,6 +6,19 @@
 # This hash is for testing a line conversion to a hash of parameters
 # which will be used to create a resource.
 ARGS_TO_HASH = {
+  'dport_and_sport' => {
+    :line => '-A nova-compute-FORWARD -s 0.0.0.0/32 -d 255.255.255.255/32 -p udp -m udp --sport 68 --dport 67 -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :chain => 'nova-compute-FORWARD',
+      :source => '0.0.0.0/32',
+      :destination => '255.255.255.255/32',
+      :sport => ['68'],
+      :dport => ['67'],
+      :proto => 'udp',
+    },
+  },
   'long_rule_1' => {
     :line => '-A INPUT -s 1.1.1.1/32 -d 1.1.1.1/32 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
     :table => 'filter',
