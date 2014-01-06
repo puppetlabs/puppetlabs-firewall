@@ -8,7 +8,7 @@ describe 'firewall', :type => :class do
 
   context 'kernel => Windows' do
     let(:facts) {{ :kernel => 'Windows' }}
-    it { expect { should include_class('firewall::linux') }.to raise_error(Puppet::Error) }
+    it { expect { should contain_class('firewall::linux') }.to raise_error(Puppet::Error) }
   end
 
   context 'ensure => stopped' do
@@ -20,6 +20,6 @@ describe 'firewall', :type => :class do
   context 'ensure => test' do
     let(:facts) {{ :kernel => 'Linux' }}
     let(:params) {{ :ensure => 'test' }}
-    it { expect { should include_class('firewall::linux') }.to raise_error(Puppet::Error) }
+    it { expect { should contain_class('firewall::linux') }.to raise_error(Puppet::Error) }
   end
 end
