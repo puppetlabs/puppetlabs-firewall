@@ -105,6 +105,14 @@ Puppet::Type.newtype(:firewallchain) do
     end
   end
 
+  newparam(:purge) do
+    desc <<-EOS
+      This is a true/false parameter for enabling chain purging
+    EOS
+    newvalues(:true, :false)
+    defaultto :true
+  end
+
   # Classes would be a better abstraction, pending:
   # http://projects.puppetlabs.com/issues/19001
   autorequire(:package) do
@@ -147,5 +155,18 @@ Puppet::Type.newtype(:firewallchain) do
 
       self.fail 'The "nat" table is not intended for filtering, the use of DROP is therefore inhibited'
     end
+  end
+
+  def generate
+    value(:name).match(Nameformat)
+    chain = $1
+
+    chainrules(chain)
+  end
+
+  def chainrules(chain)
+    Puppet::Type.type('firewall').instances.
+      select { |r| r.provider.chain == chain }.
+      each { |r| r[:chain] = r.provider.chain }
   end
 end
