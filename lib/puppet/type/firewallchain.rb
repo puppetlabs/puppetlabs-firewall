@@ -109,6 +109,7 @@ Puppet::Type.newtype(:firewallchain) do
     desc <<-EOS
       Purge unmanaged firewall rules in this chain
     EOS
+    newvalues(:false, :true)
     defaultto :false
   end
 
@@ -192,7 +193,7 @@ Puppet::Type.newtype(:firewallchain) do
   def generate
     return [] unless self.purge?
 
-    self[:name].match(Nameformat)
+    value(:name).match(Nameformat)
     chain = $1
     table = $2
     protocol = $3
@@ -208,10 +209,10 @@ Puppet::Type.newtype(:firewallchain) do
     rules_resources = Puppet::Type.type(:firewall).instances
 
     # Keep only rules in this chain
-    rules_resources.keep_if {|res| res[:provider] == provider and res.provider.properties[:table].to_s == table and res.provider.properties[:chain] == chain}
+    rules_resources.delete_if { |res| (res[:provider] != provider or res.provider.properties[:table].to_s != table or res.provider.properties[:chain] != chain) }
 
     # Remove rules which match our ignore filter
-    rules_resources.delete_if {|res| self[:ignore].find_index{|f| res.provider.properties[:line].match(f)}} if self[:ignore]
+    rules_resources.delete_if {|res| value(:ignore).find_index{|f| res.provider.properties[:line].match(f)}} if value(:ignore)
 
     # We mark all remaining rules for deletion, and then let the catalog override us on rules which should be present
     rules_resources.each {|res| res[:ensure] = :absent}

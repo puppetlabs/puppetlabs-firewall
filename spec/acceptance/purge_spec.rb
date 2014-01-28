@@ -18,13 +18,13 @@ describe "purge tests:" do
         }
       EOS
 
-      expect(apply_manifest(pp, :catch_failures => true).exit_code).to eq(2)
+      apply_manifest(pp, :expect_changes => true)
     end
 
     it 'saves' do
       shell('/sbin/iptables-save') do |r|
-        r.stdout.should_not =~ /1\.2\.1\.2/
-        r.stderr.should be_empty
+        expect(r.stdout).to_not match(/1\.2\.1\.2/)
+        expect(r.stderr).to eq("")
       end
     end
   end
@@ -45,11 +45,12 @@ describe "purge tests:" do
         }
       EOS
 
-      expect(apply_manifest(pp, :catch_failures => true).exit_code).to eq(2)
+      apply_manifest(pp, :expect_changes => true)
 
       shell('/sbin/iptables-save') do |r|
-        r.stdout.should =~ /010 output-1\.2\.1\.2/
-        r.stderr.should be_empty
+        expect(r.stdout).to match(/010 output-1\.2\.1\.2/)
+        expect(r.stdout).to_not match(/1\.2\.1\.1/)
+        expect(r.stderr).to eq("")
       end
     end
 
@@ -60,11 +61,13 @@ describe "purge tests:" do
           purge => true,
         }
         firewall { '010 output-1.2.1.2':
+          chain  => 'OUTPUT',
+          proto  => 'all',
           source => '1.2.1.2',
         }
       EOS
 
-      expect(apply_manifest(pp, :catch_failures => true).exit_code).to eq(0)
+      apply_manifest(pp, :catch_changes => true)
     end
 
     it 'ignores specified rules' do
@@ -78,7 +81,7 @@ describe "purge tests:" do
         }
       EOS
 
-      expect(apply_manifest(pp, :catch_failures => true).exit_code).to eq(0)
+      apply_manifest(pp, :catch_changes => true)
     end
   end
 end
