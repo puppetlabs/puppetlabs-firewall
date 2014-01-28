@@ -408,8 +408,39 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # No rules at all? Just bail now.
     return 1 if rules.empty?
 
+    # Add our rule to the end of the array of known rules
     my_rule = resource[:name].to_s
     rules << my_rule
-    rules.sort.index(my_rule) + 1
+
+    # Find if this is a new rule or an existing rule, then find how many
+    # unmanaged rules preceed it.
+    if rules.length == rules.uniq.length
+      # This is a new rule so find its ordered location.
+      new_rule_location = rules.sort.uniq.index(my_rule)
+      if new_rule_location == 0
+        # The rule will be the first rule in the chain because nothing came
+        # before it.
+        offset_rule = rules[0]
+      else
+        # This rule will come after other managed rules, so find the rule
+        # immediately preceeding it.
+        offset_rule = rules.sort.uniq[new_rule_location - 1]
+      end
+    else
+      # This is a pre-existing rule, so find the offset from the original
+      # ordering.
+      offset_rule = my_rule
+    end
+    # Count how many unmanaged rules are ahead of the target rule so we know
+    # how much to add to the insert order
+    unnamed_offset = rules[0..rules.index(offset_rule)].inject(0) do |sum,rule|
+      # This regex matches the names given to unmanaged rules (a number
+      # 9000-9999 followed by an MD5 hash).
+      sum + (rule.match(/^9[0-9]{3}\s[a-f0-9]{32}$/) ? 1 : 0)
+    end
+
+    # Insert our new or updated rule in the correct order of named rules, but
+    # offset for unnamed rules.
+    rules.sort.index(my_rule) + 1 + unnamed_offset
   end
 end
