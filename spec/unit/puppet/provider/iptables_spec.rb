@@ -79,6 +79,90 @@ describe 'iptables provider' do
     expect(provider.instances.length).to be_zero
   end
 
+  describe '#insert_order' do
+    let(:iptables_save_output) { [
+      '-A INPUT -s 8.0.0.2/32 -p tcp -m multiport --ports 100 -m comment --comment "100 test" -j ACCEPT',
+      '-A INPUT -s 8.0.0.3/32 -p tcp -m multiport --ports 200 -m comment --comment "200 test" -j ACCEPT',
+      '-A INPUT -s 8.0.0.4/32 -p tcp -m multiport --ports 300 -m comment --comment "300 test" -j ACCEPT'
+    ] }
+    let(:resources) do
+      iptables_save_output.each_with_index.collect { |l,index| provider.rule_to_hash(l, 'filter', index) }
+    end
+    let(:providers) do
+      resources.collect { |r| provider.new(r) }
+    end
+    it 'understands offsets for adding rules to the beginning' do
+      resource = Puppet::Type.type(:firewall).new({ :name => '001 test', })
+      allow(resource.provider.class).to receive(:instances).and_return(providers)
+      expect(resource.provider.insert_order).to eq(1) # 1-indexed
+    end
+    it 'understands offsets for editing rules at the beginning' do
+      resource = Puppet::Type.type(:firewall).new({ :name => '100 test', })
+      allow(resource.provider.class).to receive(:instances).and_return(providers)
+      expect(resource.provider.insert_order).to eq(1)
+    end
+    it 'understands offsets for adding rules to the middle' do
+      resource = Puppet::Type.type(:firewall).new({ :name => '101 test', })
+      allow(resource.provider.class).to receive(:instances).and_return(providers)
+      expect(resource.provider.insert_order).to eq(2)
+    end
+    it 'understands offsets for editing rules at the middle' do
+      resource = Puppet::Type.type(:firewall).new({ :name => '200 test', })
+      allow(resource.provider.class).to receive(:instances).and_return(providers)
+      expect(resource.provider.insert_order).to eq(2)
+    end
+    it 'understands offsets for adding rules to the end' do
+      resource = Puppet::Type.type(:firewall).new({ :name => '301 test', })
+      allow(resource.provider.class).to receive(:instances).and_return(providers)
+      expect(resource.provider.insert_order).to eq(4)
+    end
+    it 'understands offsets for editing rules at the end' do
+      resource = Puppet::Type.type(:firewall).new({ :name => '300 test', })
+      allow(resource.provider.class).to receive(:instances).and_return(providers)
+      expect(resource.provider.insert_order).to eq(3)
+    end
+
+    context 'with an unname rule' do
+      let(:iptables_save_output) { [
+        '-A INPUT -s 8.0.0.2/32 -p tcp -m multiport --ports 100 -m comment --comment "100 test" -j ACCEPT',
+        '-A INPUT -s 8.0.0.3/32 -p tcp -m multiport --ports 200 -j ACCEPT',
+        '-A INPUT -s 8.0.0.4/32 -p tcp -m multiport --ports 300 -m comment --comment "300 test" -j ACCEPT',
+        '-A INPUT -s 8.0.0.5/32 -p tcp -m multiport --ports 400 -j ACCEPT',
+        '-A INPUT -s 8.0.0.6/32 -p tcp -m multiport --ports 500 -m comment --comment "500 test" -j ACCEPT'
+      ] }
+      it 'understands offsets for adding rules before unnamed rules' do
+        resource = Puppet::Type.type(:firewall).new({ :name => '001 test', })
+        allow(resource.provider.class).to receive(:instances).and_return(providers)
+        expect(resource.provider.insert_order).to eq(1)
+      end
+      it 'understands offsets for editing rules before unnamed rules' do
+        resource = Puppet::Type.type(:firewall).new({ :name => '100 test', })
+        allow(resource.provider.class).to receive(:instances).and_return(providers)
+        expect(resource.provider.insert_order).to eq(1)
+      end
+      it 'understands offsets for adding rules between unnamed rules' do
+        resource = Puppet::Type.type(:firewall).new({ :name => '301 test', })
+        allow(resource.provider.class).to receive(:instances).and_return(providers)
+        expect(resource.provider.insert_order).to eq(4)
+      end
+      it 'understands offsets for editing rules between unnamed rules' do
+        resource = Puppet::Type.type(:firewall).new({ :name => '300 test', })
+        allow(resource.provider.class).to receive(:instances).and_return(providers)
+        expect(resource.provider.insert_order).to eq(3)
+      end
+      it 'understands offsets for adding rules after unnamed rules' do
+        resource = Puppet::Type.type(:firewall).new({ :name => '501 test', })
+        allow(resource.provider.class).to receive(:instances).and_return(providers)
+        expect(resource.provider.insert_order).to eq(6)
+      end
+      it 'understands offsets for editing rules after unnamed rules' do
+        resource = Puppet::Type.type(:firewall).new({ :name => '500 test', })
+        allow(resource.provider.class).to receive(:instances).and_return(providers)
+        expect(resource.provider.insert_order).to eq(5)
+      end
+    end
+  end
+
   # Load in ruby hash for test fixtures.
   load 'spec/fixtures/iptables/conversion_hash.rb'
 
