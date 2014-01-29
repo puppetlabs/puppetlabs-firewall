@@ -85,6 +85,31 @@ firewall { '#{name}':
     expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
   end
 
+  it 'test chain - changing names' do
+    iptables_flush_all_tables
+
+    ppm1 = pp({
+      'name'  => '004 with a chain',
+      'chain' => 'INPUT',
+      'proto' => 'all',
+    })
+
+    ppm2 = pp({
+      'name'  => '004 with a chain',
+      'chain' => 'OUTPUT',
+      'proto' => 'all',
+    })
+
+    apply_manifest(ppm1, :expect_changes => true)
+
+    ppm = <<-EOS + "\n" + ppm2
+      resources { 'firewall':
+        purge => true,
+      }
+    EOS
+    expect(apply_manifest(ppm2, :expect_failures => true).stderr).to match(/is not supported/)
+  end
+
   it 'test log rule - idempotent' do
     iptables_flush_all_tables
 

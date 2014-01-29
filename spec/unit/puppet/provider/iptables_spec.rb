@@ -180,6 +180,10 @@ describe 'iptables provider' do
     it 'update_args should be an array' do
       expect(instance.update_args.class).to eq(Array)
     end
+
+    it 'fails when modifying the chain' do
+      expect { instance.chain = "OUTPUT" }.to raise_error(/is not supported/)
+    end
   end
 
   describe 'when deleting resources' do
