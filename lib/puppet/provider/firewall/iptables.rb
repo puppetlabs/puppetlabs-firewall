@@ -92,8 +92,16 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       @property_hash[property.to_sym]
     end
 
-    define_method "#{property}=" do |value|
-      @property_hash[:needs_change] = true
+    if property == :chain
+      define_method "#{property}=" do |value|
+        if @property_hash[:chain] != value
+          raise ArgumentError, "Modifying the chain for existing rules is not supported."
+        end
+      end
+    else
+      define_method "#{property}=" do |value|
+        @property_hash[:needs_change] = true
+      end
     end
   end
 

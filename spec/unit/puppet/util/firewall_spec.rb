@@ -28,7 +28,7 @@ describe 'Puppet::Util::Firewall' do
   describe '#host_to_mask' do
     subject { resource }
     specify {
-      expect(Resolv).to receive(:getaddress).any_number_of_times.with('puppetlabs.com').and_return('96.126.112.51')
+      expect(Resolv).to receive(:getaddress).at_least(:once).with('puppetlabs.com').and_return('96.126.112.51')
       subject.host_to_mask('puppetlabs.com').should == '96.126.112.51/32'
       subject.host_to_mask('!puppetlabs.com').should == '! 96.126.112.51/32'
     }
