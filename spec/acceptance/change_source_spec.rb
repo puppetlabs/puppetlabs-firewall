@@ -28,6 +28,11 @@ describe 'firewall type' do
       apply_manifest(pp, :catch_failures => true)
     end
 
+    it 'adds a unmanaged rule without a comment' do
+      shell('/sbin/iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 102 -j ACCEPT')
+      expect(shell('iptables -S').stdout).to match(/-A INPUT -s 8\.0\.0\.3\/32 -p tcp -m multiport --ports 102 -j ACCEPT/)
+    end
+
     it 'contains the changable 8.0.0.1 rule' do
       shell('iptables -S') do |r|
         expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.1\/32 -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT/)
@@ -37,11 +42,6 @@ describe 'firewall type' do
       shell('iptables -S') do |r|
         expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.2\/32 -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT/)
       end
-    end
-
-    it 'adds a unmanaged rule without a comment' do
-      shell('/sbin/iptables -R INPUT 1 -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 100 -j ACCEPT')
-      expect(shell('iptables -S').stdout).to match(/-A INPUT -s 8\.0\.0\.3\/32 -p tcp -m multiport --ports 100 -j ACCEPT/)
     end
 
     it 'changes to 8.0.0.4 second' do

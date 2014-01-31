@@ -67,14 +67,34 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :isfirstfrag => "-m frag --fragid 0 --fragfirst",
   }
 
+  # These are known booleans that do not take a value, but we want to munge
+  # to true if they exist.
+  @known_booleans = [:ishasmorefrags, :islastfrag, :isfirstfrag]
+
   # Create property methods dynamically
   (@resource_map.keys << :chain << :table << :action).each do |property|
-    define_method "#{property}" do
-      @property_hash[property.to_sym]
+    if @known_booleans.include?(property) then
+      # The boolean properties default to '' which should be read as false
+      define_method "#{property}" do
+        @property_hash[property] = :false if @property_hash[property] == nil
+        @property_hash[property.to_sym]
+      end
+    else
+      define_method "#{property}" do
+        @property_hash[property.to_sym]
+      end
     end
 
-    define_method "#{property}=" do |value|
-      @property_hash[:needs_change] = true
+    if property == :chain
+      define_method "#{property}=" do |value|
+        if @property_hash[:chain] != value
+          raise ArgumentError, "Modifying the chain for existing rules is not supported."
+        end
+      end
+    else
+      define_method "#{property}=" do |value|
+        @property_hash[:needs_change] = true
+      end
     end
   end
 
@@ -89,9 +109,5 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport,
     :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
-
-  # These are known booleans that do not take a value, but we want to munge
-  # to true if they exist.
-  @known_booleans = [:ishasmorefrags, :islastfrag, :isfirstfrag]
 
 end

@@ -88,8 +88,16 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   # Create property methods dynamically
   (@resource_map.keys << :chain << :table << :action).each do |property|
-    define_method "#{property}" do
-      @property_hash[property.to_sym]
+    if @known_booleans.include?(property) then
+      # The boolean properties default to '' which should be read as false
+      define_method "#{property}" do
+        @property_hash[property] = :false if @property_hash[property] == nil
+        @property_hash[property.to_sym]
+      end
+    else
+      define_method "#{property}" do
+        @property_hash[property.to_sym]
+      end
     end
 
     if property == :chain
@@ -253,7 +261,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Convert booleans removing the previous cludge we did
     @known_booleans.each do |bool|
       if hash[bool] != nil then
-        unless hash[bool] == "true" then
+        if hash[bool] != "true" then
           raise "Parser error: #{bool} was meant to be a boolean but received value: #{hash[bool]}."
         end
       end
@@ -355,10 +363,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         resource_value = resource[res]
         # If socket is true then do not add the value as -m socket is standalone
         if known_booleans.include?(res) then
-          resource_value = nil
-        end
-        if res == :isfragment then
-          resource_value = nil
+          if resource[res] == :true then
+            resource_value = nil
+          else
+            # If the property is not :true then we don't want to add the value
+            # to the args list
+            next
+          end
         end
       elsif res == :jump and resource[:action] then
         # In this case, we are substituting jump for action
