@@ -1455,6 +1455,111 @@ describe 'firewall type' do
     end
   end
 
+  describe 'recent' do
+    context 'set' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '597 - test':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'set',
+            rdest        => true,
+            rname        => 'list1',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables -S') do |r|
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "597 - test" -m recent --set --name list1 --rdest/)
+        end
+      end
+    end
+
+    context 'rcheck' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '598 - test':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'rcheck',
+            rsource      => true,
+            rname        => 'list1',
+            rseconds     => 60,
+            rhitcount    => 5,
+            rttl         => true,
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables -S') do |r|
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "598 - test" -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 --rsource/)
+        end
+      end
+    end
+
+    context 'update' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '599 - test':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'update',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables -S') do |r|
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "599 - test" -m recent --update/)
+        end
+      end
+    end
+
+    context 'remove' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '600 - test':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'remove',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables -S') do |r|
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "600 - test" -m recent --remove/)
+        end
+      end
+    end
+  end
+
   describe 'reset' do
     it 'deletes all rules' do
       shell('ip6tables --flush')
