@@ -348,6 +348,15 @@ describe firewall do
     end
   end
 
+  describe ':recent' do
+    ['set', 'update', 'rcheck', 'remove'].each do |recent|
+      it "should accept recent value #{recent}" do
+        @resource[:recent] = recent
+        @resource[:recent].should == "--#{recent}"
+      end
+    end
+  end
+
   describe ':action and :jump' do
     it 'should allow only 1 to be set at a time' do
       expect {
