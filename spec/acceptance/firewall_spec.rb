@@ -116,6 +116,7 @@ describe 'firewall type' do
         EOS
 
         apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'should contain the rule' do
@@ -138,6 +139,7 @@ describe 'firewall type' do
         EOS
 
         apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'should contain the rule' do
@@ -187,6 +189,7 @@ describe 'firewall type' do
         EOS
 
         apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'should contain the rule' do
@@ -236,6 +239,7 @@ describe 'firewall type' do
         EOS
 
         apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'should contain the rule' do
@@ -258,6 +262,7 @@ describe 'firewall type' do
         EOS
 
         apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'should contain the rule' do
@@ -307,6 +312,7 @@ describe 'firewall type' do
         EOS
 
         apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'should contain the rule' do
@@ -683,6 +689,11 @@ describe 'firewall type' do
   end
 
   describe 'jump' do
+    after :all do
+      iptables_flush_all_tables
+      expect(shell('iptables -t filter -X TEST').stderr).to eq("")
+    end
+
     context 'MARK' do
       it 'applies' do
         pp = <<-EOS

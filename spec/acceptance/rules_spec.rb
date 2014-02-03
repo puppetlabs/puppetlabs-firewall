@@ -1,6 +1,17 @@
 require 'spec_helper_acceptance'
 
 describe 'complex ruleset 1' do
+  before :all do
+    iptables_flush_all_tables
+  end
+
+  after :all do
+    shell('iptables -t filter -P INPUT ACCEPT')
+    shell('iptables -t filter -P FORWARD ACCEPT')
+    shell('iptables -t filter -P OUTPUT ACCEPT')
+    shell('iptables -t filter --flush')
+  end
+
   it 'applies cleanly' do
     pp = <<-EOS
       firewall { '090 forward allow local':
@@ -87,10 +98,30 @@ describe 'complex ruleset 1' do
   end
 
   it 'contains appropriate rules' do
+    shell('iptables -S') do |r|
+      expect(r.stdout).to eq(
+        "-P INPUT ACCEPT\n" +
+        "-P FORWARD ACCEPT\n" +
+        "-P OUTPUT ACCEPT\n" +
+        "-A FORWARD -s 10.0.0.0/8 -d 10.0.0.0/8 -m comment --comment \"090 forward allow local\" -j ACCEPT \n" +
+        "-A FORWARD -s 10.0.0.0/8 ! -d 10.0.0.0/8 -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT \n" +
+        "-A FORWARD -s 10.0.0.0/8 ! -d 10.0.0.0/8 -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m comment --comment \"100 forward standard allow tcp\" -m state --state NEW -j ACCEPT \n" +
+        "-A FORWARD -s 10.0.0.0/8 ! -d 10.0.0.0/8 -p udp -m multiport --ports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT \n"
+      )
+    end
   end
 end
 
 describe 'complex ruleset 2' do
+  after :all do
+    shell('iptables -t filter -P INPUT ACCEPT')
+    shell('iptables -t filter -P FORWARD ACCEPT')
+    shell('iptables -t filter -P OUTPUT ACCEPT')
+    shell('iptables -t filter --flush')
+    expect(shell('iptables -t filter -X LOCAL_INPUT').stderr).to eq("")
+    expect(shell('iptables -t filter -X LOCAL_INPUT_PRE').stderr).to eq("")
+  end
+
   it 'applies cleanly' do
     pp = <<-EOS
       class { '::firewall': }
@@ -190,10 +221,28 @@ describe 'complex ruleset 2' do
 
     # Run it twice and test for idempotency
     apply_manifest(pp, :catch_failures => true)
-    expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+    apply_manifest(pp, :catch_changes => true)
   end
 
   it 'contains appropriate rules' do
+    shell('iptables -S') do |r|
+      expect(r.stdout).to eq(
+        "-P INPUT DROP\n" +
+        "-P FORWARD DROP\n" +
+        "-P OUTPUT ACCEPT\n" +
+        "-N LOCAL_INPUT\n" +
+        "-N LOCAL_INPUT_PRE\n" +
+        "-A INPUT -m comment --comment \"001 LOCAL_INPUT_PRE\" -j LOCAL_INPUT_PRE \n" +
+        "-A INPUT -m comment --comment \"010 INPUT allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT \n" +
+        "-A INPUT -i lo -m comment --comment \"012 accept loopback\" -j ACCEPT \n" +
+        "-A INPUT -p icmp -m comment --comment \"013 icmp destination-unreachable\" -m icmp --icmp-type 3 -j ACCEPT \n" +
+        "-A INPUT -s 10.0.0.0/8 -p icmp -m comment --comment \"013 icmp echo-request\" -m icmp --icmp-type 8 -j ACCEPT \n" +
+        "-A INPUT -p icmp -m comment --comment \"013 icmp time-exceeded\" -m icmp --icmp-type 11 -j ACCEPT \n" +
+        "-A INPUT -p tcp -m multiport --dports 22 -m comment --comment \"020 ssh\" -m state --state NEW -j ACCEPT \n" +
+        "-A INPUT -m comment --comment \"900 LOCAL_INPUT\" -j LOCAL_INPUT \n" +
+        "-A INPUT -m comment --comment \"999 reject\" -j REJECT --reject-with icmp-host-prohibited \n" +
+        "-A FORWARD -m comment --comment \"010 allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT \n"
+      )
+    end
   end
 end
-

@@ -14,7 +14,7 @@ describe 'puppet resource firewallchain command:' do
         EOS
         # Run it twice and test for idempotency
         apply_manifest(pp, :catch_failures => true)
-        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'finds the chain' do
@@ -33,7 +33,7 @@ describe 'puppet resource firewallchain command:' do
         EOS
         # Run it twice and test for idempotency
         apply_manifest(pp, :catch_failures => true)
-        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'fails to find the chain' do
@@ -44,65 +44,65 @@ describe 'puppet resource firewallchain command:' do
     end
   end
 
-  context 'adding a firewall rule to a chain:' do
-    it 'applies cleanly' do
-      pp = <<-EOS
-        firewallchain { 'MY_CHAIN:filter:IPv4':
-          ensure  => present,
-        }
-        firewall { '100 my rule':
-          chain   => 'MY_CHAIN',
-          action  => 'accept',
-          proto   => 'tcp',
-          dport   => 5000,
-        }
-      EOS
-      # Run it twice and test for idempotency
-      apply_manifest(pp, :catch_failures => true)
-      expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
-    end
-  end
+  # XXX purge => false is not yet implemented
+  #context 'adding a firewall rule to a chain:' do
+  #  it 'applies cleanly' do
+  #    pp = <<-EOS
+  #      firewallchain { 'MY_CHAIN:filter:IPv4':
+  #        ensure  => present,
+  #      }
+  #      firewall { '100 my rule':
+  #        chain   => 'MY_CHAIN',
+  #        action  => 'accept',
+  #        proto   => 'tcp',
+  #        dport   => 5000,
+  #      }
+  #    EOS
+  #    # Run it twice and test for idempotency
+  #    apply_manifest(pp, :catch_failures => true)
+  #    apply_manifest(pp, :catch_changes => true)
+  #  end
+  #end
 
-  context 'not purge firewallchain chains:' do
-    it 'does not purge the rule' do
-      pp = <<-EOS
-        firewallchain { 'MY_CHAIN:filter:IPv4':
-          ensure  => present,
-          purge   => false,
-          before  => Resources['firewall'],
-        }
-        resources { 'firewall':
-          purge => true,
-        }
-      EOS
-      # Run it twice and test for idempotency
-      apply_manifest(pp, :catch_failures => true) do |r|
-        expect(r.stdout).to_not match(/removed/)
-        expect(r.stderr).to eq('')
-        expect(r.exit_code).to eq(0)
-      end
-      expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
-    end
+  #context 'not purge firewallchain chains:' do
+  #  it 'does not purge the rule' do
+  #    pp = <<-EOS
+  #      firewallchain { 'MY_CHAIN:filter:IPv4':
+  #        ensure  => present,
+  #        purge   => false,
+  #        before  => Resources['firewall'],
+  #      }
+  #      resources { 'firewall':
+  #        purge => true,
+  #      }
+  #    EOS
+  #    # Run it twice and test for idempotency
+  #    apply_manifest(pp, :catch_failures => true) do |r|
+  #      expect(r.stdout).to_not match(/removed/)
+  #      expect(r.stderr).to eq('')
+  #    end
+  #    apply_manifest(pp, :catch_changes => true)
+  #  end
 
-    it 'still has the rule' do
-      pp = <<-EOS
-        firewall { '100 my rule':
-          chain   => 'MY_CHAIN',
-          action  => 'accept',
-          proto   => 'tcp',
-          dport   => 5000,
-        }
-      EOS
-      # Run it twice and test for idempotency
-      apply_manifest(pp, :catch_failures => true) do |r|
-        expect(r.stderr).to eq('')
-        expect(r.exit_code).to eq(0)
-      end
-      expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
-    end
-  end
+  #  it 'still has the rule' do
+  #    pp = <<-EOS
+  #      firewall { '100 my rule':
+  #        chain   => 'MY_CHAIN',
+  #        action  => 'accept',
+  #        proto   => 'tcp',
+  #        dport   => 5000,
+  #      }
+  #    EOS
+  #    # Run it twice and test for idempotency
+  #    apply_manifest(pp, :catch_changes => true)
+  #  end
+  #end
 
   describe 'policy' do
+    after :all do
+      shell('iptables -t filter -P FORWARD ACCEPT')
+    end
+
     context 'DROP' do
       it 'applies cleanly' do
         pp = <<-EOS
@@ -112,7 +112,7 @@ describe 'puppet resource firewallchain command:' do
         EOS
         # Run it twice and test for idempotency
         apply_manifest(pp, :catch_failures => true)
-        expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'finds the chain' do
@@ -122,5 +122,4 @@ describe 'puppet resource firewallchain command:' do
       end
     end
   end
-
 end
