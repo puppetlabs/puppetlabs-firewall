@@ -584,7 +584,7 @@ HASH_TO_ARGS = {
       :table => 'filter',
       :dst_range => '10.0.0.1-10.0.0.10',
     },
-    :args => ['-t', :filter, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-p', :tcp, '-m', 'comment', '--comment', '000 dst_range'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-m', 'comment', '--comment', '000 dst_range'],
   },
   'src_range_1' => {
     :params => {
@@ -592,7 +592,7 @@ HASH_TO_ARGS = {
       :table => 'filter',
       :dst_range => '10.0.0.1-10.0.0.10',
     },
-    :args => ['-t', :filter, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-p', :tcp, '-m', 'comment', '--comment', '000 src_range'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'iprange', '--dst-range', '10.0.0.1-10.0.0.10', '-m', 'comment', '--comment', '000 src_range'],
   },
   'tcp_flags_1' => {
     :params => {
