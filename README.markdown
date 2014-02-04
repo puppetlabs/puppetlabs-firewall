@@ -197,24 +197,56 @@ Drop all:
 
 ###Application-specific rules
 
-Application-specific rules can live anywhere you declare the firewall resource. It is best to put your firewall rules close to the service that needs it, such as in the module that configures it.
+Puppet doesn't care where you define rules, and this means that you can place
+your firewall resources as close to the applications and services that you
+manage as you wish.  If you use the [roles and profiles
+pattern](https://puppetlabs.com/learn/roles-profiles-introduction) then it
+would make sense to create your firewall rules in the profiles, so that they
+remain close to the services managed by the profile.
 
-You should be able to add firewall rules to your application-specific classes so firewalling is performed at the same time when the class is invoked.
+An example of this might be:
 
-For example, if you have an Apache module, you could declare the class as below
+```puppet
+class profile::apache {
+  include apache
+  apache::vhost { 'mysite': ensure => present }
 
-    class apache {
-      firewall { '100 allow http and https access':
-        port   => [80, 443],
-        proto  => tcp,
-        action => accept,
-      }
-      # ... the rest of your code ...
-    }
+  firewall { '100 allow http and https access':
+    port   => [80, 443],
+    proto  => tcp,
+    action => accept,
+  }
+}
+```
 
-When someone uses the class, firewalling is provided automatically.
 
-    class { 'apache': }
+However, if you're not using that pattern then you can place them directly into
+the individual module that manages a service, such as:
+
+```puppet
+class apache {
+  firewall { '100 allow http and https access':
+    port   => [80, 443],
+    proto  => tcp,
+    action => accept,
+  }
+  # ... the rest of your code ...
+}
+```
+
+This means if someone includes either the profile:
+
+```puppet
+include profile::apache
+```
+
+Or the module, if you're not using roles and profiles:
+
+```puppet
+  include ::apache
+```
+
+Then they would automatically get appropriate firewall rules.
 
 ###Other rules
 
