@@ -58,4 +58,21 @@ describe 'puppet resource firewall command:' do
       end
     end
   end
+
+  context 'accepts rules with negation' do
+    before :all do
+      iptables_flush_all_tables
+      shell('/sbin/iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p tcp -j MASQUERADE --to-ports 1024-65535')
+      shell('/sbin/iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p udp -j MASQUERADE --to-ports 1024-65535')
+      shell('/sbin/iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -j MASQUERADE')
+    end
+
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
+      end
+    end
+  end
 end
