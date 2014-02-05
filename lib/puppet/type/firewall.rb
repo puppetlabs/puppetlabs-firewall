@@ -30,6 +30,7 @@ Puppet::Type.newtype(:firewall) do
 
   feature :hop_limiting, "Hop limiting features."
   feature :rate_limiting, "Rate limiting features."
+  feature :recent_limiting, "The netfilter recent module"
   feature :snat, "Source NATing"
   feature :dnat, "Destination NATing"
   feature :interface_match, "Interface matching"
@@ -689,6 +690,87 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:isfragment, :required_features => :isfragment) do
     desc <<-EOS
       Set to true to match tcp fragments (requires type to be set to tcp)
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:recent, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Enable the recent module. Takes as an argument one of set, update,
+      rcheck or remove. For example:
+
+          recent    => 'update',
+          rseconds  => 60,
+          rhitcount => 4,
+          rsource   => true,
+    EOS
+
+    newvalues(:set, :update, :rcheck, :remove)
+    munge do |value|
+       value = "--" + value
+    end
+  end
+
+  newproperty(:rdest, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Recent module; add the destination IP address to the list.
+      Must be boolean true.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:rsource, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Recent module; add the source IP address to the list.
+      Must be boolean true.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:rname, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Recent module; The name of the list. Takes a string argument.
+    EOS
+  end
+
+  newproperty(:rseconds, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Recent module; used in conjunction with one of `recent => 'rcheck'` or
+      `recent => 'update'`. When used, this will narrow the match to only
+      happen when the address is in the list and was seen within the last given
+      number of seconds.
+    EOS
+  end
+
+  newproperty(:reap, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Recent module; can only be used in conjunction with the `rseconds`
+      attribute. When used, this will cause entries older than 'seconds' to be
+      purged.  Must be boolean true.
+    EOS
+  end
+
+  newproperty(:rhitcount, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Recent module; used in conjunction with `recent => 'update'` or `recent
+      => 'rcheck'. When used, this will narrow the match to only happen when
+      the address is in the list and packets had been received greater than or
+      equal to the given value.
+    EOS
+  end
+
+  newproperty(:rttl, :required_features => :recent_limiting) do
+    desc <<-EOS
+      Recent module; may only be used in conjunction with one of `recent =>
+      'rcheck'` or `recent => 'update'`. When used, this will narrow the match
+      to only happen when the address is in the list and the TTL of the current
+      packet matches that of the packet which hit the `recent => 'set'` rule.
+      This may be useful if you have problems with people faking their source
+      address in order to DoS you via this module by disallowing others access
+      to your site by sending bogus packets to you.  Must be boolean true.
     EOS
 
     newvalues(:true, :false)

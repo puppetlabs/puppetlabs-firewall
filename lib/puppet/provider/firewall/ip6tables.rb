@@ -4,6 +4,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :iptables
   has_feature :hop_limiting
   has_feature :rate_limiting
+  has_feature :recent_limiting
   has_feature :snat
   has_feature :dnat
   has_feature :interface_match
@@ -52,7 +53,15 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :outiface => "-o",
     :port => '-m multiport --ports',
     :proto => "-p",
+    :rdest => "--rdest",
+    :reap => "--reap",
+    :recent => "-m recent",
     :reject => "--reject-with",
+    :rhitcount => "--hitcount",
+    :rname => "--name",
+    :rseconds => "--seconds",
+    :rsource => "--rsource",
+    :rttl => "--rttl",
     :source => "-s",
     :state => "-m state --state",
     :sport => "-m multiport --sports",
@@ -69,7 +78,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
-  @known_booleans = [:ishasmorefrags, :islastfrag, :isfirstfrag]
+  @known_booleans = [:ishasmorefrags, :islastfrag, :isfirstfrag, :rsource, :rdest, :reap, :rttl]
 
   # Create property methods dynamically
   (@resource_map.keys << :chain << :table << :action).each do |property|
@@ -108,6 +117,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport,
     :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
+    :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject]
 
 end
