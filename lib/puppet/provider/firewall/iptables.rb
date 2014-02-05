@@ -62,6 +62,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :outiface => "-o",
     :port => '-m multiport --ports',
     :proto => "-p",
+    :random => "--random",
     :rdest => "--rdest",
     :reap => "--reap",
     :recent => "-m recent",
@@ -92,7 +93,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
-  @known_booleans = [:socket, :isfragment, :rsource, :rdest, :reap, :rttl]
+  @known_booleans = [
+    :isfragment,
+    :random,
+    :rdest,
+    :reap,
+    :rsource,
+    :rttl,
+    :socket
+  ]
 
 
   # Create property methods dynamically
@@ -132,7 +141,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
-    :toports, :log_prefix, :log_level, :reject, :set_mark
+    :toports, :random, :log_prefix, :log_level, :reject, :set_mark
   ]
 
   def insert

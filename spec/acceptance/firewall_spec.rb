@@ -822,6 +822,33 @@ describe 'firewall type' do
     end
   end
 
+  describe 'random' do
+    context '192.168.1.1' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '570 - test 2':
+            proto  => all,
+            table  => 'nat',
+            chain  => 'POSTROUTING',
+            jump   => 'MASQUERADE',
+            source => '172.30.0.0/16',
+            random => true
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables -t nat -S') do |r|
+          expect(r.stdout).to match(/-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - test 2" -j MASQUERADE --random/)
+        end
+      end
+    end
+  end
+
   describe 'icmp' do
     context 'any' do
       it 'fails' do
