@@ -700,10 +700,27 @@ Puppet::Type.newtype(:firewall) do
       Enable the recent module. Takes as an argument one of set, update,
       rcheck or remove. For example:
 
-          recent    => 'update',
-          rseconds  => 60,
-          rhitcount => 4,
-          rsource   => true,
+        # If anyone's appeared on the 'badguy' blacklist within
+        # the last 60 seconds, drop their traffic, and update the timestamp.
+        firewall { '100 Drop badguy traffic':
+          recent   => 'update',
+          rseconds => 60,
+          rsource  => true,
+          rname    => 'badguy',
+          action   => 'DROP',
+          chain    => 'FORWARD',
+        }
+        # No-one should be sending us traffic on eth0 from localhost
+        # Blacklist them
+        firewall { '101 blacklist strange traffic':
+          recent      => 'set',
+          rsource     => true,
+          rname       => 'badguy',
+          destination => '127.0.0.0/8',
+          iniface     => 'eth0',
+          action      => 'DROP',
+          chain       => 'FORWARD',
+        }
     EOS
 
     newvalues(:set, :update, :rcheck, :remove)
