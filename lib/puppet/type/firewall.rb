@@ -456,6 +456,15 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:random, :required_features => :dnat) do
+    desc <<-EOS
+      When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT"
+      this boolean will enable randomized port mapping.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
   # Reject ICMP type
   newproperty(:reject, :required_features => :reject_type) do
     desc <<-EOS
