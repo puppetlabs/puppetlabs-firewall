@@ -126,12 +126,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # we need it to properly parse and apply rules, if the order of resource
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [:table, :source, :src_range, :destination, :dst_range, :iniface, :outiface,
-    :proto, :isfragment, :tcp_flags, :gid, :uid, :sport, :dport, :port,
-    :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state, :ctstate, :icmp,
-    :limit, :burst, :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
-    :jump, :todest, :tosource, :toports, :log_prefix,
-    :log_level, :reject, :set_mark]
+  @resource_list = [
+    :table, :source, :destination, :iniface, :outiface, :proto, :isfragment,
+    :src_range, :dst_range, :tcp_flags, :gid, :uid, :sport, :dport, :port,
+    :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
+    :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
+    :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
+    :toports, :log_prefix, :log_level, :reject, :set_mark
+  ]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
