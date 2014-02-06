@@ -75,4 +75,19 @@ describe 'puppet resource firewall command:' do
       end
     end
   end
+
+  context 'accepts rules with match extension tcp flag' do
+    before :all do
+      iptables_flush_all_tables
+      shell('/sbin/iptables -t mangle -A PREROUTING -d 1.2.3.4 -p tcp -m tcp -m multiport --dports 80,443,8140 -j MARK --set-mark 42')
+    end
+
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
+      end
+    end
+  end
 end
