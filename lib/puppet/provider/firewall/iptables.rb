@@ -454,6 +454,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     my_rule = resource[:name].to_s
     rules << my_rule
 
+    unmanaged_rule_regex = /^9[0-9]{3}\s[a-f0-9]{32}$/
     # Find if this is a new rule or an existing rule, then find how many
     # unmanaged rules preceed it.
     if rules.length == rules.uniq.length
@@ -478,8 +479,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     unnamed_offset = rules[0..rules.index(offset_rule)].inject(0) do |sum,rule|
       # This regex matches the names given to unmanaged rules (a number
       # 9000-9999 followed by an MD5 hash).
-      sum + (rule.match(/^9[0-9]{3}\s[a-f0-9]{32}$/) ? 1 : 0)
+      sum + (rule.match(unmanaged_rule_regex) ? 1 : 0)
     end
+
+    # We want our rules to come before unmanaged rules
+    unnamed_offset -= 1 if offset_rule.match(unmanaged_rule_regex)
 
     # Insert our new or updated rule in the correct order of named rules, but
     # offset for unnamed rules.
