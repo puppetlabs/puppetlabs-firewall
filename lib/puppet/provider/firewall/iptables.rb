@@ -50,7 +50,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :destination => "-d",
     :dst_type => "-m addrtype --dst-type",
     :dst_range => "-m iprange --dst-range",
-    :dport => ["-m (udp|tcp) -m multiport --dports", "-m multiport --dports", "-m (udp|tcp) --dport", "--dport"],
+    :dport => ["-m multiport --dports", "--dport"],
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
     :iniface => "-i",
@@ -77,7 +77,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :source => "-s",
     :src_type => "-m addrtype --src-type",
     :src_range => "-m iprange --src-range",
-    :sport => ["-m (udp|tcp) -m multiport --sports", "-m multiport --sports", "-m (udp|tcp) --sport", "--sport"],
+    :sport => ["-m multiport --sports", "--sport"],
     :state => "-m state --state",
     :table => "-t",
     :tcp_flags => "-m tcp --tcp-flags",
@@ -212,6 +212,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
     values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
+    # The match extension for tcp & udp are optional and throws off the @resource_map.
+    values = values.sub(/-m (tcp|udp) (--(s|d)port|-m multiport)/, '\2')
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
