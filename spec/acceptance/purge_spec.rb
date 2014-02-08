@@ -33,7 +33,8 @@ describe "purge tests:" do
     before(:each) do
       iptables_flush_all_tables
 
-      shell('/sbin/iptables -A INPUT -s 1.2.1.1')
+      shell('/sbin/iptables -A INPUT -p tcp -s 1.2.1.1')
+      shell('/sbin/iptables -A INPUT -p udp -s 1.2.1.1')
       shell('/sbin/iptables -A OUTPUT -s 1.2.1.2 -m comment --comment "010 output-1.2.1.2"')
     end
 
@@ -82,6 +83,42 @@ describe "purge tests:" do
       EOS
 
       apply_manifest(pp, :catch_changes => true)
+    end
+
+    it 'adds managed rules with ignored rules' do
+      pp = <<-EOS
+        class { 'firewall': }
+        firewallchain { 'INPUT:filter:IPv4':
+          purge => true,
+          ignore => [
+            '-s 1\.2\.1\.1',
+          ],
+        }
+        firewall { '014 input-1.2.1.6':
+          chain  => 'INPUT',
+          proto  => 'all',
+          source => '1.2.1.6',
+        }
+        -> firewall { '013 input-1.2.1.5':
+          chain  => 'INPUT',
+          proto  => 'all',
+          source => '1.2.1.5',
+        }
+        -> firewall { '012 input-1.2.1.4':
+          chain  => 'INPUT',
+          proto  => 'all',
+          source => '1.2.1.4',
+        }
+        -> firewall { '011 input-1.2.1.3':
+          chain  => 'INPUT',
+          proto  => 'all',
+          source => '1.2.1.3',
+        }
+      EOS
+
+      apply_manifest(pp, :catch_failures => true)
+
+      expect(shell('/sbin/iptables-save').stdout).to match(/-A INPUT -s 1\.2\.1\.1\/32 -p tcp \n-A INPUT -s 1\.2\.1\.1\/32 -p udp/)
     end
   end
 end
