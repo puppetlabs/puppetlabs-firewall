@@ -1003,7 +1003,7 @@ describe 'firewall type' do
   end
 
   describe 'uid' do
-    context 'vagrant' do
+    context 'nobody' do
       it 'applies' do
         pp = <<-EOS
           class { '::firewall': }
@@ -1013,7 +1013,7 @@ describe 'firewall type' do
             chain => 'OUTPUT',
             port   => '574',
             action => accept,
-            uid => 'vagrant',
+            uid => 'nobody',
           }
         EOS
 
@@ -1022,14 +1022,14 @@ describe 'firewall type' do
 
       it 'should contain the rule' do
         shell('iptables -S') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --uid-owner vagrant -m multiport --ports 574 -m comment --comment "574 - test" -j ACCEPT/)
+          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --uid-owner nobody -m multiport --ports 574 -m comment --comment "574 - test" -j ACCEPT/)
         end
       end
     end
   end
 
   describe 'gid' do
-    context 'vagrant' do
+    context 'nobody' do
       it 'applies' do
         pp = <<-EOS
           class { '::firewall': }
@@ -1039,7 +1039,7 @@ describe 'firewall type' do
             chain => 'OUTPUT',
             port   => '575',
             action => accept,
-            gid => 'vagrant',
+            gid => 'nobody',
           }
         EOS
 
@@ -1048,7 +1048,7 @@ describe 'firewall type' do
 
       it 'should contain the rule' do
         shell('iptables -S') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --gid-owner vagrant -m multiport --ports 575 -m comment --comment "575 - test" -j ACCEPT/)
+          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --gid-owner nobody -m multiport --ports 575 -m comment --comment "575 - test" -j ACCEPT/)
         end
       end
     end
