@@ -4,7 +4,11 @@ Release notes for puppetlabs-firewall module.
 
 ---------------------------------------
 
-#### 0.5.0 - 2014-01-10
+#### 1.0.0 - 2014-02-11
+
+No changes, just renumbering to 1.0.0.
+
+#### 0.5.0 - 2014-02-10
 
 ##### Summary:
 This is a bigger release that brings in "recent" connection limiting (think
