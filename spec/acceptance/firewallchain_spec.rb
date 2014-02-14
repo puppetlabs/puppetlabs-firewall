@@ -18,8 +18,8 @@ describe 'puppet resource firewallchain command:' do
       end
 
       it 'finds the chain' do
-        shell('iptables -S') do |r|
-          expect(r.stdout).to match(/-N MY_CHAIN/)
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/MY_CHAIN/)
         end
       end
     end
@@ -37,8 +37,8 @@ describe 'puppet resource firewallchain command:' do
       end
 
       it 'fails to find the chain' do
-        shell('iptables -S') do |r|
-          expect(r.stdout).to_not match(/-N MY_CHAIN/)
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/MY_CHAIN/)
         end
       end
     end
@@ -116,8 +116,8 @@ describe 'puppet resource firewallchain command:' do
       end
 
       it 'finds the chain' do
-        shell('iptables -S') do |r|
-          expect(r.stdout).to match(/-P FORWARD DROP/)
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/FORWARD DROP/)
         end
       end
     end

@@ -21,7 +21,7 @@ describe 'firewall socket property' do
       apply_manifest(pp, :catch_failures => true)
       apply_manifest(pp, :catch_changes => true)
 
-      shell('iptables -t raw -S') do |r|
+      shell('iptables-save -t raw') do |r|
         expect(r.stdout).to match(/#{line_match}/)
       end
     end
@@ -41,7 +41,7 @@ describe 'firewall socket property' do
 
       apply_manifest(pp, :catch_changes => true)
 
-      shell('iptables -t raw -S') do |r|
+      shell('iptables-save -t raw') do |r|
         expect(r.stdout).to match(/#{line_match}/)
       end
     end

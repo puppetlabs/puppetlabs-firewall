@@ -20,7 +20,7 @@ describe 'firewall ishasmorefrags/islastfrag/isfirstfrag properties' do
       apply_manifest(pp, :catch_failures => true)
       apply_manifest(pp, :catch_changes => true)
 
-      shell('ip6tables -S') do |r|
+      shell('ip6tables-save') do |r|
         expect(r.stdout).to match(/#{line_match}/)
       end
     end
@@ -39,7 +39,7 @@ describe 'firewall ishasmorefrags/islastfrag/isfirstfrag properties' do
 
       apply_manifest(pp, :catch_changes => true)
 
-      shell('ip6tables -S') do |r|
+      shell('ip6tables-save') do |r|
         expect(r.stdout).to match(/#{line_match}/)
       end
     end
