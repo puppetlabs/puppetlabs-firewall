@@ -51,7 +51,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
          end
       end
@@ -73,7 +73,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
          end
       end
@@ -95,7 +95,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
          end
       end
@@ -120,7 +120,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -s 192.168.2.0\/24 -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
          end
       end
@@ -143,7 +143,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT ! -s 192.168.2.0\/24 -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
          end
       end
@@ -168,7 +168,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -s 256.168.2.0\/24 -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
          end
       end
@@ -193,7 +193,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --src-range 192.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT/)
          end
       end
@@ -218,7 +218,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --src-range 392.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT/)
          end
       end
@@ -243,7 +243,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -d 192.168.2.0\/24 -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
          end
       end
@@ -266,7 +266,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT ! -d 192.168.2.0\/24 -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
          end
       end
@@ -291,7 +291,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -d 256.168.2.0\/24 -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
          end
       end
@@ -316,7 +316,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --dst-range 192.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT/)
          end
       end
@@ -341,7 +341,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --dst-range 392.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT/)
          end
       end
@@ -364,7 +364,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --sports 560 -m comment --comment "560 - test" -j ACCEPT/)
          end
       end
@@ -385,7 +385,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --sports 560:561 -m comment --comment "560 - test" -j ACCEPT/)
          end
       end
@@ -408,7 +408,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --sports 9999560-561 -m comment --comment "560 - test" -j ACCEPT/)
          end
       end
@@ -431,7 +431,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 561 -m comment --comment "561 - test" -j ACCEPT/)
          end
       end
@@ -452,7 +452,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 561:562 -m comment --comment "561 - test" -j ACCEPT/)
          end
       end
@@ -475,7 +475,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --dports 9999561-562 -m comment --comment "560 - test" -j ACCEPT/)
          end
       end
@@ -498,7 +498,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 562 -m comment --comment "562 - test" -j ACCEPT/)
          end
       end
@@ -519,7 +519,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 562:563 -m comment --comment "562 - test" -j ACCEPT/)
          end
       end
@@ -542,7 +542,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-         shell('iptables -S') do |r|
+         shell('iptables-save') do |r|
            expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 9999562-563 -m comment --comment "562 - test" -j ACCEPT/)
          end
       end
@@ -566,7 +566,7 @@ describe 'firewall type' do
         end
 
         it 'should contain the rule' do
-          shell('iptables -S') do |r|
+          shell('iptables-save') do |r|
             expect(r.stdout).to match(/-A INPUT -p tcp -m addrtype\s.*\sMULTICAST -m comment --comment "563 - test" -j ACCEPT/)
           end
         end
@@ -589,7 +589,7 @@ describe 'firewall type' do
         end
 
         it 'should not contain the rule' do
-          shell('iptables -S') do |r|
+          shell('iptables-save') do |r|
             expect(r.stdout).to_not match(/-A INPUT -p tcp -m addrtype\s.*\sBROKEN -m comment --comment "563 - test" -j ACCEPT/)
           end
         end
@@ -613,7 +613,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN ACK -m comment --comment "564 - test" -j ACCEPT/)
         end
       end
@@ -636,7 +636,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A FORWARD -p tcp -m comment --comment "565 - test" -j ACCEPT/)
         end
       end
@@ -659,30 +659,29 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t mangle -S') do |r|
+        shell('iptables-save -t mangle') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "566 - test" -j ACCEPT/)
         end
       end
     end
-    context 'NAT' do
-      it 'fails' do
+    context 'nat' do
+      it 'applies' do
         pp = <<-EOS
           class { '::firewall': }
-          firewall { '566 - test':
+          firewall { '566 - test2':
             proto  => tcp,
             action => accept,
-            table  => 'MANGLE',
+            table  => 'nat',
+            chain  => 'OUTPUT',
           }
         EOS
 
-        apply_manifest(pp, :expect_failures => true) do |r|
-          expect(r.stderr).to match(/Invalid value "MANGLE"/)
-        end
+        apply_manifest(pp, :catch_failures => true)
       end
 
       it 'should not contain the rule' do
-        shell('iptables -t MANGLE -S', :acceptable_exit_codes => [3]) do |r|
-          expect(r.stdout).to_not match(/-A INPUT -p tcp -m comment --comment "566 - test" -j ACCEPT/)
+        shell('iptables-save -t nat') do |r|
+          expect(r.stdout).to match(/-A OUTPUT -p tcp -m comment --comment "566 - test2" -j ACCEPT/)
         end
       end
     end
@@ -712,7 +711,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "567 - test" -j TEST/)
         end
       end
@@ -739,7 +738,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to_not match(/-A INPUT -p tcp -m comment --comment "568 - test" -j TEST/)
         end
       end
@@ -764,7 +763,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t nat -S') do |r|
+        shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(/A POSTROUTING -p tcp -m comment --comment "568 - test" -j SNAT --to-source 192.168.1.1/)
         end
       end
@@ -790,7 +789,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t nat -S') do |r|
+        shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(/-A PREROUTING -s 200.200.200.200\/32 -p tcp -m comment --comment "569 - test" -j DNAT --to-destination 192.168.1.1/)
         end
       end
@@ -815,7 +814,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t nat -S') do |r|
+        shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(/-A PREROUTING -p icmp -m comment --comment "570 - test" -j REDIRECT --to-ports 2222/)
         end
       end
@@ -842,7 +841,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t nat -S') do |r|
+        shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(/-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - test 2" -j MASQUERADE --random/)
         end
       end
@@ -866,7 +865,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to_not match(/-A INPUT -p icmp -m comment --comment "570 - test" -m icmp --icmp-type 11/)
         end
       end
@@ -892,7 +891,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 571 -m comment --comment "571 - test" -m hl --hl-eq 5 -j ACCEPT/)
         end
       end
@@ -918,7 +917,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 571 -m comment --comment "571 - test" -m hl --hl-eq invalid -j ACCEPT/)
         end
       end
@@ -943,7 +942,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 572 -m comment --comment "572 - test" -m limit --limit 500\/sec -j ACCEPT/)
         end
       end
@@ -969,7 +968,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 573 -m comment --comment "573 - test" -m limit --limit 500\/sec --limit-burst 1500 -j ACCEPT/)
         end
       end
@@ -995,7 +994,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 573 -m comment --comment "573 - test" -m limit --limit 500\/sec --limit-burst 1500\/sec -j ACCEPT/)
         end
       end
@@ -1021,15 +1020,15 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --uid-owner nobody -m multiport --ports 574 -m comment --comment "574 - test" -j ACCEPT/)
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --uid-owner (nobody|\d+) -m multiport --ports 574 -m comment --comment "574 - test" -j ACCEPT/)
         end
       end
     end
   end
 
   describe 'gid' do
-    context 'nobody' do
+    context 'root' do
       it 'applies' do
         pp = <<-EOS
           class { '::firewall': }
@@ -1039,7 +1038,7 @@ describe 'firewall type' do
             chain => 'OUTPUT',
             port   => '575',
             action => accept,
-            gid => 'nobody',
+            gid => 'root',
           }
         EOS
 
@@ -1047,8 +1046,8 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --gid-owner nobody -m multiport --ports 575 -m comment --comment "575 - test" -j ACCEPT/)
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A OUTPUT -p tcp -m owner --gid-owner (root|\d+) -m multiport --ports 575 -m comment --comment "575 - test" -j ACCEPT/)
         end
       end
     end
@@ -1074,7 +1073,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t mangle -S') do |r|
+        shell('iptables-save -t mangle') do |r|
           expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 580 -m comment --comment "580 - test" -j MARK --set-xmark 0x3e8\/0xffffffff/)
         end
       end
@@ -1099,7 +1098,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 581 -m pkttype --pkt-type multicast -m comment --comment "581 - test" -j ACCEPT/)
         end
       end
@@ -1124,7 +1123,7 @@ describe 'firewall type' do
       end
 
       it 'should not contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 582 -m pkttype --pkt-type multicast -m comment --comment "582 - test" -j ACCEPT/)
         end
       end
@@ -1149,7 +1148,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -f -m multiport --ports 583 -m comment --comment "583 - test" -j ACCEPT/)
         end
       end
@@ -1172,7 +1171,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 584 -m comment --comment "584 - test" -j ACCEPT/)
         end
       end
@@ -1199,7 +1198,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t nat -S') do |r|
+        shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(/-A PREROUTING -p tcp -m multiport --ports 585 -m socket -m comment --comment "585 - test" -j ACCEPT/)
         end
       end
@@ -1224,7 +1223,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -t nat -S') do |r|
+        shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(/-A PREROUTING -p tcp -m multiport --ports 586 -m comment --comment "586 - test" -j ACCEPT/)
         end
       end
@@ -1250,7 +1249,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/A INPUT -p tcp -m frag --fragid 0 --fragmore -m multiport --ports 587 -m comment --comment "587 - test" -j ACCEPT/)
         end
       end
@@ -1274,7 +1273,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 588 -m comment --comment "588 - test" -j ACCEPT/)
         end
       end
@@ -1300,7 +1299,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m frag --fragid 0 --fraglast -m multiport --ports 589 -m comment --comment "589 - test" -j ACCEPT/)
         end
       end
@@ -1324,7 +1323,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 590 -m comment --comment "590 - test" -j ACCEPT/)
         end
       end
@@ -1350,7 +1349,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m frag --fragid 0 --fragfirst -m multiport --ports 591 -m comment --comment "591 - test" -j ACCEPT/)
         end
       end
@@ -1374,7 +1373,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('ip6tables -S') do |r|
+        shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 592 -m comment --comment "592 - test" -j ACCEPT/)
         end
       end
@@ -1403,7 +1402,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/8 -m comment --comment "593 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp-net-unreachable/)
         end
       end
@@ -1430,7 +1429,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/8 -m comment --comment "594 - test" -m policy --dir out --pol none -j REJECT --reject-with icmp-net-unreachable/)
         end
       end
@@ -1459,7 +1458,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/8 -m comment --comment "595 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp-net-unreachable/)
         end
       end
@@ -1486,7 +1485,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -d 20.0.0.0\/8 -m comment --comment "596 - test" -m policy --dir in --pol none -j REJECT --reject-with icmp-net-unreachable/)
         end
       end
@@ -1514,7 +1513,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "597 - test" -m recent --set --name list1 --rdest/)
         end
       end
@@ -1543,7 +1542,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "598 - test" -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 --rsource/)
         end
       end
@@ -1567,7 +1566,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "599 - test" -m recent --update/)
         end
       end
@@ -1591,7 +1590,7 @@ describe 'firewall type' do
       end
 
       it 'should contain the rule' do
-        shell('iptables -S') do |r|
+        shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/8 -m comment --comment "600 - test" -m recent --remove/)
         end
       end

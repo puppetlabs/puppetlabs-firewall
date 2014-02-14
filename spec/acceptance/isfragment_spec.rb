@@ -19,7 +19,7 @@ describe 'firewall isfragment property' do
       apply_manifest(pp, :catch_failures => true)
       apply_manifest(pp, :catch_changes => true)
 
-      shell('iptables -S') do |r|
+      shell('iptables-save') do |r|
         expect(r.stdout).to match(/#{line_match}/)
       end
     end
@@ -37,7 +37,7 @@ describe 'firewall isfragment property' do
 
       apply_manifest(pp, :catch_changes => true)
 
-      shell('iptables -S') do |r|
+      shell('iptables-save') do |r|
         expect(r.stdout).to match(/#{line_match}/)
       end
     end
