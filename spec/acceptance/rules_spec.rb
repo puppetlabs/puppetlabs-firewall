@@ -103,10 +103,10 @@ describe 'complex ruleset 1' do
         /INPUT ACCEPT/,
         /FORWARD ACCEPT/,
         /OUTPUT ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/8 -d 10.0.0.0\/8 -m comment --comment \"090 forward allow local\" -j ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/8 ! -d 10.0.0.0\/8 -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/8 ! -d 10.0.0.0\/8 -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m comment --comment \"100 forward standard allow tcp\" -m state --state NEW -j ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/8 ! -d 10.0.0.0\/8 -p udp -m multiport --ports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT/
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) -d 10.0.0.0\/(8|255\.0\.0\.0) -m comment --comment \"090 forward allow local\" -j ACCEPT/,
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT/,
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m comment --comment \"100 forward standard allow tcp\" -m state --state NEW -j ACCEPT/,
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --ports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT/
       ].each do |line|
         expect(r.stdout).to match(line)
       end
@@ -238,7 +238,7 @@ describe 'complex ruleset 2' do
         /-A INPUT -m comment --comment \"010 INPUT allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT/,
         /-A INPUT -i lo -m comment --comment \"012 accept loopback\" -j ACCEPT/,
         /-A INPUT -p icmp -m comment --comment \"013 icmp destination-unreachable\" -m icmp --icmp-type 3 -j ACCEPT/,
-        /-A INPUT -s 10.0.0.0\/8 -p icmp -m comment --comment \"013 icmp echo-request\" -m icmp --icmp-type 8 -j ACCEPT/,
+        /-A INPUT -s 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"013 icmp echo-request\" -m icmp --icmp-type 8 -j ACCEPT/,
         /-A INPUT -p icmp -m comment --comment \"013 icmp time-exceeded\" -m icmp --icmp-type 11 -j ACCEPT/,
         /-A INPUT -p tcp -m multiport --dports 22 -m comment --comment \"020 ssh\" -m state --state NEW -j ACCEPT/,
         /-A INPUT -m comment --comment \"900 LOCAL_INPUT\" -j LOCAL_INPUT/,
