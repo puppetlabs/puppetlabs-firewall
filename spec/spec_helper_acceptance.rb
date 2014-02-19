@@ -12,11 +12,17 @@ def ip6tables_flush_all_tables
   end
 end
 
-hosts.each do |host|
-  # Install Puppet
-  install_package host, 'rubygems'
-  on host, 'gem install puppet --no-ri --no-rdoc'
-  on host, "mkdir -p #{host['distmoduledir']}"
+unless ENV['RS_PROVISION'] == 'no'
+  hosts.each do |host|
+    # Install Puppet
+    if host.is_pe?
+      install_pe
+    else
+      install_package host, 'rubygems'
+      on host, 'gem install puppet --no-ri --no-rdoc'
+      on host, "mkdir -p #{host['distmoduledir']}"
+    end
+  end
 end
 
 RSpec.configure do |c|
