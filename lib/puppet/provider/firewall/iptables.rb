@@ -487,6 +487,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Insert our new or updated rule in the correct order of named rules, but
     # offset for unnamed rules.
-    rules.sort.index(my_rule) + 1 + unnamed_offset
+    rules.reject{|r|r.match(unmanaged_rule_regex)}.sort.index(my_rule) + 1 + unnamed_offset
   end
 end
