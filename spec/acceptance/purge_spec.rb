@@ -118,7 +118,7 @@ describe "purge tests:" do
 
       apply_manifest(pp, :catch_failures => true)
 
-      expect(shell('/sbin/iptables-save').stdout).to match(/-A INPUT -s 1\.2\.1\.1\/32 -p tcp\s?\n-A INPUT -s 1\.2\.1\.1\/32 -p udp/)
+      expect(shell('/sbin/iptables-save').stdout).to match(/-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp/)
     end
   end
 end
