@@ -5,4 +5,5 @@ spec/fixtures/manifests/
 .ruby-version
 .rspec_system
 .bundle
+.vagrant
 vendor/
