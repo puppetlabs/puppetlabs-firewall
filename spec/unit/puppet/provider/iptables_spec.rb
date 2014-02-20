@@ -196,6 +196,11 @@ describe 'iptables provider' do
         allow(resource.provider.class).to receive(:instances).and_return(providers)
         expect(resource.provider.insert_order).to eq(9)
       end
+      it 'understands offsets for adding rules at the end' do
+        resource = Puppet::Type.type(:firewall).new({ :name => '950 test', })
+        allow(resource.provider.class).to receive(:instances).and_return(providers)
+        expect(resource.provider.insert_order).to eq(11)
+      end
     end
   end
 

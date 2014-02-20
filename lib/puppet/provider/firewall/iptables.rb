@@ -482,11 +482,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       sum + (rule.match(unmanaged_rule_regex) ? 1 : 0)
     end
 
-    # We want our rules to come before unmanaged rules
-    unnamed_offset -= 1 if offset_rule.match(unmanaged_rule_regex)
+    # We want our rule to come before unmanaged rules if it's not a 9-rule
+    if offset_rule.match(unmanaged_rule_regex) and ! my_rule.match(/^9/)
+      unnamed_offset -= 1
+    end
 
     # Insert our new or updated rule in the correct order of named rules, but
     # offset for unnamed rules.
-    rules.sort.index(my_rule) + 1 + unnamed_offset
+    rules.reject{|r|r.match(unmanaged_rule_regex)}.sort.index(my_rule) + 1 + unnamed_offset
   end
 end
