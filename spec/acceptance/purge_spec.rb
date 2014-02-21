@@ -5,8 +5,8 @@ describe "purge tests:" do
     before(:all) do
       iptables_flush_all_tables
 
-      shell('/sbin/iptables -A INPUT -s 1.2.1.2')
-      shell('/sbin/iptables -A INPUT -s 1.2.1.2')
+      shell('iptables -A INPUT -s 1.2.1.2')
+      shell('iptables -A INPUT -s 1.2.1.2')
     end
 
     it 'make sure duplicate existing rules get purged' do
@@ -22,7 +22,7 @@ describe "purge tests:" do
     end
 
     it 'saves' do
-      shell('/sbin/iptables-save') do |r|
+      shell('iptables-save') do |r|
         expect(r.stdout).to_not match(/1\.2\.1\.2/)
         expect(r.stderr).to eq("")
       end
@@ -33,9 +33,9 @@ describe "purge tests:" do
     before(:each) do
       iptables_flush_all_tables
 
-      shell('/sbin/iptables -A INPUT -p tcp -s 1.2.1.1')
-      shell('/sbin/iptables -A INPUT -p udp -s 1.2.1.1')
-      shell('/sbin/iptables -A OUTPUT -s 1.2.1.2 -m comment --comment "010 output-1.2.1.2"')
+      shell('iptables -A INPUT -p tcp -s 1.2.1.1')
+      shell('iptables -A INPUT -p udp -s 1.2.1.1')
+      shell('iptables -A OUTPUT -s 1.2.1.2 -m comment --comment "010 output-1.2.1.2"')
     end
 
     it 'purges only the specified chain' do
@@ -48,7 +48,7 @@ describe "purge tests:" do
 
       apply_manifest(pp, :expect_changes => true)
 
-      shell('/sbin/iptables-save') do |r|
+      shell('iptables-save') do |r|
         expect(r.stdout).to match(/010 output-1\.2\.1\.2/)
         expect(r.stdout).to_not match(/1\.2\.1\.1/)
         expect(r.stderr).to eq("")
@@ -118,7 +118,7 @@ describe "purge tests:" do
 
       apply_manifest(pp, :catch_failures => true)
 
-      expect(shell('/sbin/iptables-save').stdout).to match(/-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp/)
+      expect(shell('iptables-save').stdout).to match(/-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp/)
     end
   end
 end

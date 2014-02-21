@@ -29,7 +29,7 @@ describe 'firewall type' do
     end
 
     it 'adds a unmanaged rule without a comment' do
-      shell('/sbin/iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 102 -j ACCEPT')
+      shell('iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 102 -j ACCEPT')
       expect(shell('iptables-save').stdout).to match(/-A INPUT -s 8\.0\.0\.3(\/32)? -p tcp -m multiport --ports 102 -j ACCEPT/)
     end
 
