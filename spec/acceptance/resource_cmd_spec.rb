@@ -32,7 +32,7 @@ describe 'puppet resource firewall command:' do
   context 'accepts rules without comments' do
     before(:all) do
       iptables_flush_all_tables
-      shell('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80')
+      shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80')
     end
 
     it do
@@ -47,7 +47,7 @@ describe 'puppet resource firewall command:' do
   context 'accepts rules with invalid comments' do
     before(:all) do
       iptables_flush_all_tables
-      shell('/sbin/iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http"')
+      shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http"')
     end
 
     it do
@@ -62,9 +62,9 @@ describe 'puppet resource firewall command:' do
   context 'accepts rules with negation' do
     before :all do
       iptables_flush_all_tables
-      shell('/sbin/iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p tcp -j MASQUERADE --to-ports 1024-65535')
-      shell('/sbin/iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p udp -j MASQUERADE --to-ports 1024-65535')
-      shell('/sbin/iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -j MASQUERADE')
+      shell('iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p tcp -j MASQUERADE --to-ports 1024-65535')
+      shell('iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p udp -j MASQUERADE --to-ports 1024-65535')
+      shell('iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -j MASQUERADE')
     end
 
     it do
@@ -79,7 +79,7 @@ describe 'puppet resource firewall command:' do
   context 'accepts rules with match extension tcp flag' do
     before :all do
       iptables_flush_all_tables
-      shell('/sbin/iptables -t mangle -A PREROUTING -d 1.2.3.4 -p tcp -m tcp -m multiport --dports 80,443,8140 -j MARK --set-mark 42')
+      shell('iptables -t mangle -A PREROUTING -d 1.2.3.4 -p tcp -m tcp -m multiport --dports 80,443,8140 -j MARK --set-mark 42')
     end
 
     it do

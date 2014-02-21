@@ -2,13 +2,13 @@ require 'beaker-rspec'
 
 def iptables_flush_all_tables
   ['filter', 'nat', 'mangle', 'raw'].each do |t|
-    expect(shell("/sbin/iptables -t #{t} -F").stderr).to eq("")
+    expect(shell("iptables -t #{t} -F").stderr).to eq("")
   end
 end
 
 def ip6tables_flush_all_tables
   ['filter'].each do |t|
-    expect(shell("/sbin/ip6tables -t #{t} -F").stderr).to eq("")
+    expect(shell("ip6tables -t #{t} -F").stderr).to eq("")
   end
 end
 

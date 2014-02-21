@@ -88,7 +88,7 @@ else
       context 'when unset or false' do
         before :each do
           ip6tables_flush_all_tables
-          shell('/sbin/ip6tables -A INPUT -p tcp -m comment --comment "599 - test"')
+          shell('ip6tables -A INPUT -p tcp -m comment --comment "599 - test"')
         end
         context 'and current value is false' do
           it_behaves_like "doesn't change", 'ishasmorefrags => false, islastfrag => false, isfirstfrag => false', /-A INPUT -p tcp -m comment --comment "599 - test"/
@@ -100,7 +100,7 @@ else
       context 'when set to true' do
         before :each do
           ip6tables_flush_all_tables
-          shell('/sbin/ip6tables -A INPUT -p tcp -m frag --fragid 0 --fragmore -m frag --fragid 0 --fraglast -m frag --fragid 0 --fragfirst -m comment --comment "599 - test"')
+          shell('ip6tables -A INPUT -p tcp -m frag --fragid 0 --fragmore -m frag --fragid 0 --fraglast -m frag --fragid 0 --fragfirst -m comment --comment "599 - test"')
         end
         context 'and current value is false' do
           it_behaves_like "is idempotent", 'ishasmorefrags => false, islastfrag => false, isfirstfrag => false', /-A INPUT -p tcp -m comment --comment "599 - test"/

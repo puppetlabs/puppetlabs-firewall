@@ -73,7 +73,7 @@ if default['platform'] !~ /el-5/
       context 'when unset or false' do
         before :each do
           iptables_flush_all_tables
-          shell('/sbin/iptables -t raw -A PREROUTING -p tcp -m comment --comment "598 - test"')
+          shell('iptables -t raw -A PREROUTING -p tcp -m comment --comment "598 - test"')
         end
         context 'and current value is false' do
           it_behaves_like "doesn't change", 'socket => false,', /-A PREROUTING -p tcp -m comment --comment "598 - test"/
@@ -85,7 +85,7 @@ if default['platform'] !~ /el-5/
       context 'when set to true' do
         before :each do
           iptables_flush_all_tables
-          shell('/sbin/iptables -t raw -A PREROUTING -p tcp -m socket -m comment --comment "598 - test"')
+          shell('iptables -t raw -A PREROUTING -p tcp -m socket -m comment --comment "598 - test"')
         end
         context 'and current value is false' do
           it_behaves_like "is idempotent", 'socket => false,', /-A PREROUTING -p tcp -m comment --comment "598 - test"/

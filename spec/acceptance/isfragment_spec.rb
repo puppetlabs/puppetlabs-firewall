@@ -67,7 +67,7 @@ describe 'firewall isfragment property' do
     context 'when unset or false' do
       before :each do
         iptables_flush_all_tables
-        shell('/sbin/iptables -A INPUT -p tcp -m comment --comment "597 - test"')
+        shell('iptables -A INPUT -p tcp -m comment --comment "597 - test"')
       end
       context 'and current value is false' do
         it_behaves_like "doesn't change", 'isfragment => false,', /-A INPUT -p tcp -m comment --comment "597 - test"/
@@ -79,7 +79,7 @@ describe 'firewall isfragment property' do
     context 'when set to true' do
       before :each do
         iptables_flush_all_tables
-        shell('/sbin/iptables -A INPUT -p tcp -f -m comment --comment "597 - test"')
+        shell('iptables -A INPUT -p tcp -f -m comment --comment "597 - test"')
       end
       context 'and current value is false' do
         it_behaves_like "is idempotent", 'isfragment => false,', /-A INPUT -p tcp -m comment --comment "597 - test"/
