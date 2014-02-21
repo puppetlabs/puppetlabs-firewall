@@ -20,23 +20,19 @@ firewall { '#{name}':
     pm
   end
 
-  it 'test various params' do
+  it 'test various params', :unless => default['platform'].match(/el-5/) do
     iptables_flush_all_tables
 
-    unless (fact('operatingsystem') == 'CentOS') && \
-      fact('operatingsystemrelease') =~ /^5\./ then
+    ppm = pp({
+      'table' => "'raw'",
+      'socket' => 'true',
+      'chain' => "'PREROUTING'",
+      'jump' => 'LOG',
+      'log_level' => 'debug',
+    })
 
-      ppm = pp({
-        'table' => "'raw'",
-        'socket' => 'true',
-        'chain' => "'PREROUTING'",
-        'jump' => 'LOG',
-        'log_level' => 'debug',
-      })
-
-      expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
-      expect(apply_manifest(ppm, :catch_failures => true).exit_code).to be_zero
-    end
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to eq(2)
+    expect(apply_manifest(ppm, :catch_failures => true).exit_code).to be_zero
   end
 
   it 'test log rule' do
