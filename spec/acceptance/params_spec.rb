@@ -20,7 +20,7 @@ firewall { '#{name}':
     pm
   end
 
-  it 'test various params', :unless => default['platform'].match(/el-5/) do
+  it 'test various params', :unless => (default['platform'].match(/el-5/) || fact('operatinsystem') == 'SLES') do
     iptables_flush_all_tables
 
     ppm = pp({

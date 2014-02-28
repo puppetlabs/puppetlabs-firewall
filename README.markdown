@@ -364,11 +364,16 @@ Retrieves the version of iptables-persistent from your OS. This is a Debian/Ubun
 
 ###SLES
 
-The `socket` parameter is not supported on SLES.  In this release it will just cause straight iptables failures rather than clean errors.
+The `socket` parameter is not supported on SLES.  In this release it will cause
+the catalog to fail with iptables failures, rather than correctly warn you that
+the features are unusable.
 
 ###Oracle Linux 5
 
-The `socket` and `owner` parameters are unsupported on Oracle Linux 5, when the "Unbreakable" kernel is used.  If you switch to the stock Redhat 5 kernel these work.   In this release it will just cause straight iptables failures rather than clean errors.
+The `socket` and `owner` parameters are unsupported on Oracle Linux 5, when the
+"Unbreakable" kernel is used.  If you switch to the stock Redhat 5 kernel these
+work.   In this release it will cause the catalog to fail with iptables
+failures, rather than correct ly warn you that the features are unusable.
 
 ###Other
 
