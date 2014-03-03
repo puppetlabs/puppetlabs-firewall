@@ -1,18 +1,27 @@
-## puppetlabs-firewall changelog
+### Supported release - 2014-03-04
 
-Release notes for puppetlabs-firewall module.
+####Summary
 
----------------------------------------
+####Features
 
-#### 1.0.1 - 2014-02-18
+####Bugfixes
+
+####Known Bugs
+
+* For Oracle, the `owner` and `socket` parameters require a workaround to function. Please see the Limitations section of the README.
+
+---
+### 1.0.1 - 2014-02-18
 
 Bugfix: gracefully fail to manage ip6tables on iptables 1.3.x
 
-#### 1.0.0 - 2014-02-11
+---
+### 1.0.0 - 2014-02-11
 
 No changes, just renumbering to 1.0.0.
 
-#### 0.5.0 - 2014-02-10
+---
+### 0.5.0 - 2014-02-10
 
 ##### Summary:
 This is a bigger release that brings in "recent" connection limiting (think
@@ -46,21 +55,21 @@ could cause modifications to the wrong rules when unmanaged rules are present.
 
 ---------------------------------------
 
-#### 0.4.2 - 2013-09-10
+### 0.4.2 - 2013-09-10
 
 Another attempt to fix the packaging issue.  We think we understand exactly
 what is failing and this should work properly for the first time.
 
 ---------------------------------------
 
-#### 0.4.1 - 2013-08-09
+### 0.4.1 - 2013-08-09
 
 Bugfix release to fix a packaging issue that may have caused puppet module
 install commands to fail.
 
 ---------------------------------------
 
-#### 0.4.0 - 2013-07-11
+### 0.4.0 - 2013-07-11
 
 This release adds support for address type, src/dest ip ranges, and adds
 additional testing and bugfixes.
@@ -78,7 +87,7 @@ additional testing and bugfixes.
 
 ---------------------------------------
 
-#### 0.3.1 - 2013/6/10
+### 0.3.1 - 2013/6/10
 
 This minor release provides some bugfixes and additional tests.
 
@@ -97,7 +106,7 @@ This minor release provides some bugfixes and additional tests.
 
 ---------------------------------------
 
-#### 0.3.0 - 2013/4/25
+### 0.3.0 - 2013/4/25
 
 This release introduces support for Arch Linux and extends support for Fedora 15 and up. There are also lots of bugs fixed and improved testing to prevent regressions.
 
@@ -115,7 +124,7 @@ This release introduces support for Arch Linux and extends support for Fedora 15
 
 ---------------------------------------
 
-#### 0.2.1 - 2012/3/13
+### 0.2.1 - 2012/3/13
 
 This maintenance release introduces the new README layout, and fixes a bug with iptables_persistent_version.
 
@@ -127,7 +136,7 @@ This maintenance release introduces the new README layout, and fixes a bug with 
 
 ---------------------------------------
 
-#### 0.2.0 - 2012/3/3
+### 0.2.0 - 2012/3/3
 
 This release introduces automatic persistence, removing the need for the previous manual dependency requirement for persistent the running rules to the OS persistence file.
 
@@ -174,7 +183,7 @@ To install pre-requisites and to create dependencies on your pre & post rules. C
 
 ---------------------------------------
 
-#### 0.1.1 - 2012/2/28
+### 0.1.1 - 2012/2/28
 
 This release primarily fixes changing parameters in 3.x
 
@@ -186,7 +195,7 @@ This release primarily fixes changing parameters in 3.x
 
 ---------------------------------------
 
-#### 0.1.0 - 2012/2/24
+### 0.1.0 - 2012/2/24
 
 This release is somewhat belated, so no summary as there are far too many changes this time around. Hopefully we won't fall this far behind again :-).
 
@@ -247,7 +256,7 @@ This release is somewhat belated, so no summary as there are far too many change
 
 ---------------------------------------
 
-#### 0.0.4 - 2011/12/05
+### 0.0.4 - 2011/12/05
 
 This release adds two new parameters, 'uid' and 'gid'. As a part of the owner module, these params allow you to specify a uid, username, gid, or group got a match:
 
@@ -292,7 +301,7 @@ Additional changes include iptables and ip6tables version facts, general whitesp
 
 ---------------------------------------
 
-#### 0.0.3 - 2011/11/12
+### 0.0.3 - 2011/11/12
 
 This release introduces a new parameter 'port' which allows you to set both
 source and destination ports for a match:
@@ -331,7 +340,7 @@ namevar:
 
 ---------------------------------------
 
-#### 0.0.2 - 2011/10/26
+### 0.0.2 - 2011/10/26
 
 This is largely a maintanence and cleanup release, but includes the ability to
 specify ranges of ports in the sport/dport parameter:
@@ -351,7 +360,7 @@ specify ranges of ports in the sport/dport parameter:
 
 ---------------------------------------
 
-#### 0.0.1 - 2011/10/18
+### 0.0.1 - 2011/10/18
 
 Initial release.
 
