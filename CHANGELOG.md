@@ -1,19 +1,19 @@
-### Supported release - 2014-03-04
+### Supported release - 2014-03-04 1.0.1
 
 ####Summary
+
+An important bugfix was made to the offset calculation for unmanaged rules
+to handle rules with 9000+ in the name.
 
 ####Features
 
 ####Bugfixes
+- Offset calculations assumed unmanaged rules were numbered 9000+.
+- Gracefully fail to manage ip6tables on iptables 1.3.x
 
 ####Known Bugs
 
 * For Oracle, the `owner` and `socket` parameters require a workaround to function. Please see the Limitations section of the README.
-
----
-### 1.0.1 - 2014-02-18
-
-Bugfix: gracefully fail to manage ip6tables on iptables 1.3.x
 
 ---
 ### 1.0.0 - 2014-02-11
