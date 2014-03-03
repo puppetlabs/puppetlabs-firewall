@@ -1,4 +1,11 @@
 {
+    "name": "puppetlabs-firewall",
+    "version": "1.0.1",
+    "source": "https://github.com/puppetlabs/puppetlabs-firewall",
+    "author": "Puppet Labs",
+    "license": "Apache-2.0",
+    "project_page": "https://github.com/puppetlabs/puppetlabs-firewall",
+    "summary": "Manages Firewalls such as iptable",
     "operatingsystem_support": [
       {
         "operatingsystem": "RedHat",
@@ -52,5 +59,6 @@
     "requirements": [
       { "name": "pe", "version_requirement": "3.2.x" },
       { "name": "puppet", "version_requirement": "3.x" }
-    ]
+    ],
+    "dependencies": []
 }
