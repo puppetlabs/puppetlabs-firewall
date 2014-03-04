@@ -1337,56 +1337,54 @@ describe 'firewall type' do
     end
   end
 
-  # RHEL5 does not support -m socket
-  if default['platform'] !~ /el-5/
-    describe 'socket' do
-      context 'true' do
-        it 'applies' do
-          pp = <<-EOS
-            class { '::firewall': }
-            firewall { '585 - test':
-              ensure => present,
-              proto => tcp,
-              port   => '585',
-              action => accept,
-              chain  => 'PREROUTING',
-              table  => 'nat',
-              socket => true,
-            }
-          EOS
+  # RHEL5/SLES does not support -m socket
+  describe 'socket', :unless => (default['platform'] =~ /el-5/ or fact('operatingsystem') == 'SLES') do
+    context 'true' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '585 - test':
+            ensure => present,
+            proto => tcp,
+            port   => '585',
+            action => accept,
+            chain  => 'PREROUTING',
+            table  => 'nat',
+            socket => true,
+          }
+        EOS
 
-          apply_manifest(pp, :catch_failures => true)
-        end
-
-        it 'should contain the rule' do
-          shell('iptables-save -t nat') do |r|
-            expect(r.stdout).to match(/-A PREROUTING -p tcp -m multiport --ports 585 -m socket -m comment --comment "585 - test" -j ACCEPT/)
-          end
-        end
+        apply_manifest(pp, :catch_failures => true)
       end
 
-      context 'false' do
-        it 'applies' do
-          pp = <<-EOS
-            class { '::firewall': }
-            firewall { '586 - test':
-              ensure => present,
-              proto => tcp,
-              port   => '586',
-              action => accept,
-              chain  => 'PREROUTING',
-              table  => 'nat',
-              socket => false,
-            }
-          EOS
-
-          apply_manifest(pp, :catch_failures => true)
+      it 'should contain the rule' do
+        shell('iptables-save -t nat') do |r|
+          expect(r.stdout).to match(/-A PREROUTING -p tcp -m multiport --ports 585 -m socket -m comment --comment "585 - test" -j ACCEPT/)
         end
+      end
+    end
 
-        it 'should contain the rule' do
-          shell('iptables-save -t nat') do |r|
-            expect(r.stdout).to match(/-A PREROUTING -p tcp -m multiport --ports 586 -m comment --comment "586 - test" -j ACCEPT/)
-          end
+    context 'false' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '586 - test':
+            ensure => present,
+            proto => tcp,
+            port   => '586',
+            action => accept,
+            chain  => 'PREROUTING',
+            table  => 'nat',
+            socket => false,
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables-save -t nat') do |r|
+          expect(r.stdout).to match(/-A PREROUTING -p tcp -m multiport --ports 586 -m comment --comment "586 - test" -j ACCEPT/)
         end
       end
     end
