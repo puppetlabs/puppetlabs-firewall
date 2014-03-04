@@ -206,7 +206,11 @@ Puppet::Type.newtype(:firewallchain) do
                end
 
     # gather a list of all rules present on the system
-    rules_resources = Puppet::Type.type(:firewall).instances
+    if not self.class.class_variable_defined?(:@@rule_resources)
+      self.class.send(:class_variable_set,:@@rule_resources,Puppet::Type.type(type).instances)
+    end
+    
+    rules_resources = self.class.send(:class_variable_get,:@@rule_resources).dup
 
     # Keep only rules in this chain
     rules_resources.delete_if { |res| (res[:provider] != provider or res.provider.properties[:table].to_s != table or res.provider.properties[:chain] != chain) }
