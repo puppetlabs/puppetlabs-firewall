@@ -50,7 +50,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :destination => "-d",
     :dst_type => "-m addrtype --dst-type",
     :dst_range => "-m iprange --dst-range",
-    :dport => ["-m multiport --dports", "--dport"],
+    :dport => ["-m multiport --dports", "-m (udp|tcp) --dport", "--dport"],
     :gid => "-m owner --gid-owner",
     :icmp => "-m icmp --icmp-type",
     :iniface => "-i",
@@ -58,6 +58,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :limit => "-m limit --limit",
     :log_level => "--log-level",
     :log_prefix => "--log-prefix",
+    :mac_addr => ["-m mac --mac-source", "--mac-source"],
     :name => "-m comment --comment",
     :outiface => "-o",
     :port => '-m multiport --ports',
@@ -137,7 +138,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface, :proto, :isfragment,
-    :src_range, :dst_range, :tcp_flags, :gid, :uid, :sport, :dport, :port,
+    :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_addr, :sport, :dport, :port,
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
