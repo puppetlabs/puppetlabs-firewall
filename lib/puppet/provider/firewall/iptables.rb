@@ -174,8 +174,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     @property_hash.clear
   end
 
-  def self.instances
-    debug "[instances]"
+  def self.cache_instances
+    debug "[cache_instances]"
     table = nil
     rules = []
     counter = 1
@@ -194,6 +194,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
     end
     rules
+  end
+
+  def self.instances
+    debug "[instances]"
+    if not class_variable_defined?(:@@cache_instances)
+      class_variable_set(:@@cache_instances,cache_instances)
+    end
+    class_variable_get(:@@cache_instances)
   end
 
   def self.rule_to_hash(line, table, counter)
