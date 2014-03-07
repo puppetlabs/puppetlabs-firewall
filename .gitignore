@@ -7,3 +7,4 @@ spec/fixtures/manifests/
 .bundle
 .vagrant
 vendor/
+/.project
