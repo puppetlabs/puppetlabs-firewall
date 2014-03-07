@@ -365,11 +365,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def insert_args
     args = []
-    if @comment_supported
-      args << ["-I", resource[:chain], insert_order]
-    else
-      args << ["-A", resource[:chain]]
-    end
+    args << ["-I", resource[:chain], insert_order]
     args << general_args
     args
   end
