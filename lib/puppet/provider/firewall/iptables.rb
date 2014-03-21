@@ -96,7 +96,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :ipsec_dir       => "-m policy --dir",
     :ipsec_policy    => "--pol",
     :mask            => '--mask',
-    :mac_addr        => ["-m mac --mac-source", "--mac-source"],
+    :mac_source        => ["-m mac --mac-source", "--mac-source"],
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -145,7 +145,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface, :proto, :isfragment,
-    :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_addr, :sport, :dport, :port,
+    :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port,
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :jump, :todest,

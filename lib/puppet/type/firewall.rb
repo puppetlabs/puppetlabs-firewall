@@ -911,6 +911,13 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:mac_source) do
+    desc <<-EOS
+      MAC Source
+    EOS
+    newvalues(/^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$/i)
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil

@@ -7,12 +7,12 @@
 # which will be used to create a resource.
 ARGS_TO_HASH = {
   'mac_source_1' => {
-    :line => '-A neutron-openvswi-FORWARD -b -s 1.2.3.4/32 -m mac --mac-source FA:16:00:00:00:00 -j ACCEPT',
+    :line => '-A neutron-openvswi-FORWARD -s 1.2.3.4/32 -m mac --mac-source FA:16:00:00:00:00 -j ACCEPT',
     :table => 'filter',
     :params => {
       :chain => 'neutron-openvswi-FORWARD',
       :source => '1.2.3.4/32',
-      :mac_addr => 'FA:16:00:00:00:00',
+      :mac_source => 'FA:16:00:00:00:00',
     },
   },
   'dport_and_sport' => {
