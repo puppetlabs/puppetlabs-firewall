@@ -166,8 +166,13 @@ module Puppet::Util::Firewall
       end
     end
 
-    # Fedora 15 and newer use systemd for to persist iptable rules
+    # Fedora 15 and newer use systemd to persist iptable rules
     if os_key == 'RedHat' && Facter.value(:operatingsystem) == 'Fedora' && Facter.value(:operatingsystemrelease).to_i >= 15
+      os_key = 'Fedora'
+    end
+
+    # RHEL 7 and newer also use systemd to persist iptable rules
+    if os_key == 'RedHat' && Facter.value(:operatingsystem) == 'RedHat' && Facter.value(:operatingsystemrelease).to_i >= 7
       os_key = 'Fedora'
     end
 
@@ -182,9 +187,9 @@ module Puppet::Util::Firewall
     when :Fedora
       case proto.to_sym
       when :IPv4
-        %w{/usr/libexec/iptables.init save}
+        %w{/usr/libexec/iptables/iptables.init save}
       when :IPv6
-        %w{/usr/libexec/ip6tables.init save}
+        %w{/usr/libexec/iptables/ip6tables.init save}
       end
     when :Debian
       case proto.to_sym
