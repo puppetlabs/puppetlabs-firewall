@@ -17,16 +17,16 @@ class firewall::linux::redhat (
   $enable = true
 ) {
 
-  # RHEL 7 and later and Fedora 15 and later require the iptables-services 
-  # package, which provides the /usr/libexec/iptables/iptables.init used by 
+  # RHEL 7 and later and Fedora 15 and later require the iptables-services
+  # package, which provides the /usr/libexec/iptables/iptables.init used by
   # lib/puppet/util/firewall.rb.
-  if $::operatingsystem == "RedHat" and $::operatingsystemrelease >= 7 {
+  if $::operatingsystem == RedHat and $::operatingsystemrelease >= 7 {
     package { 'iptables-services':
       ensure => present,
     }
   }
 
-  if $::operatingsystem == "Fedora" and $::operatingsystemrelease >= 15 {
+  if $::operatingsystem == Fedora and $::operatingsystemrelease >= 15 {
     package { 'iptables-services':
       ensure => present,
     }
