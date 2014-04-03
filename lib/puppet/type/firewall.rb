@@ -318,8 +318,10 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:proto) do
     desc <<-EOS
-      The specific protocol to match for this rule. By default this is
-      *tcp*.
+      The specific protocol to match for this rule.
+
+      DEPRECATION: The default is `tcp`, but will be `all` in a future
+      release of firewall. An explicit protocol is recommended.
     EOS
 
     newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :gre, :all)
@@ -1012,6 +1014,10 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:action) && value(:jump)
       self.fail "Only one of the parameters 'action' and 'jump' can be set"
+    end
+
+    if ! @original_parameters[:proto]
+      warning "DEPRECATION: No protocol was specified for the rule '#{value(:name)}' -- the default will change from `tcp` to `all` in a future release of firewall"
     end
   end
 end

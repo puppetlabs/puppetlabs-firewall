@@ -1614,4 +1614,16 @@ describe 'firewall type' do
     end
   end
 
+  describe 'deprecations' do
+    it 'raises a deprecation warning when no proto is passed' do
+      pp = <<-EOS
+        firewall { '597 - test':
+          ensure => present,
+          action => 'accept',
+        }
+      EOS
+
+      expect(apply_manifest(pp, :catch_failures => true).stderr).to match(/DEPRECATION: No protocol was specified for the rule '597 - test'/)
+    end
+  end
 end
