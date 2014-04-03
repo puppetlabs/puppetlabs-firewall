@@ -983,7 +983,7 @@ Puppet::Type.newtype(:firewall) do
       end
 
       unless value(:tosource)
-        self.fail "Parameter jump => DNAT must have tosource parameter"
+        self.fail "Parameter jump => SNAT must have tosource parameter"
       end
     end
 
