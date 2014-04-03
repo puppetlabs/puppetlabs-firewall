@@ -777,6 +777,8 @@ Puppet::Type.newtype(:firewall) do
       attribute. When used, this will cause entries older than 'seconds' to be
       purged.  Must be boolean true.
     EOS
+
+    newvalues(:true, :false)
   end
 
   newproperty(:rhitcount, :required_features => :recent_limiting) do
