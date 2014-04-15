@@ -159,6 +159,7 @@ describe 'Puppet::Util::Firewall' do
       it 'should raise a warning when exec fails' do
         allow(Facter.fact(:osfamily)).to receive(:value).and_return('RedHat')
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('RedHat')
+        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('6')
 
         expect(subject).to receive(:execute).with(%w{/sbin/service iptables save}).
           and_raise(Puppet::ExecutionFailure, 'some error')
