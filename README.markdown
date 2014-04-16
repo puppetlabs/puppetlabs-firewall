@@ -377,9 +377,9 @@ unsupported system will result in iptable rules failing to apply.
 
 ###Other
 
-Bugs can be reported using Github Issues:
+Bugs can be reported using JIRA issues
 
-<http://github.com/puppetlabs/puppetlabs-firewall/issues>
+<http://tickets.puppetlabs.com>
 
 ##Development
 
