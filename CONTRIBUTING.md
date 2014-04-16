@@ -31,7 +31,7 @@ top of things.
 * Make sure your commit messages are in the proper format.
 
 ````
-    (PUP-1234) Make the example in CONTRIBUTING imperative and concrete
+    (MODULES-1234) Make the example in CONTRIBUTING imperative and concrete
 
     Without this patch applied the example commit message in the CONTRIBUTING
     document is not a concrete example.  This is a problem because the
@@ -79,7 +79,7 @@ a ticket number.
 
 # Additional Resources
 
-* [More information on contributing](http://links.puppetlabs.com/contribute-to-puppet)
+* [More information on contributing](http://projects.puppetlabs.com/projects/module-site/wiki/Module_contributing)
 * [Bug tracker (Jira)](http://tickets.puppetlabs.com)
 * [Contributor License Agreement](http://links.puppetlabs.com/cla)
 * [General GitHub documentation](http://help.github.com/)
