@@ -271,7 +271,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Normalise all rules to CIDR notation.
     [:source, :destination].each do |prop|
-      next if hash[prop].nil?
+      next if hash[prop].nil? or hash[prop] =~ /([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/
       m = hash[prop].match(/(!?)\s?(.*)/)
       neg = "! " if m[1] == "!"
       hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
