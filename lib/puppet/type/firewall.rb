@@ -28,6 +28,7 @@ Puppet::Type.newtype(:firewall) do
     installed.
   EOS
 
+  feature :connection_limiting, "Connection limiting features."
   feature :hop_limiting, "Hop limiting features."
   feature :rate_limiting, "Rate limiting features."
   feature :recent_limiting, "The netfilter recent module"
@@ -40,7 +41,7 @@ Puppet::Type.newtype(:firewall) do
   feature :reject_type, "The ability to control reject messages"
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
-  feature :mark, "Set the netfilter mark value associated with the packet"
+  feature :mark, "Match or Set the netfilter mark value associated with the packet"
   feature :tcp_flags, "The ability to match on particular TCP flag settings"
   feature :pkttype, "Match a packet type"
   feature :socket, "Match open sockets"
@@ -605,6 +606,50 @@ Puppet::Type.newtype(:firewall) do
   end
 
 
+  # Connection mark
+  newproperty(:connmark, :required_features => :mark) do
+    desc <<-EOS
+      Match the Netfilter mark value associated with the packet.  Accepts either of:
+      mark/mask or mark.  These will be converted to hex if they are not already.
+    EOS
+    munge do |value|
+      int_or_hex = '[a-fA-F0-9x]'
+      match = value.to_s.match("(#{int_or_hex}+)(/)?(#{int_or_hex}+)?")
+      mark = @resource.to_hex32(match[1])
+
+      # Values that can't be converted to hex.
+      # Or contain a trailing slash with no mask.
+      if mark.nil? or (mark and match[2] and match[3].nil?)
+        raise ArgumentError, "MARK value must be integer or hex between 0 and 0xffffffff"
+      end
+
+      # There should not be a mask on connmark
+      unless match[3].nil?
+        raise ArgumentError, "iptables does not support masks on MARK match rules"
+      end
+      value = mark
+
+      value
+    end
+  end
+
+  # Connection limiting properties
+  newproperty(:connlimit_above, :required_features => :connection_limiting) do
+    desc <<-EOS
+      Connection limiting value for matched connections above n.
+    EOS
+    newvalue(/^\d+$/)
+  end
+
+  newproperty(:connlimit_mask, :required_features => :connection_limiting) do
+    desc <<-EOS
+      Connection limiting by subnet mask for matched connections.
+      IPv4: 0-32
+      IPv6: 0-128
+    EOS
+    newvalue(/^\d+$/)
+  end
+
   # Hop limiting properties
   newproperty(:hop_limit, :required_features => :hop_limiting) do
     desc <<-EOS
@@ -1013,5 +1058,10 @@ Puppet::Type.newtype(:firewall) do
     if value(:action) && value(:jump)
       self.fail "Only one of the parameters 'action' and 'jump' can be set"
     end
+
+    if value(:connlimit_mask) && ! value(:connlimit_above)
+      self.fail "Parameter 'connlimit_mask' requires 'connlimit_above'"
+    end
+
   end
 end

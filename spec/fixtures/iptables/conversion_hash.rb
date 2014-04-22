@@ -434,6 +434,36 @@ ARGS_TO_HASH = {
       :dport => ["20443"],
     },
   },
+  'connlimit_above' => {
+    :line => '-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "061 REJECT connlimit_above 10" -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable',
+    :table => 'filter',
+    :params => {
+      :proto => 'tcp',
+      :dport => ["22"],
+      :connlimit_above => '10',
+      :action => 'reject',
+    },
+  },
+  'connlimit_above_with_connlimit_mask' => {
+    :line => '-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "061 REJECT connlimit_above 10 with mask 24" -m connlimit --connlimit-above 10 --connlimit-mask 24 -j REJECT --reject-with icmp-port-unreachable',
+    :table => 'filter',
+    :params => {
+      :proto => 'tcp',
+      :dport => ["22"],
+      :connlimit_above => '10',
+      :connlimit_mask => '24',
+      :action => 'reject',
+    },
+  },
+  'connmark' => {
+    :line => '-A INPUT -m comment --comment "062 REJECT connmark" -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable',
+    :table => 'filter',
+    :params => {
+      :proto => 'all',
+      :connmark => '0x1',
+      :action => 'reject',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -867,5 +897,38 @@ HASH_TO_ARGS = {
       :action => 'accept',
     },
     :args => ['-t', :filter, '-p', :all, '-m', 'comment', '--comment', '050 testcomment-with-fdashf', '-j', 'ACCEPT'],
+  },
+  'connlimit_above' => {
+    :params => {
+      :name => '061 REJECT connlimit_above 10',
+      :table => 'filter',
+      :proto => 'tcp',
+      :dport => ["22"],
+      :connlimit_above => '10',
+      :action => 'reject',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "22", "-m", "comment", "--comment", "061 REJECT connlimit_above 10", "-j", "REJECT", "-m", "connlimit", "--connlimit-above", "10"],
+  },
+  'connlimit_above_with_connlimit_mask' => {
+    :params => {
+      :name => '061 REJECT connlimit_above 10 with mask 24',
+      :table => 'filter',
+      :proto => 'tcp',
+      :dport => ["22"],
+      :connlimit_above => '10',
+      :connlimit_mask => '24',
+      :action => 'reject',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "22", "-m", "comment", "--comment", "061 REJECT connlimit_above 10 with mask 24", "-j", "REJECT", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "24"],
+  },
+  'connmark' => {
+    :params => {
+      :name => '062 REJECT connmark',
+      :table => 'filter',
+      :proto => 'all',
+      :connmark => '0x1',
+      :action => 'reject',
+    },
+    :args => ["-t", :filter, "-p", :all, "-m", "comment", "--comment", "062 REJECT connmark", "-j", "REJECT", "-m", "connmark", "--mark", "0x1"],
   },
 }

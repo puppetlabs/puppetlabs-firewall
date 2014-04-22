@@ -7,6 +7,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @doc = "Iptables type provider"
 
   has_feature :iptables
+  has_feature :connection_limiting
   has_feature :rate_limiting
   has_feature :recent_limiting
   has_feature :snat
@@ -46,6 +47,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   @resource_map = {
     :burst => "--limit-burst",
+    :connlimit_above => "-m connlimit --connlimit-above",
+    :connlimit_mask => "--connlimit-mask",
+    :connmark => "-m connmark --mark",
     :ctstate => "-m conntrack --ctstate",
     :destination => "-d",
     :dst_type => "-m addrtype --dst-type",
@@ -141,7 +145,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
-    :toports, :random, :log_prefix, :log_level, :reject, :set_mark
+    :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
+    :connlimit_above, :connlimit_mask, :connmark
   ]
 
   def insert
