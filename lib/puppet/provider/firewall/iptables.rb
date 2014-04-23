@@ -77,6 +77,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :rsource => "--rsource",
     :rttl => "--rttl",
     :set_mark => mark_flag,
+    :set_mss => "--set-mss",
     :socket => "-m socket",
     :source => "-s",
     :src_type => "-m addrtype --src-type",
@@ -145,7 +146,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
-    :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
+    :toports, :random, :set_mss, :log_prefix, :log_level, :reject, :set_mark,
     :connlimit_above, :connlimit_mask, :connmark
   ]
 
