@@ -81,6 +81,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state => "-m state --state",
     :table => "-t",
     :tcp_flags => "-m tcp --tcp-flags",
+    :tcp_mss => "--tcp-mss",
     :todest => "--to-destination",
     :toports => "--to-ports",
     :tosource => "--to-source",
@@ -141,7 +142,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
-    :toports, :random, :log_prefix, :log_level, :reject, :set_mark
+    :toports, :random, :tcp_mss, :log_prefix, :log_level, :reject, :set_mark
   ]
 
   def insert
