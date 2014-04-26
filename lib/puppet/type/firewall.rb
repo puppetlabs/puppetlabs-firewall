@@ -53,6 +53,7 @@ Puppet::Type.newtype(:firewall) do
   feature :isfirstfrag, "Match the first fragment of a fragmented ipv6 packet"
   feature :ipsec_policy, "Match IPsec policy"
   feature :ipsec_dir, "Match IPsec policy direction"
+  feature :ipset, "Match against specified ipset list"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -897,6 +898,15 @@ Puppet::Type.newtype(:firewall) do
 	  EOS
 
 	  newvalues(:in, :out)
+  end
+
+  newproperty(:ipset, :required_features => :ipset) do
+    desc <<-EOS
+      Matches against the specified ipset list.
+      The value is the name of the blacklist, followed by a space, and then
+      'src' and/or 'dst' separated by a comma.
+      For example: 'blacklist src,dst'
+    EOS
   end
 
   newparam(:line) do

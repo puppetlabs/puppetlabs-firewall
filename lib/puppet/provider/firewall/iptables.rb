@@ -28,6 +28,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :iprange
   has_feature :ipsec_dir
   has_feature :ipsec_policy
+  has_feature :ipset
 
   optional_commands({
     :iptables => 'iptables',
@@ -93,6 +94,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :isfragment => "-f",
     :ipsec_dir => "-m policy --dir",
     :ipsec_policy => "--pol",
+    :ipset => "-m set --match-set",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -144,7 +146,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :src_range, :dst_range, :tcp_flags, :gid, :uid, :sport, :dport, :port,
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
+    :rhitcount, :rttl, :rname, :rsource, :rdest, :ipset, :jump, :todest, :tosource,
     :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
     :connlimit_above, :connlimit_mask, :connmark
   ]
@@ -213,6 +215,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+    # ditto for --match-set
+    values = values.sub(/--match-set (\S*) (\S*)/, '--match-set "\1 \2"')
     # we do a similar thing for negated address masks (source and destination).
     values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
@@ -427,7 +431,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       # our tcp_flags takes a single string with comma lists separated
       # by space
       # --tcp-flags expects two arguments
-      if res == :tcp_flags
+      if res == :tcp_flags or res == :ipset
         one, two = resource_value.split(' ')
         args << one
         args << two
