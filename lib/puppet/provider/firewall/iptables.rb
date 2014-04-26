@@ -135,19 +135,42 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
   end
 
-  # This is the order of resources as they appear in iptables-save output,
-  # we need it to properly parse and apply rules, if the order of resource
-  # changes between puppet runs, the changed rules will be re-applied again.
-  # This order can be determined by going through iptables source code or just tweaking and trying manually
-  @resource_list = [
-    :table, :source, :destination, :iniface, :outiface, :proto, :isfragment,
-    :src_range, :dst_range, :tcp_flags, :gid, :uid, :sport, :dport, :port,
-    :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
-    :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
-    :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
-    :connlimit_above, :connlimit_mask, :connmark
+  # When adding new resources, it is important that you add them to the appropriate group.
+  # The parameters of each extension must also be in the right order. You can determine this
+  # order by looking at the iptables source, or the output of `iptables-save`.
+  # If you add an extension to the wrong group, or add the parameters of that extension in
+  # the wrong order, puppet will end up reapplying the rule every run.
+  parameters = [
+    :source, :destination, :iniface, :outiface, :proto, :isfragment,
   ]
+  match_extensions = [
+    :src_range, :dst_range,
+    :tcp_flags,
+    :gid, :uid,
+    :sport, :dport, :port,
+    :dst_type, :src_type,
+    :socket,
+    :pkttype,
+    :name,
+    :ipsec_dir, :ipsec_policy,
+    :state, :ctstate,
+    :icmp,
+    :limit, :burst,
+    :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
+  ]
+  target_extensions = [
+    :todest,
+    :tosource,
+    :toports,
+    :random,
+    :log_prefix, :log_level,
+    :reject,
+    :set_mark,
+    :connlimit_above,
+    :connlimit_mask,
+    :connmark,
+  ]
+  @resource_list = [:table] + parameters + match_extensions + [:jump] + target_extensions
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
