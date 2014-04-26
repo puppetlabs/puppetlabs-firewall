@@ -54,6 +54,7 @@ Puppet::Type.newtype(:firewall) do
   feature :ipsec_policy, "Match IPsec policy"
   feature :ipsec_dir, "Match IPsec policy direction"
   feature :mask, "Ability to match recent rules based on the ipv4 mask"
+  feature :ipset, "Match against specified ipset list"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -879,7 +880,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:isfirstfrag, :required_features => :isfirstfrag) do
     desc <<-EOS
-      If true, matches if the packet is the first fragment. 
+      If true, matches if the packet is the first fragment.
       Sadly cannot be negated. ipv6.
     EOS
 
@@ -961,6 +962,15 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:mask, :required_features => :mask) do
     desc <<-EOS
       Sets the mask to use when `recent` is enabled.
+    EOS
+  end
+
+  newproperty(:ipset, :required_features => :ipset) do
+    desc <<-EOS
+      Matches against the specified ipset list.
+      The value is the name of the blacklist, followed by a space, and then
+      'src' and/or 'dst' separated by a comma.
+      For example: 'blacklist src,dst'
     EOS
   end
 
