@@ -219,6 +219,19 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
     values = values.sub(/-m (tcp|udp) (--(s|d)port|-m multiport)/, '\2')
+    # '--pol ipsec' takes many optional arguments; we cheat again by adding " around them
+    values = values.sub(/
+        --pol\sipsec
+        (\s--strict)?
+        (\s--reqid\s\S+)?
+        (\s--spi\s\S+)?
+        (\s--proto\s\S+)?
+        (\s--mode\s\S+)?
+        (\s--tunnel-dst\s\S+)?
+        (\s--tunnel-src\s\S+)?
+        (\s--next)?/x,
+        '--pol "ipsec\1\2\3\4\5\6\7\8" '
+    )
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
@@ -310,10 +323,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     hash[:state]   = hash[:state].sort   unless hash[:state].nil?
     hash[:ctstate] = hash[:ctstate].sort unless hash[:ctstate].nil?
 
-    # This forces all existing, commentless rules or rules with invalid comments to be moved 
+    # This forces all existing, commentless rules or rules with invalid comments to be moved
     # to the bottom of the stack.
-    # Puppet-firewall requires that all rules have comments (resource names) and match this 
-    # regex and will fail if a rule in iptables does not have a comment. We get around this 
+    # Puppet-firewall requires that all rules have comments (resource names) and match this
+    # regex and will fail if a rule in iptables does not have a comment. We get around this
     # by appending a high level
     if ! hash[:name]
       num = 9000 + counter
