@@ -20,7 +20,8 @@ describe 'firewall type' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "500 - test" -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable/)
+          #connlimit-saddr is added in Ubuntu 14.04.
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "500 - test" -m connlimit --connlimit-above 10 --connlimit-mask 32 (--connlimit-saddr )?-j REJECT --reject-with icmp-port-unreachable/)
         end
       end
     end
@@ -33,9 +34,9 @@ describe 'firewall type' do
           class { '::firewall': }
           firewall { '501 - test':
             proto           => tcp,
-	    dport           => '22',
-	    connlimit_above => '10',
-	    connlimit_mask  => '24',
+            dport           => '22',
+            connlimit_above => '10',
+            connlimit_mask  => '24',
             action          => reject,
           }
         EOS
@@ -45,7 +46,8 @@ describe 'firewall type' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "501 - test" -m connlimit --connlimit-above 10 --connlimit-mask 24 -j REJECT --reject-with icmp-port-unreachable/)
+          #connlimit-saddr is added in Ubuntu 14.04.
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "501 - test" -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-j REJECT --reject-with icmp-port-unreachable/)
         end
       end
     end
