@@ -18,7 +18,9 @@ unless ENV['RS_PROVISION'] == 'no' or ENV['BEAKER_provision'] == 'no'
   else
     install_puppet
   end
-  on hosts, "mkdir -p #{host['distmoduledir']}"
+  hosts.each do |host|
+    on host, "mkdir -p #{host['distmoduledir']}"
+  end
 end
 
 RSpec.configure do |c|
