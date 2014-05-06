@@ -1524,7 +1524,8 @@ describe 'firewall type' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "597 - test" -m recent --set --name list1 --rdest/)
+          # Mask added as of Ubuntu 14.04.
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "597 - test" -m recent --set --name list1 (--mask 255.255.255.255 )?--rdest/)
         end
       end
     end
@@ -1553,7 +1554,7 @@ describe 'firewall type' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "598 - test" -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 --rsource/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "598 - test" -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource/)
         end
       end
     end

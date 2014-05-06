@@ -899,6 +899,12 @@ Puppet::Type.newtype(:firewall) do
 	  newvalues(:in, :out)
   end
 
+  newproperty(:mask, :required_features => :mask) do
+    desc <<-EOS
+      Sets the mask to use when `recent` is enabled.
+    EOS
+  end
+
   newparam(:line) do
     desc <<-EOS
       Read-only property for caching the rule line.
@@ -1061,6 +1067,10 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:connlimit_mask) && ! value(:connlimit_above)
       self.fail "Parameter 'connlimit_mask' requires 'connlimit_above'"
+    end
+
+    if value(:mask) && ! value(:recent)
+      self.fail "Mask can only be set if recent is enabled."
     end
 
   end
