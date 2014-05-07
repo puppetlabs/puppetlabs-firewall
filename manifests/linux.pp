@@ -19,8 +19,14 @@ class firewall::linux (
     stopped => false,
   }
 
+  if $::osfamily == 'RedHat' {
+    $package_ensure = 'latest'
+  } else {
+    $package_ensure = 'present'
+  }
+
   package { 'iptables':
-    ensure => present,
+    ensure => $package_ensure,
   }
 
   case $::operatingsystem {
