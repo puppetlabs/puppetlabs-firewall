@@ -52,68 +52,44 @@ Persistence of rules between reboots is handled automatically, although there ar
 
 In your `site.pp` (or some similarly top-scope file), set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
 
-    resources { "firewall":
-      purge => true
-    }
+```puppet
+resources { "firewall":
+  purge => true
+}
+```
 
-Next, set up the default parameters for all of the firewall rules you will be establishing later. These defaults will ensure that the pre and post classes (you will be setting up in just a moment) are run in the correct order to avoid locking you out of your box during the first puppet run.
+You should include the `firewall` class to ensure the correct packages are installed.
 
-    Firewall {
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
+```puppet
+class { 'firewall': }
+```
 
-You also need to declare the `my_fw::pre` & `my_fw::post` classes so that dependencies are satisfied. This can be achieved using an External Node Classifier or the following
+Next, set up some default rules that allow networking (such as ICMP and TCP), as well as ensure that existing connections are not closed to avoid locking yourself out of your own boxes when Puppet runs.
 
-    class { ['my_fw::pre', 'my_fw::post']: }
+```puppet
+# Default firewall rules
+firewall { '000 accept all icmp':
+  proto   => 'icmp',
+  action  => 'accept',
+}
+firewall { '001 accept all to lo interface':
+  proto   => 'all',
+  iniface => 'lo',
+  action  => 'accept',
+}
+firewall { '002 accept related established rules':
+  proto   => 'all',
+  ctstate => ['RELATED', 'ESTABLISHED'],
+  action  => 'accept',
+}
+# Big drop all
+firewall { '999 drop all':
+  proto   => 'all',
+  action  => 'drop',
+}
+```
 
-Finally, you should include the `firewall` class to ensure the correct packages are installed.
-
-    class { 'firewall': }
-
-Now to create the `my_fw::pre` and `my_fw::post` classes. Firewall acts on your running firewall, making immediate changes as the catalog executes. Defining default pre and post rules allows you provide global defaults for your hosts before and after any custom rules; it is also required to avoid locking yourself out of your own boxes when Puppet runs. This approach employs a whitelist setup, so you can define what rules you want and everything else is ignored rather than removed.
-
-The `pre` class should be located in `my_fw/manifests/pre.pp` and should contain any default rules to be applied first.
-
-    class my_fw::pre {
-      Firewall {
-        require => undef,
-      }
-
-      # Default firewall rules
-      firewall { '000 accept all icmp':
-        proto   => 'icmp',
-        action  => 'accept',
-      }->
-      firewall { '001 accept all to lo interface':
-        proto   => 'all',
-        iniface => 'lo',
-        action  => 'accept',
-      }->
-      firewall { '002 accept related established rules':
-        proto   => 'all',
-        ctstate => ['RELATED', 'ESTABLISHED'],
-        action  => 'accept',
-      }
-    }
-
-The rules in `pre` should allow basic networking (such as ICMP and TCP), as well as ensure that existing connections are not closed.
-
-The `post` class should be located in `my_fw/manifests/post.pp` and include any default rules to be applied last.
-
-    class my_fw::post {
-      firewall { '999 drop all':
-        proto   => 'all',
-        action  => 'drop',
-        before  => undef,
-      }
-    }
-
-To put it all together: the `require` parameter in `Firewall {}` ensures `my_fw::pre` is run before any other rules and the `before` parameter ensures `my_fw::post` is run after any other rules. So the run order is:
-
-* run the rules in `my_fw::pre`
-* run your rules (defined in code)
-* run the rules in `my_fw::post`
+Finally, you should define you own rules.
 
 ###Upgrading
 
@@ -123,6 +99,67 @@ Upgrade the module with the puppet module tool as normal:
 
     puppet module upgrade puppetlabs/firewall
 
+Previously, you would have required the following in your `site.pp` (or some other global location):
+
+```puppet
+Firewall {
+  before  => Class['my_fw::post'],
+  require => Class['my_fw::pre'],
+}
+
+class { ['my_fw::pre', 'my_fw::post']: }
+
+class { 'firewall': }
+```
+
+and create `pre` class in a `my_fw` module.
+
+```puppet
+class my_fw::pre {
+  Firewall {
+    require => undef,
+  }
+
+  # Default firewall rules
+  firewall { '000 accept all icmp':
+    proto   => 'icmp',
+    action  => 'accept',
+  }->
+  firewall { '001 accept all to lo interface':
+    proto   => 'all',
+    iniface => 'lo',
+    action  => 'accept',
+  }->
+  firewall { '002 accept related established rules':
+    proto   => 'all',
+    ctstate => ['RELATED', 'ESTABLISHED'],
+    action  => 'accept',
+  }
+}
+```
+
+The rules in `pre` should allow basic networking (such as ICMP and TCP), as well as ensure that existing connections are not closed.
+
+and a `post` class that includes any default rules to be applied last:
+
+```puppet
+class my_fw::post {
+  firewall { '999 drop all':
+    proto   => 'all',
+    action  => 'drop',
+    before  => undef,
+  }
+}
+```
+
+To put it all together: the `require` parameter in `Firewall {}` ensures `my_fw::pre` is run before any other rules and the `before` parameter ensures `my_fw::post` is run after any other rules. So the run order is:
+
+* run the rules in `my_fw::pre`
+* run your rules (defined in code)
+* run the rules in `my_fw::post`
+
+With the latest version, we now have an auto require base on alphabetical order of rules name. So you no longer need to setup & define pre & post rules.
+
 ####Upgrading from version 0.1.1 and older
 
 Start by upgrading the module using the puppet module tool:
@@ -131,37 +168,41 @@ Start by upgrading the module using the puppet module tool:
 
 Previously, you would have required the following in your `site.pp` (or some other global location):
 
-    # Always persist firewall rules
-    exec { 'persist-firewall':
-      command     => $operatingsystem ? {
-        'debian'          => '/sbin/iptables-save > /etc/iptables/rules.v4',
-        /(RedHat|CentOS)/ => '/sbin/iptables-save > /etc/sysconfig/iptables',
-      },
-      refreshonly => true,
-    }
-    Firewall {
-      notify  => Exec['persist-firewall'],
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
-    Firewallchain {
-      notify  => Exec['persist-firewall'],
-    }
-    resources { "firewall":
-      purge => true
-    }
+```puppet
+# Always persist firewall rules
+exec { 'persist-firewall':
+  command     => $operatingsystem ? {
+    'debian'          => '/sbin/iptables-save > /etc/iptables/rules.v4',
+    /(RedHat|CentOS)/ => '/sbin/iptables-save > /etc/sysconfig/iptables',
+  },
+  refreshonly => true,
+}
+Firewall {
+  notify  => Exec['persist-firewall'],
+  before  => Class['my_fw::post'],
+  require => Class['my_fw::pre'],
+}
+Firewallchain {
+  notify  => Exec['persist-firewall'],
+}
+resources { "firewall":
+  purge => true
+}
+```
 
 With the latest version, we now have in-built persistence, so this is no longer needed. However, you will still need some basic setup to define pre & post rules.
 
-    resources { "firewall":
-      purge => true
-    }
-    Firewall {
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
-    class { ['my_fw::pre', 'my_fw::post']: }
-    class { 'firewall': }
+```puppet
+resources { "firewall":
+  purge => true
+}
+Firewall {
+  before  => Class['my_fw::post'],
+  require => Class['my_fw::pre'],
+}
+class { ['my_fw::pre', 'my_fw::post']: }
+class { 'firewall': }
+```
 
 Consult the the documentation below for more details around the classes `my_fw::pre` and `my_fw::post`.
 
@@ -176,24 +217,26 @@ All rules employ a numbering system in the resource's title that is used for ord
 
 ###Default rules
 
-You can place default rules in either `my_fw::pre` or `my_fw::post`, depending on when you would like them to run. Rules placed in the `pre` class will run first, rules in the `post` class, last.
-
 Depending on the provider, the title of the rule can be stored using the comment feature of the underlying firewall subsystem. Values can match `/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/`.
 
 ####Examples of default rules
 
 Basic accept ICMP request example:
 
-    firewall { "000 accept all icmp requests":
-      proto  => "icmp",
-      action => "accept",
-    }
+```puppet
+firewall { "000 accept all icmp requests":
+  proto  => "icmp",
+  action => "accept",
+}
+```
 
 Drop all:
 
-    firewall { "999 drop all other requests":
-      action => "drop",
-    }
+```puppet
+firewall { "999 drop all other requests":
+  action => "drop",
+}
+```
 
 ###Application-specific rules
 
@@ -243,7 +286,7 @@ include profile::apache
 Or the module, if you're not using roles and profiles:
 
 ```puppet
-  include ::apache
+include ::apache
 ```
 
 Then they would automatically get appropriate firewall rules.
@@ -252,39 +295,45 @@ Then they would automatically get appropriate firewall rules.
 
 You can also apply firewall rules to specific nodes. Usually, you will want to put the firewall rule in another class and apply that class to a node. But you can apply a rule to a node.
 
-    node 'foo.bar.com' {
-      firewall { '111 open port 111':
-        dport => 111
-      }
-    }
+```puppet
+node 'foo.bar.com' {
+  firewall { '111 open port 111':
+    dport => 111
+  }
+}
+```
 
 You can also do more complex things with the `firewall` resource. Here we are doing some NAT configuration.
 
-    firewall { '100 snat for network foo2':
-      chain    => 'POSTROUTING',
-      jump     => 'MASQUERADE',
-      proto    => 'all',
-      outiface => "eth0",
-      source   => '10.1.2.0/24',
-      table    => 'nat',
-    }
+```puppet
+firewall { '100 snat for network foo2':
+  chain    => 'POSTROUTING',
+  jump     => 'MASQUERADE',
+  proto    => 'all',
+  outiface => "eth0",
+  source   => '10.1.2.0/24',
+  table    => 'nat',
+}
+```
 
 In the below example, we are creating a new chain and forwarding any port 5000 access to it.
 
-    firewall { '100 forward to MY_CHAIN':
-      chain   => 'INPUT',
-      jump    => 'MY_CHAIN',
-    }
-    # The namevar here is in the format chain_name:table:protocol
-    firewallchain { 'MY_CHAIN:filter:IPv4':
-      ensure  => present,
-    }
-    firewall { '100 my rule':
-      chain   => 'MY_CHAIN',
-      action  => 'accept',
-      proto   => 'tcp',
-      dport   => 5000,
-    }
+```puppet
+firewall { '100 forward to MY_CHAIN':
+  chain   => 'INPUT',
+  jump    => 'MY_CHAIN',
+}
+# The namevar here is in the format chain_name:table:protocol
+firewallchain { 'MY_CHAIN:filter:IPv4':
+  ensure  => present,
+}
+firewall { '100 my rule':
+  chain   => 'MY_CHAIN',
+  action  => 'accept',
+  proto   => 'tcp',
+  dport   => 5000,
+}
+```
 
 ###Additional Information
 
@@ -324,7 +373,9 @@ At the moment this takes care of:
 
 You should include the class for nodes that need to use the resources in this module. For example
 
-    class { 'firewall': }
+```puppet
+class { 'firewall': }
+```
 
 ####`ensure`
 
