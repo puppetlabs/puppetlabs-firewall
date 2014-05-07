@@ -32,7 +32,7 @@ class firewall::linux::redhat (
     }
   }
 
-  service { 'iptables':
+  service { ['iptables', 'ip6tables']:
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
