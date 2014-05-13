@@ -1,3 +1,38 @@
+## 2014-05-13 Release 1.1.0
+###Summary
+
+This release has a significant change from previous releases; we now apply the
+firewall resources alphabetically by default, removing the need to create pre
+and post classes just to enforce ordering.  It only effects default ordering
+and further information can be found in the README about this.  Please test
+this in development before rolling into production out of an abundance of
+caution.
+
+We've also added `mask` which is required for --recent in recent (no pun
+intended) versions of iptables, as well as connlimit and connmark.  This
+release has been validated against Ubuntu 14.04 and RHEL7 and should be fully
+working on those platforms.
+
+####Features
+
+- Apply firewall resources alphabetically. 
+- Add support for connlimit and connmark.
+- Add `mask` as a parameter. (Used exclusively with the recent parameter).
+
+####Bugfixes
+
+- Add systemd support for RHEL7.
+- Replace &&'s with the correct and in manifests.
+- Fix tests on Trusty and RHEL7
+- Fix for Fedora Rawhide.
+- Fix boolean flag tests.
+- Fix DNAT->SNAT typo in an error message.
+
+####Known Bugs
+
+* For Oracle, the `owner` and `socket` parameters require a workaround to function. Please see the Limitations section of the README.
+
+
 ## 2014-03-04 Supported Release 1.0.2
 ###Summary
 
