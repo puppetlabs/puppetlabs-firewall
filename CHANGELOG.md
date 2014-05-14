@@ -1,3 +1,8 @@
+##2014-05-14 - Supported Release 1.2.0
+###Summary
+
+This is a supported release of the code previously released as 1.1.0.
+
 ## 2014-05-13 Release 1.1.0
 ###Summary
 
