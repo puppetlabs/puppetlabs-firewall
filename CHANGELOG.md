@@ -1,3 +1,10 @@
+## 2014-05-16 Release 1.1.1
+###Summary
+
+This release reverts the alphabetical ordering of 1.1.0.  We found this caused
+a regression in the Openstack modules so in the interest of safety we have
+removed this for now.
+
 ## 2014-05-13 Release 1.1.0
 ###Summary
 
