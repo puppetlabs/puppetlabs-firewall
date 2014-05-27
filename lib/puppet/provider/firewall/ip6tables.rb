@@ -47,6 +47,13 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   @protocol = "IPv6"
 
+  ip6tables_version = Facter.fact('ip6tables_version').value
+  if (ip6tables_version and Puppet::Util::Package.versioncmp(ip6tables_version, '1.4.1') < 0)
+    mark_flag = '--set-mark'
+  else
+    mark_flag = '--set-xmark'
+  end
+
   @resource_map = {
     :burst => "--limit-burst",
     :connlimit_above => "-m connlimit --connlimit-above",
@@ -76,6 +83,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :rseconds => "--seconds",
     :rsource => "--rsource",
     :rttl => "--rttl",
+    :set_mark => mark_flag,
     :source => "-s",
     :state => "-m state --state",
     :sport => "-m multiport --sports",
@@ -128,11 +136,12 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # (Note: on my CentOS 6.4 ip6tables-save returns -m frag on the place
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport,
+  @resource_list = [
+    :table, :source, :destination, :iniface, :outiface, :proto,
+    :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport,
     :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
     :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject,
-    :connlimit_above, :connlimit_mask, :connmark]
+    :set_mark, :connlimit_above, :connlimit_mask, :connmark]
 
 end
