@@ -90,4 +90,23 @@ describe 'puppet resource firewall command:' do
       end
     end
   end
+
+  context 'accepts rules with negation' do
+    before :all do
+      iptables_flush_all_tables
+      shell('iptables -t nat -A POSTROUTING -s 192.168.122.0/24 -m policy --dir out --pol ipsec -j ACCEPT')
+      shell('iptables -t filter -A FORWARD -s 192.168.1.0/24 -d 192.168.122.0/24 -i eth0 -m policy --dir in --pol ipsec --reqid 108 --proto esp -j ACCEPT')
+      shell('iptables -t filter -A FORWARD -s 192.168.122.0/24 -d 192.168.1.0/24 -o eth0 -m policy --dir out --pol ipsec --reqid 108 --proto esp -j ACCEPT')
+      shell('iptables -t filter -A FORWARD -s 192.168.201.1/32 -d 192.168.122.0/24 -i eth0 -m policy --dir in --pol ipsec --reqid 107 --proto esp -j ACCEPT')
+      shell('iptables -t filter -A FORWARD -s 192.168.122.0/24 -d 192.168.201.1/32 -o eth0 -m policy --dir out --pol ipsec --reqid 107 --proto esp -j ACCEPT')
+    end
+
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
+      end
+    end
+  end
 end
