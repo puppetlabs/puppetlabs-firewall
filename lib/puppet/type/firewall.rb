@@ -884,19 +884,19 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:ipsec_policy, :required_features => :ipsec_policy) do
-	  desc <<-EOS
-	  	 Sets the ipsec policy type
-	  EOS
+    desc <<-EOS
+       Sets the ipsec policy type. May take a combination of arguments for any flags that can be passed to `--pol ipsec` such as: `--strict`, `--reqid 100`, `--next`, `--proto esp`, etc.
+    EOS
 
-	  newvalues(:none, :ipsec)
+    newvalues(:none, :ipsec)
   end
 
   newproperty(:ipsec_dir, :required_features => :ipsec_dir) do
-	  desc <<-EOS
-	  	 Sets the ipsec policy direction
-	  EOS
+    desc <<-EOS
+       Sets the ipsec policy direction
+    EOS
 
-	  newvalues(:in, :out)
+    newvalues(:in, :out)
   end
 
   newproperty(:mask, :required_features => :mask) do
