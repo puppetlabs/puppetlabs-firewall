@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe 'puppet resource firewallchain command:' do
+describe 'puppet resource firewallchain command:', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   before :all do
     iptables_flush_all_tables
   end

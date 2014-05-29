@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 
 # Some tests for the standard recommended usage
-describe 'standard usage tests:' do
+describe 'standard usage tests:', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   it 'applies twice' do
     pp = <<-EOS
       class my_fw::pre {

@@ -3,7 +3,7 @@ require 'spec_helper_acceptance'
 # Here we want to test the the resource commands ability to work with different
 # existing ruleset scenarios. This will give the parsing capabilities of the
 # code a good work out.
-describe 'puppet resource firewall command:' do
+describe 'puppet resource firewall command:', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   context 'make sure it returns no errors when executed on a clean machine' do
     it do
       shell('puppet resource firewall') do |r|
