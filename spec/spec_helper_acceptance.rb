@@ -23,6 +23,8 @@ unless ENV['RS_PROVISION'] == 'no' or ENV['BEAKER_provision'] == 'no'
   end
 end
 
+UNSUPPORTED_PLATFORMS = ['windows','Solaris','Darwin']
+
 RSpec.configure do |c|
   # Project root
   proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))

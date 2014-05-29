@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe "param based tests:" do
+describe "param based tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   # Takes a hash and converts it into a firewall resource
   def pp(params)
     name = params.delete('name') || '100 test'

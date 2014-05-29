@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall type' do
+describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
 
   describe 'connlimit_above' do
     context '10' do

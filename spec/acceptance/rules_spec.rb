@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe 'complex ruleset 1' do
+describe 'complex ruleset 1', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   before :all do
     iptables_flush_all_tables
   end

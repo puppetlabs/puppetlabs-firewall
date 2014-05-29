@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall isfragment property' do
+describe 'firewall isfragment property', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   before :all do
     iptables_flush_all_tables
   end
