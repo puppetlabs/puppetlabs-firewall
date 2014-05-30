@@ -36,5 +36,13 @@ class firewall::linux::redhat (
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
+    require   => File['/etc/sysconfig/iptables'],
+  }
+  
+  file { '/etc/sysconfig/iptables':
+    ensure => present,
+    owner  => root,
+    group   => root,
+    mode   => "0600",
   }
 }
