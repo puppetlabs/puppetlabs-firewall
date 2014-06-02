@@ -92,7 +92,7 @@ The `pre` class should be located in `my_fw/manifests/pre.pp` and should contain
       }->
       firewall { '002 accept related established rules':
         proto   => 'all',
-        state => ['RELATED', 'ESTABLISHED'],
+        ctstate => ['RELATED', 'ESTABLISHED'],
         action  => 'accept',
       }
     }
@@ -163,7 +163,7 @@ With the latest version, we now have in-built persistence, so this is no longer 
     class { ['my_fw::pre', 'my_fw::post']: }
     class { 'firewall': }
 
-Consult the the documentation below for more details around the classes `my_fw::pre` and `my_fw::post`.
+Consult the documentation below for more details around the classes `my_fw::pre` and `my_fw::post`.
 
 ##Usage
 
