@@ -1,7 +1,14 @@
-##2014-05-14 - Supported Release 1.2.0
+##2014-06-04 - Release 1.1.2
 ###Summary
 
-This is a supported release of the code previously released as 1.1.0.
+This is a release of the code previously released as 1.1.1, with updated metadata.
+
+## 2014-05-16 Release 1.1.1
+###Summary
+
+This release reverts the alphabetical ordering of 1.1.0.  We found this caused
+a regression in the Openstack modules so in the interest of safety we have
+removed this for now.
 
 ## 2014-05-13 Release 1.1.0
 ###Summary
