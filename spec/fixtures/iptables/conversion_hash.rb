@@ -38,6 +38,16 @@ ARGS_TO_HASH = {
       :table => "filter",
     },
   },
+  'action_notrack_1' => {
+    :line => '-A OUTPUT -p udp --dport 53 -m comment --comment "000 allow foo" -j NOTRACK',
+    :table => 'OUTPUT',
+    :params => {
+      :chain => "output",
+      :dport => ['53'],
+      :proto => "udp",
+      :action => "notrack",
+    },
+  },
   'action_drop_1' => {
     :line => '-A INPUT -m comment --comment "000 allow foo" -j DROP',
     :table => 'filter',

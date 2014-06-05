@@ -395,7 +395,7 @@ Puppet::Type.newtype(:firewall) do
 
       But any valid chain name is allowed.
 
-      For the values ACCEPT, DROP and REJECT you must use the generic
+      For the values ACCEPT, NOTRACK, DROP and REJECT you must use the generic
       'action' parameter. This is to enfore the use of generic parameters where
       possible for maximum cross-platform modelling.
 
@@ -411,10 +411,10 @@ Puppet::Type.newtype(:firewall) do
         EOS
       end
 
-      if ["accept","reject","drop"].include?(value.downcase)
+      if ["accept","notrack","reject","drop"].include?(value.downcase)
         raise ArgumentError, <<-EOS
-          Jump destination should not be one of ACCEPT, REJECT or DROP. Use
-          the action property instead.
+          Jump destination should not be one of ACCEPT, NOTRACK, REJECT or DROP
+          Use the action property instead.
         EOS
       end
 

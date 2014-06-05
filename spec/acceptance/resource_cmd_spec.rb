@@ -29,6 +29,21 @@ describe 'puppet resource firewall command:' do
     end
   end
 
+  context 'accepts rules with notrack' do
+    before(:all) do
+      iptables_flush_all_tables
+      shell('iptables -A OUTPUT -p tcp --dport 53 -j NOTRACK')
+    end
+
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
+      end
+    end
+  end
+
   context 'accepts rules without comments' do
     before(:all) do
       iptables_flush_all_tables
