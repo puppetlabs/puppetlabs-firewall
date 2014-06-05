@@ -35,7 +35,7 @@ The Firewall module acts on your running firewall, making immediate changes as t
 ###What Firewall Affects
 
 * Every node running a firewall
-* FIrewall Settings in Your System
+* Firewall Settings in Your System
 * Connection settings for managed nodes
 * Unmanaged resources (get purged)
 
