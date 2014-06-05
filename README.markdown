@@ -7,14 +7,14 @@
 1. [Overview - What is the Firewall module?](#overview)
 2. [Module Description - What does the module do?](#module-description)
 3. [Setup - The basics of getting started with Firewall](#setup)
-    * [What Firewall affects](#what-firewall-affects)
+    * [What Firewall Affects](#what-firewall-affects)
     * [Setup Requirements](#setup-requirements)
     * [Beginning with Firewall](#beginning-with-firewall)
     * [Upgrading](#upgrading)
 4. [Usage - Configuration and customization options](#usage)
     * [Default rules - Setting up general configurations for all firewalls](#default-rules)
     * [Application-specific rules - Options for configuring and managing firewalls across applications](#application-specific-rules)
-    * [Other Rules](#other-rules)
+    * [Additional Uses for the Firewall Module](#other-rules)
 5. [Reference - An under-the-hood peek at what the module is doing](#reference)
 6. [Limitations - OS compatibility, etc.](#limitations)
 7. [Development - Guide for contributing to the module](#development)
@@ -22,23 +22,23 @@
 
 ##Overview
 
-The Firewall module lets you manage firewall rules with Puppet.
+The Firewall module lets you manage firewall rules with Puppet. 
 
 ##Module Description
 
-PuppetLabs' Firewall introduces the resource `firewall`, which is used to manage and configure firewall rules from within the Puppet DSL. This module offers support for iptables, ip6tables, and ebtables.
+PuppetLabs' Firewall module introduces the resource `firewall`, which is used to manage and configure firewall rules from within the Puppet DSL. This module offers support for iptables and ip6tables. The module also introduces the resource `firewallchain`, which allows you to manage chains or firewall lists and ebtables for bridging support. At the moment, only iptables and ip6tables chains are supported.
 
-The module also introduces the resource `firewallchain`, which allows you to manage chains or firewall lists. At the moment, only iptables and ip6tables chains are supported.
+The Firewall module acts on your running firewall, making immediate changes as the catalog executes. Defining default pre and post rules allows you to provide global defaults for your hosts before and after any custom rules; defining pre and post rules is also necessary to help you avoid locking yourself out of your own boxes when Puppet runs. 
 
 ##Setup
 
-###What Firewall affects:
+###What Firewall Affects
 
-* every node running a firewall
-* system's firewall settings
-* connection settings for managed nodes
-* unmanaged resources (get purged)
-* site.pp
+* Every node running a firewall
+* System's firewall settings
+* Connection settings for managed nodes
+* Unmanaged resources (get purged)
+
 
 ###Setup Requirements
 
@@ -46,34 +46,27 @@ Firewall uses Ruby-based providers, so you must have [pluginsync enabled](http:/
 
 ###Beginning with Firewall
 
-To begin, you need to provide some initial top-scope configuration to ensure your firewall configurations are ordered properly and you do not lock yourself out of your box or lose any configuration.
+In the following two sections, you create new classes and then create firewall rules related to those classes. These steps are optional, but provide a framework for firewall rules, which is helpful if you’re just starting to create them. 
 
-Persistence of rules between reboots is handled automatically, although there are known issues with ip6tables on older Debian/Ubuntu, as well as known issues with ebtables.
+If you already have rules in place, then you don’t need to do these two sections. However, be aware of the ordering of your firewall rules. The module will dynamically apply rules in the order they appear in the catalog, meaning a deny rule could be applied before the allow rules. This might mean it hasn’t established some of the important connections, such as the connection to the Puppet master. 
 
-In your `site.pp` (or some similarly top-scope file), set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
+The following steps are designed to ensure that you keep your SSH and other connections, primarily your connection to your Puppet master. If you create the `pre` and `post` classes described in the first section, then you also need to create the rules described in the second section.
 
-    resources { "firewall":
-      purge => true
-    }
+####Create the `my_fw::pre` and `my_fw::post` Classes
 
-Next, set up the default parameters for all of the firewall rules you will be establishing later. These defaults will ensure that the pre and post classes (you will be setting up in just a moment) are run in the correct order to avoid locking you out of your box during the first puppet run.
+This approach employs a whitelist setup, so you can define what rules you want and everything else is ignored rather than removed.
 
-    Firewall {
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
+The code in this section does the following: The `require` parameter in `Firewall {}` ensures `my_fw::pre` is run before any other rules.  In the `my_fw::post` class declaration, the `before` parameter ensures `my_fw::post` is run after any other rules. So the run order is:
 
-You also need to declare the `my_fw::pre` & `my_fw::post` classes so that dependencies are satisfied. This can be achieved using an External Node Classifier or the following
+* The rules in `my_fw::pre`
+* Your rules (defined in code)
+* The rules in `my_fw::post`
 
-    class { ['my_fw::pre', 'my_fw::post']: }
+The rules in the `pre` and `post` classes are fairly general. The rules you define in your manifests are likely specific to the applications you run. 
 
-Finally, you should include the `firewall` class to ensure the correct packages are installed.
+These two classes ensure that you retain connectivity, and that you drop unmatched packets appropriately.
 
-    class { 'firewall': }
-
-Now to create the `my_fw::pre` and `my_fw::post` classes. Firewall acts on your running firewall, making immediate changes as the catalog executes. Defining default pre and post rules allows you provide global defaults for your hosts before and after any custom rules; it is also required to avoid locking yourself out of your own boxes when Puppet runs. This approach employs a whitelist setup, so you can define what rules you want and everything else is ignored rather than removed.
-
-The `pre` class should be located in `my_fw/manifests/pre.pp` and should contain any default rules to be applied first.
+1. Add the `pre` class to `my_fw/manifests/pre.pp`. `pre.pp` should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.
 
     class my_fw::pre {
       Firewall {
@@ -97,9 +90,9 @@ The `pre` class should be located in `my_fw/manifests/pre.pp` and should contain
       }
     }
 
-The rules in `pre` should allow basic networking (such as ICMP and TCP), as well as ensure that existing connections are not closed.
+The rules in `pre` should allow basic networking (such as ICMP and TCP), and ensure that existing connections are not closed.
 
-The `post` class should be located in `my_fw/manifests/post.pp` and include any default rules to be applied last.
+2. Add the `post` class to `my_fw/manifests/post.pp` and include any default rules to be applied last.
 
     class my_fw::post {
       firewall { '999 drop all':
@@ -109,78 +102,63 @@ The `post` class should be located in `my_fw/manifests/post.pp` and include any 
       }
     }
 
-To put it all together: the `require` parameter in `Firewall {}` ensures `my_fw::pre` is run before any other rules and the `before` parameter ensures `my_fw::post` is run after any other rules. So the run order is:
+####Create Firewall Rules
 
-* run the rules in `my_fw::pre`
-* run your rules (defined in code)
-* run the rules in `my_fw::post`
+The rules you create here are helpful if you don’t have any existing rules; they help you order your firewall configurations so you don’t lock yourself out of your box.
+
+Rules are persisted automatically between reboots, although there are known issues with ip6tables on older Debian/Ubuntu distributions. There are also known issues with ebtables.
+
+1. In `site.pp` or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine. 
+
+**Note** - This only purges IPv4 rules. 
+
+    resources { "firewall":
+      purge => true
+    }
+
+2.  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
+
+    Firewall {
+      before  => Class['my_fw::post'],
+      require => Class['my_fw::pre'],
+    }
+
+3. Then, declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an **External Node Classifier** or the following code:
+
+    class { ['my_fw::pre', 'my_fw::post']: }
+
+4. Include the `firewall` class to ensure the correct packages are installed.
+
+    class { 'firewall': }
+
 
 ###Upgrading
 
-####Upgrading from version 0.2.0 and newer
+Use these steps if you already have a version of the Firewall module installed.
+
+####From version 0.2.0 and newer
 
 Upgrade the module with the puppet module tool as normal:
 
     puppet module upgrade puppetlabs/firewall
 
-####Upgrading from version 0.1.1 and older
-
-Start by upgrading the module using the puppet module tool:
-
-    puppet module upgrade puppetlabs/firewall
-
-Previously, you would have required the following in your `site.pp` (or some other global location):
-
-    # Always persist firewall rules
-    exec { 'persist-firewall':
-      command     => $operatingsystem ? {
-        'debian'          => '/sbin/iptables-save > /etc/iptables/rules.v4',
-        /(RedHat|CentOS)/ => '/sbin/iptables-save > /etc/sysconfig/iptables',
-      },
-      refreshonly => true,
-    }
-    Firewall {
-      notify  => Exec['persist-firewall'],
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
-    Firewallchain {
-      notify  => Exec['persist-firewall'],
-    }
-    resources { "firewall":
-      purge => true
-    }
-
-With the latest version, we now have in-built persistence, so this is no longer needed. However, you will still need some basic setup to define pre & post rules.
-
-    resources { "firewall":
-      purge => true
-    }
-    Firewall {
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
-    class { ['my_fw::pre', 'my_fw::post']: }
-    class { 'firewall': }
-
-Consult the the documentation below for more details around the classes `my_fw::pre` and `my_fw::post`.
 
 ##Usage
 
-There are two kinds of firewall rules you can use with Firewall: default rules and application-specific rules. Default rules apply to general firewall settings, whereas application-specific rules manage firewall settings of a specific application, node, etc.
+There are two kinds of firewall rules you can use with Firewall: default rules and application-specific rules. Default rules apply to general firewall settings, whereas application-specific rules manage firewall settings for a specific application, node, etc.
 
-All rules employ a numbering system in the resource's title that is used for ordering. When titling your rules, make sure you prefix the rule with a number.
+All rules employ a numbering system in the resource's title that is used for ordering. When titling your rules, make sure you prefix the rule with a number, for example, `000 accept all icmp requests`
 
-      000 this runs first
-      999 this runs last
+      000 runs first
+      999 runs last
 
-###Default rules
+###Default Rules
 
-You can place default rules in either `my_fw::pre` or `my_fw::post`, depending on when you would like them to run. Rules placed in the `pre` class will run first, rules in the `post` class, last.
+You can place default rules in either `my_fw::pre` or `my_fw::post`, depending on when you would like them to run. Rules placed in the `pre` class will run first, and rules in the `post` class, last.
 
-Depending on the provider, the title of the rule can be stored using the comment feature of the underlying firewall subsystem. Values can match `/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/`.
+In iptables, the title of the rule is stored using the comment feature of the underlying firewall subsystem. Values can match `/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/`.
 
-####Examples of default rules
+####Examples of Default Rules
 
 Basic accept ICMP request example:
 
@@ -195,16 +173,16 @@ Drop all:
       action => "drop",
     }
 
-###Application-specific rules
+###Application-Specific Rules
 
 Puppet doesn't care where you define rules, and this means that you can place
 your firewall resources as close to the applications and services that you
 manage as you wish.  If you use the [roles and profiles
 pattern](https://puppetlabs.com/learn/roles-profiles-introduction) then it
-would make sense to create your firewall rules in the profiles, so that they
+makes sense to create your firewall rules in the profiles, so that they
 remain close to the services managed by the profile.
 
-An example of this might be:
+This is an example of firewall rules in a profile:
 
 ```puppet
 class profile::apache {
@@ -220,45 +198,17 @@ class profile::apache {
 ```
 
 
-However, if you're not using that pattern then you can place them directly into
-the individual module that manages a service, such as:
+###Additional Uses for the Firewall Module
 
-```puppet
-class apache {
-  firewall { '100 allow http and https access':
-    port   => [80, 443],
-    proto  => tcp,
-    action => accept,
-  }
-  # ... the rest of your code ...
-}
-```
+You can apply firewall rules to specific nodes. Usually, you will want to put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows.
 
-This means if someone includes either the profile:
-
-```puppet
-include profile::apache
-```
-
-Or the module, if you're not using roles and profiles:
-
-```puppet
-  include ::apache
-```
-
-Then they would automatically get appropriate firewall rules.
-
-###Other rules
-
-You can also apply firewall rules to specific nodes. Usually, you will want to put the firewall rule in another class and apply that class to a node. But you can apply a rule to a node.
-
-    node 'foo.bar.com' {
+    node 'some.node.com' {
       firewall { '111 open port 111':
         dport => 111
       }
     }
 
-You can also do more complex things with the `firewall` resource. Here we are doing some NAT configuration.
+You can also do more complex things with the `firewall` resource. This example sets up static NAT for the source network 10.1.2.0/24:
 
     firewall { '100 snat for network foo2':
       chain    => 'POSTROUTING',
@@ -269,7 +219,7 @@ You can also do more complex things with the `firewall` resource. Here we are do
       table    => 'nat',
     }
 
-In the below example, we are creating a new chain and forwarding any port 5000 access to it.
+The following example creates a new chain and forwards any port 5000 access to it.
 
     firewall { '100 forward to MY_CHAIN':
       chain   => 'INPUT',
@@ -288,7 +238,7 @@ In the below example, we are creating a new chain and forwarding any port 5000 a
 
 ###Additional Information
 
-You can access the inline documentation:
+Access the inline documentation:
 
     puppet describe firewall
 
@@ -316,45 +266,45 @@ Facts:
 
 ###Class: firewall
 
-This class is provided to do the basic setup tasks required for using the firewall resources.
+Performs the basic setup tasks required for using the firewall resources.
 
 At the moment this takes care of:
 
 * iptables-persistent package installation
 
-You should include the class for nodes that need to use the resources in this module. For example
+Include the `firewall` class for nodes that need to use the resources in this module:
 
     class { 'firewall': }
 
 ####`ensure`
 
-Indicates the state of `iptables` on your system, allowing you to disable `iptables` if desired.
+Parameter that controls the state of the `iptables` service on your system, allowing you to disable `iptables` if you want.
 
-Can either be `running` or `stopped`. Default to `running`.
+`ensure` can either be `running` or `stopped`. Default to `running`.
 
 ###Type: firewall
 
-This type provides the capability to manage firewall rules within puppet.
+Enables you to manage firewall rules within Puppet.
 
-For more documentation on the type, access the 'Types' tab on the Puppet Labs Forge:
-
-<http://forge.puppetlabs.com/puppetlabs/firewall#types>
+For more information on Firewall types, see the [Types tab](http://forge.puppetlabs.com/puppetlabs/firewall#types).
 
 ###Type:: firewallchain
 
-This type provides the capability to manage rule chains for firewalls.
+Enables you to manage rule chains for firewalls.
 
-For more documentation on the type, access the 'Types' tab on the Puppet Labs Forge:
+Currently this type supports only iptables, ip6tables, and ebtables on Linux. It also provides support for setting the default policy on chains and tables that allow it.
 
-<http://forge.puppetlabs.com/puppetlabs/firewall#types>
+
+For more information on Firewall types, see the [Types tab](http://forge.puppetlabs.com/puppetlabs/firewall#types).
+
 
 ###Fact: ip6tables_version
 
-The module provides a Facter fact that can be used to determine what the default version of ip6tables is for your operating system/distribution.
+A Facter fact that can be used to determine what the default version of ip6tables is for your operating system/distribution.
 
 ###Fact: iptables_version
 
-The module provides a Facter fact that can be used to determine what the default version of iptables is for your operating system/distribution.
+A Facter fact that can be used to determine what the default version of iptables is for your operating system/distribution.
 
 ###Fact: iptables_persistent_version
 
@@ -397,15 +347,6 @@ Currently we support:
 * ip6tables
 * ebtables (chains only)
 
-But plans are to support lots of other firewall implementations:
-
-* FreeBSD (ipf)
-* Mac OS X (ipfw)
-* OpenBSD (pf)
-* Cisco (ASA and basic access lists)
-
-If you have knowledge in these technologies, know how to code, and wish to contribute to this project, we would welcome the help.
-
 ###Testing
 
 Make sure you have:
@@ -423,7 +364,8 @@ And run the tests from the root of the source code:
 
 If you have a copy of Vagrant 1.1.0 you can also run the system tests:
 
-    RSPEC_SET=debian-606-x64 rake spec:system
-    RSPEC_SET=centos-58-x64 rake spec:system
+    RS_SET=ubuntu-1404-x64 rspec spec/acceptance
+    RS_SET=centos-64-x64 rspec spec/acceptance
 
-*Note:* system testing is fairly alpha at this point, your mileage may vary.
+
+
