@@ -95,13 +95,14 @@ Puppet::Type.newtype(:firewall) do
       This is the action to perform on a match. Can be one of:
 
       * accept - the packet is accepted
+      * notrack - the packet is accepted and not tracked in conntrack
       * reject - the packet is rejected with a suitable ICMP response
       * drop - the packet is dropped
 
       If you specify no value it will simply match the rule but perform no
       action unless you provide a provider specific parameter (such as *jump*).
     EOS
-    newvalues(:accept, :reject, :drop)
+    newvalues(:accept, :notrack, :reject, :drop)
   end
 
   # Generic matching properties
