@@ -43,7 +43,7 @@ describe firewall do
       res.parameters[:action].should == nil
     end
 
-    [:accept, :drop, :reject].each do |action|
+    [:accept, :notrack, :drop, :reject].each do |action|
       it "should accept value #{action}" do
         @resource[:action] = action
         @resource[:action].should == action

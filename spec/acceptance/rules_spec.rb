@@ -16,24 +16,28 @@ describe 'notrack ruleset 1' do
   it 'applies cleanly' do
   pp <<-EOS
     firewall {'010 prerouting udp sport 53 notrack':
+      table => 'RAW'
       chain => 'PREROUTING',
       proto => 'udp',
       sport => '53',
       action => 'notrack',
     }
     firewall {'011 prerouting tcp sport 53 notrack':
+      table => 'RAW'
       chain => 'PREROUTING',
       proto => 'tcp',
       sport => '53',
       action => 'notrack',
     }
     firewall {'012 output udp dport 53 notrack':
+      table => 'RAW'
       chain => 'OUTPUT',
       proto => 'udp',
       dport => '53',
       action => 'notrack',
     }
     firewall {'013 output tcp dport 53 notrack':
+      table => 'RAW'
       chain => 'OUTPUT',
       proto => 'tcp',
       dport => '53',

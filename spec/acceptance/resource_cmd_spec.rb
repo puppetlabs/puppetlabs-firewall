@@ -32,7 +32,7 @@ describe 'puppet resource firewall command:' do
   context 'accepts rules with notrack' do
     before(:all) do
       iptables_flush_all_tables
-      shell('iptables -A OUTPUT -p tcp --dport 53 -j NOTRACK')
+      shell('iptables -t raw -A OUTPUT -p tcp --dport 53 -j NOTRACK')
     end
 
     it do

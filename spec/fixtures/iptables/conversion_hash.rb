@@ -40,7 +40,7 @@ ARGS_TO_HASH = {
   },
   'action_notrack_1' => {
     :line => '-A OUTPUT -p udp --dport 53 -m comment --comment "000 allow foo" -j NOTRACK',
-    :table => 'OUTPUT',
+    :table => 'RAW',
     :params => {
       :chain => "output",
       :dport => ['53'],
