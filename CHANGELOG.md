@@ -1,3 +1,7 @@
+##2014-06-04 - Release 1.1.3
+###Summary
+This is a repackage release.
+
 ##2014-06-04 - Release 1.1.2
 ###Summary
 

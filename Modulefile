@@ -1,5 +1,5 @@
 name 'puppetlabs-firewall'
-version '1.1.2'
+version '1.1.3'
 source 'git://github.com/puppetlabs/puppetlabs-firewall.git'
 author 'puppetlabs'
 license 'ASL 2.0'
