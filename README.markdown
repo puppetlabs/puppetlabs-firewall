@@ -13,7 +13,7 @@
     * [Upgrading](#upgrading)
 4. [Usage - Configuration and customization options](#usage)
     * [Default rules - Setting up general configurations for all firewalls](#default-rules)
-    * [Application-specific rules - Options for configuring and managing firewalls across applications](#application-specific-rules)
+    * [Application-Specific Rules - Options for configuring and managing firewalls across applications](#application-specific-rules)
     * [Additional Uses for the Firewall Module](#other-rules)
 5. [Reference - An under-the-hood peek at what the module is doing](#reference)
 6. [Limitations - OS compatibility, etc.](#limitations)
@@ -68,39 +68,39 @@ These two classes ensure that you retain connectivity, and that you drop unmatch
 
 1. Add the `pre` class to `my_fw/manifests/pre.pp`. `pre.pp` should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.
 
-    class my_fw::pre {
-      Firewall {
-        require => undef,
-      }
+    	class my_fw::pre {
+      	    Firewall {
+                require => undef,
+      	    }
 
-      # Default firewall rules
-      firewall { '000 accept all icmp':
-        proto   => 'icmp',
-        action  => 'accept',
-      }->
-      firewall { '001 accept all to lo interface':
-        proto   => 'all',
-        iniface => 'lo',
-        action  => 'accept',
-      }->
-      firewall { '002 accept related established rules':
-        proto   => 'all',
-        ctstate => ['RELATED', 'ESTABLISHED'],
-        action  => 'accept',
-      }
-    }
+      	    # Default firewall rules
+      	    firewall { '000 accept all icmp':
+                proto   => 'icmp',
+                action  => 'accept',
+      	    }->
+     	    firewall { '001 accept all to lo interface':
+                proto   => 'all',
+                iniface => 'lo',
+                action  => 'accept',
+      	    }->
+      	    firewall { '002 accept related established rules':
+                proto   => 'all',
+                ctstate => ['RELATED', 'ESTABLISHED'],
+                action  => 'accept',
+      	    }
+    	}
 
 The rules in `pre` should allow basic networking (such as ICMP and TCP), and ensure that existing connections are not closed.
 
 2. Add the `post` class to `my_fw/manifests/post.pp` and include any default rules to be applied last.
 
-    class my_fw::post {
-      firewall { '999 drop all':
-        proto   => 'all',
-        action  => 'drop',
-        before  => undef,
-      }
-    }
+    	class my_fw::post {
+      	    firewall { '999 drop all':
+                proto   => 'all',
+                action  => 'drop',
+                before  => undef,
+          }
+        }
 
 ####Create Firewall Rules
 
@@ -109,27 +109,26 @@ The rules you create here are helpful if you don’t have any existing rules; th
 Rules are persisted automatically between reboots, although there are known issues with ip6tables on older Debian/Ubuntu distributions. There are also known issues with ebtables.
 
 1. In `site.pp` or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine. 
+**Note** - The below only purges IPv4 rules. 
 
-**Note** - This only purges IPv4 rules. 
-
-    resources { "firewall":
-      purge => true
-    }
+    	resources { "firewall":
+      	    purge => true
+    	}
 
 2.  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
 
-    Firewall {
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
+    	Firewall {
+      	    before  => Class['my_fw::post'],
+      	    require => Class['my_fw::pre'],
+    	}
 
 3. Then, declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an **External Node Classifier** or the following code:
 
-    class { ['my_fw::pre', 'my_fw::post']: }
+    	class { ['my_fw::pre', 'my_fw::post']: }
 
 4. Include the `firewall` class to ensure the correct packages are installed.
 
-    class { 'firewall': }
+    	class { 'firewall': }
 
 
 ###Upgrading
