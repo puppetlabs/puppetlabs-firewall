@@ -54,6 +54,10 @@ Puppet::Type.newtype(:firewall) do
   feature :ipsec_policy, "Match IPsec policy"
   feature :ipsec_dir, "Match IPsec policy direction"
   feature :mask, "Ability to match recent rules based on the ipv4 mask"
+  feature :stat_mode, "Match packets based on staistic mode"
+  feature :stat_every, "Match one packet every nth time"
+  feature :stat_packet, "Set initial counter"
+  feature :stat_prob, "Match packets based on probability"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -902,6 +906,62 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:in, :out)
   end
 
+  newproperty(:stat_mode, :required_features => :stat_mode) do
+    desc <<-EOS
+      Sets the statistic modoule mode
+    EOS
+
+    newvalues(:nth, :random)
+  end
+
+  newproperty(:stat_every, :required_features => :stat_mode) do
+    desc <<-EOS
+      Match every nth packet (used with 'nth' mode)
+    EOS
+
+    validate do |value|
+      unless value =~ /^\d+$/
+        raise ArgumentError, <<-EOS
+          stat_every value must be a digit
+        EOS
+      end
+
+      unless value.to_i > 0
+        raise ArgumentError, <<-EOS
+          stat_every value must be larger than 0
+        EOS
+      end
+    end
+  end
+
+  newproperty(:stat_packet, :required_features => :stat_mode) do
+    desc <<-EOS
+      Set initial counter (used with 'nth' mode)
+    EOS
+
+    newvalues(/^\d+$/)
+  end
+
+  newproperty(:stat_prob, :required_features => :stat_mode) do
+    desc <<-EOS
+      Set the probably for a packet to be matched (used with 'random' mode)
+    EOS
+
+    validate do |value|
+      unless value =~ /^([01])\.(\d+)$/
+        raise ArgumentError, <<-EOS
+          stat_prob must be between 0.0 and 1.0
+        EOS
+      end
+
+      if $1.to_i == 1 && $2.to_i != 0
+        raise ArgumentError, <<-EOS
+          start_prob must be between 0.0 and 1.0
+        EOS
+      end
+    end
+  end
+
   newproperty(:mask, :required_features => :mask) do
     desc <<-EOS
       Sets the mask to use when `recent` is enabled.
@@ -1081,6 +1141,24 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:mask) && ! value(:recent)
       self.fail "Mask can only be set if recent is enabled."
+    end
+
+    [:stat_packet, :stat_every, :stat_prob].each do |param|
+      if value(param) && ! value(:stat_mode)
+        self.fail "Parameter '#{param.to_s}' requires 'stat_mode' to be set"
+      end
+    end
+
+    if value(:stat_packet) && value(:stat_mode) != :nth
+      self.fail "Parameter 'stat_packet' requires 'stat_mode' to be set to 'nth'"
+    end
+
+    if value(:stat_every) && value(:stat_mode) != :nth
+      self.fail "Parameter 'stat_every' requires 'stat_mode' to be set to 'nth'"
+    end
+
+    if value(:stat_prob) && value(:stat_mode) != :random
+      self.fail "Parameter 'stat_prob' requires 'stat_mode' to be set to 'random'"
     end
 
   end
