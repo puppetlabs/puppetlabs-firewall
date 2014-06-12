@@ -91,6 +91,23 @@ describe 'puppet resource firewall command:' do
     end
   end
 
+  context 'accepts rules utilizing the statistic module' do
+    before :all do
+      iptables_flush_all_tables
+      shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode nth --every 2 -j SNAT --to-source 2.3.4.5')
+      shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode nth --every 1 --packet 0 -j SNAT --to-source 2.3.4.6')
+      shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode random --probability 0.99 -j SNAT --to-source 2.3.4.7')
+    end
+
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
+      end
+    end
+  end
+
   context 'accepts rules with negation' do
     before :all do
       iptables_flush_all_tables
