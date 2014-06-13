@@ -647,4 +647,25 @@ describe firewall do
       end
     end
   end
+  it 'is suitable' do
+    expect(@resource.suitable?).to be_truthy
+  end
+end
+
+describe 'firewall on unsupported platforms' do
+  it 'is not suitable' do
+    # Stub iptables version
+    allow(Facter.fact(:iptables_version)).to receive(:value).and_return(nil)
+    allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return(nil)
+
+    # Stub confine facts
+    allow(Facter.fact(:kernel)).to receive(:value).and_return('Darwin')
+    allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Darwin')
+    resource = firewall.new(:name => "000 test foo", :ensure => :present)
+
+    # If our provider list is nil, then the Puppet::Transaction#evaluate will
+    # say 'Error: Could not find a suitable provider for firewall' but there
+    # isn't a unit testable way to get this.
+    expect(resource.suitable?).to be_falsey
+  end
 end
