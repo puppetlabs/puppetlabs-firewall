@@ -21,6 +21,10 @@ describe 'iptables provider detection' do
   before :each do
     # Reset the default provider
     Puppet::Type.type(:firewall).defaultprovider = nil
+
+    # Stub confine facts
+    allow(Facter.fact(:kernel)).to receive(:value).and_return('Linux')
+    allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Debian')
   end
 
   it "should default to iptables provider if /sbin/iptables[-save] exists" do
@@ -32,7 +36,7 @@ describe 'iptables provider detection' do
 
     # Every other command should return false so we don't pick up any
     # other providers
-    allow(exists).to receive(:which).with() { |value|
+    allow(exists).to receive(:which) { |value|
       ! ["iptables","iptables-save"].include?(value)
     }.and_return false
 
@@ -224,7 +228,7 @@ describe 'iptables provider' do
           it "the parameter '#{param_name.to_s}' should match #{param_value.inspect}" do
             # booleans get cludged to string "true"
             if param_value == true then
-              expect(resource[param_name]).to be_true
+              expect(resource[param_name]).to be_truthy
             else
               expect(resource[param_name]).to eq(data[:params][param_name])
             end

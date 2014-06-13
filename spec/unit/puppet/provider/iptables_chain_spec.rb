@@ -21,6 +21,10 @@ describe 'iptables chain provider detection' do
   before :each do
     # Reset the default provider
     Puppet::Type.type(:firewallchain).defaultprovider = nil
+
+    # Stub confine facts
+    allow(Facter.fact(:kernel)).to receive(:value).and_return('Linux')
+    allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Debian')
   end
 
   it "should default to iptables provider if /sbin/(eb|ip|ip6)tables[-save] exists" do
@@ -42,7 +46,7 @@ describe 'iptables chain provider detection' do
 
     # Every other command should return false so we don't pick up any
     # other providers
-    allow(exists).to receive(:which).with() { |value|
+    allow(exists).to receive(:which) { |value|
       value !~ /(eb|ip|ip6)tables(-save)?$/
     }.and_return false
 
