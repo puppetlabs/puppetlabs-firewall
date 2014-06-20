@@ -43,7 +43,7 @@ describe firewall do
       res.parameters[:action].should == nil
     end
 
-    [:accept, :drop, :reject].each do |action|
+    [:accept, :notrack, :drop, :reject].each do |action|
       it "should accept value #{action}" do
         @resource[:action] = action
         @resource[:action].should == action
@@ -107,7 +107,7 @@ describe firewall do
       end
     end
 
-    ['ACCEPT', 'DROP', 'REJECT'].each do |jump|
+    ['ACCEPT', 'NOTRACK', 'DROP', 'REJECT'].each do |jump|
       it "should now fail when value #{jump}" do
         lambda { @resource[:jump] = jump }.should raise_error(Puppet::Error)
       end

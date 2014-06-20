@@ -95,13 +95,14 @@ Puppet::Type.newtype(:firewall) do
       This is the action to perform on a match. Can be one of:
 
       * accept - the packet is accepted
+      * notrack - the packet is accepted and not tracked in conntrack
       * reject - the packet is rejected with a suitable ICMP response
       * drop - the packet is dropped
 
       If you specify no value it will simply match the rule but perform no
       action unless you provide a provider specific parameter (such as *jump*).
     EOS
-    newvalues(:accept, :reject, :drop)
+    newvalues(:accept, :notrack, :reject, :drop)
   end
 
   # Generic matching properties
@@ -395,7 +396,7 @@ Puppet::Type.newtype(:firewall) do
 
       But any valid chain name is allowed.
 
-      For the values ACCEPT, DROP and REJECT you must use the generic
+      For the values ACCEPT, NOTRACK, DROP and REJECT you must use the generic
       'action' parameter. This is to enfore the use of generic parameters where
       possible for maximum cross-platform modelling.
 
@@ -411,10 +412,10 @@ Puppet::Type.newtype(:firewall) do
         EOS
       end
 
-      if ["accept","reject","drop"].include?(value.downcase)
+      if ["accept","notrack","reject","drop"].include?(value.downcase)
         raise ArgumentError, <<-EOS
-          Jump destination should not be one of ACCEPT, REJECT or DROP. Use
-          the action property instead.
+          Jump destination should not be one of ACCEPT, NOTRACK, REJECT or DROP
+          Use the action property instead.
         EOS
       end
 

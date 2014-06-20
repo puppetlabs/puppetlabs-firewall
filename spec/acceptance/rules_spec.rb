@@ -1,5 +1,73 @@
 require 'spec_helper_acceptance'
 
+describe 'notrack ruleset 1' do
+  before :all do
+    iptables_flush_all_tables
+  end
+
+  after :all do
+    shell('iptables -t filter -P PREROUTING ACCEPT')
+    shell('iptables -t filter -P OUTPUT ACCEPT')
+    shell('iptables -t filter -P INPUT ACCEPT')
+    shell('iptables -t filter -P FORWARD ACCEPT')
+    shell('iptables -t filter --flush')
+  end
+
+  it 'applies cleanly' do
+  pp <<-EOS
+    firewall {'010 prerouting udp sport 53 notrack':
+      table => 'RAW'
+      chain => 'PREROUTING',
+      proto => 'udp',
+      sport => '53',
+      action => 'notrack',
+    }
+    firewall {'011 prerouting tcp sport 53 notrack':
+      table => 'RAW'
+      chain => 'PREROUTING',
+      proto => 'tcp',
+      sport => '53',
+      action => 'notrack',
+    }
+    firewall {'012 output udp dport 53 notrack':
+      table => 'RAW'
+      chain => 'OUTPUT',
+      proto => 'udp',
+      dport => '53',
+      action => 'notrack',
+    }
+    firewall {'013 output tcp dport 53 notrack':
+      table => 'RAW'
+      chain => 'OUTPUT',
+      proto => 'tcp',
+      dport => '53',
+      action => 'notrack',
+    }
+  EOS
+
+    # Run it twice and test for idempotency
+    apply_manifest(pp, :catch_failures => true)
+    expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+  end
+
+  it 'contains appropriate rules' do
+    shell('iptables-save') do |r|
+      [
+        /PREROUTING ACCEPT/,
+        /OUTPUT ACCEPT/,
+        /INPUT ACCEPT/,
+        /FORWARD ACCEPT/,
+        /-A PREROUTING -p udp -m multiport --ports 53 -j NOTRACK/,
+        /-A PREROUTING -p tcp -m multiport --ports 53 -j NOTRACK/,
+        /-A OUTPUT -p udp -m multiport --ports 53 -j NOTRACK/,
+        /-A OUTPUT -p tcp -m multiport --ports 53 -j NOTRACK/,
+      ].each do |line|
+        expect(r.stdout).to match(line)
+      end
+    end
+  end
+end
+
 describe 'complex ruleset 1' do
   before :all do
     iptables_flush_all_tables
