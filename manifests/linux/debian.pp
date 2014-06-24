@@ -22,16 +22,16 @@ class firewall::linux::debian (
     'Debian': {
       case $::operatingsystemrelease {
         'wheezy': {
-          $package_name = "iptables-persistent"
+          $package_name = 'iptables-persistent'
         }
         default: {
-          $package_name = "netfilter-persistent"
+          $package_name = 'netfilter-persistent'
         }
       }
     }
     default: {
       # Ubuntu and others
-      $package_name = "iptables-persistent"
+      $package_name = 'iptables-persistent'
     }
   }
   
@@ -43,10 +43,10 @@ class firewall::linux::debian (
   and versioncmp($::iptables_persistent_version, '0.5.0') < 0 ) {
     # This fixes a bug in the iptables-persistent LSB headers in 6.x, without it
     # we lose idempotency
-    exec { '${package_name}-enable':
+    exec { "${package_name}-enable":
       logoutput => on_failure,
-      command   => '/usr/sbin/update-rc.d ${package_name} enable',
-      unless    => '/usr/bin/test -f /etc/rcS.d/S*${package_name}',
+      command   => "/usr/sbin/update-rc.d ${package_name} enable",
+      unless    => "/usr/bin/test -f /etc/rcS.d/S*${package_name}",
       require   => Package[$package_name],
     }
   } else {
