@@ -17,7 +17,7 @@ class firewall::linux::debian (
   $ensure = running,
   $enable = true
 ) {
-  
+
   case $::operatingsystem {
     'Debian': {
       case $::operatingsystemrelease {
@@ -34,7 +34,7 @@ class firewall::linux::debian (
       $package_name = 'iptables-persistent'
     }
   }
-  
+
   package { $package_name:
     ensure => present,
   }
