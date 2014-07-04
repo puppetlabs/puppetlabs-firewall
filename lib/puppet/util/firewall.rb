@@ -194,7 +194,7 @@ module Puppet::Util::Firewall
     when :Debian
       case proto.to_sym
       when :IPv4, :IPv6
-        if Facter.value(:operatingsystem) == 'Debian' && Facter.value(:operatingsystemrelease) != 'wheezy'
+        if Facter.value(:operatingsystem) == 'Debian' && Facter.value(:lsbdistcodename) != 'squeeze' && Facter.value(:lsbdistcodename) != 'wheezy'
           # Debian Jessie switched to netfilter-persistent
           %w{/usr/sbin/service netfilter-persistent save}
         else
