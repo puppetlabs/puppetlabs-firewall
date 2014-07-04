@@ -21,7 +21,7 @@ class firewall::linux::debian (
   case $::operatingsystem {
     'Debian': {
       case $::lsbdistcodename {
-        [ 'squeeze', 'wheezy' ]: {
+        'squeeze', 'wheezy': {
           $package_name = 'iptables-persistent'
         }
         default: {
