@@ -1,3 +1,10 @@
+##2014-07-08 - Supported Release 1.1.3
+###Summary
+This is a supported release with test coverage enhancements.
+
+####Bugfixes
+- Confine to supported kernels
+
 ##2014-06-04 - Release 1.1.2
 ###Summary
 
