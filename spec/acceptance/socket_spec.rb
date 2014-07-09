@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 
 # RHEL5 does not support -m socket
-describe 'firewall socket property', :unless => (default['platform'] =~ /el-5/ || fact('operatingsystem') == 'SLES') do
+describe 'firewall socket property', :unless => (UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) || default['platform'] =~ /el-5/ || fact('operatingsystem') == 'SLES') do
   before :all do
     iptables_flush_all_tables
   end

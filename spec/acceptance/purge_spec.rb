@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe "purge tests:" do
+describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   context('resources purge') do
     before(:all) do
       iptables_flush_all_tables

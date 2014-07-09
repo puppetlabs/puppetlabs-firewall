@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe "firewall class:" do
+describe "firewall class:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   it 'should run successfully' do
     pp = "class { 'firewall': }"
 

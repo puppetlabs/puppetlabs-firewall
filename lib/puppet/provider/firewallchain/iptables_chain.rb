@@ -16,6 +16,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
   })
 
   defaultfor :kernel => :linux
+  confine :kernel => :linux
 
   # chain name is greedy so we anchor from the end.
   # [\d+:\d+] doesn't exist on ebtables

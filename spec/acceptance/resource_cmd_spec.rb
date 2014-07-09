@@ -3,13 +3,13 @@ require 'spec_helper_acceptance'
 # Here we want to test the the resource commands ability to work with different
 # existing ruleset scenarios. This will give the parsing capabilities of the
 # code a good work out.
-describe 'puppet resource firewall command:' do
+describe 'puppet resource firewall command:', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
   context 'make sure it returns no errors when executed on a clean machine' do
     it do
       shell('puppet resource firewall') do |r|
         r.exit_code.should be_zero
         # don't check stdout, some boxes come with rules, that is normal
-        r.stderr.should be_empty
+        # don't check stderr, puppet throws deprecation warnings
       end
     end
   end
@@ -23,7 +23,6 @@ describe 'puppet resource firewall command:' do
     it do
       shell('puppet resource firewall') do |r|
         r.exit_code.should be_zero
-        r.stderr.should be_empty
         r.stdout.should == "\n"
       end
     end
@@ -39,7 +38,7 @@ describe 'puppet resource firewall command:' do
       shell('puppet resource firewall') do |r|
         r.exit_code.should be_zero
         # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
+        # don't check stderr, puppet throws deprecation warnings
       end
     end
   end
@@ -54,7 +53,7 @@ describe 'puppet resource firewall command:' do
       shell('puppet resource firewall') do |r|
         r.exit_code.should be_zero
         # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
+        # don't check stderr, puppet throws deprecation warnings
       end
     end
   end
@@ -71,7 +70,7 @@ describe 'puppet resource firewall command:' do
       shell('puppet resource firewall') do |r|
         r.exit_code.should be_zero
         # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
+        # don't check stderr, puppet throws deprecation warnings
       end
     end
   end
@@ -86,7 +85,7 @@ describe 'puppet resource firewall command:' do
       shell('puppet resource firewall') do |r|
         r.exit_code.should be_zero
         # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
+        # don't check stderr, puppet throws deprecation warnings
       end
     end
   end
