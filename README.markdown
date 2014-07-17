@@ -48,7 +48,7 @@ Firewall uses Ruby-based providers, so you must enable [pluginsync enabled](http
 
 In the following two sections, you create new classes and then create firewall rules related to those classes. These steps are optional, but provide a framework for firewall rules, which is helpful if you’re just starting to create them. 
 
-If you already have rules in place, then you don’t need to do these two sections. However, be aware of the ordering of your firewall rules. The module will dynamically apply rules in the order they appear in the catalog, meaning a deny rule could be applied before the allow rules. This might mean the mdule hasn’t established some of the important connections, such as the connection to the Puppet master. 
+If you already have rules in place, then you don’t need to do these two sections. However, be aware of the ordering of your firewall rules. The module will dynamically apply rules in the order they appear in the catalog, meaning a deny rule could be applied before the allow rules. This might mean the module hasn’t established some of the important connections, such as the connection to the Puppet master. 
 
 The following steps are designed to ensure that you keep your SSH and other connections, primarily your connection to your Puppet master. If you create the `pre` and `post` classes described in the first section, then you also need to create the rules described in the second section.
 
