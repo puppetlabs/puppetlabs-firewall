@@ -121,11 +121,12 @@ describe firewallchain do
       rel.target.ref.should == resource.ref
     end
 
-    it "provider iptables_chain should autorequire packages iptables and iptables-persistent" do
+    it "provider iptables_chain should autorequire packages iptables, iptables-persistent, and iptables-services" do
       resource[:provider].should == :iptables_chain
       packages = [
         Puppet::Type.type(:package).new(:name => 'iptables'),
-        Puppet::Type.type(:package).new(:name => 'iptables-persistent')
+        Puppet::Type.type(:package).new(:name => 'iptables-persistent'),
+        Puppet::Type.type(:package).new(:name => 'iptables-services')
       ]
       catalog = Puppet::Resource::Catalog.new
       catalog.add_resource resource
