@@ -7,7 +7,7 @@ describe 'firewall::linux', :type => :class do
   context 'RedHat like' do
     %w{RedHat CentOS Fedora}.each do |os|
       context "operatingsystem => #{os}" do
-        releases = (os == 'Fedora' ? [14,15,'Rawhide'] : [6,7])
+        releases = (os == 'Fedora' ? ['14','15','Rawhide'] : ['6','7'])
         releases.each do |osrel|
           context "operatingsystemrelease => #{osrel}" do
             let(:facts) { facts_default.merge({ :operatingsystem => os,
