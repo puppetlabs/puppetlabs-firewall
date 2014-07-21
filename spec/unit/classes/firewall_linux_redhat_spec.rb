@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe 'firewall::linux::redhat', :type => :class do
+  let(:facts) {{ :operatingsystemmajrelease => 7 }}
   it { should contain_service('iptables').with(
     :ensure => 'running',
     :enable => 'true'
