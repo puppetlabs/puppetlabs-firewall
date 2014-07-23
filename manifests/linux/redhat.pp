@@ -23,18 +23,30 @@ class firewall::linux::redhat (
   if $::operatingsystem == RedHat and $::operatingsystemrelease >= 7 {
     package { 'iptables-services':
       ensure => present,
+      before => Service['iptables'],
     }
+    Package['iptables-services'] -> Firewall <||>
   }
 
-  if ($::operatingsystem == 'Fedora' and (( $::operatingsystemrelease =~ /^\d+/ and $::operatingsystemrelease >= 15 ) or $::operatingsystemrelease == "Rawhide")) {
+  if ($::operatingsystem == 'Fedora' and (( $::operatingsystemrelease =~ /^\d+/ and $::operatingsystemrelease >= 15 ) or $::operatingsystemrelease == 'Rawhide')) {
     package { 'iptables-services':
       ensure => present,
+      before => Service['iptables'],
     }
+    Package['iptables-services'] -> Firewall <||>
   }
 
   service { 'iptables':
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
+    require   => File['/etc/sysconfig/iptables'],
+  }
+
+  file { '/etc/sysconfig/iptables':
+    ensure => present,
+    owner  => root,
+    group  => root,
+    mode   => 0600,
   }
 }
