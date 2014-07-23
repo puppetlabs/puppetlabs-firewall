@@ -22,8 +22,8 @@ Puppet::Type.newtype(:firewall) do
     `chain` or `jump` parameters, the firewall resource will autorequire
     those firewallchain resources.
 
-    If Puppet is managing the iptables or iptables-persistent packages, and
-    the provider is iptables or ip6tables, the firewall resource will
+    If Puppet is managing the iptables, iptables-persistent, or iptables-services packages,
+    and the provider is iptables or ip6tables, the firewall resource will
     autorequire those packages to ensure that any required binaries are
     installed.
   EOS
@@ -937,7 +937,7 @@ Puppet::Type.newtype(:firewall) do
   autorequire(:package) do
     case value(:provider)
     when :iptables, :ip6tables
-      %w{iptables iptables-persistent}
+      %w{iptables iptables-persistent iptables-services}
     else
       []
     end

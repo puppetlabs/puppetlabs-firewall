@@ -8,7 +8,8 @@ group :development, :test do
   gem 'puppet-lint',             :require => false
   gem 'beaker',                  :require => false
   gem 'beaker-rspec',            :require => false
-  gem 'pry',                     :require => false
+  gem 'vagrant-wrapper',         :require => false
+  gem 'pry', '~> 0.9.0',         :require => false
   gem 'simplecov',               :require => false
 end
 
