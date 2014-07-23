@@ -9,9 +9,9 @@ describe 'firewall::linux', :type => :class do
       context "operatingsystem => #{os}" do
         releases = (os == 'Fedora' ? [14,15,'Rawhide'] : [6,7])
         releases.each do |osrel|
-          context "operatingsystemrelease => #{osrel}" do
+          context "operatingsystemmajrelease => #{osrel}" do
             let(:facts) { facts_default.merge({ :operatingsystem => os,
-                                                :operatingsystemrelease => osrel}) }
+                                                :operatingsystemmajrelease => osrel}) }
             it { should contain_class('firewall::linux::redhat').with_require('Package[iptables]') }
           end
         end
