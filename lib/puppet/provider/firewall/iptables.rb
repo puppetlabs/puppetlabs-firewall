@@ -29,6 +29,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :ipsec_dir
   has_feature :ipsec_policy
   has_feature :mask
+  has_feature :stat_mode
+  has_feature :stat_every
+  has_feature :stat_packet
+  has_feature :stat_prob
 
   optional_commands({
     :iptables => 'iptables',
@@ -96,6 +100,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :ipsec_dir       => "-m policy --dir",
     :ipsec_policy    => "--pol",
     :mask            => '--mask',
+    :stat_mode       => "-m statistic --mode",
+    :stat_every      => '--every',
+    :stat_packet     => '--packet',
+    :stat_prob       => '--probability',
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -144,12 +152,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface, :proto, :isfragment,
-    :src_range, :dst_range, :tcp_flags, :gid, :uid, :sport, :dport, :port,
-    :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
-    :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :jump, :todest,
-    :tosource, :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
-    :connlimit_above, :connlimit_mask, :connmark
+    :stat_mode, :stat_every, :stat_packet, :stat_prob, :src_range, :dst_range,
+    :tcp_flags, :gid, :uid, :sport, :dport, :port, :dst_type, :src_type, 
+    :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state, :ctstate,
+    :icmp, :limit, :burst, :recent, :rseconds, :reap, :rhitcount, :rttl,
+    :rname, :mask, :rsource, :rdest, :jump, :todest, :tosource, :toports,
+    :random, :log_prefix, :log_level, :reject, :set_mark, :connlimit_above,
+    :connlimit_mask, :connmark
   ]
 
   def insert
