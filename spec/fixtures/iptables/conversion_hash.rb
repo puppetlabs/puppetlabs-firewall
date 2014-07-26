@@ -6,6 +6,15 @@
 # This hash is for testing a line conversion to a hash of parameters
 # which will be used to create a resource.
 ARGS_TO_HASH = {
+  'mac_source_1' => {
+    :line => '-A neutron-openvswi-FORWARD -s 1.2.3.4/32 -m mac --mac-source FA:16:00:00:00:00 -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :chain => 'neutron-openvswi-FORWARD',
+      :source => '1.2.3.4/32',
+      :mac_source => 'FA:16:00:00:00:00',
+    },
+  },
   'dport_and_sport' => {
     :line => '-A nova-compute-FORWARD -s 0.0.0.0/32 -d 255.255.255.255/32 -p udp -m udp --sport 68 --dport 67 -j ACCEPT',
     :table => 'filter',

@@ -1608,6 +1608,30 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
+  describe 'mac_source' do
+    context '0A:1B:3C:4D:5E:6F' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '610 - test':
+            ensure      => present,
+            source      => '10.1.5.28/32',
+            mac_source  => '0A:1B:3C:4D:5E:6F',
+            chain       => 'INPUT',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
+        end
+      end
+    end
+  end
+
   describe 'reset' do
     it 'deletes all rules' do
       shell('ip6tables --flush')
