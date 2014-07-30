@@ -77,14 +77,11 @@ module Puppet::Util::Firewall
       proto = 'tcp'
     end
 
-    if value.kind_of?(String)
-      if value.match(/^\d+(-\d+)?$/)
-        return value
-      else
-        return Socket.getservbyname(value, proto).to_s
-      end
+    m = value.to_s.match(/^(!\s+)?(\S+)/)
+    if m[2].match(/^\d+(-\d+)?$/)
+      return "#{m[1]}#{m[2]}"
     else
-      Socket.getservbyname(value.to_s, proto).to_s
+      return "#{m[1]}#{Socket.getservbyname(m[2], proto).to_s}"
     end
   end
 

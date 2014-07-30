@@ -53,6 +53,7 @@ Puppet::Type.newtype(:firewall) do
   feature :isfirstfrag, "Match the first fragment of a fragmented ipv6 packet"
   feature :ipsec_policy, "Match IPsec policy"
   feature :ipsec_dir, "Match IPsec policy direction"
+  feature :mask, "Ability to match recent rules based on the ipv4 mask"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -323,7 +324,9 @@ Puppet::Type.newtype(:firewall) do
       *tcp*.
     EOS
 
-    newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :gre, :cbt, :all)
+    newvalues(*[:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :gre, :cbt, :all].collect do |proto|
+      [proto, "! #{proto}".to_sym]
+    end.flatten)
     defaultto "tcp"
   end
 

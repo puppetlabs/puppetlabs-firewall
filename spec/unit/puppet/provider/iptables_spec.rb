@@ -315,6 +315,27 @@ describe 'iptables provider' do
     end
   end
 
+  describe 'when inverting rules' do
+    let(:resource) {
+      Puppet::Type.type(:firewall).new({
+        :name  => '040 partial invert',
+        :table       => 'filter',
+        :action      => 'accept',
+        :chain       => 'nova-compute-FORWARD',
+        :source      => '0.0.0.0/32',
+        :destination => '255.255.255.255/32',
+        :sport       => ['! 78','79','http'],
+        :dport       => ['77','! 76'],
+        :proto       => 'udp',
+      })
+    }
+    let(:instance) { provider.new(resource) }
+
+    it 'fails when not all array items are inverted' do
+      expect { instance.insert }.to raise_error Puppet::Error, /but '79', '80' are not prefixed/
+    end
+  end
+
   describe 'when deleting resources' do
     let(:sample_rule) {
       '-A INPUT -s 1.1.1.1 -d 1.1.1.1 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -j ACCEPT'

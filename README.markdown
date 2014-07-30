@@ -198,6 +198,28 @@ class profile::apache {
 }
 ```
 
+###Rule inversion
+Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
+
+Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, port, proto, source, sport, src\_range, src\_type, and state.
+
+Examples:
+
+```puppet
+firewall { '001 disallow esp protocol':
+  action => 'accept',
+  proto  => '! esp',
+}
+firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
+  chain     => 'INPUT',
+  state     => 'NEW',
+  action    => 'drop',
+  proto     => 'tcp',
+  sport     => ['! http', '! 443'],
+  source    => '! 10.0.0.0/8',
+  tcp_flags => '! FIN,SYN,RST,ACK SYN',
+}
+```
 
 ###Additional Uses for the Firewall Module
 
