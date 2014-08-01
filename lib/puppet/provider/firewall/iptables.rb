@@ -216,13 +216,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
-    values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+    values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
     # we do a similar thing for negated address masks (source and destination).
-    values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
+    values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
-    values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
+    values = values.gsub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
-    values = values.sub(/-m (tcp|udp) (--(s|d)port|-m multiport)/, '\2')
+    values = values.gsub(/-m (tcp|udp) (--(s|d)port|-m multiport)/, '\2')
     # '--pol ipsec' takes many optional arguments; we cheat again by adding " around them
     values = values.sub(/
         --pol\sipsec
@@ -291,14 +291,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # POST PARSE CLUDGING
     #####################
 
-    # Normalise all rules to CIDR notation.
-    [:source, :destination].each do |prop|
-      next if hash[prop].nil?
-      m = hash[prop].match(/(!?)\s?(.*)/)
-      neg = "! " if m[1] == "!"
-      hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
-    end
-
     [:dport, :sport, :port, :state, :ctstate].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
@@ -319,6 +311,43 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       next unless hash[prop]
       hash[prop] = hash[prop].collect do |elem|
         elem.gsub(/:/,'-')
+      end
+    end
+
+    # Invert any rules that are prefixed with a '!'
+    [
+      :connmark,
+      :ctstate,
+      :destination,
+      :dport,
+      :dst_range,
+      :dst_type,
+      :port,
+      :proto,
+      :source,
+      :sport,
+      :src_range,
+      :src_type,
+      :state,
+    ].each do |prop|
+      if hash[prop] and hash[prop].is_a?(Array)
+        # find if any are negated, then negate all if so
+        should_negate = hash[prop].index do |value|
+          value.match(/^(!)\s+/)
+        end
+        hash[prop] = hash[prop].collect { |v|
+          "! #{v.sub(/^!\s+/,'')}"
+        } if should_negate
+      elsif hash[prop]
+        m = hash[prop].match(/^(!?)\s?(.*)/)
+        neg = "! " if m[1] == "!"
+        if [:source,:destination].include?(prop)
+          p hash if hash[prop] == "udp"
+          # Normalise all rules to CIDR notation.
+          hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
+        else
+          hash[prop] = "#{neg}#{m[2]}"
+        end
       end
     end
 
@@ -424,12 +453,37 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
 
       args << [resource_map[res]].flatten.first.split(' ')
+      args = args.flatten
 
       # On negations, the '!' has to be before the option (eg: "! -d 1.2.3.4")
       if resource_value.is_a?(String) and resource_value.sub!(/^!\s*/, '') then
         # we do this after adding the 'dash' argument because of ones like "-m multiport --dports", where we want it before the "--dports" but after "-m multiport".
         # so we insert before whatever the last argument is
         args.insert(-2, '!')
+      elsif resource_value.is_a?(Symbol) and resource_value.to_s.match(/^!/) then
+        #ruby 1.8.7 can't .match Symbols ------------------ ^
+        resource_value = resource_value.to_s.sub!(/^!\s*/, '').to_sym
+        args.insert(-2, '!')
+      elsif resource_value.is_a?(Array)
+        should_negate = resource_value.index do |value|
+          #ruby 1.8.7 can't .match symbols
+          value.to_s.match(/^(!)\s+/)
+        end
+        if should_negate
+          resource_value, wrong_values = resource_value.collect do |value|
+            if value.is_a?(String)
+              wrong = value if ! value.match(/^!\s+/)
+              [value.sub(/^!\s*/, ''),wrong]
+            else
+              [value,nil]
+            end
+          end.transpose
+          wrong_values = wrong_values.compact
+          if ! wrong_values.empty?
+            fail "All values of the '#{res}' property must be prefixed with a '!' when inverting, but '#{wrong_values.join("', '")}' #{wrong_values.length>1?"are":"is"} not prefixed; aborting"
+          end
+          args.insert(-2, '!')
+        end
       end
 
 
