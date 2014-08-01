@@ -342,7 +342,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         m = hash[prop].match(/^(!?)\s?(.*)/)
         neg = "! " if m[1] == "!"
         if [:source,:destination].include?(prop)
-          p hash if hash[prop] == "udp"
           # Normalise all rules to CIDR notation.
           hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
         else
