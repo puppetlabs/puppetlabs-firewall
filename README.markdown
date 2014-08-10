@@ -70,39 +70,43 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
 
 1. Add the `pre` class to `my_fw/manifests/pre.pp`. `pre.pp` should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.
 
-    class my_fw::pre {
-      Firewall {
-        require => undef,
-      }
+```puppet
+class my_fw::pre {
+   Firewall {
+      require => undef,
+   }
 
-      # Default firewall rules
-      firewall { '000 accept all icmp':
-        proto   => 'icmp',
-        action  => 'accept',
-      }->
-      firewall { '001 accept all to lo interface':
-        proto   => 'all',
-        iniface => 'lo',
-        action  => 'accept',
-      }->
-      firewall { '002 accept related established rules':
-        proto   => 'all',
-        ctstate => ['RELATED', 'ESTABLISHED'],
-        action  => 'accept',
-      }
-    }
+   # Default firewall rules
+   firewall { '000 accept all icmp':
+      proto   => 'icmp',
+      action  => 'accept',
+   }->
+   firewall { '001 accept all to lo interface':
+      proto   => 'all',
+      iniface => 'lo',
+      action  => 'accept',
+   }->
+   firewall { '002 accept related established rules':
+      proto   => 'all',
+      ctstate => ['RELATED', 'ESTABLISHED'],
+      action  => 'accept',
+   }
+}
+```
 
 The rules in `pre` should allow basic networking (such as ICMP and TCP), and ensure that existing connections are not closed.
 
 2. Add the `post` class to `my_fw/manifests/post.pp` and include any default rules to be applied last.
 
-    class my_fw::post {
-      firewall { '999 drop all':
-        proto   => 'all',
-        action  => 'drop',
-        before  => undef,
-      }
-    }
+```puppet
+class my_fw::post {
+   firewall { '999 drop all':
+      proto   => 'all',
+      action  => 'drop',
+      before  => undef,
+   }
+}
+```
 
 ####Create Firewall Rules
 
@@ -114,24 +118,32 @@ Rules are persisted automatically between reboots, although there are known issu
 
 **Note** - This only purges IPv4 rules. 
 
-    resources { "firewall":
-      purge => true
-    }
+```puppet
+resources { "firewall":
+   purge => true
+}
+```
 
 2.  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
 
-    Firewall {
-      before  => Class['my_fw::post'],
-      require => Class['my_fw::pre'],
-    }
+```puppet
+Firewall {
+   before  => Class['my_fw::post'],
+   require => Class['my_fw::pre'],
+}
+```
 
 3. Then, declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an **External Node Classifier** or the following code:
 
-    class { ['my_fw::pre', 'my_fw::post']: }
+```puppet
+class { ['my_fw::pre', 'my_fw::post']: }
+```
 
 4. Include the `firewall` class to ensure the correct packages are installed.
 
-    class { 'firewall': }
+```puppet
+class { 'firewall': }
+```
 
 ###Upgrading
 
@@ -163,16 +175,20 @@ In iptables, the title of the rule is stored using the comment feature of the un
 
 Basic accept ICMP request example:
 
-    firewall { "000 accept all icmp requests":
-      proto  => "icmp",
-      action => "accept",
-    }
+```puppet
+firewall { "000 accept all icmp requests":
+   proto  => "icmp",
+   action => "accept",
+}
+```
 
 Drop all:
 
-    firewall { "999 drop all other requests":
-      action => "drop",
-    }
+```puppet
+firewall { "999 drop all other requests":
+   action => "drop",
+}
+```
 
 ###Application-Specific Rules
 
@@ -225,39 +241,46 @@ firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN u
 
 You can apply firewall rules to specific nodes. Usually, you will want to put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows:
 
-    node 'some.node.com' {
-      firewall { '111 open port 111':
-        dport => 111
-      }
-    }
+```puppet
+node 'some.node.com' {
+   firewall { '111 open port 111':
+     dport => 111
+   }
+}
+```
 
 You can also do more complex things with the `firewall` resource. This example sets up static NAT for the source network 10.1.2.0/24:
 
-    firewall { '100 snat for network foo2':
-      chain    => 'POSTROUTING',
-      jump     => 'MASQUERADE',
-      proto    => 'all',
-      outiface => "eth0",
-      source   => '10.1.2.0/24',
-      table    => 'nat',
-    }
+```puppet
+firewall { '100 snat for network foo2':
+   chain    => 'POSTROUTING',
+   jump     => 'MASQUERADE',
+   proto    => 'all',
+   outiface => "eth0",
+   source   => '10.1.2.0/24',
+   table    => 'nat',
+}
+```
 
 The following example creates a new chain and forwards any port 5000 access to it.
 
-    firewall { '100 forward to MY_CHAIN':
-      chain   => 'INPUT',
-      jump    => 'MY_CHAIN',
-    }
-    # The namevar here is in the format chain_name:table:protocol
-    firewallchain { 'MY_CHAIN:filter:IPv4':
-      ensure  => present,
-    }
-    firewall { '100 my rule':
-      chain   => 'MY_CHAIN',
-      action  => 'accept',
-      proto   => 'tcp',
-      dport   => 5000,
-    }
+```puppet
+firewall { '100 forward to MY_CHAIN':
+   chain   => 'INPUT',
+   jump    => 'MY_CHAIN',
+}
+
+# The namevar here is in the format chain_name:table:protocol
+firewallchain { 'MY_CHAIN:filter:IPv4':
+   ensure  => present,
+}
+firewall { '100 my rule':
+   chain   => 'MY_CHAIN',
+   action  => 'accept',
+   proto   => 'tcp',
+   dport   => 5000,
+}
+```
 
 ###Additional Information
 
@@ -297,7 +320,9 @@ At the moment this takes care of:
 
 Include the `firewall` class for nodes that need to use the resources in this module:
 
-    class { 'firewall': }
+```puppet
+class { 'firewall': }
+```
 
 ####`ensure`
 
