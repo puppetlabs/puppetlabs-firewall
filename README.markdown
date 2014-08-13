@@ -316,7 +316,7 @@ This type enables you to manage firewall rules within Puppet.
     * Required binaries: `ip6tables-save`, `ip6tables`.
     * Supported features: `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `state_match`, `tcp_flags`.
     
-  * `iptables`: Iptables type provider
+* `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
     * Default for `kernel` == `linux`.
     * Supported features: `address_type`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
@@ -395,50 +395,24 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `burst`: Rate limiting burst value (per second) before limit checks apply. Values must match '/^\d+$/'. Requires the `rate_limiting` feature.
 
 * `chain`: Name of the chain to use. You can provide a user-based chain or use one of the following built-in chains:'INPUT','FORWARD','OUTPUT','PREROUTING', or 'POSTROUTING'. The default value is 'INPUT'. Values must match '/^[a-zA-Z0-9\-_]+$/'. Requires the `iptables` feature.
-  * 'INPUT'
-  * 'FORWARD'
-  * 'OUTPUT'
-  * 'PREROUTING'
-  * 'POSTROUTING'
-  
-  The default value is 'INPUT'. Values can match `/^[a-zA-Z0-9\-_]+$/`. Requires the `iptables` feature.
-
+ 
 * `connlimit_above`: Connection limiting value for matched connections above n. Values must match '/^\d+$/'. Requires the `connection_limiting` feature.
 
-* `connlimit_mask`: Connection limiting by subnet mask for matched connections. 
-Apply a subnet mask of /0 to /32 for IPv4, and a subnet mask of /0 to /128 for IPv6. Values must match '/^\d+$/'. Requires the `connection_limiting` feature.
+* `connlimit_mask`: Connection limiting by subnet mask for matched connections. Apply a subnet mask of /0 to /32 for IPv4, and a subnet mask of /0 to /128 for IPv6. Values must match '/^\d+$/'. Requires the `connection_limiting` feature.
 
 * `connmark`: Match the Netfilter mark value associated with the packet. Accepts values `mark/mask` or `mark`. These will be converted to hex if they are not hex already. Requires the `mark` feature.
 
-* `ctstate`: Matches a packet based on its state in the firewall stateful inspection table, using the conntrack module. Valid values are:
-  * 'INVALID'
-  * 'ESTABLISHED'
-  * 'NEW'
-  * 'RELATED'
-  
-  Requires the `state_match` feature.
-
-* `destination`: The destination address to match. For example:
-
-  destination => '192.168.1.0/24'
-  
-  You can also negate a mask by putting ! in front. For example:
-
-  destination  => '! 192.168.2.0/24'
-  
-  The destination can also be an IPv6 address if your provider supports it.
+* `ctstate`: Matches a packet based on its state in the firewall stateful inspection table, using the conntrack module. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'. Requires the `state_match` feature.
 
 * `destination`: The destination address to match. For example: `destination` => '192.168.1.0/24'. You can also negate a mask by putting ! in front. For example: `destination`  => '! 192.168.2.0/24'. The destination can also be an IPv6 address if your provider supports it.
 
-  For some firewall providers you can pass a range of ports in the format: `<start_number>-<ending_number>`. For example, '1-1024' would cover ports 1 to 1024.
+  For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
 * `dport`: The destination port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
 * `dst_range`: The destination IP range. For example: `dst_range` => '192.168.1.1-192.168.1.10'.
   
   The destination IP range is must in 'IP1-IP2' format. Values must match '0.0.0.0-0.0.0.0' through '255.255.255.255-255.255.255.255'. Requires the `iprange` feature.
-
-* `dst_type`: The destination address type. For example:
 
 * `dst_type`: The destination address type. For example: `dst_type` => 'LOCAL'.
 
@@ -472,23 +446,12 @@ Apply a subnet mask of /0 to /32 for IPv4, and a subnet mask of /0 to /128 for I
 
 * `ipsec_policy`: Sets the ipsec policy type. Valid values are 'none', 'ipsec'. Requires the `ipsec_policy` feature.
 
-* `isfirstfrag`: If true, matches if the packet is the first fragment. Cannot be negated. Supported by ipv6 only. Valid values are `true`, `false`. Requires the `isfirstfrag` feature.
-
-* `isfragment`: Set to 'true' to match tcp fragments (requires type to be set to tcp). Valid values are 'true', 'false'. Requires features `isfragment`.
-
 * `isfirstfrag`: If true, matches when the packet is the first fragment of a fragmented ipv6 packet. Cannot be negated. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `isfirstfrag` feature. 
 
 * `isfragment`: If 'true', matches when the packet is a tcp fragment of a fragmented packet. Supported by iptables only. Valid values are 'true', 'false'. Requires features `isfragment`.
 
 * `ishasmorefrags`: If 'true', matches when the packet has the 'more fragments' bit set. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `ishasmorefrags` feature.
 
-  * 'QUEUE'
-  * 'RETURN'
-  * 'DNAT'
-  * 'SNAT'
-  * 'LOG'
-  * 'MASQUERADE'
-  * 'REDIRECT'
 * `islastfrag`: If true, matches when the packet is the last fragment of a fragmented ipv6 packet. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `islastfrag`.
 
 * `jump`: The value for the iptables `--jump` parameter. Any valid chain name is allowed, but normal values are: 'QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK'.
@@ -509,22 +472,20 @@ Apply a subnet mask of /0 to /32 for IPv4, and a subnet mask of /0 to /128 for I
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
-      firewall { '000 this runs first':
-        # this rule will run first
-      }
-      firewall { '999 this runs last':
-        # this rule will run last
-      }
-  
+```
+firewall { '000 this runs first':
+  # this rule will run first
+}
+firewall { '999 this runs last':
+  # this rule will run last
+}
+ ``` 
+ 
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/'.
 
 * `outiface`: Output interface to filter on. Values must match '/^[a-zA-Z0-9\-\._\+]+$/'. Requires the `interface_match` feature.
 
-* `pkttype`: Sets the packet type to match. Valid values are:
-  * 'unicast'
-  * 'broadcast'
-  * 'multicast'
-Requires the `pkttype` feature.
+* `pkttype`: Sets the packet type to match. Valid values are: 'unicast', 'broadcast', and'multicast'. Requires the `pkttype` feature.
 
 * `port`: The destination or source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
@@ -544,16 +505,7 @@ Requires the `pkttype` feature.
 
 * `provider`: The specific backend to use for this firewall resource. You will seldom need to specify this --- Puppet will usually discover the appropriate provider for your platform. Available providers are ip6tables and iptables. See the [Providers](#providers) section above for details about these providers.
 
-  * ip6tables: Ip6tables type provider
-    * Required binaries: `ip6tables-save`, `ip6tables`.
-    * Supported features: `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `state_match`, `tcp_flags`.
-    
-  * iptables : Iptables type provider
-    * Required binaries: `iptables-save`, `iptables`.
-    * Default for `kernel` == `linux`.
-    * Supported features: `address_type`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
-
-* `random`: When using a `jump` value of 'MASQUERADE', 'DNAT', 'REDIRECT', or 'SNAT', this boolean will enable randomized port mapping. Valid values are 'true', 'false'. Requires the `dnat` feature.
+ * `random`: When using a `jump` value of 'MASQUERADE', 'DNAT', 'REDIRECT', or 'SNAT', this boolean will enable randomized port mapping. Valid values are 'true', 'false'. Requires the `dnat` feature.
 
 * `rdest`: If boolean 'true', adds the destination IP address to the list. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
 
@@ -583,13 +535,6 @@ Requires the `pkttype` feature.
           chain       => 'FORWARD',
         }
 
-  Valid values are: 
-
-    * 'set'
-    * 'update'
-    * 'rcheck'
-    * 'remove'
-  
   Requires the `recent_limiting` feature.
 
 * `reject`: When combined with `jump` => 'REJECT', you can specify a different ICMP response to be sent back to the packet sender. Requires the `reject_type` feature.
@@ -608,25 +553,8 @@ Requires the `pkttype` feature.
 
 * `socket`: If 'true', matches if an open socket can be found by doing a socket lookup on the packet. Valid values are 'true', 'false'. Requires the `socket` feature.
 
-* `source`: The source address. For example:
-
-  source => '192.168.2.0/24'
-  
-  You can also negate a mask by putting ! in front. For example:
-
-  source => '! 192.168.2.0/24'
-  
 * `source`: The source address. For example: `source` => '192.168.2.0/24'. You can also negate a mask by putting ! in front. For example: `source` => '! 192.168.2.0/24'. The source can also be an IPv6 address if your provider supports it.
 
-* `sport`: The source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format:
-
-  `<start_number>-<ending_number>`
-For example, '1-1024' would cover ports 1 to 1024.
-
-* `src_range`: The source IP range. For example:
-
-  src_range => '192.168.1.1-192.168.1.10'
-  
 * `sport`: The source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format:'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
 * `src_range`: The source IP range. For example: `src_range` => '192.168.1.1-192.168.1.10'. The source IP range is must in 'IP1-IP2' format. Values must match '0.0.0.0-0.0.0.0' through '255.255.255.255-255.255.255.255'. Requires the `iprange` feature.
@@ -649,36 +577,13 @@ For example, '1-1024' would cover ports 1 to 1024.
 
   Requires the `address_type` feature.
 
-* `state`: Matches a packet based on its state in the firewall stateful inspection table. Valid values are:
-
-  * 'INVALID'
-  * 'ESTABLISHED'
-  * 'NEW'
-  * 'RELATED'
-
-  Requires the `state_match` feature.
-
 * `state`: Matches a packet based on its state in the firewall stateful inspection table. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'. Requires the `state_match` feature.
-
-  * 'nat'
-  * 'mangle'
-  * 'filter'
-  * 'raw'
-  * 'rawpost'
 
 * `table`: Table to use. Valid values are: 'nat', 'mangle', 'filter', 'raw', 'rawpost'. By default the setting is 'filter'. Requires the `iptables` feature.
 
 * `tcp_flags`: Match when the TCP flags are as specified. Set as a string with a list of comma-separated flag names for the mask, then a space, then a comma-separated list of flags that should be set. The flags are: 'SYN', 'ACK', 'FIN', 'RST', 'URG', 'PSH', 'ALL', 'NONE'.
-  * 'SYN' 
-  * 'ACK' 
-  * 'FIN' 
-  * 'RST' 
-  * 'URG' 
-  * 'PSH' 
-  * 'ALL' 
-  * 'NONE'
-  
-  Note that you specify flags in the order that iptables `--list` rules would list them to avoid having Puppet think you changed the flags. For example, `FIN,SYN,RST,ACK SYN` matches packets with the SYN bit set and the ACK, RST and FIN bits cleared. Such packets are used to request TCP connection initiation. Requires the `tcp_flags` feature.
+ 
+   Note that you specify flags in the order that iptables `--list` rules would list them to avoid having Puppet think you changed the flags. For example, 'FIN,SYN,RST,ACK SYN' matches packets with the SYN bit set and the ACK, RST and FIN bits cleared. Such packets are used to request TCP connection initiation. Requires the `tcp_flags` feature.
 
 * `todest`: When using `jump` => 'DNAT', you can specify the new destination address using this parameter. Requires the `dnat` feature.
 
@@ -731,8 +636,6 @@ Currently this type supports only iptables, ip6tables, and ebtables on Linux. It
   * 'drop': The packet is dropped.
   * 'queue': The packet is passed userspace.
   * 'return': The packet is returned to calling (jump) queue or to the default of inbuilt chains.
-
-* `provider`: The specific backend to use for this firewallchain resource. You will seldom need to specify this --- Puppet will usually discover the appropriate provider for your platform. Available providers are:
 
 * `provider`: The specific backend to use for this firewallchain resource. You will seldom need to specify this --- Puppet will usually discover the appropriate provider for your platform. The only available provider is: 
 
