@@ -404,17 +404,17 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `ctstate`: Matches a packet based on its state in the firewall stateful inspection table, using the conntrack module. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'. Requires the `state_match` feature.
 
-* `destination`: The destination address to match. For example: `destination` => '192.168.1.0/24'. You can also negate a mask by putting ! in front. For example: `destination`  => '! 192.168.2.0/24'. The destination can also be an IPv6 address if your provider supports it.
+* `destination`: The destination address to match. For example: `destination => '192.168.1.0/24'`. You can also negate a mask by putting ! in front. For example: `destination  => '! 192.168.2.0/24'`. The destination can also be an IPv6 address if your provider supports it.
 
   For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
 * `dport`: The destination port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
-* `dst_range`: The destination IP range. For example: `dst_range` => '192.168.1.1-192.168.1.10'.
+* `dst_range`: The destination IP range. For example: `dst_range => '192.168.1.1-192.168.1.10'`.
   
   The destination IP range is must in 'IP1-IP2' format. Values must match '0.0.0.0-0.0.0.0' through '255.255.255.255-255.255.255.255'. Requires the `iprange` feature.
 
-* `dst_type`: The destination address type. For example: `dst_type` => 'LOCAL'.
+* `dst_type`: The destination address type. For example: `dst_type => 'LOCAL'`.
 
   Valid values are:
 
@@ -464,9 +464,9 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `line`: Read-only property for caching the rule line.
 
-* `log_level`: When combined with `jump` => 'LOG' specifies the system log level to log to. Requires the `log_level` feature.
+* `log_level`: When combined with `jump => 'LOG'` specifies the system log level to log to. Requires the `log_level` feature.
 
-* `log_prefix`: When combined with `jump` => 'LOG' specifies the log prefix to use when logging. Requires the `log_prefix` feature.
+* `log_prefix`: When combined with `jump => 'LOG'` specifies the log prefix to use when logging. Requires the `log_prefix` feature.
 
 * `mask`: Sets the mask to use when `recent` is enabled. Requires the `mask` feature.
 
@@ -513,53 +513,55 @@ firewall { '999 this runs last':
 
 * `recent`: Enable the recent module. Valid values are: 'set', 'update', 'rcheck', or 'remove'. For example:
 
-        # If anyone's appeared on the 'badguy' blacklist within
-        # the last 60 seconds, drop their traffic, and update the timestamp.
-        firewall { '100 Drop badguy traffic':
-          recent   => 'update',
-          rseconds => 60,
-          rsource  => true,
-          rname    => 'badguy',
-          action   => 'DROP',
-          chain    => 'FORWARD',
-        }
-        # No-one should be sending us traffic on eth0 from localhost
-        # Blacklist them
-        firewall { '101 blacklist strange traffic':
-          recent      => 'set',
-          rsource     => true,
-          rname       => 'badguy',
-          destination => '127.0.0.0/8',
-          iniface     => 'eth0',
-          action      => 'DROP',
-          chain       => 'FORWARD',
-        }
+``` 
+# If anyone's appeared on the 'badguy' blacklist within
+# the last 60 seconds, drop their traffic, and update the timestamp.
+firewall { '100 Drop badguy traffic':
+  recent   => 'update',
+  rseconds => 60,
+  rsource  => true,
+  rname    => 'badguy',
+  action   => 'DROP',
+  chain    => 'FORWARD',
+}
+# No-one should be sending us traffic on eth0 from localhost
+# Blacklist them
+firewall { '101 blacklist strange traffic':
+  recent      => 'set',
+  rsource     => true,
+  rname       => 'badguy',
+  destination => '127.0.0.0/8',
+  iniface     => 'eth0',
+  action      => 'DROP',
+  chain       => 'FORWARD',
+}
+```
 
   Requires the `recent_limiting` feature.
 
-* `reject`: When combined with `jump` => 'REJECT', you can specify a different ICMP response to be sent back to the packet sender. Requires the `reject_type` feature.
+* `reject`: When combined with `jump => 'REJECT'`, you can specify a different ICMP response to be sent back to the packet sender. Requires the `reject_type` feature.
 
-* `rhitcount`: Used in conjunction with `recent` => 'update' or `recent` => 'rcheck'. When used, this will narrow the match to happen only when the address is in the list and packets greater than or equal to the given value have been received. Requires the `recent_limiting` feature and the `recent` parameter.
+* `rhitcount`: Used in conjunction with `recent => 'update'` or `recent => 'rcheck'`. When used, this will narrow the match to happen only when the address is in the list and packets greater than or equal to the given value have been received. Requires the `recent_limiting` feature and the `recent` parameter.
 
 * `rname`: Specify the name of the list. Takes a string argument. Requires the `recent_limiting` feature and the `recent` parameter.
 
-* `rseconds`: Used in conjunction with `recent` => 'rcheck' or `recent` => 'update'. When used, this will narrow the match to only happen when the address is in the list and was seen within the last given number of seconds. Requires the `recent_limiting` feature and the `recent` parameter.
+* `rseconds`: Used in conjunction with `recent => 'rcheck'` or `recent => 'update'`. When used, this will narrow the match to only happen when the address is in the list and was seen within the last given number of seconds. Requires the `recent_limiting` feature and the `recent` parameter.
 
 * `rsource`: If boolean 'true', adds the source IP address to the list. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
 
-* `rttl`: May only be used in conjunction with `recent` => 'rcheck' or `recent` => 'update'. If boolean 'true', this will narrow the match to happen only when the address is in the list and the TTL of the current packet matches that of the packet that hit the `recent` => 'set' rule. If you have problems with DoS attacks via bogus packets from fake source addresses, this parameter may help. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
+* `rttl`: May only be used in conjunction with `recent => 'rcheck'` or `recent => 'update'`. If boolean 'true', this will narrow the match to happen only when the address is in the list and the TTL of the current packet matches that of the packet that hit the `recent => 'set'` rule. If you have problems with DoS attacks via bogus packets from fake source addresses, this parameter may help. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
 
 * `set_mark`: Set the Netfilter mark value associated with the packet. Accepts either  'mark/mask' or 'mark'. These will be converted to hex if they are not already. Requires the `mark` feature.
 
 * `socket`: If 'true', matches if an open socket can be found by doing a socket lookup on the packet. Valid values are 'true', 'false'. Requires the `socket` feature.
 
-* `source`: The source address. For example: `source` => '192.168.2.0/24'. You can also negate a mask by putting ! in front. For example: `source` => '! 192.168.2.0/24'. The source can also be an IPv6 address if your provider supports it.
+* `source`: The source address. For example: `source => '192.168.2.0/24'`. You can also negate a mask by putting ! in front. For example: `source => '! 192.168.2.0/24'`. The source can also be an IPv6 address if your provider supports it.
 
 * `sport`: The source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format:'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
-* `src_range`: The source IP range. For example: `src_range` => '192.168.1.1-192.168.1.10'. The source IP range is must in 'IP1-IP2' format. Values must match '0.0.0.0-0.0.0.0' through '255.255.255.255-255.255.255.255'. Requires the `iprange` feature.
+* `src_range`: The source IP range. For example: `src_range => '192.168.1.1-192.168.1.10'`. The source IP range is must in 'IP1-IP2' format. Values must match '0.0.0.0-0.0.0.0' through '255.255.255.255-255.255.255.255'. Requires the `iprange` feature.
 
-* `src_type`: Specify the source address type. For example: `src_type` => 'LOCAL'.
+* `src_type`: Specify the source address type. For example: `src_type => 'LOCAL'`.
 
   Valid values are:
 
@@ -585,11 +587,11 @@ firewall { '999 this runs last':
  
    Note that you specify flags in the order that iptables `--list` rules would list them to avoid having Puppet think you changed the flags. For example, 'FIN,SYN,RST,ACK SYN' matches packets with the SYN bit set and the ACK, RST and FIN bits cleared. Such packets are used to request TCP connection initiation. Requires the `tcp_flags` feature.
 
-* `todest`: When using `jump` => 'DNAT', you can specify the new destination address using this parameter. Requires the `dnat` feature.
+* `todest`: When using `jump => 'DNAT'`, you can specify the new destination address using this parameter. Requires the `dnat` feature.
 
 * `toports`: For DNAT this is the port that will replace the destination port. Requires the `dnat` feature.
 
-* `tosource`: When using `jump` => 'SNAT', you can specify the new source address using this parameter. Requires the `snat` feature.
+* `tosource`: When using `jump => 'SNAT'`, you can specify the new source address using this parameter. Requires the `snat` feature.
 
 * `uid`: UID or Username owner matching rule. Accepts a string argument only, as iptables does not accept multiple uid in a single statement. Requires the `owner` feature.
 
