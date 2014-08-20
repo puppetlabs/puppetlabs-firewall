@@ -29,10 +29,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :ipsec_dir
   has_feature :ipsec_policy
   has_feature :mask
-  has_feature :stat_mode
-  has_feature :stat_every
-  has_feature :stat_packet
-  has_feature :stat_prob
 
   optional_commands({
     :iptables => 'iptables',

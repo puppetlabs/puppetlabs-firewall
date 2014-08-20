@@ -54,10 +54,6 @@ Puppet::Type.newtype(:firewall) do
   feature :ipsec_policy, "Match IPsec policy"
   feature :ipsec_dir, "Match IPsec policy direction"
   feature :mask, "Ability to match recent rules based on the ipv4 mask"
-  feature :stat_mode, "Match packets based on staistic mode"
-  feature :stat_every, "Match one packet every nth time"
-  feature :stat_packet, "Set initial counter"
-  feature :stat_prob, "Match packets based on probability"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -906,17 +902,17 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:in, :out)
   end
 
-  newproperty(:stat_mode, :required_features => :stat_mode) do
+  newproperty(:stat_mode) do
     desc <<-EOS
-      Sets the statistic modoule mode
+      Set the matching mode for statistic matching. Supported modes are `random` and `nth`.
     EOS
 
     newvalues(:nth, :random)
   end
 
-  newproperty(:stat_every, :required_features => :stat_mode) do
+  newproperty(:stat_every) do
     desc <<-EOS
-      Match every nth packet (used with 'nth' mode)
+      Match one packet every nth packet. Requires `stat_mode => 'nth'`
     EOS
 
     validate do |value|
@@ -934,29 +930,29 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:stat_packet, :required_features => :stat_mode) do
+  newproperty(:stat_packet) do
     desc <<-EOS
-      Set initial counter (used with 'nth' mode)
+      Set the initial counter value for the nth mode. Must be between 0 and the value of `stat_every`. Defaults to 0. Requires `stat_mode => 'nth'`
     EOS
 
     newvalues(/^\d+$/)
   end
 
-  newproperty(:stat_prob, :required_features => :stat_mode) do
+  newproperty(:stat_probability) do
     desc <<-EOS
-      Set the probably for a packet to be matched (used with 'random' mode)
+      Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
     EOS
 
     validate do |value|
       unless value =~ /^([01])\.(\d+)$/
         raise ArgumentError, <<-EOS
-          stat_prob must be between 0.0 and 1.0
+          stat_probability must be between 0.0 and 1.0
         EOS
       end
 
       if $1.to_i == 1 && $2.to_i != 0
         raise ArgumentError, <<-EOS
-          start_prob must be between 0.0 and 1.0
+          start_probability must be between 0.0 and 1.0
         EOS
       end
     end
@@ -1143,7 +1139,7 @@ Puppet::Type.newtype(:firewall) do
       self.fail "Mask can only be set if recent is enabled."
     end
 
-    [:stat_packet, :stat_every, :stat_prob].each do |param|
+    [:stat_packet, :stat_every, :stat_probability].each do |param|
       if value(param) && ! value(:stat_mode)
         self.fail "Parameter '#{param.to_s}' requires 'stat_mode' to be set"
       end
@@ -1157,8 +1153,8 @@ Puppet::Type.newtype(:firewall) do
       self.fail "Parameter 'stat_every' requires 'stat_mode' to be set to 'nth'"
     end
 
-    if value(:stat_prob) && value(:stat_mode) != :random
-      self.fail "Parameter 'stat_prob' requires 'stat_mode' to be set to 'random'"
+    if value(:stat_probability) && value(:stat_mode) != :random
+      self.fail "Parameter 'stat_probability' requires 'stat_mode' to be set to 'random'"
     end
 
   end
