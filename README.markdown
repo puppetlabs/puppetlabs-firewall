@@ -579,6 +579,14 @@ firewall { '101 blacklist strange traffic':
 
   Requires the `address_type` feature.
 
+* `stat_every`: Match one packet every nth packet. Requires `stat_mode => 'nth'`
+
+* `stat_mode`: Set the matching mode for statistic matching. Supported modes are `random` and `nth`.
+
+* `stat_packet`: Set the initial counter value for the nth mode. Must be between 0 and the value of `stat_every`. Defaults to 0. Requires `stat_mode => 'nth'`
+
+* `stat_probability`: Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
+
 * `state`: Matches a packet based on its state in the firewall stateful inspection table. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'. Requires the `state_match` feature.
 
 * `table`: Table to use. Valid values are: 'nat', 'mangle', 'filter', 'raw', 'rawpost'. By default the setting is 'filter'. Requires the `iptables` feature.

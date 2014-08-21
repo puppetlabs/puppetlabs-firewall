@@ -902,6 +902,62 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:in, :out)
   end
 
+  newproperty(:stat_mode) do
+    desc <<-EOS
+      Set the matching mode for statistic matching. Supported modes are `random` and `nth`.
+    EOS
+
+    newvalues(:nth, :random)
+  end
+
+  newproperty(:stat_every) do
+    desc <<-EOS
+      Match one packet every nth packet. Requires `stat_mode => 'nth'`
+    EOS
+
+    validate do |value|
+      unless value =~ /^\d+$/
+        raise ArgumentError, <<-EOS
+          stat_every value must be a digit
+        EOS
+      end
+
+      unless value.to_i > 0
+        raise ArgumentError, <<-EOS
+          stat_every value must be larger than 0
+        EOS
+      end
+    end
+  end
+
+  newproperty(:stat_packet) do
+    desc <<-EOS
+      Set the initial counter value for the nth mode. Must be between 0 and the value of `stat_every`. Defaults to 0. Requires `stat_mode => 'nth'`
+    EOS
+
+    newvalues(/^\d+$/)
+  end
+
+  newproperty(:stat_probability) do
+    desc <<-EOS
+      Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
+    EOS
+
+    validate do |value|
+      unless value =~ /^([01])\.(\d+)$/
+        raise ArgumentError, <<-EOS
+          stat_probability must be between 0.0 and 1.0
+        EOS
+      end
+
+      if $1.to_i == 1 && $2.to_i != 0
+        raise ArgumentError, <<-EOS
+          start_probability must be between 0.0 and 1.0
+        EOS
+      end
+    end
+  end
+
   newproperty(:mask, :required_features => :mask) do
     desc <<-EOS
       Sets the mask to use when `recent` is enabled.
@@ -1081,6 +1137,24 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:mask) && ! value(:recent)
       self.fail "Mask can only be set if recent is enabled."
+    end
+
+    [:stat_packet, :stat_every, :stat_probability].each do |param|
+      if value(param) && ! value(:stat_mode)
+        self.fail "Parameter '#{param.to_s}' requires 'stat_mode' to be set"
+      end
+    end
+
+    if value(:stat_packet) && value(:stat_mode) != :nth
+      self.fail "Parameter 'stat_packet' requires 'stat_mode' to be set to 'nth'"
+    end
+
+    if value(:stat_every) && value(:stat_mode) != :nth
+      self.fail "Parameter 'stat_every' requires 'stat_mode' to be set to 'nth'"
+    end
+
+    if value(:stat_probability) && value(:stat_mode) != :random
+      self.fail "Parameter 'stat_probability' requires 'stat_mode' to be set to 'random'"
     end
 
   end
