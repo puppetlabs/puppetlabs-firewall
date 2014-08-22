@@ -17,7 +17,25 @@ class firewall::linux::debian (
   $ensure = running,
   $enable = true
 ) {
-  package { 'iptables-persistent':
+
+  case $::operatingsystem {
+    'Debian': {
+      case $::lsbdistcodename {
+        'squeeze', 'wheezy': {
+          $package_name = 'iptables-persistent'
+        }
+        default: {
+          $package_name = 'netfilter-persistent'
+        }
+      }
+    }
+    default: {
+      # Ubuntu and others
+      $package_name = 'iptables-persistent'
+    }
+  }
+
+  package { $package_name:
     ensure => present,
   }
 
@@ -25,20 +43,20 @@ class firewall::linux::debian (
   and versioncmp($::iptables_persistent_version, '0.5.0') < 0 ) {
     # This fixes a bug in the iptables-persistent LSB headers in 6.x, without it
     # we lose idempotency
-    exec { 'iptables-persistent-enable':
+    exec { "${package_name}-enable":
       logoutput => on_failure,
-      command   => '/usr/sbin/update-rc.d iptables-persistent enable',
-      unless    => '/usr/bin/test -f /etc/rcS.d/S*iptables-persistent',
-      require   => Package['iptables-persistent'],
+      command   => "/usr/sbin/update-rc.d ${package_name} enable",
+      unless    => "/usr/bin/test -f /etc/rcS.d/S*${package_name}",
+      require   => Package[$package_name],
     }
   } else {
     # This isn't a real service/daemon. The start action loads rules, so just
     # needs to be called on system boot.
-    service { 'iptables-persistent':
+    service { $package_name:
       ensure    => undef,
       enable    => $enable,
       hasstatus => true,
-      require   => Package['iptables-persistent'],
+      require   => Package[$package_name],
     }
   }
 }
