@@ -191,7 +191,11 @@ module Puppet::Util::Firewall
     when :Debian
       case proto.to_sym
       when :IPv4, :IPv6
-        %w{/usr/sbin/service iptables-persistent save}
+        if Puppet::Util::Package.versioncmp(persist_ver, '1.0') > 0
+          %w{/usr/sbin/service netfilter-persistent save}
+        else
+          %w{/usr/sbin/service iptables-persistent save}
+        end
       end
     when :Debian_manual
       case proto.to_sym
