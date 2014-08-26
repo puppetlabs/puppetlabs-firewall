@@ -1039,20 +1039,6 @@ Puppet::Type.newtype(:firewall) do
 
     # Now we analyse the individual properties to make sure they apply to
     # the correct combinations.
-    if value(:iniface)
-      unless value(:chain).to_s =~ /INPUT|FORWARD|PREROUTING/
-        self.fail "Parameter iniface only applies to chains " \
-          "INPUT,FORWARD,PREROUTING"
-      end
-    end
-
-    if value(:outiface)
-      unless value(:chain).to_s =~ /OUTPUT|FORWARD|POSTROUTING/
-        self.fail "Parameter outiface only applies to chains " \
-          "OUTPUT,FORWARD,POSTROUTING"
-      end
-    end
-
     if value(:uid)
       unless value(:chain).to_s =~ /OUTPUT|POSTROUTING/
         self.fail "Parameter uid only applies to chains " \
