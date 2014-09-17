@@ -1090,13 +1090,6 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
-    if value(:jump).to_s == "REDIRECT"
-      unless value(:toports)
-        self.fail "Parameter jump => REDIRECT missing mandatory toports " \
-          "parameter"
-      end
-    end
-
     if value(:jump).to_s == "MASQUERADE"
       unless value(:table).to_s =~ /nat/
         self.fail "Parameter jump => MASQUERADE only applies to table => nat"
