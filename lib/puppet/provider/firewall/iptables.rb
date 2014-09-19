@@ -225,7 +225,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # so it behaves like --comment
     values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
     # ditto for --match-set
-    values = values.sub(/--match-set (\S*) (\S*)/, '--match-set "\1 \2"')
+    values = values.sub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set "\1\2 \3"')
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
@@ -331,6 +331,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       :dport,
       :dst_range,
       :dst_type,
+      :ipset,
       :port,
       :proto,
       :source,
