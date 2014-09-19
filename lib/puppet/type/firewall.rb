@@ -968,6 +968,7 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:ipset, :required_features => :ipset) do
     desc <<-EOS
       Matches against the specified ipset list.
+      Requires ipset kernel module.
       The value is the name of the blacklist, followed by a space, and then
       'src' and/or 'dst' separated by a comma.
       For example: 'blacklist src,dst'

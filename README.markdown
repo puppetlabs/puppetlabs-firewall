@@ -446,6 +446,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `ipsec_policy`: Sets the ipsec policy type. Valid values are 'none', 'ipsec'. Requires the `ipsec_policy` feature.
 
+* `ipset`: Matches IP sets. Value must be `ipset_name (src|dst|src,dst)` and can be negated by putting ! in front. Requires ipset kernel module.
+
 * `isfirstfrag`: If true, matches when the packet is the first fragment of a fragmented ipv6 packet. Cannot be negated. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `isfirstfrag` feature. 
 
 * `isfragment`: If 'true', matches when the packet is a tcp fragment of a fragmented packet. Supported by iptables only. Valid values are 'true', 'false'. Requires features `isfragment`.
