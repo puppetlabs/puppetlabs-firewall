@@ -24,6 +24,16 @@ ARGS_TO_HASH6 = {
       :destination => '2001:db8:4321::/48',
     },
   },
+  'udp_source_port_and_destination_port' => {
+    :line => '-A ufw6-before-input -s fe80::/10 -d fe80::/10 -p udp -m udp --sport 547 --dport 546 -j ACCEPT',
+    :table => 'filter',
+    :provider => 'ip6tables',
+    :params => {
+      :proto => 'udp',
+      :sport => ['547'],
+      :dport => ['546'],
+    },
+  }
 }
 
 # This hash is for testing converting a hash to an argument line.
