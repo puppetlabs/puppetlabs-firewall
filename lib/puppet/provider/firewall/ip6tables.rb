@@ -119,6 +119,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :toports          => "--to-ports",
     :tosource         => "--to-source",
     :uid              => "-m owner --uid-owner",
+    :bridge           => "-m physdev",
   }
 
   # These are known booleans that do not take a value, but we want to munge

@@ -1033,6 +1033,19 @@ Puppet::Type.newtype(:firewall) do
     newvalues(/^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$/i)
   end
 
+  newproperty(:bridge, :required_features => :iptables) do
+    desc <<-EOS
+      Match if the packet is being bridged.
+    EOS
+    munge do |value|
+      if ! value.to_s.start_with?("--")
+        "--" + value.to_s
+      else
+        value
+      end
+    end
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
@@ -1189,6 +1202,12 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:stat_probability) && value(:stat_mode) != :random
       self.fail "Parameter 'stat_probability' requires 'stat_mode' to be set to 'random'"
+    end
+
+    if value(:bridged)
+      unless value(:chain).to_s =~ /FORWARD/
+        self.fail "Parameter isbridged only applies to the FORWARD chain"
+      end
     end
 
   end
