@@ -1204,9 +1204,9 @@ Puppet::Type.newtype(:firewall) do
       self.fail "Parameter 'stat_probability' requires 'stat_mode' to be set to 'random'"
     end
 
-    if value(:bridged)
+    if value(:bridge)
       unless value(:chain).to_s =~ /FORWARD/
-        self.fail "Parameter isbridged only applies to the FORWARD chain"
+        self.fail "Parameter bridge only applies to the FORWARD chain"
       end
     end
 
