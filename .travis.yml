@@ -30,6 +30,8 @@ matrix:
     env: PUPPET_GEM_VERSION="~> 3.7.0"
   - rvm: 2.0.0
     env: PUPPET_GEM_VERSION="~> 3.7.0"
+  allowed_failures:
   - rvm: 2.1.2
+    env: PUPPET_GEM_VERSION="~> 3.7.0"
 notifications:
   email: false
