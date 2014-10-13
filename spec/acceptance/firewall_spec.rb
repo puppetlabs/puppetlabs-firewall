@@ -1626,7 +1626,11 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
+          if (fact('osfamily') == 'RedHat' and fact('operatingsystemmajrelease') == '5')
+            expect(r.stdout).to match(/-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
+          else
+            expect(r.stdout).to match(/-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
+          end
         end
       end
     end
