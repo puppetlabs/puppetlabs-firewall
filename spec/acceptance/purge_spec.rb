@@ -68,6 +68,9 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
         }
       EOS
 
+      if fact('selinux')
+        apply_manifest(pp, :catch_failures => true)
+      end
       apply_manifest(pp, :catch_changes => true)
     end
 
