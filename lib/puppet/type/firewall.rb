@@ -977,6 +977,19 @@ Puppet::Type.newtype(:firewall) do
     newvalues(/^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$/i)
   end
 
+  # Make sure that all iptables files are subscribed to before rules are applied
+  # This is evil and horrible and not right. But it's really the only way right now.
+  def autorequire(rel_catalog = nil)
+    rel_catalog ||= catalog
+    raise(Puppet::DevError, "You cannot add relationship without a catalog") unless rel_catalog
+
+    reqs = super
+    rel_catalog.resources.select{|x| x.is_a? Puppet::Type::File and x[:name] =~ /iptables/ }.each do |res|
+      reqs << Puppet::Relationship::new(self, res)
+    end
+    reqs
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
