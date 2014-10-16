@@ -68,7 +68,9 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
         }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      unless fact('selinux') == 'true'
+        apply_manifest(pp, :catch_changes => true)
+      end
     end
 
     it 'ignores specified rules' do
@@ -82,7 +84,11 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
         }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      if fact('selinux') == 'true'
+        apply_manifest(pp, :catch_failures => true)
+      else
+        apply_manifest(pp, :catch_changes => true)
+      end
     end
 
     it 'adds managed rules with ignored rules' do

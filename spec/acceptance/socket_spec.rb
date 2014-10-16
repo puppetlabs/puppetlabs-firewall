@@ -20,7 +20,9 @@ describe 'firewall socket property', :unless => (UNSUPPORTED_PLATFORMS.include?(
       EOS
 
       apply_manifest(pp, :catch_failures => true)
-      apply_manifest(pp, :catch_changes => true)
+      unless fact('selinux') == 'true'
+        apply_manifest(pp, :catch_changes => true)
+      end
 
       shell('iptables-save -t raw') do |r|
         expect(r.stdout).to match(/#{line_match}/)
@@ -40,7 +42,11 @@ describe 'firewall socket property', :unless => (UNSUPPORTED_PLATFORMS.include?(
           }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      if fact('selinux') == 'true'
+        apply_manifest(pp, :catch_failures => true)
+      else
+        apply_manifest(pp, :catch_changes => true)
+      end
 
       shell('iptables-save -t raw') do |r|
         expect(r.stdout).to match(/#{line_match}/)
