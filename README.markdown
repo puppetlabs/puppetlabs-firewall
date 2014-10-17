@@ -67,7 +67,7 @@ Therefore, the run order is:
 * Your rules (defined in code)
 * The rules in `my_fw::post`
 
-The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity, and that you drop unmatched packets appropriately. The rules you define in your manifests are likely specific to the applications you run. 
+The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity and that you drop unmatched packets appropriately. The rules you define in your manifests are likely specific to the applications you run. 
 
 1. Add the `pre` class to `my_fw/manifests/pre.pp`. `pre.pp` should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.
 
@@ -88,12 +88,12 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
       }->
       firewall { '002 accept related established rules':
         proto   => 'all',
-        ctstate => ['RELATED', 'ESTABLISHED'],
+        state => ['RELATED', 'ESTABLISHED'],
         action  => 'accept',
       }
     }
 
-The rules in `pre` should allow basic networking (such as ICMP and TCP), and ensure that existing connections are not closed.
+The rules in `pre` should allow basic networking (such as ICMP and TCP) and ensure that existing connections are not closed.
 
 2. Add the `post` class to `my_fw/manifests/post.pp` and include any default rules to be applied last.
 
