@@ -12,6 +12,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :recent_limiting
   has_feature :snat
   has_feature :dnat
+  has_feature :netmap
   has_feature :interface_match
   has_feature :icmp_match
   has_feature :owner
@@ -102,6 +103,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :todest           => "--to-destination",
     :toports          => "--to-ports",
     :tosource         => "--to-source",
+    :to               => "--to",
     :uid              => "-m owner --uid-owner",
   }
 
@@ -156,7 +158,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
-    :tosource, :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
+    :tosource, :toports, :to, :random, :log_prefix, :log_level, :reject, :set_mark,
     :connlimit_above, :connlimit_mask, :connmark
   ]
 
