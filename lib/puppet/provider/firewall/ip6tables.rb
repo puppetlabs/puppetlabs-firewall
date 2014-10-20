@@ -1,4 +1,4 @@
-Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source => :iptables do
+Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source => :ip6tables do
   @doc = "Ip6tables type provider"
 
   has_feature :iptables
