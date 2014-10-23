@@ -29,6 +29,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :ipsec_dir
   has_feature :ipsec_policy
   has_feature :mask
+  has_feature :ipset
 
   optional_commands({
     :iptables => 'iptables',
@@ -62,6 +63,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :iniface          => "-i",
     :ipsec_dir        => "-m policy --dir",
     :ipsec_policy     => "--pol",
+    :ipset            => "-m set --match-set",
     :isfragment       => "-f",
     :jump             => "-j",
     :limit            => "-m limit --limit",
@@ -153,7 +155,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port,
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :jump, :todest,
+    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
     :connlimit_above, :connlimit_mask, :connmark
   ]
@@ -222,6 +224,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
+    # ditto for --match-set
+    values = values.sub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set "\1\2 \3"')
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
@@ -327,6 +331,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       :dport,
       :dst_range,
       :dst_type,
+      :ipset,
       :port,
       :proto,
       :source,
@@ -502,7 +507,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       # our tcp_flags takes a single string with comma lists separated
       # by space
       # --tcp-flags expects two arguments
-      if res == :tcp_flags
+      if res == :tcp_flags or res == :ipset
         one, two = resource_value.split(' ')
         args << one
         args << two
