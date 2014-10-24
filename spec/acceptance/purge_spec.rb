@@ -166,9 +166,10 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
           purge => true,
         }
         firewall { '010 output-1::50':
-          chain  => 'OUTPUT',
-          proto  => 'all',
-          source => '1::50',
+          chain    => 'OUTPUT',
+          proto    => 'all',
+          source   => '1::50',
+          provider => 'ip6tables',
         }
       EOS
 
