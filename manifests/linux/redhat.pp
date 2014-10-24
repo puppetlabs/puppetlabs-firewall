@@ -23,7 +23,7 @@ class firewall::linux::redhat (
   if   ($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
     or ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0) {
     package { 'firewalld':
-      ensure  => absent,
+      ensure  => purged,
       before  => Package['iptables-services'],
     }
 

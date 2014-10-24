@@ -25,7 +25,7 @@ describe 'firewall::linux::redhat', :type => :class do
         }}
 
         it { should contain_package('firewalld').with(
-          :ensure => 'absent',
+          :ensure => 'purged',
           :before => 'Package[iptables-services]'
         )}
 
