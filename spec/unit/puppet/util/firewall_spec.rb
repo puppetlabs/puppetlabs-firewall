@@ -143,10 +143,19 @@ describe 'Puppet::Util::Firewall' do
         subject.persist_iptables(proto)
       end
 
-      it 'should exec for CentOS identified from operatingsystem' do
+      it 'should exec for CentOS 6 identified from operatingsystem and operatingsystemrelease' do
         allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('CentOS')
+        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('6.5')
         expect(subject).to receive(:execute).with(%w{/sbin/service iptables save})
+        subject.persist_iptables(proto)
+      end
+
+      it 'should exec for CentOS 7 identified from operatingsystem and operatingsystemrelease' do
+        allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
+        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('CentOS')
+        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('7.0.1406')
+        expect(subject).to receive(:execute).with(%w{/usr/libexec/iptables/iptables.init save})
         subject.persist_iptables(proto)
       end
 
