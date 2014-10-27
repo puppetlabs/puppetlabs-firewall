@@ -1066,10 +1066,9 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:set_mark)
       unless value(:jump).to_s  =~ /MARK/ &&
-             value(:chain).to_s =~ /PREROUTING|OUTPUT/ &&
              value(:table).to_s =~ /mangle/
         self.fail "Parameter set_mark only applies to " \
-          "the PREROUTING or OUTPUT chain of the mangle table and when jump => MARK"
+          "the mangle table and when jump => MARK"
       end
     end
 
