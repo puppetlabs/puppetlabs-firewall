@@ -130,7 +130,7 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
       expect(shell('iptables-save').stdout).to match(/-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp/)
     end
   end
-  context('ipv6 chain purge') do
+  context 'ipv6 chain purge', :unless => (fact('osfamily') == 'RedHat' and fact('operatingsystemmajrelease') == '5') do
     after(:all) do
       ip6tables_flush_all_tables
     end
