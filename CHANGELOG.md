@@ -1,3 +1,26 @@
+##2014-11-04 - Supported Release 1.2.0
+###Summary
+
+This release has a number of new features and bugfixes, including rule inversion, future parser support, improved EL7 support, and the ability to purge ip6tables rules.
+
+####Features
+- Documentation updates!
+- Test updates!
+- Add ipset support
+- Enable rule inversion
+- Future parser support
+- Improved support for EL7
+- Support netfilter-persistent
+- Add support for statistics module
+- Add support for mac address source rules
+- Add cbt protocol
+
+####Bugfixes
+- Incorrect use of `source => :iptables` in the ip6tables provider was making it impossible to purge ip6tables rules (MODULES-41)
+- Don't require `toports` when `jump => 'REDIRECT'` (MODULES-1086)
+- Don't limit which chains iniface and outiface parameters can be used in
+- Don't fail on rules added with ipsec/strongswan (MODULES-796)
+
 ##2014-07-08 - Supported Release 1.1.3
 ###Summary
 This is a supported release with test coverage enhancements.
