@@ -37,7 +37,9 @@ else
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        unless fact('selinux') == 'true'
+          apply_manifest(pp, :catch_changes => true)
+        end
 
         shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/#{line_match}/)
@@ -56,7 +58,11 @@ else
             }
         EOS
 
-        apply_manifest(pp, :catch_changes => true)
+        if fact('selinux') == 'true'
+          apply_manifest(pp, :catch_failures => true)
+        else
+          apply_manifest(pp, :catch_changes => true)
+        end
 
         shell('ip6tables-save') do |r|
           expect(r.stdout).to match(/#{line_match}/)

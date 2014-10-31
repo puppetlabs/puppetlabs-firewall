@@ -116,7 +116,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        unless fact('selinux') == 'true'
+          apply_manifest(pp, :catch_changes => true)
+        end
       end
 
       it 'should contain the rule' do
@@ -139,7 +141,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        unless fact('selinux') == 'true'
+          apply_manifest(pp, :catch_changes => true)
+        end
       end
 
       it 'should contain the rule' do
@@ -189,7 +193,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        unless fact('selinux') == 'true'
+          apply_manifest(pp, :catch_changes => true)
+        end
       end
 
       it 'should contain the rule' do
@@ -239,7 +245,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        unless fact('selinux') == 'true'
+          apply_manifest(pp, :catch_changes => true)
+        end
       end
 
       it 'should contain the rule' do
@@ -262,7 +270,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        unless fact('selinux') == 'true'
+          apply_manifest(pp, :catch_changes => true)
+        end
       end
 
       it 'should contain the rule' do
@@ -312,7 +322,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        unless fact('selinux') == 'true'
+          apply_manifest(pp, :catch_changes => true)
+        end
       end
 
       it 'should contain the rule' do
@@ -839,7 +851,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           EOS
 
           apply_manifest(pp, :catch_failures => true)
-          apply_manifest(pp, :catch_changes => true)
+          unless fact('selinux') == 'true'
+            apply_manifest(pp, :catch_changes => true)
+          end
         end
 
         it 'should contain the rule' do
@@ -1603,6 +1617,34 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       it 'should contain the rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "600 - test" -m recent --remove/)
+        end
+      end
+    end
+  end
+
+  describe 'mac_source' do
+    context '0A:1B:3C:4D:5E:6F' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '610 - test':
+            ensure      => present,
+            source      => '10.1.5.28/32',
+            mac_source  => '0A:1B:3C:4D:5E:6F',
+            chain       => 'INPUT',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables-save') do |r|
+          if (fact('osfamily') == 'RedHat' and fact('operatingsystemmajrelease') == '5')
+            expect(r.stdout).to match(/-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
+          else
+            expect(r.stdout).to match(/-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
+          end
         end
       end
     end

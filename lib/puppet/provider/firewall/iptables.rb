@@ -29,6 +29,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :ipsec_dir
   has_feature :ipsec_policy
   has_feature :mask
+  has_feature :ipset
 
   optional_commands({
     :iptables => 'iptables',
@@ -48,54 +49,60 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @protocol = "IPv4"
 
   @resource_map = {
-    :burst           => "--limit-burst",
-    :connlimit_above => "-m connlimit --connlimit-above",
-    :connlimit_mask  => "--connlimit-mask",
-    :connmark        => "-m connmark --mark",
-    :ctstate         => "-m conntrack --ctstate",
-    :destination     => "-d",
-    :dst_type        => "-m addrtype --dst-type",
-    :dst_range       => "-m iprange --dst-range",
-    :dport           => ["-m multiport --dports", "--dport"],
-    :gid             => "-m owner --gid-owner",
-    :icmp            => "-m icmp --icmp-type",
-    :iniface         => "-i",
-    :jump            => "-j",
-    :limit           => "-m limit --limit",
-    :log_level       => "--log-level",
-    :log_prefix      => "--log-prefix",
-    :name            => "-m comment --comment",
-    :outiface        => "-o",
-    :port            => '-m multiport --ports',
-    :proto           => "-p",
-    :random          => "--random",
-    :rdest           => "--rdest",
-    :reap            => "--reap",
-    :recent          => "-m recent",
-    :reject          => "--reject-with",
-    :rhitcount       => "--hitcount",
-    :rname           => "--name",
-    :rseconds        => "--seconds",
-    :rsource         => "--rsource",
-    :rttl            => "--rttl",
-    :set_mark        => mark_flag,
-    :socket          => "-m socket",
-    :source          => "-s",
-    :src_type        => "-m addrtype --src-type",
-    :src_range       => "-m iprange --src-range",
-    :sport           => ["-m multiport --sports", "--sport"],
-    :state           => "-m state --state",
-    :table           => "-t",
-    :tcp_flags       => "-m tcp --tcp-flags",
-    :todest          => "--to-destination",
-    :toports         => "--to-ports",
-    :tosource        => "--to-source",
-    :uid             => "-m owner --uid-owner",
-    :pkttype         => "-m pkttype --pkt-type",
-    :isfragment      => "-f",
-    :ipsec_dir       => "-m policy --dir",
-    :ipsec_policy    => "--pol",
-    :mask            => '--mask',
+    :burst            => "--limit-burst",
+    :connlimit_above  => "-m connlimit --connlimit-above",
+    :connlimit_mask   => "--connlimit-mask",
+    :connmark         => "-m connmark --mark",
+    :ctstate          => "-m conntrack --ctstate",
+    :destination      => "-d",
+    :dport            => ["-m multiport --dports", "--dport"],
+    :dst_range        => "-m iprange --dst-range",
+    :dst_type         => "-m addrtype --dst-type",
+    :gid              => "-m owner --gid-owner",
+    :icmp             => "-m icmp --icmp-type",
+    :iniface          => "-i",
+    :ipsec_dir        => "-m policy --dir",
+    :ipsec_policy     => "--pol",
+    :ipset            => "-m set --match-set",
+    :isfragment       => "-f",
+    :jump             => "-j",
+    :limit            => "-m limit --limit",
+    :log_level        => "--log-level",
+    :log_prefix       => "--log-prefix",
+    :mac_source       => ["-m mac --mac-source", "--mac-source"],
+    :mask             => '--mask',
+    :name             => "-m comment --comment",
+    :outiface         => "-o",
+    :pkttype          => "-m pkttype --pkt-type",
+    :port             => '-m multiport --ports',
+    :proto            => "-p",
+    :random           => "--random",
+    :rdest            => "--rdest",
+    :reap             => "--reap",
+    :recent           => "-m recent",
+    :reject           => "--reject-with",
+    :rhitcount        => "--hitcount",
+    :rname            => "--name",
+    :rseconds         => "--seconds",
+    :rsource          => "--rsource",
+    :rttl             => "--rttl",
+    :set_mark         => mark_flag,
+    :socket           => "-m socket",
+    :source           => "-s",
+    :sport            => ["-m multiport --sports", "--sport"],
+    :src_range        => "-m iprange --src-range",
+    :src_type         => "-m addrtype --src-type",
+    :stat_every       => '--every',
+    :stat_mode        => "-m statistic --mode",
+    :stat_packet      => '--packet',
+    :stat_probability => '--probability',
+    :state            => "-m state --state",
+    :table            => "-t",
+    :tcp_flags        => "-m tcp --tcp-flags",
+    :todest           => "--to-destination",
+    :toports          => "--to-ports",
+    :tosource         => "--to-source",
+    :uid              => "-m owner --uid-owner",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -144,10 +151,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface, :proto, :isfragment,
-    :src_range, :dst_range, :tcp_flags, :gid, :uid, :sport, :dport, :port,
+    :stat_mode, :stat_every, :stat_packet, :stat_probability,
+    :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port,
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :jump, :todest,
+    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
     :connlimit_above, :connlimit_mask, :connmark
   ]
@@ -215,13 +223,28 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
-    values = values.sub(/--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1 \2"')
+    values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
+    # ditto for --match-set
+    values = values.sub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set "\1\2 \3"')
     # we do a similar thing for negated address masks (source and destination).
-    values = values.sub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
+    values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
-    values = values.sub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
+    values = values.gsub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
-    values = values.sub(/-m (tcp|udp) (--(s|d)port|-m multiport)/, '\2')
+    values = values.gsub(/-m (tcp|udp) (--(s|d)port|-m multiport)/, '\2')
+    # '--pol ipsec' takes many optional arguments; we cheat again by adding " around them
+    values = values.sub(/
+        --pol\sipsec
+        (\s--strict)?
+        (\s--reqid\s\S+)?
+        (\s--spi\s\S+)?
+        (\s--proto\s\S+)?
+        (\s--mode\s\S+)?
+        (\s--tunnel-dst\s\S+)?
+        (\s--tunnel-src\s\S+)?
+        (\s--next)?/x,
+        '--pol "ipsec\1\2\3\4\5\6\7\8" '
+    )
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
@@ -277,14 +300,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # POST PARSE CLUDGING
     #####################
 
-    # Normalise all rules to CIDR notation.
-    [:source, :destination].each do |prop|
-      next if hash[prop].nil?
-      m = hash[prop].match(/(!?)\s?(.*)/)
-      neg = "! " if m[1] == "!"
-      hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
-    end
-
     [:dport, :sport, :port, :state, :ctstate].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
@@ -308,15 +323,52 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
     end
 
+    # Invert any rules that are prefixed with a '!'
+    [
+      :connmark,
+      :ctstate,
+      :destination,
+      :dport,
+      :dst_range,
+      :dst_type,
+      :ipset,
+      :port,
+      :proto,
+      :source,
+      :sport,
+      :src_range,
+      :src_type,
+      :state,
+    ].each do |prop|
+      if hash[prop] and hash[prop].is_a?(Array)
+        # find if any are negated, then negate all if so
+        should_negate = hash[prop].index do |value|
+          value.match(/^(!)\s+/)
+        end
+        hash[prop] = hash[prop].collect { |v|
+          "! #{v.sub(/^!\s+/,'')}"
+        } if should_negate
+      elsif hash[prop]
+        m = hash[prop].match(/^(!?)\s?(.*)/)
+        neg = "! " if m[1] == "!"
+        if [:source,:destination].include?(prop)
+          # Normalise all rules to CIDR notation.
+          hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
+        else
+          hash[prop] = "#{neg}#{m[2]}"
+        end
+      end
+    end
+
     # States should always be sorted. This ensures that the output from
     # iptables-save and user supplied resources is consistent.
     hash[:state]   = hash[:state].sort   unless hash[:state].nil?
     hash[:ctstate] = hash[:ctstate].sort unless hash[:ctstate].nil?
 
-    # This forces all existing, commentless rules or rules with invalid comments to be moved 
+    # This forces all existing, commentless rules or rules with invalid comments to be moved
     # to the bottom of the stack.
-    # Puppet-firewall requires that all rules have comments (resource names) and match this 
-    # regex and will fail if a rule in iptables does not have a comment. We get around this 
+    # Puppet-firewall requires that all rules have comments (resource names) and match this
+    # regex and will fail if a rule in iptables does not have a comment. We get around this
     # by appending a high level
     if ! hash[:name]
       num = 9000 + counter
@@ -410,12 +462,37 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       end
 
       args << [resource_map[res]].flatten.first.split(' ')
+      args = args.flatten
 
       # On negations, the '!' has to be before the option (eg: "! -d 1.2.3.4")
       if resource_value.is_a?(String) and resource_value.sub!(/^!\s*/, '') then
         # we do this after adding the 'dash' argument because of ones like "-m multiport --dports", where we want it before the "--dports" but after "-m multiport".
         # so we insert before whatever the last argument is
         args.insert(-2, '!')
+      elsif resource_value.is_a?(Symbol) and resource_value.to_s.match(/^!/) then
+        #ruby 1.8.7 can't .match Symbols ------------------ ^
+        resource_value = resource_value.to_s.sub!(/^!\s*/, '').to_sym
+        args.insert(-2, '!')
+      elsif resource_value.is_a?(Array)
+        should_negate = resource_value.index do |value|
+          #ruby 1.8.7 can't .match symbols
+          value.to_s.match(/^(!)\s+/)
+        end
+        if should_negate
+          resource_value, wrong_values = resource_value.collect do |value|
+            if value.is_a?(String)
+              wrong = value if ! value.match(/^!\s+/)
+              [value.sub(/^!\s*/, ''),wrong]
+            else
+              [value,nil]
+            end
+          end.transpose
+          wrong_values = wrong_values.compact
+          if ! wrong_values.empty?
+            fail "All values of the '#{res}' property must be prefixed with a '!' when inverting, but '#{wrong_values.join("', '")}' #{wrong_values.length>1?"are":"is"} not prefixed; aborting"
+          end
+          args.insert(-2, '!')
+        end
       end
 
 
@@ -430,7 +507,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       # our tcp_flags takes a single string with comma lists separated
       # by space
       # --tcp-flags expects two arguments
-      if res == :tcp_flags
+      if res == :tcp_flags or res == :ipset
         one, two = resource_value.split(' ')
         args << one
         args << two

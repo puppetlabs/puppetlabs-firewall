@@ -22,8 +22,8 @@ Puppet::Type.newtype(:firewall) do
     `chain` or `jump` parameters, the firewall resource will autorequire
     those firewallchain resources.
 
-    If Puppet is managing the iptables or iptables-persistent packages, and
-    the provider is iptables or ip6tables, the firewall resource will
+    If Puppet is managing the iptables, iptables-persistent, or iptables-services packages,
+    and the provider is iptables or ip6tables, the firewall resource will
     autorequire those packages to ensure that any required binaries are
     installed.
   EOS
@@ -53,6 +53,8 @@ Puppet::Type.newtype(:firewall) do
   feature :isfirstfrag, "Match the first fragment of a fragmented ipv6 packet"
   feature :ipsec_policy, "Match IPsec policy"
   feature :ipsec_dir, "Match IPsec policy direction"
+  feature :mask, "Ability to match recent rules based on the ipv4 mask"
+  feature :ipset, "Match against specified ipset list"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -323,7 +325,9 @@ Puppet::Type.newtype(:firewall) do
       *tcp*.
     EOS
 
-    newvalues(:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :gre, :all)
+    newvalues(*[:tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ospf, :gre, :cbt, :all].collect do |proto|
+      [proto, "! #{proto}".to_sym]
+    end.flatten)
     defaultto "tcp"
   end
 
@@ -876,7 +880,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:isfirstfrag, :required_features => :isfirstfrag) do
     desc <<-EOS
-      If true, matches if the packet is the first fragment. 
+      If true, matches if the packet is the first fragment.
       Sadly cannot be negated. ipv6.
     EOS
 
@@ -884,19 +888,75 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:ipsec_policy, :required_features => :ipsec_policy) do
-	  desc <<-EOS
-	  	 Sets the ipsec policy type
-	  EOS
+    desc <<-EOS
+       Sets the ipsec policy type. May take a combination of arguments for any flags that can be passed to `--pol ipsec` such as: `--strict`, `--reqid 100`, `--next`, `--proto esp`, etc.
+    EOS
 
-	  newvalues(:none, :ipsec)
+    newvalues(:none, :ipsec)
   end
 
   newproperty(:ipsec_dir, :required_features => :ipsec_dir) do
-	  desc <<-EOS
-	  	 Sets the ipsec policy direction
-	  EOS
+    desc <<-EOS
+       Sets the ipsec policy direction
+    EOS
 
-	  newvalues(:in, :out)
+    newvalues(:in, :out)
+  end
+
+  newproperty(:stat_mode) do
+    desc <<-EOS
+      Set the matching mode for statistic matching. Supported modes are `random` and `nth`.
+    EOS
+
+    newvalues(:nth, :random)
+  end
+
+  newproperty(:stat_every) do
+    desc <<-EOS
+      Match one packet every nth packet. Requires `stat_mode => 'nth'`
+    EOS
+
+    validate do |value|
+      unless value =~ /^\d+$/
+        raise ArgumentError, <<-EOS
+          stat_every value must be a digit
+        EOS
+      end
+
+      unless value.to_i > 0
+        raise ArgumentError, <<-EOS
+          stat_every value must be larger than 0
+        EOS
+      end
+    end
+  end
+
+  newproperty(:stat_packet) do
+    desc <<-EOS
+      Set the initial counter value for the nth mode. Must be between 0 and the value of `stat_every`. Defaults to 0. Requires `stat_mode => 'nth'`
+    EOS
+
+    newvalues(/^\d+$/)
+  end
+
+  newproperty(:stat_probability) do
+    desc <<-EOS
+      Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
+    EOS
+
+    validate do |value|
+      unless value =~ /^([01])\.(\d+)$/
+        raise ArgumentError, <<-EOS
+          stat_probability must be between 0.0 and 1.0
+        EOS
+      end
+
+      if $1.to_i == 1 && $2.to_i != 0
+        raise ArgumentError, <<-EOS
+          start_probability must be between 0.0 and 1.0
+        EOS
+      end
+    end
   end
 
   newproperty(:mask, :required_features => :mask) do
@@ -905,10 +965,27 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:ipset, :required_features => :ipset) do
+    desc <<-EOS
+      Matches against the specified ipset list.
+      Requires ipset kernel module.
+      The value is the name of the blacklist, followed by a space, and then
+      'src' and/or 'dst' separated by a comma.
+      For example: 'blacklist src,dst'
+    EOS
+  end
+
   newparam(:line) do
     desc <<-EOS
       Read-only property for caching the rule line.
     EOS
+  end
+
+  newproperty(:mac_source) do
+    desc <<-EOS
+      MAC Source
+    EOS
+    newvalues(/^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$/i)
   end
 
   autorequire(:firewallchain) do
@@ -937,7 +1014,7 @@ Puppet::Type.newtype(:firewall) do
   autorequire(:package) do
     case value(:provider)
     when :iptables, :ip6tables
-      %w{iptables iptables-persistent}
+      %w{iptables iptables-persistent iptables-services}
     else
       []
     end
@@ -973,20 +1050,6 @@ Puppet::Type.newtype(:firewall) do
 
     # Now we analyse the individual properties to make sure they apply to
     # the correct combinations.
-    if value(:iniface)
-      unless value(:chain).to_s =~ /INPUT|FORWARD|PREROUTING/
-        self.fail "Parameter iniface only applies to chains " \
-          "INPUT,FORWARD,PREROUTING"
-      end
-    end
-
-    if value(:outiface)
-      unless value(:chain).to_s =~ /OUTPUT|FORWARD|POSTROUTING/
-        self.fail "Parameter outiface only applies to chains " \
-          "OUTPUT,FORWARD,POSTROUTING"
-      end
-    end
-
     if value(:uid)
       unless value(:chain).to_s =~ /OUTPUT|POSTROUTING/
         self.fail "Parameter uid only applies to chains " \
@@ -1038,13 +1101,6 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
-    if value(:jump).to_s == "REDIRECT"
-      unless value(:toports)
-        self.fail "Parameter jump => REDIRECT missing mandatory toports " \
-          "parameter"
-      end
-    end
-
     if value(:jump).to_s == "MASQUERADE"
       unless value(:table).to_s =~ /nat/
         self.fail "Parameter jump => MASQUERADE only applies to table => nat"
@@ -1071,6 +1127,24 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:mask) && ! value(:recent)
       self.fail "Mask can only be set if recent is enabled."
+    end
+
+    [:stat_packet, :stat_every, :stat_probability].each do |param|
+      if value(param) && ! value(:stat_mode)
+        self.fail "Parameter '#{param.to_s}' requires 'stat_mode' to be set"
+      end
+    end
+
+    if value(:stat_packet) && value(:stat_mode) != :nth
+      self.fail "Parameter 'stat_packet' requires 'stat_mode' to be set to 'nth'"
+    end
+
+    if value(:stat_every) && value(:stat_mode) != :nth
+      self.fail "Parameter 'stat_every' requires 'stat_mode' to be set to 'nth'"
+    end
+
+    if value(:stat_probability) && value(:stat_mode) != :random
+      self.fail "Parameter 'stat_probability' requires 'stat_mode' to be set to 'random'"
     end
 
   end

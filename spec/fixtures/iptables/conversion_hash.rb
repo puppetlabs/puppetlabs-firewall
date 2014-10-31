@@ -6,6 +6,15 @@
 # This hash is for testing a line conversion to a hash of parameters
 # which will be used to create a resource.
 ARGS_TO_HASH = {
+  'mac_source_1' => {
+    :line => '-A neutron-openvswi-FORWARD -s 1.2.3.4/32 -m mac --mac-source FA:16:00:00:00:00 -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :chain => 'neutron-openvswi-FORWARD',
+      :source => '1.2.3.4/32',
+      :mac_source => 'FA:16:00:00:00:00',
+    },
+  },
   'dport_and_sport' => {
     :line => '-A nova-compute-FORWARD -s 0.0.0.0/32 -d 255.255.255.255/32 -p udp -m udp --sport 68 --dport 67 -j ACCEPT',
     :table => 'filter',
@@ -462,6 +471,40 @@ ARGS_TO_HASH = {
       :proto => 'all',
       :connmark => '0x1',
       :action => 'reject',
+    },
+  },
+  'disallow_esp_protocol' => {
+    :line   => '-t filter ! -p esp -m comment --comment "063 disallow esp protocol" -j ACCEPT',
+    :table  => 'filter',
+    :params => {
+      :name   => '063 disallow esp protocol',
+      :action => 'accept',
+      :proto  => '! esp',
+    },
+  },
+  'drop_new_packets_without_syn' => {
+    :line   => '-t filter ! -s 10.0.0.0/8 ! -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset" -m state --state NEW -j DROP',
+    :table  => 'filter',
+    :params => {
+      :name      => '064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset',
+      :state     => ['NEW'],
+      :action    => 'drop',
+      :proto     => '! tcp',
+      :source    => '! 10.0.0.0/8',
+      :tcp_flags => '! FIN,SYN,RST,ACK SYN',
+    },
+  },
+  'negate_dport_and_sport' => {
+    :line => '-A nova-compute-FORWARD -s 0.0.0.0/32 -d 255.255.255.255/32 -p udp -m udp ! --sport 68,69 ! --dport 67,66 -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :chain => 'nova-compute-FORWARD',
+      :source => '0.0.0.0/32',
+      :destination => '255.255.255.255/32',
+      :sport => ['! 68','! 69'],
+      :dport => ['! 67','! 66'],
+      :proto => 'udp',
     },
   },
 }
@@ -930,5 +973,41 @@ HASH_TO_ARGS = {
       :action => 'reject',
     },
     :args => ["-t", :filter, "-p", :all, "-m", "comment", "--comment", "062 REJECT connmark", "-j", "REJECT", "-m", "connmark", "--mark", "0x1"],
+  },
+  'disallow_esp_protocol' => {
+    :params => {
+      :name   => '063 disallow esp protocol',
+      :table  => 'filter',
+      :action => 'accept',
+      :proto  => '! esp',
+    },
+    :args => ["-t", :filter, "!", "-p", :esp, "-m", "comment", "--comment", "063 disallow esp protocol", "-j", "ACCEPT"],
+  },
+  'drop_new_packets_without_syn' => {
+    :params => {
+      :name      => '064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset',
+      :table     => 'filter',
+      :chain     => 'INPUT',
+      :state     => ['NEW'],
+      :action    => 'drop',
+      :proto     => '! tcp',
+      :source    => '! 10.0.0.0/8',
+      :tcp_flags => '! FIN,SYN,RST,ACK SYN',
+    },
+    :args => ["-t", :filter, "!", "-s", "10.0.0.0/8", "!", "-p", :tcp, "-m", "tcp", "!", "--tcp-flags", "FIN,SYN,RST,ACK", "SYN", "-m", "comment", "--comment", "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset", "-m", "state", "--state", "NEW", "-j", "DROP"]
+  },
+  'negate_dport_and_sport' => {
+    :params => {
+      :name        => '065 negate dport and sport',
+      :table       => 'filter',
+      :action      => 'accept',
+      :chain       => 'nova-compute-FORWARD',
+      :source      => '0.0.0.0/32',
+      :destination => '255.255.255.255/32',
+      :sport       => ['! 68','! 69'],
+      :dport       => ['! 67','! 66'],
+      :proto       => 'udp',
+    },
+    :args => ["-t", :filter, "-s", "0.0.0.0/32", "-d", "255.255.255.255/32", "-p", :udp, "-m", "multiport", "!", "--sports", "68,69", "-m", "multiport", "!", "--dports", "67,66", "-m", "comment", "--comment", "065 negate dport and sport", "-j", "ACCEPT"],
   },
 }
