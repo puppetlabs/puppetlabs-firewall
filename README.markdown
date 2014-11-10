@@ -440,7 +440,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `icmp`: When matching ICMP packets, this indicates the type of ICMP packet to match. A value of 'any' is not supported. To match any type of ICMP packet, the parameter should be omitted or undefined. Requires the `icmp_match` feature.
 
-* `iniface`: Input interface to filter on. Values must match '/^[a-zA-Z0-9\-\._\+]+$/'. Requires the `interface_match` feature.
+* `iniface`: Input interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.   
 
 * `ipsec_dir`: Sets the ipsec policy direction. Valid values are 'in', 'out'. Requires the `ipsec_dir` feature.
 
@@ -485,7 +485,7 @@ firewall { '999 this runs last':
  
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/'.
 
-* `outiface`: Output interface to filter on. Values must match '/^[a-zA-Z0-9\-\._\+]+$/'. Requires the `interface_match` feature.
+* `outiface`: Output interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.   
 
 * `pkttype`: Sets the packet type to match. Valid values are: 'unicast', 'broadcast', and'multicast'. Requires the `pkttype` feature.
 
