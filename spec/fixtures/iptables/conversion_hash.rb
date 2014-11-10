@@ -328,6 +328,24 @@ ARGS_TO_HASH = {
       :iniface => 'eth0',
     },
   },
+  'iniface_1_negated' => {
+    :line => '-A INPUT ! -i eth0 -m comment --comment "060 iniface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => '! eth0',
+    },
+  },
+  'iniface_1_aliased' => {
+    :line => '-A INPUT -i eth0:1 -m comment --comment "060 iniface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'INPUT',
+      :iniface => 'eth0:1',
+    },
+  },
   'iniface_with_vlans_1' => {
     :line => '-A INPUT -i eth0.234 -m comment --comment "060 iniface" -j DROP',
     :table => 'filter',
@@ -353,6 +371,24 @@ ARGS_TO_HASH = {
       :action => 'drop',
       :chain => 'OUTPUT',
       :outiface => 'eth0',
+    },
+  },
+  'outiface_1_negated' => {
+    :line => '-A OUTPUT ! -o eth0 -m comment --comment "060 outiface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => '! eth0',
+    },
+  },
+  'outiface_1_aliased' => {
+    :line => '-A OUTPUT -o eth0:2 -m comment --comment "060 outiface" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'OUTPUT',
+      :outiface => 'eth0:2',
     },
   },
   'outiface_with_vlans_1' => {

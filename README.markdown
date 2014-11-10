@@ -86,7 +86,13 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
         iniface => 'lo',
         action  => 'accept',
       }->
-      firewall { '002 accept related established rules':
+      firewall { "002 reject local traffic not on loopback interface":
+        iniface     => '! lo',
+        proto       => 'all',
+        destination => '127.0.0.1/8',
+        action      => 'reject',
+      }->
+      firewall { '003 accept related established rules':
         proto   => 'all',
         state => ['RELATED', 'ESTABLISHED'],
         action  => 'accept',
@@ -201,7 +207,7 @@ class profile::apache {
 ###Rule inversion
 Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
 
-Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, port, proto, source, sport, src\_range, src\_type, and state.
+Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, iniface, outiface, port, proto, source, sport, src\_range, src\_type, and state.
 
 Examples:
 
@@ -440,7 +446,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `icmp`: When matching ICMP packets, this indicates the type of ICMP packet to match. A value of 'any' is not supported. To match any type of ICMP packet, the parameter should be omitted or undefined. Requires the `icmp_match` feature.
 
-* `iniface`: Input interface to filter on. Values must match '/^[a-zA-Z0-9\-\._\+]+$/'. Requires the `interface_match` feature.
+* `iniface`: Input interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.   
 
 * `ipsec_dir`: Sets the ipsec policy direction. Valid values are 'in', 'out'. Requires the `ipsec_dir` feature.
 
@@ -485,7 +491,7 @@ firewall { '999 this runs last':
  
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/'.
 
-* `outiface`: Output interface to filter on. Values must match '/^[a-zA-Z0-9\-\._\+]+$/'. Requires the `interface_match` feature.
+* `outiface`: Output interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.   
 
 * `pkttype`: Sets the packet type to match. Valid values are: 'unicast', 'broadcast', and'multicast'. Requires the `pkttype` feature.
 
