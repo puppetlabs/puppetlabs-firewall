@@ -86,7 +86,12 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
         iniface => 'lo',
         action  => 'accept',
       }->
-      firewall { '002 accept related established rules':
+      firewall { "002 reject local traffic not on loopback interface":
+        iniface     => '! lo',
+        destination => '127.0.0.1/8',
+        action      => 'reject',
+      }->
+      firewall { '003 accept related established rules':
         proto   => 'all',
         state => ['RELATED', 'ESTABLISHED'],
         action  => 'accept',
