@@ -428,16 +428,24 @@ Puppet::Type.newtype(:firewall) do
   # Interface specific matching properties
   newproperty(:iniface, :required_features => :interface_match) do
     desc <<-EOS
-      Input interface to filter on.
+      Input interface to filter on.  Supports interface alias like eth0:0.
+      To negate the match try this:
+
+            iniface => '! lo',
+
     EOS
-    newvalues(/^[a-zA-Z0-9\-\._\+]+$/)
+    newvalues(/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/)
   end
 
   newproperty(:outiface, :required_features => :interface_match) do
     desc <<-EOS
-      Output interface to filter on.
+      Output interface to filter on.  Supports interface alias like eth0:0.
+     To negate the match try this:
+
+           outiface => '! lo',
+
     EOS
-    newvalues(/^[a-zA-Z0-9\-\._\+]+$/)
+    newvalues(/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/)
   end
 
   # NAT specific properties

@@ -208,6 +208,14 @@ describe firewall do
         @resource[iface] = 'eth1'
         @resource[iface].should == 'eth1'
       end
+      it "should accept a negated #{iface} value as a string" do
+        @resource[iface] = '! eth1'
+        @resource[iface].should == '! eth1'
+      end
+      it "should accept an interface alias for the #{iface} value as a string" do
+        @resource[iface] = 'eth1:2'
+        @resource[iface].should == 'eth1:2'
+      end
     end
   end
 
