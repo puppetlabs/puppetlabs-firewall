@@ -206,7 +206,7 @@ class profile::apache {
 ###Rule inversion
 Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
 
-Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, port, proto, source, sport, src\_range, src\_type, and state.
+Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, iniface, outiface, port, proto, source, sport, src\_range, src\_type, and state.
 
 Examples:
 
