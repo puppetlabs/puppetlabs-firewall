@@ -148,6 +148,7 @@ describe 'complex ruleset 2' do
       }
       firewall { "011 reject local traffic not on loopback interface":
             iniface => '! lo',
+               port => 'all',
         destination => '127.0.0.1/8',
              action => 'reject',
       }
@@ -256,7 +257,7 @@ describe 'complex ruleset 2' do
         /LOCAL_INPUT_PRE/,
         /-A INPUT -m comment --comment \"001 LOCAL_INPUT_PRE\" -j LOCAL_INPUT_PRE/,
         /-A INPUT -m comment --comment \"010 INPUT allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT/,
-        /-A INPUT -d 127.0.0.0\/8 ! -i lo -p tcp -m comment --comment "011 reject local traffic not on loopback interface" -j REJECT/,
+        /-A INPUT -d 127.0.0.0\/8 ! -i lo -m comment --comment \"011 reject local traffic not on loopback interface\" -j REJECT --reject-with icmp-port-unreachable/,
         /-A INPUT -i lo -m comment --comment \"012 accept loopback\" -j ACCEPT/,
         /-A INPUT -p icmp -m comment --comment \"013 icmp destination-unreachable\" -m icmp --icmp-type 3 -j ACCEPT/,
         /-A INPUT -s 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"013 icmp echo-request\" -m icmp --icmp-type 8 -j ACCEPT/,

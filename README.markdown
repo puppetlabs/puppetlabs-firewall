@@ -88,6 +88,7 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
       }->
       firewall { "002 reject local traffic not on loopback interface":
         iniface     => '! lo',
+        proto       => 'all',
         destination => '127.0.0.1/8',
         action      => 'reject',
       }->
