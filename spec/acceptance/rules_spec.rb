@@ -147,10 +147,10 @@ describe 'complex ruleset 2' do
         before => Firewallchain['INPUT:filter:IPv4'],
       }
       firewall { "011 reject local traffic not on loopback interface":
-            iniface => '! lo',
-               port => 'all',
+        iniface     => '! lo',
+        proto       => 'all',
         destination => '127.0.0.1/8',
-             action => 'reject',
+        action      => 'reject',
       }
       firewall { '012 accept loopback':
         iniface => 'lo',
@@ -167,10 +167,10 @@ describe 'complex ruleset 2' do
       firewall { '025 smtp':
         outiface => '! eth0:2',
         chain    => 'OUTPUT',
-        proto   => 'tcp',
-        dport   => '25',
-        state   => 'NEW',
-        action  => 'accept',
+        proto    => 'tcp',
+        dport    => '25',
+        state    => 'NEW',
+        action   => 'accept',
       }
       firewall { '013 icmp echo-request':
         proto  => 'icmp',
@@ -263,8 +263,8 @@ describe 'complex ruleset 2' do
         /-A INPUT -s 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"013 icmp echo-request\" -m icmp --icmp-type 8 -j ACCEPT/,
         /-A INPUT -p icmp -m comment --comment \"013 icmp time-exceeded\" -m icmp --icmp-type 11 -j ACCEPT/,
         /-A INPUT -p tcp -m multiport --dports 22 -m comment --comment \"020 ssh\" -m state --state NEW -j ACCEPT/,
-        /-A OUTPUT -o ! eth0:2 -p tcp -multiport --dport 25 -m comment --comment \"025 smtp\" -m state --state NEW -j ACCEPT/,
-        /-A INPUT -i eth0:3 -p tcp -m multiport --dport 443 -m comment --comment \"443 ssl on aliased interface\" -m state --state NEW -j ACCEPT/,
+        /-A OUTPUT ! -o eth0:2 -p tcp -m multiport --dports 25 -m comment --comment \"025 smtp\" -m state --state NEW -j ACCEPT/,
+        /-A INPUT -i eth0:3 -p tcp -m multiport --dports 443 -m comment --comment \"443 ssl on aliased interface\" -m state --state NEW -j ACCEPT/,
         /-A INPUT -m comment --comment \"900 LOCAL_INPUT\" -j LOCAL_INPUT/,
         /-A INPUT -m comment --comment \"999 reject\" -j REJECT --reject-with icmp-host-prohibited/,
         /-A FORWARD -m comment --comment \"010 allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT/
