@@ -12,8 +12,10 @@
 #   Default: running
 #
 class firewall (
-  $ensure = running
-) {
+  $ensure       = running,
+  $service_name = $::firewall::params::service_name,
+  $package_name = $::firewall::params::package_name,
+) inherits ::firewall::params {
   case $ensure {
     /^(running|stopped)$/: {
       # Do nothing.
@@ -26,7 +28,9 @@ class firewall (
   case $::kernel {
     'Linux': {
       class { "${title}::linux":
-        ensure => $ensure,
+        ensure       => $ensure,
+        service_name => $service_name,
+        package_name => $package_name,
       }
     }
     default: {
