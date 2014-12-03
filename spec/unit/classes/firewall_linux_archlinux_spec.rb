@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe 'firewall::linux::archlinux', :type => :class do
+  let(:facts) do
+    {
+      :osfamily        => 'RedHat',
+      :operatingsystem => 'Archlinux'
+    }
+  end
   it { should contain_service('iptables').with(
     :ensure   => 'running',
     :enable   => 'true'

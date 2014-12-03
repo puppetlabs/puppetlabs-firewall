@@ -311,6 +311,14 @@ Parameter that controls the state of the `iptables` service on your system, allo
 
 `ensure` can either be `running` or `stopped`. Default to `running`.
 
+####`package`
+
+Specify the platform-specific package(s) to install. Defaults defined in `firewall::params`.
+
+####`service`
+
+Specify the platform-specific service(s) to start or stop. Defaults defined in `firewall::params`.
+
 ###Type: firewall
 
 This type enables you to manage firewall rules within Puppet.

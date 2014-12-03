@@ -8,6 +8,7 @@ describe 'firewall::linux::redhat', :type => :class do
     oldreleases.each do |osrel|
       context "os #{os} and osrel #{osrel}" do
         let(:facts) {{
+          :osfamily               => 'RedHat',
           :operatingsystem        => os,
           :operatingsystemrelease => osrel
         }}
@@ -20,6 +21,7 @@ describe 'firewall::linux::redhat', :type => :class do
     newreleases.each do |osrel|
       context "os #{os} and osrel #{osrel}" do
         let(:facts) {{
+          :osfamily               => 'RedHat',
           :operatingsystem        => os,
           :operatingsystemrelease => osrel
         }}
