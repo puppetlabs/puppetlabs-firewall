@@ -19,7 +19,12 @@ describe 'standard usage tests:', :unless => UNSUPPORTED_PLATFORMS.include?(fact
           iniface => 'lo',
           action  => 'accept',
         }->
-        firewall { '002 accept related established rules':
+        firewall { "0002 reject local traffic not on loopback interface":
+          iniface     => '! lo',
+          destination => '127.0.0.1/8',
+          action      => 'reject',
+        }->
+        firewall { '003 accept related established rules':
           proto   => 'all',
           ctstate => ['RELATED', 'ESTABLISHED'],
           action  => 'accept',
