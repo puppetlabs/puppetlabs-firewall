@@ -543,6 +543,16 @@ ARGS_TO_HASH = {
       :proto => 'udp',
     },
   },
+  'negate_dst_type_and_src_type' => {
+    :line => '-A nova-compute-FORWARD -m addrtype ! --src-type LOCAL -m addrtype ! --dst-type ANYCAST -j ACCEPT',
+    :table => 'filter',
+    :params => {
+      :action => 'accept',
+      :chain => 'nova-compute-FORWARD',
+      :src_type => '! LOCAL',
+      :dst_type => '! ANYCAST',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -1045,5 +1055,17 @@ HASH_TO_ARGS = {
       :proto       => 'udp',
     },
     :args => ["-t", :filter, "-s", "0.0.0.0/32", "-d", "255.255.255.255/32", "-p", :udp, "-m", "multiport", "!", "--sports", "68,69", "-m", "multiport", "!", "--dports", "67,66", "-m", "comment", "--comment", "065 negate dport and sport", "-j", "ACCEPT"],
+  },
+  'negate_dst_type_and_src_type' => {
+    :params => {
+      :name        => '066 negate dst-type and src-type',
+      :table       => 'filter',
+      :action      => 'accept',
+      :chain       => 'nova-compute-FORWARD',
+      :src_type    => '! LOCAL',
+      :dst_type    => '! ANYCAST',
+      :proto       => 'udp',
+    },
+    :args => ["-t", :filter, "-p", :udp, "-m", "addrtype", "!", "--dst-type", :ANYCAST, "-m", "addrtype", "!", "--src-type", :LOCAL, "-m", "comment", "--comment", "066 negate dst-type and src-type", "-j", "ACCEPT"],
   },
 }

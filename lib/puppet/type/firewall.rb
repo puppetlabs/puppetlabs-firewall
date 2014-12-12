@@ -289,8 +289,10 @@ Puppet::Type.newtype(:firewall) do
       * XRESOLVE - undocumented
     EOS
 
-    newvalues(:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
-              :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE)
+    newvalues(*[:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
+              :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].collect do |address_type|
+      [address_type, "! #{address_type}".to_sym]
+    end.flatten)
   end
 
   newproperty(:src_type, :required_features => :address_type) do
@@ -315,8 +317,10 @@ Puppet::Type.newtype(:firewall) do
       * XRESOLVE - undocumented
     EOS
 
-    newvalues(:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
-              :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE)
+    newvalues(*[:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
+              :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].collect do |address_type|
+      [address_type, "! #{address_type}".to_sym]
+    end.flatten)
   end
 
   newproperty(:proto) do
