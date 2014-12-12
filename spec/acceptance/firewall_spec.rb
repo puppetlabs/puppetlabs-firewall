@@ -584,6 +584,30 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         end
       end
 
+      context '! MULTICAST' do
+        it 'applies' do
+          pp = <<-EOS
+            class { '::firewall': }
+            firewall { '563 - test inversion':
+              proto  => tcp,
+              action => accept,
+              #{type} => '! MULTICAST',
+            }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+          unless fact('selinux') == 'true'
+            apply_manifest(pp, :catch_changes => true)
+          end
+        end
+
+        it 'should contain the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -p tcp -m addrtype( !\s.*\sMULTICAST|\s.*\s! MULTICAST) -m comment --comment "563 - test inversion" -j ACCEPT/)
+          end
+        end
+      end
+
       context 'BROKEN' do
         it 'fails' do
           pp = <<-EOS
@@ -1613,6 +1637,31 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
             it 'should contain the rule' do
               shell('ip6tables-save') do |r|
                 expect(r.stdout).to match(/-A INPUT -p tcp -m addrtype\s.*\sMULTICAST -m comment --comment "603 - test" -j ACCEPT/)
+              end
+            end
+          end
+
+          context '! MULTICAST' do
+            it 'applies' do
+              pp = <<-EOS
+            class { '::firewall': }
+            firewall { '603 - test inversion':
+              proto    => tcp,
+              action   => accept,
+              #{type}  => '! MULTICAST',
+              provider => 'ip6tables',
+            }
+              EOS
+
+              apply_manifest(pp, :catch_failures => true)
+              unless fact('selinux') == 'true'
+                apply_manifest(pp, :catch_changes => true)
+              end
+            end
+
+            it 'should contain the rule' do
+              shell('ip6tables-save') do |r|
+                expect(r.stdout).to match(/-A INPUT -p tcp -m addrtype( !\s.*\sMULTICAST|\s.*\s! MULTICAST) -m comment --comment "603 - test inversion" -j ACCEPT/)
               end
             end
           end
