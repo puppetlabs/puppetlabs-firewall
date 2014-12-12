@@ -25,10 +25,7 @@ class firewall::params {
       }
     }
     'Debian': {
-      if $::operatingsystemrelease =~ /^6\./ and versioncmp($::iptables_persistent_version, '0.5.0') < 0 {
-        $service_name = undef
-        $package_name = 'iptables-persistent'
-      } elsif $::operatingsystem == 'Debian' and versioncmp($::operatingsystemrelease, '8.0') >= 0 {
+      if $::operatingsystem == 'Debian' and versioncmp($::operatingsystemrelease, '8.0') >= 0 {
         $service_name = 'netfilter-persistent'
         $package_name = 'netfilter-persistent'
       } else {
