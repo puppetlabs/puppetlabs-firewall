@@ -1,3 +1,18 @@
+##2014-12-16 - Supported Release 1.3.0
+###Summary
+
+This release includes a number of bugfixes and features, including fixing `tcp_flags` support, and added support for interface aliases, negation for iniface and outiface, and extra configurability for packages and service names.
+
+####Features
+- Add support for interface aliases (eth0:0) (MODULES-1469)
+- Add negation for iniface, outiface (MODULES-1470)
+- Make package and service names configurable (MODULES-1309)
+
+####Bugfixes
+- Fix test regexes for EL5 (MODULES-1565)
+- Fix `tcp_flags` support for ip6tables (MODULES-556)
+- Don't arbitrarily limit `set_mark` for certain chains
+
 ##2014-11-04 - Supported Release 1.2.0
 ###Summary
 
