@@ -88,6 +88,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :stat_probability => '--probability',
     :state            => "-m state --state",
     :table            => "-t",
+    :tcp_flags        => "-m tcp --tcp-flags",
     :todest           => "--to-destination",
     :toports          => "--to-ports",
     :tosource         => "--to-source",
@@ -133,7 +134,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :gid, :uid, :sport, :dport,
+    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :tcp_flags, :gid, :uid, :sport, :dport,
     :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
     :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject,

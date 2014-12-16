@@ -1092,6 +1092,30 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         end
       end
     end
+
+    describe 'tcp_flags' do
+      context 'FIN,SYN ACK' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '593 - test':
+            proto  => tcp,
+            action => accept,
+            tcp_flags => 'FIN,SYN ACK',
+            provider => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN ACK -m comment --comment "593 - test" -j ACCEPT/)
+          end
+        end
+      end
+    end
   end
 
   describe 'limit' do
