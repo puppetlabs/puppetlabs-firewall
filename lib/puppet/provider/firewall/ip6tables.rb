@@ -93,6 +93,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :toports          => "--to-ports",
     :tosource         => "--to-source",
     :uid              => "-m owner --uid-owner",
+    :bridge           => "-m physdev",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -138,6 +139,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
     :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject,
-    :connlimit_above, :connlimit_mask, :connmark]
+    :connlimit_above, :connlimit_mask, :connmark, :bridge]
 
 end

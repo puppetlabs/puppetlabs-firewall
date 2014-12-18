@@ -103,6 +103,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :toports          => "--to-ports",
     :tosource         => "--to-source",
     :uid              => "-m owner --uid-owner",
+    :bridge           => "-m physdev",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -157,7 +158,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :random, :log_prefix, :log_level, :reject, :set_mark,
-    :connlimit_above, :connlimit_mask, :connmark
+    :connlimit_above, :connlimit_mask, :connmark, :bridge
   ]
 
   def insert
