@@ -1681,4 +1681,54 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
+  describe 'to' do
+    context 'Destination netmap 192.168.1.1' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '569 - test':
+            proto  => tcp,
+            table  => 'nat',
+            chain  => 'PREROUTING',
+            jump   => 'NETMAP',
+            source => '200.200.200.200',
+            to => '192.168.1.1',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables-save -t nat') do |r|
+          expect(r.stdout).to match(/-A PREROUTING -s 200.200.200.200(\/32)? -p tcp -m comment --comment "611 - test" -j NETMAP --to 192.168.1.1/)
+        end
+      end
+    end
+
+    context 'Source netmap 192.168.1.1' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '569 - test':
+            proto  => tcp,
+            table  => 'nat',
+            chain  => 'POSTROUTING',
+            jump   => 'NETMAP',
+            destination => '200.200.200.200',
+            to => '192.168.1.1',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables-save -t nat') do |r|
+          expect(r.stdout).to match(/-A POSTROUTING -d 200.200.200.200(\/32)? -p tcp -m comment --comment "611 - test" -j NETMAP --to 192.168.1.1/)
+        end
+      end
+    end    
+  end
+
 end

@@ -34,6 +34,7 @@ Puppet::Type.newtype(:firewall) do
   feature :recent_limiting, "The netfilter recent module"
   feature :snat, "Source NATing"
   feature :dnat, "Destination NATing"
+  feature :netmap, "NET MAPping"
   feature :interface_match, "Interface matching"
   feature :icmp_match, "Matching ICMP types"
   feature :owner, "Matching owners"
@@ -466,6 +467,12 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:toports, :required_features => :dnat) do
     desc <<-EOS
       For DNAT this is the port that will replace the destination port.
+    EOS
+  end
+
+  newproperty(:to, :required_features => :netmap) do
+    desc <<-EOS
+      For NETMAP this will replace the destination IP
     EOS
   end
 

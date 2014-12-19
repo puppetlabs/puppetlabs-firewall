@@ -344,7 +344,7 @@ This type enables you to manage firewall rules within Puppet.
 * `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
     * Default for `kernel` == `linux`.
-    * Supported features: `address_type`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
+    * Supported features: `address_type`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`, `netmap`.
 
 **Autorequires:**
 
@@ -407,6 +407,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `state_match`: The ability to match stateful firewall states.
 
 * `tcp_flags`: The ability to match on particular TCP flag settings.
+
+* `netmap`: The ability to map entire subnets via source or destination nat rules.
 
 #### Parameters
 
@@ -627,6 +629,8 @@ firewall { '101 blacklist strange traffic':
 * `toports`: For DNAT this is the port that will replace the destination port. Requires the `dnat` feature.
 
 * `tosource`: When using `jump => 'SNAT'`, you can specify the new source address using this parameter. Requires the `snat` feature.
+
+* `to`: When using `jump => 'NETMAP'`, you can specify a source or destination subnet to nat to. Requires the `netmap` feature`.
 
 * `uid`: UID or Username owner matching rule. Accepts a string argument only, as iptables does not accept multiple uid in a single statement. Requires the `owner` feature.
 
