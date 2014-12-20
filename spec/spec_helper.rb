@@ -7,6 +7,8 @@ ARGV.clear
 require 'rubygems'
 require 'bundler/setup'
 require 'rspec-puppet'
+require 'rspec-puppet-facts'
+include RspecPuppetFacts
 
 Bundler.require :default, :test
 

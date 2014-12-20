@@ -9,6 +9,12 @@
   "issues_url": "https://tickets.puppetlabs.com/browse/MODULES",
   "operatingsystem_support": [
     {
+      "operatingsystem": "ArchLinux",
+      "operatingsystemrelease": [
+        "3"
+      ]
+    },
+    {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
         "5",
