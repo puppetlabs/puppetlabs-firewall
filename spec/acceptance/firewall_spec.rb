@@ -1701,10 +1701,17 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
       it 'should contain the rule' do
         shell('iptables-save -t nat') do |r|
-          expect(r.stdout).to match(/-A PREROUTING -s 200.200.200.200(\/32)? -p tcp -m comment --comment "611 - test" -j NETMAP --to 192.168.1.1/)
+          expect(r.stdout).to match(/-A PREROUTING -s 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - test" -j NETMAP --to 192.168.1.1/)
         end
       end
     end
+
+     describe 'reset' do
+       it 'deletes all rules' do
+         shell('ip6tables --flush')
+         shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
+       end
+     end
 
     context 'Source netmap 192.168.1.1' do
       it 'applies' do
@@ -1725,7 +1732,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
       it 'should contain the rule' do
         shell('iptables-save -t nat') do |r|
-          expect(r.stdout).to match(/-A POSTROUTING -d 200.200.200.200(\/32)? -p tcp -m comment --comment "611 - test" -j NETMAP --to 192.168.1.1/)
+          expect(r.stdout).to match(/-A POSTROUTING -d 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - test" -j NETMAP --to 192.168.1.1/)
         end
       end
     end    

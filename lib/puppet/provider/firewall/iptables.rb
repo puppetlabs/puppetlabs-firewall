@@ -267,7 +267,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     map_index={}
     @resource_map.each_pair do |map_k,map_v|
       [map_v].flatten.each do |v|
-        ind=values.index(/\s#{v}/)
+        ind=values.index(/\s#{v}\s/)
         next unless ind
         map_index[map_k]=ind
      end
