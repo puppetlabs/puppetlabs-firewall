@@ -219,7 +219,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :expect_failures => true) do |r|
-          expect(r.stderr).to match(/Invalid value "392.168.1.1-192.168.1.10"/)
+          expect(r.stderr).to match(/Invalid IP address "392.168.1.1" in range "392.168.1.1-192.168.1.10"/)
         end
       end
 
@@ -348,7 +348,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :expect_failures => true) do |r|
-          expect(r.stderr).to match(/Invalid value "392.168.1.1-192.168.1.10"/)
+          expect(r.stderr).to match(/Invalid IP address "392.168.1.1" in range "392.168.1.1-192.168.1.10"/)
         end
       end
 
@@ -1116,6 +1116,113 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         end
       end
     end
+
+    describe 'src_range' do
+      context '2001:db8::1-2001:db8::ff' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '601 - test':
+            proto  => tcp,
+            port   => '601',
+            action => accept,
+            src_range => '2001:db8::1-2001:db8::ff',
+            provider => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+          unless fact('selinux') == 'true'
+            apply_manifest(pp, :catch_changes => true)
+          end
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --src-range 2001:db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - test" -j ACCEPT/)
+          end
+        end
+      end
+
+      # Invalid IP
+      context '2001::db8::1-2001:db8::ff' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '601 - test':
+            proto  => tcp,
+            port   => '601',
+            action => accept,
+            src_range => '2001::db8::1-2001:db8::ff',
+          }
+          EOS
+
+          apply_manifest(pp, :expect_failures => true) do |r|
+            expect(r.stderr).to match(/Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"/)
+          end
+        end
+
+        it 'should not contain the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --src-range 2001::db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - test" -j ACCEPT/)
+          end
+        end
+      end
+    end
+
+    describe 'dst_range' do
+      context '2001:db8::1-2001:db8::ff' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '602 - test':
+            proto  => tcp,
+            port   => '602',
+            action => accept,
+            dst_range => '2001:db8::1-2001:db8::ff',
+            provider => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+          unless fact('selinux') == 'true'
+            apply_manifest(pp, :catch_changes => true)
+          end
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --dst-range 2001:db8::1-2001:db8::ff -m multiport --ports 602 -m comment --comment "602 - test" -j ACCEPT/)
+          end
+        end
+      end
+
+      # Invalid IP
+      context '2001::db8::1-2001:db8::ff' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '602 - test':
+            proto  => tcp,
+            port   => '602',
+            action => accept,
+            dst_range => '2001::db8::1-2001:db8::ff',
+          }
+          EOS
+
+          apply_manifest(pp, :expect_failures => true) do |r|
+            expect(r.stderr).to match(/Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"/)
+          end
+        end
+
+        it 'should not contain the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --dst-range 2001::db8::1-2001:db8::ff -m multiport --ports 602 -m comment --comment "602 - test" -j ACCEPT/)
+          end
+        end
+      end
+    end
+
   end
 
   describe 'limit' do

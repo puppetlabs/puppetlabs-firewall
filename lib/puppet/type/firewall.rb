@@ -137,10 +137,25 @@ Puppet::Type.newtype(:firewall) do
 
           src_range => '192.168.1.1-192.168.1.10'
 
-      The source IP range is must in 'IP1-IP2' format.
+      The source IP range must be in 'IP1-IP2' format.
     EOS
 
-    newvalues(/^((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)-((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)/)
+    validate do |value|
+      if matches = /^([^\-\/]+)-([^\-\/]+)$/.match(value)
+        start_addr = matches[1]
+        end_addr = matches[2]
+
+        [start_addr, end_addr].each do |addr|
+          begin
+            @resource.host_to_ip(addr)
+          rescue Exception
+            self.fail("Invalid IP address \"#{addr}\" in range \"#{value}\"")
+          end
+        end
+      else
+        raise(ArgumentError, "The source IP range must be in 'IP1-IP2' format.")
+      end
+    end
   end
 
   newproperty(:destination) do
@@ -172,10 +187,25 @@ Puppet::Type.newtype(:firewall) do
 
           dst_range => '192.168.1.1-192.168.1.10'
 
-      The destination IP range is must in 'IP1-IP2' format.
+      The destination IP range must be in 'IP1-IP2' format.
     EOS
 
-    newvalues(/^((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)-((25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)/)
+    validate do |value|
+      if matches = /^([^\-\/]+)-([^\-\/]+)$/.match(value)
+        start_addr = matches[1]
+        end_addr = matches[2]
+
+        [start_addr, end_addr].each do |addr|
+          begin
+            @resource.host_to_ip(addr)
+          rescue Exception
+            self.fail("Invalid IP address \"#{addr}\" in range \"#{value}\"")
+          end
+        end
+      else
+        raise(ArgumentError, "The destination IP range must be in 'IP1-IP2' format.")
+      end
+    end
   end
 
   newproperty(:sport, :array_matching => :all) do
