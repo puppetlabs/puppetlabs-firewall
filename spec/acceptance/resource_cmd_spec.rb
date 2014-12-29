@@ -126,4 +126,22 @@ describe 'puppet resource firewall command:', :unless => UNSUPPORTED_PLATFORMS.i
       end
     end
   end
+
+  # version of iptables that ships with el5 doesn't work with the
+  # ip6tables provider
+  if default['platform'] !~ /el-5/
+    context 'dport/sport with ip6tables' do
+      before :all do
+        ip6tables_flush_all_tables
+        shell('ip6tables -A INPUT -d fe80::/64 -p udp -m udp --dport 546 --sport 547 -j ACCEPT')
+      end
+      it do
+        shell('puppet resource firewall \'000-foobar\' provider=ip6tables') do |r|
+          r.exit_code.should be_zero
+          # don't check stdout, testing preexisting rules, output is normal
+          r.stderr.should be_empty
+        end
+      end
+    end
+  end
 end
