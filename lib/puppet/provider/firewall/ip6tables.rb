@@ -21,6 +21,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :ishasmorefrags
   has_feature :islastfrag
   has_feature :isfirstfrag
+  has_feature :iprange
 
   optional_commands({
     :ip6tables      => 'ip6tables',
@@ -55,6 +56,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ctstate          => "-m conntrack --ctstate",
     :destination      => "-d",
     :dport            => ["-m multiport --dports", "--dport"],
+    :dst_range        => '-m iprange --dst-range',
     :gid              => "-m owner --gid-owner",
     :hop_limit        => "-m hl --hl-eq",
     :icmp             => "-m icmp6 --icmpv6-type",
@@ -82,6 +84,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :rttl             => "--rttl",
     :source           => "-s",
     :sport            => ["-m multiport --sports", "--sport"],
+    :src_range        => '-m iprange --src-range',
     :stat_every       => '--every',
     :stat_mode        => "-m statistic --mode",
     :stat_packet      => '--packet',
@@ -134,7 +137,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :tcp_flags, :gid, :uid, :sport, :dport,
+    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
+    :tcp_flags, :gid, :uid, :sport, :dport,
     :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
     :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject,

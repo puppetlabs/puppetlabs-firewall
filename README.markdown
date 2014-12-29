@@ -439,7 +439,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `dst_range`: The destination IP range. For example: `dst_range => '192.168.1.1-192.168.1.10'`.
 
-  The destination IP range is must in 'IP1-IP2' format. Values must match '0.0.0.0-0.0.0.0' through '255.255.255.255-255.255.255.255'. Requires the `iprange` feature.
+  The destination IP range is must in 'IP1-IP2' format. Values in the range must be valid IPv4 or IPv6 addresses. Requires the `iprange` feature.
 
 * `dst_type`: The destination address type. For example: `dst_type => 'LOCAL'`.
 
@@ -588,7 +588,7 @@ firewall { '101 blacklist strange traffic':
 
 * `sport`: The source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format:'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
-* `src_range`: The source IP range. For example: `src_range => '192.168.1.1-192.168.1.10'`. The source IP range is must in 'IP1-IP2' format. Values must match '0.0.0.0-0.0.0.0' through '255.255.255.255-255.255.255.255'. Requires the `iprange` feature.
+* `src_range`: The source IP range. For example: `src_range => '192.168.1.1-192.168.1.10'`. The source IP range must be in 'IP1-IP2' format. Values in the range must be valid IPv4 or IPv6 addresses. Requires the `iprange` feature.
 
 * `src_type`: Specify the source address type. For example: `src_type => 'LOCAL'`.
 
