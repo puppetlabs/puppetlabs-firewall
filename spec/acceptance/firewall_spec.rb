@@ -1123,11 +1123,11 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           pp = <<-EOS
           class { '::firewall': }
           firewall { '601 - test':
-            proto  => tcp,
-            port   => '601',
-            action => accept,
+            proto     => tcp,
+            port      => '601',
+            action    => accept,
             src_range => '2001:db8::1-2001:db8::ff',
-            provider => 'ip6tables',
+            provider  => 'ip6tables',
           }
           EOS
 
@@ -1150,9 +1150,10 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           pp = <<-EOS
           class { '::firewall': }
           firewall { '601 - test':
-            proto  => tcp,
-            port   => '601',
-            action => accept,
+            proto     => tcp,
+            port      => '601',
+            action    => accept,
+            provider  => 'ip6tables',
             src_range => '2001::db8::1-2001:db8::ff',
           }
           EOS
@@ -1163,7 +1164,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         end
 
         it 'should not contain the rule' do
-          shell('iptables-save') do |r|
+          shell('ip6tables-save') do |r|
             expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --src-range 2001::db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - test" -j ACCEPT/)
           end
         end
@@ -1176,11 +1177,11 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           pp = <<-EOS
           class { '::firewall': }
           firewall { '602 - test':
-            proto  => tcp,
-            port   => '602',
-            action => accept,
+            proto     => tcp,
+            port      => '602',
+            action    => accept,
             dst_range => '2001:db8::1-2001:db8::ff',
-            provider => 'ip6tables',
+            provider  => 'ip6tables',
           }
           EOS
 
@@ -1203,9 +1204,10 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           pp = <<-EOS
           class { '::firewall': }
           firewall { '602 - test':
-            proto  => tcp,
-            port   => '602',
-            action => accept,
+            proto     => tcp,
+            port      => '602',
+            action    => accept,
+            provider  => 'ip6tables',
             dst_range => '2001::db8::1-2001:db8::ff',
           }
           EOS
@@ -1216,8 +1218,64 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         end
 
         it 'should not contain the rule' do
-          shell('iptables-save') do |r|
+          shell('ip6tables-save') do |r|
             expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --dst-range 2001::db8::1-2001:db8::ff -m multiport --ports 602 -m comment --comment "602 - test" -j ACCEPT/)
+          end
+        end
+      end
+    end
+
+    # ip6tables on el5 and el6 doesn't support addrtype
+    if default['platform'] !~ /el-[5-6]/
+      ['dst_type', 'src_type'].each do |type|
+        describe "#{type}" do
+          context 'MULTICAST' do
+            it 'applies' do
+              pp = <<-EOS
+            class { '::firewall': }
+            firewall { '603 - test':
+              proto    => tcp,
+              action   => accept,
+              #{type}  => 'MULTICAST',
+              provider => 'ip6tables',
+            }
+              EOS
+
+              apply_manifest(pp, :catch_failures => true)
+              unless fact('selinux') == 'true'
+                apply_manifest(pp, :catch_changes => true)
+              end
+            end
+
+            it 'should contain the rule' do
+              shell('ip6tables-save') do |r|
+                expect(r.stdout).to match(/-A INPUT -p tcp -m addrtype\s.*\sMULTICAST -m comment --comment "603 - test" -j ACCEPT/)
+              end
+            end
+          end
+
+          context 'BROKEN' do
+            it 'fails' do
+              pp = <<-EOS
+            class { '::firewall': }
+            firewall { '603 - test':
+              proto    => tcp,
+              action   => accept,
+              #{type}  => 'BROKEN',
+              provider => 'ip6tables',
+            }
+              EOS
+
+              apply_manifest(pp, :expect_failures => true) do |r|
+                expect(r.stderr).to match(/Invalid value "BROKEN"./)
+              end
+            end
+
+            it 'should not contain the rule' do
+              shell('ip6tables-save') do |r|
+                expect(r.stdout).to_not match(/-A INPUT -p tcp -m addrtype\s.*\sBROKEN -m comment --comment "603 - test" -j ACCEPT/)
+              end
+            end
           end
         end
       end
@@ -1842,7 +1900,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           expect(r.stdout).to match(/-A POSTROUTING -d 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - test" -j NETMAP --to 192.168.1.1/)
         end
       end
-    end    
+    end
   end
 
 end
