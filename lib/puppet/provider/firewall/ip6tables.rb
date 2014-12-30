@@ -21,6 +21,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :ishasmorefrags
   has_feature :islastfrag
   has_feature :isfirstfrag
+  has_feature :address_type
   has_feature :iprange
 
   optional_commands({
@@ -57,6 +58,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :destination      => "-d",
     :dport            => ["-m multiport --dports", "--dport"],
     :dst_range        => '-m iprange --dst-range',
+    :dst_type         => "-m addrtype --dst-type",
     :gid              => "-m owner --gid-owner",
     :hop_limit        => "-m hl --hl-eq",
     :icmp             => "-m icmp6 --icmpv6-type",
@@ -85,6 +87,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :source           => "-s",
     :sport            => ["-m multiport --sports", "--sport"],
     :src_range        => '-m iprange --src-range',
+    :src_type         => "-m addrtype --src-type",
     :stat_every       => '--every',
     :stat_mode        => "-m statistic --mode",
     :stat_packet      => '--packet',
@@ -138,8 +141,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
-    :tcp_flags, :gid, :uid, :sport, :dport,
-    :port, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
+    :tcp_flags, :gid, :uid, :sport, :dport, :port, :dst_type, :src_type,
+    :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
     :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
     :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject,
     :connlimit_above, :connlimit_mask, :connmark]
