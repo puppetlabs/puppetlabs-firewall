@@ -71,6 +71,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :log_level        => "--log-level",
     :log_prefix       => "--log-prefix",
     :name             => "-m comment --comment",
+    :mac_source       => ["-m mac --mac-source", "--mac-source"],
     :outiface         => "-o",
     :pkttype          => "-m pkttype --pkt-type",
     :port             => '-m multiport --ports',
@@ -141,10 +142,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface,
     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
-    :tcp_flags, :gid, :uid, :sport, :dport, :port, :dst_type, :src_type,
-    :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit, :burst,
-    :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource, :rdest,
-    :jump, :todest, :tosource, :toports, :log_level, :log_prefix, :reject,
-    :connlimit_above, :connlimit_mask, :connmark]
+    :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port, :dst_type,
+    :src_type, :pkttype, :name, :state, :ctstate, :icmp, :hop_limit, :limit,
+    :burst, :recent, :rseconds, :reap, :rhitcount, :rttl, :rname, :rsource,
+    :rdest, :jump, :todest, :tosource, :toports, :log_level, :log_prefix,
+    :reject, :connlimit_above, :connlimit_mask, :connmark]
 
 end

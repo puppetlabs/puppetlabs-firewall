@@ -1225,6 +1225,31 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
+    describe 'mac_source' do
+      context '0A:1B:3C:4D:5E:6F' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '604 - test':
+            ensure      => present,
+            source      => '2001:db8::1/128',
+            mac_source  => '0A:1B:3C:4D:5E:6F',
+            chain       => 'INPUT',
+            provider    => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -s 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "604 - test"/)
+          end
+        end
+      end
+    end
+
     # ip6tables only support addrtype on a limited set of platforms
     if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
       ['dst_type', 'src_type'].each do |type|
