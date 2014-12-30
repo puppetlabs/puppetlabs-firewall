@@ -1225,8 +1225,8 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
-    # ip6tables on el5 and el6 doesn't support addrtype
-    if default['platform'] !~ /el-[5-6]/
+    # ip6tables only support addrtype on a limited set of platforms
+    if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
       ['dst_type', 'src_type'].each do |type|
         describe "#{type}" do
           context 'MULTICAST' do
