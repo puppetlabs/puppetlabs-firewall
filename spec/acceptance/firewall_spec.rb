@@ -1251,7 +1251,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
 
     # ip6tables has limited `-m socket` support
-    if default['platform'] !~ /el-5/ and default['platform'] !~ /ubuntu-1004/ and default['platform'] !~ /debian-6/ and default['platform'] !~ /sles/
+    if default['platform'] !~ /el-5/ and default['platform'] !~ /ubuntu-10\.04/ and default['platform'] !~ /debian-6/ and default['platform'] !~ /sles/
       describe 'socket' do
         context 'true' do
           it 'applies' do
