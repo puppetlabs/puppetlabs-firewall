@@ -1250,6 +1250,61 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
+    # ip6tables has limited `-m socket` support
+    if default['platform'] !~ /el-5/ and default['platform'] !~ /ubuntu-1004/ and default['platform'] !~ /debian-6/ and default['platform'] !~ /sles/
+      describe 'socket' do
+        context 'true' do
+          it 'applies' do
+            pp = <<-EOS
+          class { '::firewall': }
+          firewall { '605 - test':
+            ensure   => present,
+            proto    => tcp,
+            port     => '605',
+            action   => accept,
+            chain    => 'INPUT',
+            socket   => true,
+            provider => 'ip6tables',
+          }
+            EOS
+
+            apply_manifest(pp, :catch_failures => true)
+          end
+
+          it 'should contain the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 605 -m socket -m comment --comment "605 - test" -j ACCEPT/)
+            end
+          end
+        end
+
+        context 'false' do
+          it 'applies' do
+            pp = <<-EOS
+          class { '::firewall': }
+          firewall { '606 - test':
+            ensure   => present,
+            proto    => tcp,
+            port     => '606',
+            action   => accept,
+            chain    => 'INPUT',
+            socket   => false,
+            provider => 'ip6tables',
+          }
+            EOS
+
+            apply_manifest(pp, :catch_failures => true)
+          end
+
+          it 'should contain the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 606 -m comment --comment "606 - test" -j ACCEPT/)
+            end
+          end
+        end
+      end
+    end
+
     # ip6tables only support addrtype on a limited set of platforms
     if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
       ['dst_type', 'src_type'].each do |type|
