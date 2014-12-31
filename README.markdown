@@ -339,7 +339,7 @@ This type enables you to manage firewall rules within Puppet.
 
  * `ip6tables`: Ip6tables type provider
     * Required binaries: `ip6tables-save`, `ip6tables`.
-    * Supported features: `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `state_match`, `tcp_flags`.
+    * Supported features: `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `log_level`, `log_prefix`, `mark`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
 
 * `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
