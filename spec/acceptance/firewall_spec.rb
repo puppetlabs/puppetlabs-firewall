@@ -1305,6 +1305,122 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
+    describe 'ipsec_policy' do
+      context 'ipsec' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '607 - test':
+            ensure       => 'present',
+            action       => 'reject',
+            chain        => 'OUTPUT',
+            destination  => '2001:db8::1/128',
+            ipsec_dir    => 'out',
+            ipsec_policy => 'ipsec',
+            proto        => 'all',
+            reject       => 'icmp6-adm-prohibited',
+            table        => 'filter',
+            provider     => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "607 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp6-adm-prohibited/)
+          end
+        end
+      end
+
+      context 'none' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '608 - test':
+            ensure       => 'present',
+            action       => 'reject',
+            chain        => 'OUTPUT',
+            destination  => '2001:db8::1/128',
+            ipsec_dir    => 'out',
+            ipsec_policy => 'none',
+            proto        => 'all',
+            reject       => 'icmp6-adm-prohibited',
+            table        => 'filter',
+            provider     => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "608 - test" -m policy --dir out --pol none -j REJECT --reject-with icmp6-adm-prohibited/)
+          end
+        end
+      end
+    end
+
+    describe 'ipsec_dir' do
+      context 'out' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '609 - test':
+            ensure       => 'present',
+            action       => 'reject',
+            chain        => 'OUTPUT',
+            destination  => '2001:db8::1/128',
+            ipsec_dir    => 'out',
+            ipsec_policy => 'ipsec',
+            proto        => 'all',
+            reject       => 'icmp6-adm-prohibited',
+            table        => 'filter',
+            provider     => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "609 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp6-adm-prohibited/)
+          end
+        end
+      end
+
+      context 'in' do
+        it 'applies' do
+          pp = <<-EOS
+          class { '::firewall': }
+          firewall { '610 - test':
+            ensure       => 'present',
+            action       => 'reject',
+            chain        => 'INPUT',
+            destination  => '2001:db8::1/128',
+            ipsec_dir    => 'in',
+            ipsec_policy => 'none',
+            proto        => 'all',
+            reject       => 'icmp6-adm-prohibited',
+            table        => 'filter',
+            provider     => 'ip6tables',
+          }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "610 - test" -m policy --dir in --pol none -j REJECT --reject-with icmp6-adm-prohibited/)
+          end
+        end
+      end
+    end
+
     # ip6tables only support addrtype on a limited set of platforms
     if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
       ['dst_type', 'src_type'].each do |type|
