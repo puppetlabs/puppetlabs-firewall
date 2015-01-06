@@ -51,9 +51,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -73,9 +73,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -95,9 +95,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should not contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -122,9 +122,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -s 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -s 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -147,9 +147,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT (! -s|-s !) 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT (! -s|-s !) 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -172,9 +172,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should not contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -s 256.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -s 256.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -199,9 +199,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --src-range 192.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --src-range 192.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -224,9 +224,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should not contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --src-range 392.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --src-range 392.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -251,9 +251,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -d 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -d 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -276,9 +276,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT (! -d|-d !) 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT (! -d|-d !) 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -301,9 +301,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should not contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -d 256.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -d 256.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -328,9 +328,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --dst-range 192.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m iprange --dst-range 192.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -353,9 +353,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should not contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --dst-range 392.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -p tcp -m iprange --dst-range 392.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -376,9 +376,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --sports 560 -m comment --comment "560 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --sports 560 -m comment --comment "560 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -397,9 +397,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --sports 560:561 -m comment --comment "560 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --sports 560:561 -m comment --comment "560 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -420,9 +420,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --sports 9999560-561 -m comment --comment "560 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --sports 9999560-561 -m comment --comment "560 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -443,9 +443,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 561 -m comment --comment "561 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 561 -m comment --comment "561 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -464,9 +464,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 561:562 -m comment --comment "561 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 561:562 -m comment --comment "561 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -487,9 +487,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --dports 9999561-562 -m comment --comment "560 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --dports 9999561-562 -m comment --comment "560 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -510,9 +510,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 562 -m comment --comment "562 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 562 -m comment --comment "562 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -531,9 +531,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 562:563 -m comment --comment "562 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 562:563 -m comment --comment "562 - test" -j ACCEPT/)
+        end
       end
     end
 
@@ -554,9 +554,9 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-         shell('iptables-save') do |r|
-           expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 9999562-563 -m comment --comment "562 - test" -j ACCEPT/)
-         end
+        shell('iptables-save') do |r|
+          expect(r.stdout).to_not match(/-A INPUT -p tcp -m multiport --ports 9999562-563 -m comment --comment "562 - test" -j ACCEPT/)
+        end
       end
     end
   end
@@ -2067,12 +2067,12 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
-     describe 'reset' do
-       it 'deletes all rules' do
-         shell('ip6tables --flush')
-         shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
-       end
-     end
+    describe 'reset' do
+      it 'deletes all rules' do
+        shell('ip6tables --flush')
+        shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
+      end
+    end
 
     context 'Source netmap 192.168.1.1' do
       it 'applies' do
@@ -2095,6 +2095,14 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(/-A POSTROUTING -d 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - test" -j NETMAP --to 192.168.1.1/)
         end
+      end
+    end
+  end
+  describe 'resource' do
+    it 'should report back no errors on resource firewall' do
+      shell('iptables -A MY_CHAIN -s 10.0.0.0/8 -p udp -m udp -j ACCEPT')
+      on default, puppet('resource firewall') do |r|
+        expect(r.stdout).to_not match(/Error:/)
       end
     end
   end
