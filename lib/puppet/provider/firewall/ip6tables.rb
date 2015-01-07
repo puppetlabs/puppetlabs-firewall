@@ -34,6 +34,14 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   confine :kernel => :linux
 
+  ip6tables_version = Facter.fact('iptables_version').value
+  if (ip6tables_version and Puppet::Util::Package.versioncmp(ip6tables_version, '1.4.1') < 0)
+    mark_flag = '--set-mark'
+  else
+    mark_flag = '--set-xmark'
+  end
+
+
   def initialize(*args)
     if Facter.fact('ip6tables_version').value.match /1\.3\.\d/
       raise ArgumentError, 'The ip6tables provider is not supported on version 1.3 of iptables'
@@ -90,6 +98,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :rseconds         => "--seconds",
     :rsource          => "--rsource",
     :rttl             => "--rttl",
+    :set_mark         => mark_flag,
     :socket           => "-m socket",
     :source           => "-s",
     :sport            => ["-m multiport --sports", "--sport"],
@@ -161,7 +170,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
-    :toports, :log_level, :log_prefix, :reject, :connlimit_above,
+    :toports, :log_level, :log_prefix, :reject, :set_mark, :connlimit_above,
     :connlimit_mask, :connmark]
 
 end

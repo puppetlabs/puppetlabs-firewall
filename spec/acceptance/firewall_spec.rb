@@ -1421,6 +1421,34 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
+    describe 'set_mark' do
+      context '0x3e8/0xffffffff' do
+        it 'applies' do
+          pp = <<-EOS
+            class { '::firewall': }
+            firewall { '611 - test':
+              ensure => present,
+              chain => 'OUTPUT',
+              proto => tcp,
+              port   => '611',
+              jump => 'MARK',
+              table => 'mangle',
+              set_mark => '0x3e8/0xffffffff',
+              provider => 'ip6tables',
+            }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save -t mangle') do |r|
+            expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 611 -m comment --comment "611 - test" -j MARK --set-xmark 0x3e8\/0xffffffff/)
+          end
+        end
+      end
+    end
+
     # ip6tables only support addrtype on a limited set of platforms
     if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
       ['dst_type', 'src_type'].each do |type|
