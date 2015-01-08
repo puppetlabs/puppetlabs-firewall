@@ -693,6 +693,11 @@ Puppet::Type.newtype(:firewall) do
       only, as iptables does not accept multiple uid in a single
       statement.
     EOS
+    def insync?(is)
+      require 'etc'
+      return is.to_s == @should.first.to_s || Etc.getpwuid(Integer(is)).name == @should.first.to_s
+    end
+
   end
 
   newproperty(:gid, :required_features => :owner) do
