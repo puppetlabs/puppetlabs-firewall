@@ -179,6 +179,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     properties[:ensure] != :absent
   end
 
+  def uid
+    require 'etc'
+    return properties[:uid] == resource[:uid] || Etc.getpwuid(properties[:uid]).name == resource[:uid]
+  end
+
   # Flush the property hash once done.
   def flush
     debug("[flush]")
