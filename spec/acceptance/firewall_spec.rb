@@ -1449,7 +1449,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
-    #ip6tables only supports ipset on a limited set of platforms
+    #ip6tables only supports ipset, addrtype, and mask on a limited set of platforms
     if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
       describe 'ipset' do
         it 'applies' do
@@ -1486,10 +1486,33 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           end
         end
       end
-    end
 
-    # ip6tables only support addrtype on a limited set of platforms
-    if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
+      describe 'mask' do
+        it 'applies' do
+          pp = <<-EOS
+            class { '::firewall': }
+            firewall { '613 - test':
+              recent => 'update',
+              rseconds => 60,
+              rsource => true,
+              rname => 'test',
+              action => 'drop',
+              chain => 'FORWARD',
+              mask => 'ffff::',
+              provider => 'ip6tables',
+            }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A FORWARD -p tcp -m comment --comment "613 - test" -m recent --update --seconds 60 --name test --mask ffff:: --rsource -j DROP/)
+          end
+        end
+      end
+
       ['dst_type', 'src_type'].each do |type|
         describe "#{type}" do
           context 'MULTICAST' do
