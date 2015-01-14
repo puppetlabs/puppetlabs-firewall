@@ -1487,9 +1487,11 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         end
       end
 
-      describe 'mask' do
-        it 'applies' do
-          pp = <<-EOS
+      # mask isn't supported on deb7
+      if default['platform'] !~ /debian-7/
+        describe 'mask' do
+          it 'applies' do
+            pp = <<-EOS
             class { '::firewall': }
             firewall { '613 - test':
               recent => 'update',
@@ -1501,14 +1503,15 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
               mask => 'ffff::',
               provider => 'ip6tables',
             }
-          EOS
+            EOS
 
-          apply_manifest(pp, :catch_failures => true)
-        end
+            apply_manifest(pp, :catch_failures => true)
+          end
 
-        it 'should contain the rule' do
-          shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A FORWARD -p tcp -m comment --comment "613 - test" -m recent --update --seconds 60 --name test --mask ffff:: --rsource -j DROP/)
+          it 'should contain the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).to match(/-A FORWARD -p tcp -m comment --comment "613 - test" -m recent --update --seconds 60 --name test --mask ffff:: --rsource -j DROP/)
+            end
           end
         end
       end
