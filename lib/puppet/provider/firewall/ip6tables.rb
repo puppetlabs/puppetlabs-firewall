@@ -26,6 +26,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :iprange
   has_feature :ipsec_dir
   has_feature :ipsec_policy
+  has_feature :ipset
 
   optional_commands({
     :ip6tables      => 'ip6tables',
@@ -76,6 +77,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :iniface          => "-i",
     :ipsec_dir        => "-m policy --dir",
     :ipsec_policy     => "--pol",
+    :ipset            => "-m set --match-set",
     :isfirstfrag      => "-m frag --fragid 0 --fragfirst",
     :ishasmorefrags   => "-m frag --fragid 0 --fragmore",
     :islastfrag       => "-m frag --fragid 0 --fraglast",
@@ -169,8 +171,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port, :dst_type,
     :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :rsource, :rdest, :jump, :todest, :tosource,
-    :toports, :log_level, :log_prefix, :reject, :set_mark, :connlimit_above,
-    :connlimit_mask, :connmark]
+    :rhitcount, :rttl, :rname, :rsource, :rdest, :ipset, :jump, :todest,
+    :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark,
+    :connlimit_above, :connlimit_mask, :connmark]
 
 end

@@ -1449,6 +1449,45 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
+    #ip6tables only supports ipset on a limited set of platforms
+    if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
+      describe 'ipset' do
+        it 'applies' do
+          pp = <<-EOS
+            package { 'ipset': ensure => present }
+            exec { 'create ipset':
+              command => 'ipset create blacklist family inet6 hash:ip,port maxelem 1024 hashsize 65535 timeout 120',
+              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+              require => Package['ipset'],
+            }
+            exec { 'add blacklist':
+              command => 'ipset add blacklist 2001:db8::1,80',
+              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+              require => Exec['create ipset'],
+            }
+            class { '::firewall': }
+            firewall { '612 - test':
+              ensure   => present,
+              chain    => 'INPUT',
+              proto    => tcp,
+              action   => drop,
+              ipset    => 'blacklist src,src',
+              provider => 'ip6tables',
+              require  => Exec['add blacklist'],
+            }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "612 - test" -m set --match-set blacklist src,src -j DROP/)
+          end
+        end
+      end
+    end
+
     # ip6tables only support addrtype on a limited set of platforms
     if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
       ['dst_type', 'src_type'].each do |type|
