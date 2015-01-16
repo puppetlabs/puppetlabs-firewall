@@ -1450,13 +1450,28 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
 
     #ip6tables only supports ipset, addrtype, and mask on a limited set of platforms
-    if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-1404/
-      describe 'ipset' do
-        it 'applies' do
-          pp = <<-EOS
-            package { 'ipset': ensure => present }
+    if default['platform'] =~ /el-7/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /ubuntu-14\.04/
+      #ipset is really difficult to test, just testing on one platform
+      if default['platform'] =~ /ubuntu-14\.04/
+        describe 'ipset' do
+          it 'applies' do
+            pp = <<-EOS
+            exec { 'hackery pt 1':
+              command => 'service iptables-persistent flush',
+              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+            }
+            package { 'ipset':
+              ensure  => present,
+              require => Exec['hackery pt 1'],
+            }
+            exec { 'hackery pt 2':
+              command => 'service iptables-persistent start',
+              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+              require => Package['ipset'],
+            }
+            class { '::firewall': }
             exec { 'create ipset':
-              command => 'ipset create blacklist family inet6 hash:ip,port maxelem 1024 hashsize 65535 timeout 120',
+              command => 'ipset create blacklist hash:ip,port family inet6 maxelem 1024 hashsize 65535 timeout 120',
               path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
               require => Package['ipset'],
             }
@@ -1465,7 +1480,6 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
               path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
               require => Exec['create ipset'],
             }
-            class { '::firewall': }
             firewall { '612 - test':
               ensure   => present,
               chain    => 'INPUT',
@@ -1475,14 +1489,15 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
               provider => 'ip6tables',
               require  => Exec['add blacklist'],
             }
-          EOS
+            EOS
 
-          apply_manifest(pp, :catch_failures => true)
-        end
+            apply_manifest(pp, :catch_failures => true)
+          end
 
-        it 'should contain the rule' do
-          shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "612 - test" -m set --match-set blacklist src,src -j DROP/)
+          it 'should contain the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "612 - test" -m set --match-set blacklist src,src -j DROP/)
+            end
           end
         end
       end
