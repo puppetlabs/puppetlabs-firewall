@@ -2,6 +2,10 @@ class firewall::params {
   case $::osfamily {
     'RedHat': {
       case $::operatingsystem {
+        'Amazon': {
+          $service_name = 'iptables'
+          $package_name = undef
+        }
         'Archlinux': {
           $service_name = ['iptables','ip6tables']
           $package_name = undef
