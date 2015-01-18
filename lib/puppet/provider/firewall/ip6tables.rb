@@ -119,7 +119,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :toports          => "--to-ports",
     :tosource         => "--to-source",
     :uid              => "-m owner --uid-owner",
-    :bridge           => "-m physdev",
+    :physdev_in       => "-m physdev --physdev-in",
+    :physdev_out      => "-m physdev --physdev-out",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -169,8 +170,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # (Note: on my CentOS 6.4 ip6tables-save returns -m frag on the place
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
-  @resource_list = [:table, :source, :destination, :iniface, :outiface,
-    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
+  @resource_list = [:table, :source, :destination, :iniface, :outiface, :physdev_in,
+    :physdev_out, :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
     :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port, :dst_type,
     :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
