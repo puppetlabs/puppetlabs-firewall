@@ -730,6 +730,29 @@ Puppet::Type.newtype(:firewall) do
       only, as iptables does not accept multiple uid in a single
       statement.
     EOS
+    def insync?(is)
+      require 'etc'
+
+      # The following code allow us to take into consideration unix mappings
+      # between string usernames and UIDs (integers). We also need to ignore
+      # spaces as they are irrelevant with respect to rule sync.
+
+      is = is.gsub(/\s+/,'')
+
+      if is.start_with?('!')
+        lookup_id = is.gsub(/^!/,'')
+        negate = '!'
+      else
+        lookup_id = is
+        negate = ''
+      end
+
+      resolve = Etc.getpwuid(Integer(lookup_id)).name
+      resolve_with_negate = "#{negate}#{resolve}"
+
+      return is.to_s == @should.first.to_s.gsub(/\s+/,'') || resolve_with_negate == @should.first.to_s.gsub(/\s+/,'')
+    end
+
   end
 
   newproperty(:gid, :required_features => :owner) do
