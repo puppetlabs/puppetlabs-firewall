@@ -737,20 +737,37 @@ Puppet::Type.newtype(:firewall) do
       # between string usernames and UIDs (integers). We also need to ignore
       # spaces as they are irrelevant with respect to rule sync.
 
+      # Remove whitespace
       is = is.gsub(/\s+/,'')
+      should = @should.first.to_s.gsub(/\s+/,'')
 
+      # Keep track of negation, but remove the '!'
+      is_negate = ''
+      should_negate = ''
       if is.start_with?('!')
-        lookup_id = is.gsub(/^!/,'')
-        negate = '!'
-      else
-        lookup_id = is
-        negate = ''
+        is = is.gsub(/^!/,'')
+        is_negate = '!'
+      end
+      if should.start_with?('!')
+        should = should.gsub(/^!/,'')
+        should_negate = '!'
       end
 
-      resolve = Etc.getpwuid(Integer(lookup_id)).name
-      resolve_with_negate = "#{negate}#{resolve}"
+      # If 'should' contains anything other than digits,
+      # we assume that we have to do a lookup to convert
+      # to UID
+      unless should[/[0-9]+/] == should
+        should = Etc.getpwnam(should).uid
+      end
 
-      return is.to_s == @should.first.to_s.gsub(/\s+/,'') || resolve_with_negate == @should.first.to_s.gsub(/\s+/,'')
+      # If 'is' contains anything other than digits,
+      # we assume that we have to do a lookup to convert
+      # to UID
+      unless is[/[0-9]+/] == is
+        is = Etc.getpwnam(is).uid
+      end
+
+      return "#{is_negate}#{is}" == "#{should_negate}#{should}"
     end
 
   end
