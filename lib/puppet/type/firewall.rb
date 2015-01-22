@@ -1113,7 +1113,7 @@ Puppet::Type.newtype(:firewall) do
   autorequire(:package) do
     case value(:provider)
     when :iptables, :ip6tables
-      %w{iptables iptables-persistent iptables-services}
+      %w{iptables iptables-persistent netfilter-persistent iptables-services}
     else
       []
     end
