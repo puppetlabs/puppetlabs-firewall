@@ -45,7 +45,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
 
   def initialize(*args)
-    if Facter.fact('ip6tables_version').value.match /1\.3\.\d/
+    ip6tables_version = Facter.value('ip6tables_version')
+    if ip6tables_version and ip6tables_version.match /1\.3\.\d/
       raise ArgumentError, 'The ip6tables provider is not supported on version 1.3 of iptables'
     else
       super
