@@ -2222,7 +2222,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
     it 'should contain the rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "100 foo bar" -j LOG --log-prefix "FW-A-INPUT: "/)
+        expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "700 - test" -j LOG --log-prefix "FW-A-INPUT: "/)
       end
     end
 
@@ -2241,7 +2241,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
     it 'should not contain the rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to_not match(/-A INPUT -p tcp -m comment --comment "100 foo bar" -j LOG --log-prefix "FW-A-INPUT: "/)
+        expect(r.stdout).to_not match(/-A INPUT -p tcp -m comment --comment "700 - test" -j LOG --log-prefix "FW-A-INPUT: "/)
       end
     end
   end
