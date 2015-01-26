@@ -22,7 +22,7 @@ class firewall::params {
           if versioncmp($::operatingsystemrelease, '7.0') >= 0 {
             $package_name = 'iptables-services'
           } else {
-            $package_name = undef
+            $package_name = 'iptables-ipv6'
           }
           $service_name = 'iptables'
         }
