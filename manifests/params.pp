@@ -56,6 +56,15 @@ class firewall::params {
         }
       }
     }
+    'Ubuntu' : {
+      if $::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemrelease, '14.10') >= 0 {
+        $service_name = 'netfilter-persistent'
+        $package_name = 'netfilter-persistent'
+      } else {
+        $service_name = 'iptables-persistent'
+        $package_name = 'iptables-persistent'
+      }
+    }
     default: {
       $package_name = undef
       $service_name = 'iptables'
