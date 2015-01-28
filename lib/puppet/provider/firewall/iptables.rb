@@ -88,6 +88,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :rsource          => "--rsource",
     :rttl             => "--rttl",
     :set_mark         => mark_flag,
+    :set_dscp         => "--set-dscp",
     :socket           => "-m socket",
     :source           => "-s",
     :sport            => ["-m multiport --sports", "--sport"],
@@ -154,13 +155,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
-    :table, :source, :destination, :iniface, :outiface, :physdev_in, :physdev_out, :proto, :isfragment,
-    :stat_mode, :stat_every, :stat_packet, :stat_probability,
-    :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port,
-    :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
-    :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
-    :tosource, :toports, :to, :random, :log_prefix, :log_level, :reject, :set_mark,
+    :table, :source, :destination, :iniface, :outiface, :physdev_in,
+    :physdev_out, :proto, :isfragment, :stat_mode, :stat_every, :stat_packet,
+    :stat_probability, :src_range, :dst_range, :tcp_flags, :gid, :uid,
+    :mac_source, :sport, :dport, :port, :dst_type, :src_type, :socket,
+    :pkttype, :name, :ipsec_dir, :ipsec_policy, :state, :ctstate, :icmp,
+    :limit, :burst, :recent, :rseconds, :reap, :rhitcount, :rttl, :rname,
+    :mask, :rsource, :rdest, :ipset, :jump, :set_dscp, :todest, :tosource,
+    :toports, :to, :random, :log_prefix, :log_level, :reject, :set_mark,
     :connlimit_above, :connlimit_mask, :connmark
   ]
 
