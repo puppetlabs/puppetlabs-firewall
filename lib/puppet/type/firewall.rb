@@ -780,6 +780,20 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:set_dscp) do
+    desc <<-EOS
+      The DSCP bit value we wish to set
+    EOS
+    munge do |value|
+      int_or_hex = '[a-fA-F0-9x]'
+      match = value.to_s.match("(#{int_or_hex}+)(/)?(#{int_or_hex}+)?")
+      dscpbit = @resource.to_hex32(match[1])
+      if (dscpbit.to_i(16) < 0 or dscpbit.to_i(16) > 64)
+        raise ArgumentError, "dscp bit value must be integer or hex between 0 and 0x40"
+      end
+    end
+  end
+
   newproperty(:set_mark, :required_features => :mark) do
     desc <<-EOS
       Set the Netfilter mark value associated with the packet.  Accepts either of:
@@ -1176,6 +1190,12 @@ Puppet::Type.newtype(:firewall) do
         self.fail "[%s] Parameter dport only applies to sctp, tcp and udp " \
           "protocols. Current protocol is [%s] and dport is [%s]" %
           [value(:name), should(:proto), should(:dport)]
+      end
+    end
+
+    if value(:jump).to_s == "DSCP"
+      unless value(:set_dscp)
+        self.fail "Parameter jump => DSCP set_dscp is required"
       end
     end
 

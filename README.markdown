@@ -344,7 +344,7 @@ This type enables you to manage firewall rules within Puppet.
 * `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
     * Default for `kernel` == `linux`.
-    * Supported features: `address_type`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `mask`, `netmap`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
+    * Supported features: `address_type`, `connection_limiting`, `dnat`, `dscp`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `mask`, `netmap`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
 
 **Autorequires:**
 
@@ -399,6 +399,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `recent_limiting`: The netfilter recent module.
 
 * `reject_type`: The ability to control reject messages.
+
+* `set_dscp`: Set the 6 bit DSCP field within the TOS field in the IP header
 
 * `snat`: Source NATing.
 
@@ -483,7 +485,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `islastfrag`: If true, matches when the packet is the last fragment of a fragmented ipv6 packet. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `islastfrag`.
 
-* `jump`: The value for the iptables `--jump` parameter. Any valid chain name is allowed, but normal values are: 'QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK'.
+* `jump`: The value for the iptables `--jump` parameter. Any valid chain name is allowed, but normal values are: 'QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK', 'DSCP'.
 
   For the values 'ACCEPT', 'DROP', and 'REJECT', you must use the generic `action` parameter. This is to enforce the use of generic parameters where possible for maximum cross-platform modeling.
 
@@ -583,6 +585,8 @@ firewall { '101 blacklist strange traffic':
 * `rsource`: If boolean 'true', adds the source IP address to the list. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
 
 * `rttl`: May only be used in conjunction with `recent => 'rcheck'` or `recent => 'update'`. If boolean 'true', this will narrow the match to happen only when the address is in the list and the TTL of the current packet matches that of the packet that hit the `recent => 'set'` rule. If you have problems with DoS attacks via bogus packets from fake source addresses, this parameter may help. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
+
+* `set_dscp`: When combined with `jump => 'DSCP'` specifies the value of the DSCP field. Can be either hexadecimal or decimal value.
 
 * `set_mark`: Set the Netfilter mark value associated with the packet. Accepts either  'mark/mask' or 'mark'. These will be converted to hex if they are not already. Requires the `mark` feature.
 
