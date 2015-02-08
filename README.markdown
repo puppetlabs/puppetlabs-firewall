@@ -199,7 +199,6 @@ firewall { "006 Allow inbound SSH (v6)":
   action   => accept,
   provider => 'ip6tables',
 }
-
 ```
 
 ###Application-Specific Rules
