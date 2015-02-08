@@ -187,6 +187,21 @@ firewall { "999 drop all other requests":
   action => "drop",
 }
 ```
+
+#### Example of an IPv6 rule
+
+IPv6 rules can be specified using the _ip6tables_ provider:
+
+```puppet
+firewall { "006 Allow inbound SSH (v6)":
+  port     => 22,
+  proto    => tcp,
+  action   => accept,
+  provider => 'ip6tables',
+}
+
+```
+
 ###Application-Specific Rules
 
 Puppet doesn't care where you define rules, and this means that you can place
