@@ -119,7 +119,7 @@ Alternatively, this can be used to set the default policy:
   firewallchain { 'INPUT:filter:IPv4':
     ensure => present,
     policy => drop,
-    before  => undef,
+    before => undef,
   }
   ```
 
