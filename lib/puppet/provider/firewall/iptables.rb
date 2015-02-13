@@ -50,63 +50,64 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @protocol = "IPv4"
 
   @resource_map = {
-    :burst            => "--limit-burst",
-    :connlimit_above  => "-m connlimit --connlimit-above",
-    :connlimit_mask   => "--connlimit-mask",
-    :connmark         => "-m connmark --mark",
-    :ctstate          => "-m conntrack --ctstate",
-    :destination      => "-d",
-    :dport            => ["-m multiport --dports", "--dport"],
-    :dst_range        => "-m iprange --dst-range",
-    :dst_type         => "-m addrtype --dst-type",
-    :gid              => "-m owner --gid-owner",
-    :icmp             => "-m icmp --icmp-type",
-    :iniface          => "-i",
-    :ipsec_dir        => "-m policy --dir",
-    :ipsec_policy     => "--pol",
-    :ipset            => "-m set --match-set",
-    :isfragment       => "-f",
-    :jump             => "-j",
-    :limit            => "-m limit --limit",
-    :log_level        => "--log-level",
-    :log_prefix       => "--log-prefix",
-    :mac_source       => ["-m mac --mac-source", "--mac-source"],
-    :mask             => '--mask',
-    :name             => "-m comment --comment",
-    :outiface         => "-o",
-    :pkttype          => "-m pkttype --pkt-type",
-    :port             => '-m multiport --ports',
-    :proto            => "-p",
-    :random           => "--random",
-    :rdest            => "--rdest",
-    :reap             => "--reap",
-    :recent           => "-m recent",
-    :reject           => "--reject-with",
-    :rhitcount        => "--hitcount",
-    :rname            => "--name",
-    :rseconds         => "--seconds",
-    :rsource          => "--rsource",
-    :rttl             => "--rttl",
-    :set_mark         => mark_flag,
-    :socket           => "-m socket",
-    :source           => "-s",
-    :sport            => ["-m multiport --sports", "--sport"],
-    :src_range        => "-m iprange --src-range",
-    :src_type         => "-m addrtype --src-type",
-    :stat_every       => '--every',
-    :stat_mode        => "-m statistic --mode",
-    :stat_packet      => '--packet',
-    :stat_probability => '--probability',
-    :state            => "-m state --state",
-    :table            => "-t",
-    :tcp_flags        => "-m tcp --tcp-flags",
-    :todest           => "--to-destination",
-    :toports          => "--to-ports",
-    :tosource         => "--to-source",
-    :to               => "--to",
-    :uid              => "-m owner --uid-owner",
-    :physdev_in       => "-m physdev --physdev-in",
-    :physdev_out      => "-m physdev --physdev-out",
+    :burst              => "--limit-burst",
+    :connlimit_above    => "-m connlimit --connlimit-above",
+    :connlimit_mask     => "--connlimit-mask",
+    :connmark           => "-m connmark --mark",
+    :ctstate            => "-m conntrack --ctstate",
+    :destination        => "-d",
+    :dport              => ["-m multiport --dports", "--dport"],
+    :dst_range          => "-m iprange --dst-range",
+    :dst_type           => "-m addrtype --dst-type",
+    :gid                => "-m owner --gid-owner",
+    :icmp               => "-m icmp --icmp-type",
+    :iniface            => "-i",
+    :ipsec_dir          => "-m policy --dir",
+    :ipsec_policy       => "--pol",
+    :ipset              => "-m set --match-set",
+    :isfragment         => "-f",
+    :jump               => "-j",
+    :limit              => "-m limit --limit",
+    :log_level          => "--log-level",
+    :log_prefix         => "--log-prefix",
+    :mac_source         => ["-m mac --mac-source", "--mac-source"],
+    :mask               => '--mask',
+    :name               => "-m comment --comment",
+    :outiface           => "-o",
+    :pkttype            => "-m pkttype --pkt-type",
+    :port               => '-m multiport --ports',
+    :proto              => "-p",
+    :random             => "--random",
+    :rdest              => "--rdest",
+    :reap               => "--reap",
+    :recent             => "-m recent",
+    :reject             => "--reject-with",
+    :rhitcount          => "--hitcount",
+    :rname              => "--name",
+    :rseconds           => "--seconds",
+    :rsource            => "--rsource",
+    :rttl               => "--rttl",
+    :set_mark           => mark_flag,
+    :socket             => "-m socket",
+    :source             => "-s",
+    :sport              => ["-m multiport --sports", "--sport"],
+    :src_range          => "-m iprange --src-range",
+    :src_type           => "-m addrtype --src-type",
+    :stat_every         => '--every',
+    :stat_mode          => "-m statistic --mode",
+    :stat_packet        => '--packet',
+    :stat_probability   => '--probability',
+    :state              => "-m state --state",
+    :table              => "-t",
+    :tcp_flags          => "-m tcp --tcp-flags",
+    :todest             => "--to-destination",
+    :toports            => "--to-ports",
+    :tosource           => "--to-source",
+    :to                 => "--to",
+    :uid                => "-m owner --uid-owner",
+    :physdev_in         => "-m physdev --physdev-in",
+    :physdev_out        => "-m physdev --physdev-out",
+    :physdev_is_bridged => "-m physdev --physdev-is-bridged"
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -118,7 +119,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :reap,
     :rsource,
     :rttl,
-    :socket
+    :socket,
+    :physdev_is_bridged
   ]
 
 
@@ -154,7 +156,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
-    :table, :source, :destination, :iniface, :outiface, :physdev_in, :physdev_out, :proto, :isfragment,
+    :table, :source, :destination, :iniface, :outiface, :physdev_in, :physdev_out, :physdev_is_bridged, :proto, :isfragment,
     :stat_mode, :stat_every, :stat_packet, :stat_probability,
     :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port,
     :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
@@ -250,6 +252,18 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         '--pol "ipsec\1\2\3\4\5\6\7\8" '
     )
 
+    # Handle resource_map values depending on whether physdev-in, physdev-out, ,physdev-is-bridged, or all three are specified
+    if values.include? "--physdev-in"
+      @resource_map[:physdev_in] = "-m physdev --physdev-in"
+      @resource_map[:physdev_out] = "--physdev-out"
+      @resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
+    elsif values.include? "--physdev-out"
+      @resource_map[:physdev_out] = "-m physdev --physdev-out"
+      @resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
+    else
+      @resource_map[:physdev_is_bridged] = "-m physdev --physdev-is-bridged"
+    end
+
     # Trick the system for booleans
     @known_booleans.each do |bool|
       # append "true" because all params are expected to have values
@@ -261,14 +275,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       else
         values = values.sub(/#{@resource_map[bool]}/, "#{@resource_map[bool]} true")
       end
-    end
-
-    # Handle resource_map values depending on whether physdev-in, physdev-out, or both are specified
-    if values.include? "--physdev-in" and values.include? "--physdev-out" then
-      #values = values.sub("--physdev-out","-m physdev --physdev-out")
-      @resource_map[:physdev_out] = "--physdev-out"
-    else
-      @resource_map[:physdev_out] = "-m physdev --physdev-out"
     end
 
     ############
@@ -452,11 +458,16 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     resource_map = self.class.instance_variable_get('@resource_map')
     known_booleans = self.class.instance_variable_get('@known_booleans')
 
-    # Handle physdev args depending on whether physdev-in, physdev-out, or both are specified
+    # Handle physdev args depending on whether physdev-in, physdev-out, physdev-is-bridged, or all three are specified
     if (resource[:physdev_in])
+      resource_map[:physdev_in] = "-m physdev --physdev-in"
       resource_map[:physdev_out] = "--physdev-out"
-    else
+      resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
+    elsif (resource[:physdev_out])
       resource_map[:physdev_out] = "-m physdev --physdev-out"
+      resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
+    else
+      resource_map[:physdev_is_bridged] = "-m physdev --physdev-is-bridged"
     end
 
     resource_list.each do |res|

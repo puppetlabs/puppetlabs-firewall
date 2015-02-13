@@ -1087,6 +1087,13 @@ Puppet::Type.newtype(:firewall) do
     newvalues(/^[a-zA-Z0-9\-\._\+]+$/)
   end
 
+  newproperty(:physdev_is_bridged, :required_features => :iptables) do
+    desc <<-EOS
+      Match if the packet is transversing a bridge.
+    EOS
+    newvalues(:true, :false)
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
