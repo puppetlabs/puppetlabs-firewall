@@ -518,6 +518,8 @@ firewall { '999 this runs last':
 
 * `physdev_out`: Match if the packet is leaving a bridge via the given interface. Values must match '/^[a-zA-Z0-9\-\._\+]+$/'.
 
+* `physdev_is_bridged`: Match if the packet is transversing a bridge. Valid values are true or false.
+
 * `pkttype`: Sets the packet type to match. Valid values are: 'unicast', 'broadcast', and'multicast'. Requires the `pkttype` feature.
 
 * `port`: The destination or source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
