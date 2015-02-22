@@ -1064,6 +1064,13 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:gateway, :required_features => :iptables) do
+    desc <<-EOS
+      The TEE target will clone a packet and redirect this clone to another
+      machine on the local network segment. gateway is the target host's IP.
+    EOS
+  end
+
   newproperty(:ipset, :required_features => :ipset) do
     desc <<-EOS
       Matches against the specified ipset list.
@@ -1306,6 +1313,12 @@ Puppet::Type.newtype(:firewall) do
     if value(:jump).to_s == "TCPMSS"
       unless value(:set_mss)
         self.fail "When using jump => TCPMSS, the set_mss property is required"
+      end
+    end
+
+    if value(:jump).to_s == "TEE"
+      unless value(:gateway)
+        self.fail "When using jump => TEE, the gateway property is required"
       end
     end
 
