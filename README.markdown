@@ -272,6 +272,21 @@ firewall { '100 snat for network foo2':
 }
 ```
 
+You can also change the TCP MSS value for VPN client traffic:
+
+```puppet
+firewall { '110 TCPMSS for VPN clients':
+  chain     => 'FORWARD',
+  table     => 'mangle',
+  source    => '10.0.2.0/24',
+  proto     => tcp,
+  tcp_flags => 'SYN,RST SYN',
+  mss       => '1361:1541',
+  set_mss   => '1360',
+  jump      => 'TCPMSS',
+}
+```
+
 The following example creates a new chain and forwards any port 5000 access to it.
 ```puppet
 firewall { '100 forward to MY_CHAIN':
