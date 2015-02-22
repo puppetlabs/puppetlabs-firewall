@@ -832,7 +832,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:set_mss, :required_features => :iptables) do
     desc <<-EOS
-      Sets the MSS to match.
+      Sets the TCP MSS value for packets.
     EOS
   end
 
@@ -1210,7 +1210,7 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:jump).to_s == "TCPMSS"
       unless value(:set_mss)
-        self.fail "Parameter jump => TCPMSS set_dscp is required"
+        self.fail "Parameter jump => TCPMSS set_mss is required"
       end
     end
 
