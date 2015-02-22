@@ -833,6 +833,57 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
+  describe 'tee_gateway' do
+    context '10.0.0.2' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { 
+            '503 - gateway':
+              jump    => 'TEE',
+              gateway => '10.0.0.2',
+              chain   => 'PREROUTING',
+              table   => 'mangle',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables-save -t mangle') do |r|
+          expect(r.stdout).to match(/-A PREROUTING -m comment --comment "503 - tee_gateway"  -j TEE --gateway 10.0.0.2/)
+        end
+      end
+    end
+  end
+
+  describe 'tee_gateway6' do
+    context '2001:db8::1' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { 
+            '502 - set_mss':
+              jump     => 'TEE',
+              gateway  => '2001:db8::1',
+              chain    => 'PREROUTING',
+              table    => 'mangle',
+              provider => 'ip6tables',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('ip6tables-save -t mangle') do |r|
+          expect(r.stdout).to match(/-A PREROUTING -m comment --comment "503 - tee_gateway6"  -j TEE --gateway 2001:db8::1/)
+        end
+      end
+    end
+  end
+
   # RHEL5 does not support --random
   if default['platform'] !~ /el-5/
     describe 'random' do
