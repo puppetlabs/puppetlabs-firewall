@@ -517,6 +517,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `mask`: Sets the mask to use when `recent` is enabled. Requires the `mask` feature.
 
+* `mss`: Sets a given TCP MSS value or range to match.
+
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
 ```puppet

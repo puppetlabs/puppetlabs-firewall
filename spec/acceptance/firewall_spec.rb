@@ -899,6 +899,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
               proto   => 'tcp',
               jump    => 'TCPMSS',
               set_mss => '1360',
+              mss     => '1361:1541',
               chain   => 'FORWARD',
               table   => 'mangle',
           }
@@ -909,7 +910,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
       it 'should contain the rule' do
         shell('iptables-save -t mangle') do |r|
-          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360/)
+          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360/)
         end
       end
     end
@@ -925,6 +926,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
               proto    => 'tcp',
               jump     => 'TCPMSS',
               set_mss  => '1360',
+              mss      => '1361:1541',
               chain    => 'FORWARD',
               table    => 'mangle',
               provider => 'ip6tables',
@@ -936,7 +938,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
       it 'should contain the rule' do
         shell('ip6tables-save -t mangle') do |r|
-          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360/)
+          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360/)
         end
       end
     end
