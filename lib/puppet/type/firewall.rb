@@ -822,6 +822,12 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:set_mss) do
+    desc <<-EOS
+      Sets the MSS to match.
+    EOS
+  end
+
   newproperty(:pkttype, :required_features => :pkttype) do
     desc <<-EOS
       Sets the packet type to match.
@@ -1191,6 +1197,12 @@ Puppet::Type.newtype(:firewall) do
         self.fail "[%s] Parameter dport only applies to sctp, tcp and udp " \
           "protocols. Current protocol is [%s] and dport is [%s]" %
           [value(:name), should(:proto), should(:dport)]
+      end
+    end
+
+    if value(:jump).to_s == "TCPMSS"
+      unless value(:set_mss)
+        self.fail "Parameter jump => TCPMSS set_dscp is required"
       end
     end
 
