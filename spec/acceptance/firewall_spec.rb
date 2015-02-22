@@ -908,7 +908,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
 
       it 'should contain the rule' do
-        shell('iptables-save') do |r|
+        shell('iptables-save -t mangle') do |r|
           expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360/)
         end
       end
