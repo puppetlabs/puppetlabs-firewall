@@ -839,7 +839,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         pp = <<-EOS
           class { '::firewall': }
           firewall { 
-            '503 - gateway':
+            '503 - tee_gateway':
               jump    => 'TEE',
               gateway => '10.0.0.2',
               chain   => 'PREROUTING',
@@ -864,7 +864,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         pp = <<-EOS
           class { '::firewall': }
           firewall { 
-            '502 - set_mss':
+            '502 - tee_gateway6':
               jump     => 'TEE',
               gateway  => '2001:db8::1',
               chain    => 'PREROUTING',
