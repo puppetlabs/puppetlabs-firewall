@@ -1050,6 +1050,13 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:gateway, :required_features => :iptables) do
+    desc <<-EOS
+      The TEE target will clone a packet and redirect this clone to another
+      machine on the local network segment. gateway is the target host's IP.
+    EOS
+  end
+
   newproperty(:ipset, :required_features => :ipset) do
     desc <<-EOS
       Matches against the specified ipset list.
@@ -1183,6 +1190,12 @@ Puppet::Type.newtype(:firewall) do
         self.fail "[%s] Parameter dport only applies to sctp, tcp and udp " \
           "protocols. Current protocol is [%s] and dport is [%s]" %
           [value(:name), should(:proto), should(:dport)]
+      end
+    end
+
+    if value(:jump).to_s == "TEE"
+      unless value(:gateway)
+        self.fail "Parameter jump => TEE gateway is required"
       end
     end
 

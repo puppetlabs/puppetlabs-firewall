@@ -73,6 +73,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :dport              => ["-m multiport --dports", "--dport"],
     :dst_range          => '-m iprange --dst-range',
     :dst_type           => "-m addrtype --dst-type",
+    :gateway            => "--gateway",
     :gid                => "-m owner --gid-owner",
     :hop_limit          => "-m hl --hl-eq",
     :icmp               => "-m icmp6 --icmpv6-type",
@@ -180,6 +181,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark,
-    :connlimit_above, :connlimit_mask, :connmark]
+    :connlimit_above, :connlimit_mask, :connmark, :gateway]
 
 end
