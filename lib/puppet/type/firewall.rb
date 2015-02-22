@@ -822,7 +822,7 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:set_mss) do
+  newproperty(:set_mss, :required_features => :iptables) do
     desc <<-EOS
       Sets the MSS to match.
     EOS

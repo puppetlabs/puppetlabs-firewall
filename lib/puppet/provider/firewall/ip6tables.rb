@@ -105,6 +105,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :rsource            => "--rsource",
     :rttl               => "--rttl",
     :set_mark           => mark_flag,
+    :set_mss            => '--set-mss',
     :socket             => "-m socket",
     :source             => "-s",
     :sport              => ["-m multiport --sports", "--sport"],
@@ -200,7 +201,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
-    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject,
+    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject, :set_mss
     :set_mark, :connlimit_above, :connlimit_mask, :connmark]
-
 end
