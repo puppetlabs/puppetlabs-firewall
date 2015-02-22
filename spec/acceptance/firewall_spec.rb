@@ -840,10 +840,11 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           class { '::firewall': }
           firewall { 
             '503 - tee_gateway':
-              jump    => 'TEE',
-              gateway => '10.0.0.2',
               chain   => 'PREROUTING',
               table   => 'mangle',
+              jump    => 'TEE',
+              gateway => '10.0.0.2',
+              proto   => all,
           }
         EOS
 
@@ -865,10 +866,11 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           class { '::firewall': }
           firewall { 
             '502 - tee_gateway6':
-              jump     => 'TEE',
-              gateway  => '2001:db8::1',
               chain    => 'PREROUTING',
               table    => 'mangle',
+              jump     => 'TEE',
+              gateway  => '2001:db8::1',
+              proto   => all,
               provider => 'ip6tables',
           }
         EOS
