@@ -59,6 +59,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :dport              => ["-m multiport --dports", "--dport"],
     :dst_range          => "-m iprange --dst-range",
     :dst_type           => "-m addrtype --dst-type",
+    :gateway            => "--gateway",
     :gid                => "-m owner --gid-owner",
     :icmp               => "-m icmp --icmp-type",
     :iniface            => "-i",
@@ -163,7 +164,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :to, :random, :log_prefix, :log_level, :reject, :set_mark,
-    :connlimit_above, :connlimit_mask, :connmark
+    :connlimit_above, :connlimit_mask, :connmark, :gateway
   ]
 
   def insert
