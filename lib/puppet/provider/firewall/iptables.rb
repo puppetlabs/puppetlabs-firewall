@@ -57,9 +57,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :ctstate            => "-m conntrack --ctstate",
     :destination        => "-d",
     :dport              => ["-m multiport --dports", "--dport"],
-    :dst_range          => "-m iprange --dst-range",
-    :dst_type           => "-m addrtype --dst-type",
-    :gid                => "-m owner --gid-owner",
+    :dst_range          => "--dst-range",
+    :dst_type           => "--dst-type",
+    :gid                => "--gid-owner",
     :icmp               => "-m icmp --icmp-type",
     :iniface            => "-i",
     :ipsec_dir          => "-m policy --dir",
@@ -91,8 +91,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :socket             => "-m socket",
     :source             => "-s",
     :sport              => ["-m multiport --sports", "--sport"],
-    :src_range          => "-m iprange --src-range",
-    :src_type           => "-m addrtype --src-type",
+    :src_range          => "--src-range",
+    :src_type           => "--src-type",
     :stat_every         => '--every',
     :stat_mode          => "-m statistic --mode",
     :stat_packet        => '--packet',
@@ -104,10 +104,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :toports            => "--to-ports",
     :tosource           => "--to-source",
     :to                 => "--to",
-    :uid                => "-m owner --uid-owner",
-    :physdev_in         => "-m physdev --physdev-in",
-    :physdev_out        => "-m physdev --physdev-out",
-    :physdev_is_bridged => "-m physdev --physdev-is-bridged"
+    :uid                => "--uid-owner",
+    :physdev_in         => "--physdev-in",
+    :physdev_out        => "--physdev-out",
+    :physdev_is_bridged => "--physdev-is-bridged"
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -122,6 +122,67 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :socket,
     :physdev_is_bridged
   ]
+
+  # Properties that use "-m <ipt module name>" (with the potential to have multiple 
+  # arguments against the same IPT module) must be in this hash. The keys in this
+  # hash are the IPT module names, with the values being an array of the respective
+  # supported arguments for this IPT module.
+  #
+  # ** IPT Module arguments must be in order as they would appear in iptables-save **
+  #
+  # Exceptions:
+  #             => multiport: (For some reason, the multiport arguments can't be)
+  #                specified within the same "-m multiport", but works in seperate
+  #                ones.
+  #
+  @module_to_argument_mapping = {
+    :physdev   => [:physdev_in, :physdev_out, :physdev_is_bridged],
+    :addrtype  => [:src_type, :dst_type],
+    :iprange   => [:src_range, :dst_range],
+    :owner     => [:uid, :gid],
+  }
+
+  def self.munge_resource_map_from_existing_values(resource_map_original, compare)
+    resource_map_new = resource_map_original.clone
+
+    @module_to_argument_mapping.each do |ipt_module, arg_array|
+      arg_array.each do |argument|
+        if resource_map_original[argument].is_a?(Array)
+          if compare.include?(resource_map_original[argument].first)
+            resource_map_new[argument] = resource_map_original[argument].clone
+            resource_map_new[argument][0] = "-m #{ipt_module.to_s} #{resource_map_original[argument].first}"
+            break
+          end
+        else
+          if compare.include?(resource_map_original[argument])
+            resource_map_new[argument] = "-m #{ipt_module.to_s} #{resource_map_original[argument]}"
+            break
+          end
+        end
+      end
+    end
+    resource_map_new
+  end
+
+  def munge_resource_map_from_resource(resource_map_original, compare)
+    resource_map_new = resource_map_original.clone
+    module_to_argument_mapping = self.class.instance_variable_get('@module_to_argument_mapping')
+
+    module_to_argument_mapping.each do |ipt_module, arg_array|
+      arg_array.each do |argument|
+        if compare[argument]
+          if resource_map_original[argument].is_a?(Array)
+            resource_map_new[argument] = resource_map_original[argument].clone
+            resource_map_new[argument][0] = "-m #{ipt_module.to_s} #{resource_map_original[argument].first}"
+          else
+            resource_map_new[argument] = "-m #{ipt_module.to_s} #{resource_map_original[argument]}"
+          end
+          break
+        end
+      end
+    end
+    resource_map_new
+  end
 
 
   # Create property methods dynamically
@@ -158,8 +219,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface, :physdev_in, :physdev_out, :physdev_is_bridged, :proto, :isfragment,
     :stat_mode, :stat_every, :stat_packet, :stat_probability,
-    :src_range, :dst_range, :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port,
-    :dst_type, :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
+    :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
+    :src_type, :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :to, :random, :log_prefix, :log_level, :reject, :set_mark,
@@ -252,17 +313,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         '--pol "ipsec\1\2\3\4\5\6\7\8" '
     )
 
-    # Handle resource_map values depending on whether physdev-in, physdev-out, ,physdev-is-bridged, or all three are specified
-    if values.include? "--physdev-in"
-      @resource_map[:physdev_in] = "-m physdev --physdev-in"
-      @resource_map[:physdev_out] = "--physdev-out"
-      @resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
-    elsif values.include? "--physdev-out"
-      @resource_map[:physdev_out] = "-m physdev --physdev-out"
-      @resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
-    else
-      @resource_map[:physdev_is_bridged] = "-m physdev --physdev-is-bridged"
-    end
+    resource_map = munge_resource_map_from_existing_values(@resource_map, values)
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
@@ -273,7 +324,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         # distinguish between -f and the '-f' inside of --tcp-flags.
         values = values.sub(/-f(?!l)(?=.*--comment)/, '-f true')
       else
-        values = values.sub(/#{@resource_map[bool]}/, "#{@resource_map[bool]} true")
+        values = values.sub(/#{resource_map[bool]}/, "#{resource_map[bool]} true")
       end
     end
 
@@ -281,7 +332,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Populate parser_list with used value, in the correct order
     ############
     map_index={}
-    @resource_map.each_pair do |map_k,map_v|
+    resource_map.each_pair do |map_k,map_v|
       [map_v].flatten.each do |v|
         ind=values.index(/\s#{v}\s/)
         next unless ind
@@ -298,7 +349,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Here we iterate across our values to generate an array of keys
     parser_list.reverse.each do |k|
-      resource_map_key = @resource_map[k]
+      resource_map_key = resource_map[k]
       [resource_map_key].flatten.each do |opt|
         if values.slice!(/\s#{opt}/)
           keys << k
@@ -455,20 +506,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     args = []
     resource_list = self.class.instance_variable_get('@resource_list')
-    resource_map = self.class.instance_variable_get('@resource_map')
     known_booleans = self.class.instance_variable_get('@known_booleans')
-
-    # Handle physdev args depending on whether physdev-in, physdev-out, physdev-is-bridged, or all three are specified
-    if (resource[:physdev_in])
-      resource_map[:physdev_in] = "-m physdev --physdev-in"
-      resource_map[:physdev_out] = "--physdev-out"
-      resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
-    elsif (resource[:physdev_out])
-      resource_map[:physdev_out] = "-m physdev --physdev-out"
-      resource_map[:physdev_is_bridged] = "--physdev-is-bridged"
-    else
-      resource_map[:physdev_is_bridged] = "-m physdev --physdev-is-bridged"
-    end
+    resource_map = self.class.instance_variable_get('@resource_map')
+    resource_map = munge_resource_map_from_resource(resource_map, resource)
 
     resource_list.each do |res|
       resource_value = nil

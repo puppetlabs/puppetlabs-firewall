@@ -71,9 +71,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ctstate            => "-m conntrack --ctstate",
     :destination        => "-d",
     :dport              => ["-m multiport --dports", "--dport"],
-    :dst_range          => '-m iprange --dst-range',
-    :dst_type           => "-m addrtype --dst-type",
-    :gid                => "-m owner --gid-owner",
+    :dst_range          => '--dst-range',
+    :dst_type           => "--dst-type",
+    :gid                => "--gid-owner",
     :hop_limit          => "-m hl --hl-eq",
     :icmp               => "-m icmp6 --icmpv6-type",
     :iniface            => "-i",
@@ -107,8 +107,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :socket             => "-m socket",
     :source             => "-s",
     :sport              => ["-m multiport --sports", "--sport"],
-    :src_range          => '-m iprange --src-range',
-    :src_type           => "-m addrtype --src-type",
+    :src_range          => '--src-range',
+    :src_type           => "--src-type",
     :stat_every         => '--every',
     :stat_mode          => "-m statistic --mode",
     :stat_packet        => '--packet',
@@ -119,10 +119,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :todest             => "--to-destination",
     :toports            => "--to-ports",
     :tosource           => "--to-source",
-    :uid                => "-m owner --uid-owner",
-    :physdev_in         => "-m physdev --physdev-in",
-    :physdev_out        => "-m physdev --physdev-out",
-    :physdev_is_bridged => "-m physdev --physdev-is-bridged"
+    :uid                => "--uid-owner",
+    :physdev_in         => "--physdev-in",
+    :physdev_out        => "--physdev-out",
+    :physdev_is_bridged => "--physdev-is-bridged"
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -138,6 +138,25 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :socket,
     :physdev_is_bridged
   ]
+
+  # Properties that use "-m <ipt module name>" (with the potential to have multiple 
+  # arguments against the same IPT module) must be in this hash. The keys in this
+  # hash are the IPT module names, with the values being an array of the respective
+  # supported arguments for this IPT module.
+  #
+  # ** IPT Module arguments must be in order as they would appear in iptables-save **
+  #
+  # Exceptions:
+  #             => multiport: (For some reason, the multiport arguments can't be)
+  #                specified within the same "-m multiport", but works in seperate
+  #                ones.
+  #
+  @module_to_argument_mapping = {
+    :physdev   => [:physdev_in, :physdev_out, :physdev_is_bridged],
+    :addrtype  => [:src_type, :dst_type],
+    :iprange   => [:src_range, :dst_range],
+    :owner     => [:uid, :gid],
+  }
 
   # Create property methods dynamically
   (@resource_map.keys << :chain << :table << :action).each do |property|
@@ -175,8 +194,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface, :physdev_in,
     :physdev_out, :physdev_is_bridged, :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
-    :tcp_flags, :gid, :uid, :mac_source, :sport, :dport, :port, :dst_type,
-    :src_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
+    :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
+    :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark,
