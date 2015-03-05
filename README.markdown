@@ -437,6 +437,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `chain`: Name of the chain to use. You can provide a user-based chain or use one of the following built-in chains:'INPUT','FORWARD','OUTPUT','PREROUTING', or 'POSTROUTING'. The default value is 'INPUT'. Values must match '/^[a-zA-Z0-9\-_]+$/'. Requires the `iptables` feature.
 
+ * `checksum_fill`: When using a `jump` value of 'CHECKSUM' this boolean will make sure that a checksum is calculated and filled in a packet that lacks a checksum. Valid values are true or false. Requires the `iptables` feature.
+
 * `connlimit_above`: Connection limiting value for matched connections above n. Values must match '/^\d+$/'. Requires the `connection_limiting` feature.
 
 * `connlimit_mask`: Connection limiting by subnet mask for matched connections. Apply a subnet mask of /0 to /32 for IPv4, and a subnet mask of /0 to /128 for IPv6. Values must match '/^\d+$/'. Requires the `connection_limiting` feature.
