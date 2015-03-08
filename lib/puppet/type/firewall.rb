@@ -788,6 +788,36 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  # match mark
+  newproperty(:match_mark, :required_features => :mark) do
+    desc <<-EOS
+      Match the Netfilter mark value associated with the packet.  Accepts either of:
+      mark/mask or mark.  These will be converted to hex if they are not already.
+    EOS
+    munge do |value|
+      mark_regex = %r{\A((?:0x)?[0-9A-F]+)(/)?((?:0x)?[0-9A-F]+)?\z}i
+      match = value.to_s.match(mark_regex)
+      if match.nil?
+        raise ArgumentError, "Match MARK value must be integer or hex between 0 and 0xffffffff"
+      end
+      mark = @resource.to_hex32(match[1])
+
+      # Values that can't be converted to hex.
+      # Or contain a trailing slash with no mask.
+      if mark.nil? or (mark and match[2] and match[3].nil?)
+        raise ArgumentError, "Match MARK value must be integer or hex between 0 and 0xffffffff"
+      end
+
+      # There should not be a mask on match_mark
+      unless match[3].nil?
+        raise ArgumentError, "iptables does not support masks on MARK match rules"
+      end
+      value = mark
+
+      value
+    end
+  end
+
   newproperty(:set_mark, :required_features => :mark) do
     desc <<-EOS
       Set the Netfilter mark value associated with the packet.  Accepts either of:
