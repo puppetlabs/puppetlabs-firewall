@@ -89,6 +89,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :log_level          => "--log-level",
     :log_prefix         => "--log-prefix",
     :mask               => "--mask",
+    :match_mark         => "-m mark --mark",
     :name               => "-m comment --comment",
     :mac_source         => ["-m mac --mac-source", "--mac-source"],
     :outiface           => "-o",
@@ -201,6 +202,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject,
-    :set_mark, :connlimit_above, :connlimit_mask, :connmark]
+    :set_mark, :connlimit_above, :connlimit_mask, :connmark, :match_mark]
 
 end
