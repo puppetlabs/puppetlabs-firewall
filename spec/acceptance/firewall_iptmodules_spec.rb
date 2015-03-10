@@ -21,7 +21,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
             dport              => '8080',
             action             => reject,
             chain              => 'OUTPUT',
-            uid                => 500,
+            uid                => 0,
             gid                => 404,
             src_range          => "90.0.0.1-90.0.0.2",
             dst_range          => "100.0.0.1-100.0.0.2",
@@ -41,7 +41,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
       it 'should contain the rule' do
          shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner 500 --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable/)
+           expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable/)
          end
       end
     end
@@ -90,7 +90,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
                 action             => reject,
                 chain              => 'OUTPUT',
                 provider           => 'ip6tables',
-                uid                => 500,
+                uid                => 0,
                 gid                => 404,
                 src_range          => "2001::-2002::",
                 dst_range          => "2003::-2004::",
@@ -110,7 +110,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner 500 --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
+               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
              end
           end
         end
@@ -160,7 +160,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
                 action             => reject,
                 chain              => 'OUTPUT',
                 provider           => 'ip6tables',
-                uid                => 500,
+                uid                => 0,
                 gid                => 404,
                 src_range          => "2001::-2002::",
                 dst_range          => "2003::-2004::",
@@ -178,7 +178,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner 500 --gid-owner 404 -m multiport --dports 8080 -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
+               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
              end
           end
         end
