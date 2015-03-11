@@ -54,6 +54,15 @@ class firewall::linux (
         require      => Package['iptables'],
       }
     }
+    'Gentoo': {
+      class { "${title}::gentoo":
+        ensure       => $ensure,
+        enable       => $enable,
+        package_name => $package_name,
+        service_name => $service_name,
+        require      => Package['iptables'],
+      }
+    }
     default: {}
   }
 }
