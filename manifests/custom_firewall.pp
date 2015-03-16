@@ -12,7 +12,7 @@ class firewall::custom_firewall (
     purge => true,
   }
 
-  if $firewall_data != false {
+  if $manage != false {
     create_resources('firewall', $rules)
   }
 }

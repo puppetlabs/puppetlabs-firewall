@@ -1,7 +1,7 @@
 # This creates all of the default rules
 class firewall::pre {
 
-  require firewall
+  require firewall::service
 
   Firewall {
     before => Class['firewall::custom_firewall'],
