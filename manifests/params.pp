@@ -19,6 +19,10 @@ class firewall::params {
           }
           $service_name = 'iptables'
         }
+        'Gentoo': {
+          $service_name = ['iptables','ip6tables']
+          $package_name = 'net-firewall/iptables'
+         }
         default: {
           if versioncmp($::operatingsystemrelease, '7.0') >= 0 {
             $package_name = 'iptables-services'
