@@ -4,7 +4,7 @@ class firewall::pre {
   require firewall::service
 
   Firewall {
-    before => Class['firewall::custom_firewall'],
+    before => Class['firewall::post'],
   }
 
 # default firewall rules

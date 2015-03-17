@@ -1,3 +1,4 @@
+# This defines the parameters for the firewall module
 class firewall::params {
   case $::osfamily {
     'RedHat': {
@@ -55,10 +56,6 @@ class firewall::params {
           $package_name = 'iptables-persistent'
         }
       }
-    }
-    'Gentoo': {
-      $service_name = ['iptables','ip6tables']
-      $package_name = 'net-firewall/iptables'
     }
     default: {
       $package_name = undef

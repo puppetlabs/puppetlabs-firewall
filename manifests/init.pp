@@ -20,4 +20,8 @@ class firewall (
   include pre
   include post
   include custom_firewall
+
+  resources { 'firewall':
+    purge => true,
+  }
 }

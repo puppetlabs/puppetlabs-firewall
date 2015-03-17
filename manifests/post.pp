@@ -2,7 +2,7 @@
 class firewall::post {
 
   Firewall {
-    require => Class['firewall::custom_firewall'],
+    require => Class['firewall::pre'],
   }
 
 # default firewall rules

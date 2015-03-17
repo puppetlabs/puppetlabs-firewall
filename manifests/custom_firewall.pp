@@ -1,18 +1,14 @@
 # This class creates custom firewall rules using hieradata
-class firewall::custom_firewall (
+class firewall::custom_firewall {
 
-  $rules  = {},
-  $manage = true,
-) {
-
-  validate_hash($rules)
-  validate_bool($manage)
-
-  resources { 'firewall':
-    purge => true,
+  Firewall {
+    before  => Class['firewall::post'],
+    require => Class['firewall::pre'],
   }
 
-  if $manage != false {
+  $rules  = hiera_hash('firewall::custom_firewall',{})
+
+  if !empty($rules) {
     create_resources('firewall', $rules)
   }
 }
