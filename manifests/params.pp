@@ -6,10 +6,6 @@ class firewall::params {
           $service_name = 'iptables'
           $package_name = undef
         }
-        'Archlinux': {
-          $service_name = ['iptables','ip6tables']
-          $package_name = undef
-        }
         'Fedora': {
           if versioncmp($::operatingsystemrelease, '15') >= 0 {
             $package_name = 'iptables-services'
@@ -56,6 +52,10 @@ class firewall::params {
         }
       }
     }
+    'Archlinux': {
+      $service_name = ['iptables','ip6tables']
+      $package_name = undef
+     }
     'Gentoo': {
       $service_name = ['iptables','ip6tables']
       $package_name = 'net-firewall/iptables'
