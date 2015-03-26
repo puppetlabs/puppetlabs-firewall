@@ -113,6 +113,16 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
   }
   ```
 
+Alternatively, this can be used to set the default policy:
+
+  ```puppet
+  firewallchain { 'INPUT:filter:IPv4':
+    ensure => present,
+    policy => drop,
+    before => undef,
+  }
+  ```
+
 ####Create Firewall Rules
 
 The rules you create here are helpful if you don’t have any existing rules; they help you order your firewall configurations so you don’t lock yourself out of your box.
