@@ -65,6 +65,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   @resource_map = {
     :burst              => "--limit-burst",
+    :checksum_fill      => "--checksum-fill",
     :connlimit_above    => "-m connlimit --connlimit-above",
     :connlimit_mask     => "--connlimit-mask",
     :connmark           => "-m connmark --mark",
@@ -128,6 +129,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # These are known booleans that do not take a value, but we want to munge
   # to true if they exist.
   @known_booleans = [
+    :checksum_fill,
     :ishasmorefrags,
     :islastfrag,
     :isfirstfrag,
@@ -198,7 +200,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
-    :tosource, :toports, :log_level, :log_prefix, :reject, :set_mark,
-    :connlimit_above, :connlimit_mask, :connmark]
+    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject,
+    :set_mark, :connlimit_above, :connlimit_mask, :connmark]
 
 end

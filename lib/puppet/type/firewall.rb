@@ -1060,6 +1060,14 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:checksum_fill, :required_features => :iptables) do
+    desc <<-EOS
+      Compute and fill missing packet checksums.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
   newparam(:line) do
     desc <<-EOS
       Read-only property for caching the rule line.
@@ -1250,6 +1258,12 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:stat_probability) && value(:stat_mode) != :random
       self.fail "Parameter 'stat_probability' requires 'stat_mode' to be set to 'random'"
+    end
+
+    if value(:checksum_fill)
+      unless value(:jump).to_s == "CHECKSUM" && value(:table).to_s == "mangle"
+        self.fail "Parameter checksum_fill requires jump => CHECKSUM and table => mangle"
+      end
     end
 
   end
