@@ -12,6 +12,21 @@ def ip6tables_flush_all_tables
   end
 end
 
+def is_rhel7(osfamily, operatingsystem, operatingsystemrelease)
+  if osfamily == 'RedHat'
+    case operatingsystem
+    when 'Amazon'
+      false
+    when 'Fedora'
+      operatingsystemrelease >= '7.0'
+    else
+      operatingsystemrelease >= '15'
+    end
+  else
+    false
+  end
+end
+
 unless ENV['RS_PROVISION'] == 'no' or ENV['BEAKER_provision'] == 'no'
   # This will install the latest available package on el and deb based
   # systems fail on windows and osx, and install via gem on other *nixes
