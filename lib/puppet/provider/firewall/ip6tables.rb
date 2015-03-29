@@ -203,6 +203,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
-    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject, :set_mss, :mss
+    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject, :set_mss, :mss,
     :set_mark, :connlimit_above, :connlimit_mask, :connmark]
 end
