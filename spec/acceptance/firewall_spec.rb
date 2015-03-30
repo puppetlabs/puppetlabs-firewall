@@ -833,57 +833,60 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
-  describe 'checksum_fill' do
-    context 'virbr' do
-      it 'applies' do
-        pp = <<-EOS
-          class { '::firewall': }
-          firewall { '576 - test':
-            proto  => udp,
-            table  => 'mangle',
-            outiface => 'virbr0',
-            chain  => 'POSTROUTING',
-            dport => '68',
-            jump  => 'CHECKSUM',
-            checksum_fill => true,
-            provider => iptables,
-          }
-        EOS
+  
+  if default['platform'] !~ /el-5/ and default['platform'] !~ /ubuntu-10\.04/ and default['platform'] !~ /debian-6/ and default['platform'] !~ /sles/
+    describe 'checksum_fill' do
+      context 'virbr' do
+        it 'applies' do
+          pp = <<-EOS
+            class { '::firewall': }
+            firewall { '576 - test':
+              proto  => udp,
+              table  => 'mangle',
+              outiface => 'virbr0',
+              chain  => 'POSTROUTING',
+              dport => '68',
+              jump  => 'CHECKSUM',
+              checksum_fill => true,
+              provider => iptables,
+            }
+          EOS
 
-        apply_manifest(pp, :catch_failures => true)
-      end
+          apply_manifest(pp, :catch_failures => true)
+        end
 
-      it 'should contain the rule' do
-        shell('iptables-save -t mangle') do |r|
-          expect(r.stdout).to match(/-A POSTROUTING -o virbr0 -p udp -m multiport --dports 68 -m comment --comment "576 - test" -j CHECKSUM --checksum-fill/)
+        it 'should contain the rule' do
+          shell('iptables-save -t mangle') do |r|
+            expect(r.stdout).to match(/-A POSTROUTING -o virbr0 -p udp -m multiport --dports 68 -m comment --comment "576 - test" -j CHECKSUM --checksum-fill/)
+          end
         end
       end
     end
-  end
 
-  describe 'checksum_fill6' do
-    context 'virbr' do
-      it 'applies' do
-        pp = <<-EOS
-          class { '::firewall': }
-          firewall { '576 - test':
-            proto  => udp,
-            table  => 'mangle',
-            outiface => 'virbr0',
-            chain  => 'POSTROUTING',
-            dport => '68',
-            jump  => 'CHECKSUM',
-            checksum_fill => true,
-            provider => ip6tables,
-          }
-        EOS
+    describe 'checksum_fill6' do
+      context 'virbr' do
+        it 'applies' do
+          pp = <<-EOS
+            class { '::firewall': }
+            firewall { '576 - test':
+              proto  => udp,
+              table  => 'mangle',
+              outiface => 'virbr0',
+              chain  => 'POSTROUTING',
+              dport => '68',
+              jump  => 'CHECKSUM',
+              checksum_fill => true,
+              provider => ip6tables,
+            }
+          EOS
 
-        apply_manifest(pp, :catch_failures => true)
-      end
+          apply_manifest(pp, :catch_failures => true)
+        end
 
-      it 'should contain the rule' do
-        shell('ip6tables-save -t mangle') do |r|
-          expect(r.stdout).to match(/-A POSTROUTING -o virbr0 -p udp -m multiport --dports 68 -m comment --comment "576 - test" -j CHECKSUM --checksum-fill/)
+        it 'should contain the rule' do
+          shell('ip6tables-save -t mangle') do |r|
+            expect(r.stdout).to match(/-A POSTROUTING -o virbr0 -p udp -m multiport --dports 68 -m comment --comment "576 - test" -j CHECKSUM --checksum-fill/)
+          end
         end
       end
     end
