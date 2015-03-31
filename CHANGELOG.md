@@ -1,3 +1,17 @@
+##2015-03-31 - Supported Release 1.5.0
+###Summary
+
+This release includes physdev_is_bridged support, checksum_fill support, basic Gentoo compatibility, and a number of test fixes and improvements.
+
+####Features
+- Add `physdev_is_bridged` support
+- Add `checksum_fill` support
+- Add basic Gentoo compatibility (unsupported)
+
+####Bugfixes
+- Implementation for resource map munging to allow a single ipt module to be used multiple times in a single rule on older versions of iptables (MODULES-1808)
+- Test fixes
+
 ##2015-01-27 - Supported Release 1.4.0
 ###Summary
 
