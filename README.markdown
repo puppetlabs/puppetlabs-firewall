@@ -123,10 +123,20 @@ Rules are persisted automatically between reboots, although there are known issu
 
   **Note** - This only purges IPv4 rules.
   ```puppet
-  resources { "firewall":
+  resources { 'firewall':
     purge => true
   }
   ```
+
+  To purge unmanaged firewall chains, also add:
+
+  ```puppet
+  resources { 'firewallchain':
+    purge => true
+  }
+  ```
+  **Note** - If there are unmanaged rules in unmanaged chains it will take two Puppet runs before the firewall chain is purged.
+
 2.)  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
 
   ```puppet
