@@ -135,7 +135,7 @@ Rules are persisted automatically between reboots, although there are known issu
     purge => true
   }
   ```
-  **Note** - If there are unmanaged rules in unmanaged chains it will take two Puppet runs before the firewall chain is purged.
+  **Note** - If there are unmanaged rules in unmanaged chains it will take two Puppet runs before the firewall chain is purged. This is different than the `purge` parameter available in `firewallchain`.
 
 2.)  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
 
@@ -720,6 +720,14 @@ firewallchain { 'INPUT:filter:IPv4':
     * Supported features: `iptables_chain`, `policy`.
 
 * `purge`: Purge unmanaged firewall rules in this chain. Valid values are 'false', 'true'.
+
+**Note** This `purge` is purging unmanaged rules in a firewall chain, not unmanaged firewall chains. To purge unmanaged firewall chains, use the following instead.
+
+```puppet
+resources { 'firewallchain':
+  purge => true
+}
+```
 
 ###Fact: ip6tables_version
 
