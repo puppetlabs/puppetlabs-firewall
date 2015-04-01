@@ -43,6 +43,7 @@ Puppet::Type.newtype(:firewall) do
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
   feature :mark, "Match or Set the netfilter mark value associated with the packet"
+  feature :mss, "Match a given TCP MSS value or range."
   feature :tcp_flags, "The ability to match on particular TCP flag settings"
   feature :pkttype, "Match a packet type"
   feature :socket, "Match open sockets"
@@ -360,6 +361,13 @@ Puppet::Type.newtype(:firewall) do
       [proto, "! #{proto}".to_sym]
     end.flatten)
     defaultto "tcp"
+  end
+  
+  # tcp-specific
+  newproperty(:mss) do
+    desc <<-EOS
+      Match a given TCP MSS value or range.
+    EOS
   end
 
   # tcp-specific
@@ -822,6 +830,12 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:set_mss, :required_features => :iptables) do
+    desc <<-EOS
+      Sets the TCP MSS value for packets.
+    EOS
+  end
+
   newproperty(:pkttype, :required_features => :pkttype) do
     desc <<-EOS
       Sets the packet type to match.
@@ -1191,6 +1205,12 @@ Puppet::Type.newtype(:firewall) do
         self.fail "[%s] Parameter dport only applies to sctp, tcp and udp " \
           "protocols. Current protocol is [%s] and dport is [%s]" %
           [value(:name), should(:proto), should(:dport)]
+      end
+    end
+
+    if value(:jump).to_s == "TCPMSS"
+      unless value(:set_mss)
+        self.fail "Parameter jump => TCPMSS set_mss is required"
       end
     end
 
