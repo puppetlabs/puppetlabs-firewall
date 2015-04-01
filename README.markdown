@@ -564,6 +564,8 @@ firewall { '999 this runs last':
   * 'tcp'
   * 'udp'
   * 'icmp'
+  * 'ipv4'
+  * 'ipv6'
   * 'ipv6-icmp'
   * 'esp'
   * 'ah'
