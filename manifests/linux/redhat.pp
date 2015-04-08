@@ -52,4 +52,12 @@ class firewall::linux::redhat (
     group  => 'root',
     mode   => '0600',
   }
+
+  file { '/etc/sysconfig/iptables-config':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0600',
+    source => 'puppet:///modules/puppetlabs-firewall/iptables-config',
+  }
 }
