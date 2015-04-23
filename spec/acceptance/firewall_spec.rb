@@ -833,7 +833,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
-  
+
   if default['platform'] !~ /el-5/ and default['platform'] !~ /ubuntu-10\.04/ and default['platform'] !~ /debian-6/ and default['platform'] !~ /sles/
     describe 'checksum_fill' do
       context 'virbr' do
@@ -897,14 +897,15 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       it 'applies' do
         pp = <<-EOS
           class { '::firewall': }
-          firewall { 
+          firewall {
             '502 - set_mss':
-              proto   => 'tcp',
-              jump    => 'TCPMSS',
-              set_mss => '1360',
-              mss     => '1361:1541',
-              chain   => 'FORWARD',
-              table   => 'mangle',
+              proto     => 'tcp',
+              tcp_flags => 'SYN,RST SYN',
+              jump      => 'TCPMSS',
+              set_mss   => '1360',
+              mss       => '1361:1541',
+              chain     => 'FORWARD',
+              table     => 'mangle',
           }
         EOS
 
@@ -924,15 +925,16 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       it 'applies' do
         pp = <<-EOS
           class { '::firewall': }
-          firewall { 
+          firewall {
             '502 - set_mss':
-              proto    => 'tcp',
-              jump     => 'TCPMSS',
-              set_mss  => '1360',
-              mss      => '1361:1541',
-              chain    => 'FORWARD',
-              table    => 'mangle',
-              provider => 'ip6tables',
+              proto     => 'tcp',
+              tcp_flags => 'SYN,RST SYN',
+              jump      => 'TCPMSS',
+              set_mss   => '1360',
+              mss       => '1361:1541',
+              chain     => 'FORWARD',
+              table     => 'mangle',
+              provider  => 'ip6tables',
           }
         EOS
 
