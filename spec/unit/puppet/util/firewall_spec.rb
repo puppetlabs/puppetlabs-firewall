@@ -86,6 +86,8 @@ describe 'Puppet::Util::Firewall' do
       specify { subject.icmp_name_to_number('echo-reply', proto).should == '129' }
       specify { subject.icmp_name_to_number('router-solicitation', proto).should == '133' }
       specify { subject.icmp_name_to_number('router-advertisement', proto).should == '134' }
+      specify { subject.icmp_name_to_number('neighbour-solicitation', proto).should == '135' }
+      specify { subject.icmp_name_to_number('neighbour-advertisement', proto).should == '136' }
       specify { subject.icmp_name_to_number('redirect', proto).should == '137' }
     end
   end
