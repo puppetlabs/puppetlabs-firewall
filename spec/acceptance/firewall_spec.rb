@@ -833,7 +833,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
-  
+
   if default['platform'] !~ /el-5/ and default['platform'] !~ /ubuntu-10\.04/ and default['platform'] !~ /debian-6/ and default['platform'] !~ /sles/
     describe 'checksum_fill' do
       context 'virbr' do
@@ -887,6 +887,63 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           shell('ip6tables-save -t mangle') do |r|
             expect(r.stdout).to match(/-A POSTROUTING -o virbr0 -p udp -m multiport --dports 68 -m comment --comment "576 - test" -j CHECKSUM --checksum-fill/)
           end
+        end
+      end
+    end
+  end
+
+  describe 'set_mss' do
+    context '1360' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall {
+            '502 - set_mss':
+              proto     => 'tcp',
+              tcp_flags => 'SYN,RST SYN',
+              jump      => 'TCPMSS',
+              set_mss   => '1360',
+              mss       => '1361:1541',
+              chain     => 'FORWARD',
+              table     => 'mangle',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('iptables-save -t mangle') do |r|
+          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360/)
+        end
+      end
+    end
+  end
+
+  describe 'set_mss6' do
+    context '1360' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall {
+            '502 - set_mss':
+              proto     => 'tcp',
+              tcp_flags => 'SYN,RST SYN',
+              jump      => 'TCPMSS',
+              set_mss   => '1360',
+              mss       => '1361:1541',
+              chain     => 'FORWARD',
+              table     => 'mangle',
+              provider  => 'ip6tables',
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+      end
+
+      it 'should contain the rule' do
+        shell('ip6tables-save -t mangle') do |r|
+          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360/)
         end
       end
     end
