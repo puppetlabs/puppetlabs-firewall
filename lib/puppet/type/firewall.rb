@@ -90,7 +90,7 @@ Puppet::Type.newtype(:firewall) do
     isnamevar
 
     # Keep rule names simple - they must start with a number
-    newvalues(/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/)
+    newvalues(/^\d+[[:graph:][:space:]]+$/)
   end
 
   newproperty(:action) do
