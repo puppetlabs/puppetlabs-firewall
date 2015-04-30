@@ -35,13 +35,13 @@ describe 'firewall::linux::debian', :type => :class do
         :operatingsystem       => 'Debian',
         :operatingsystemrelease => 'jessie/sid'
     }}
-    it { should contain_package('netfilter-persistent').with(
+    it { should contain_package('iptables-persistent').with(
       :ensure => 'present'
     )}
     it { should contain_service('netfilter-persistent').with(
       :ensure   => nil,
       :enable   => 'true',
-      :require  => 'Package[netfilter-persistent]'
+      :require  => 'Package[iptables-persistent]'
     )}
   end
 
@@ -63,13 +63,13 @@ describe 'firewall::linux::debian', :type => :class do
         :operatingsystem        => 'Debian',
         :operatingsystemrelease => '8.0'
     }}
-    it { should contain_package('netfilter-persistent').with(
+    it { should contain_package('iptables-persistent').with(
       :ensure => 'present'
     )}
     it { should contain_service('netfilter-persistent').with(
       :ensure   => nil,
       :enable   => 'true',
-      :require  => 'Package[netfilter-persistent]'
+      :require  => 'Package[iptables-persistent]'
     )}
   end
 
