@@ -108,7 +108,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :uid                => "--uid-owner",
     :physdev_in         => "--physdev-in",
     :physdev_out        => "--physdev-out",
-    :physdev_is_bridged => "--physdev-is-bridged"
+    :physdev_is_bridged => "--physdev-is-bridged",
+    :date_start         => "--datestart",
+    :date_stop          => "--datestop",
+    :time_start         => "--timestart",
+    :time_stop          => "--timestop",
+    :month_days         => "--monthdays",
+    :week_days          => "--weekdays",
+    :time_contiguous    => "--contiguous",
+    :kernel_timezone    => "--kerneltz",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -122,7 +130,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :rsource,
     :rttl,
     :socket,
-    :physdev_is_bridged
+    :physdev_is_bridged,
+    :time_contiguous,
+    :kernel_timezone,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple 
@@ -142,6 +152,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :addrtype  => [:src_type, :dst_type],
     :iprange   => [:src_range, :dst_range],
     :owner     => [:uid, :gid],
+    :time      => [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone]
   }
 
   def self.munge_resource_map_from_existing_values(resource_map_original, compare)
@@ -226,7 +237,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :todest,
     :tosource, :toports, :to, :checksum_fill, :random, :log_prefix, :log_level, :reject, :set_mark,
-    :connlimit_above, :connlimit_mask, :connmark
+    :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone
   ]
 
   def insert

@@ -1102,6 +1102,101 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:true, :false)
   end
 
+  newproperty(:date_start, :required_features => :iptables) do
+    desc <<-EOS
+      Only match during the given time, which must be in ISO 8601 "T" notation.
+      The possible time range is 1970-01-01T00:00:00 to 2038-01-19T04:17:07
+    EOS
+  end
+
+  newproperty(:date_stop, :required_features => :iptables) do
+    desc <<-EOS
+      Only match during the given time, which must be in ISO 8601 "T" notation.
+      The possible time range is 1970-01-01T00:00:00 to 2038-01-19T04:17:07
+    EOS
+  end
+
+  newproperty(:time_start, :required_features => :iptables) do
+    desc <<-EOS
+      Only match during the given daytime. The possible time range is 00:00:00 to 23:59:59.
+      Leading zeroes are allowed (e.g. "06:03") and correctly interpreted as base-10.
+    EOS
+
+    munge do |value|
+      if value =~ /^([0-9]):/
+        value = "0#{value}"
+      end
+
+      if value =~ /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
+        value = "#{value}:00"
+      end
+
+      value
+    end
+  end
+
+  newproperty(:time_stop, :required_features => :iptables) do
+    desc <<-EOS
+      Only match during the given daytime. The possible time range is 00:00:00 to 23:59:59.
+      Leading zeroes are allowed (e.g. "06:03") and correctly interpreted as base-10.
+    EOS
+
+    munge do |value|
+      if value =~ /^([0-9]):/
+        value = "0#{value}"
+      end
+
+      if value =~ /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
+        value = "#{value}:00"
+      end
+
+      value
+    end
+  end
+
+  newproperty(:month_days, :required_features => :iptables) do
+    desc <<-EOS
+      Only match on the given days of the month. Possible values are 1 to 31.
+      Note that specifying 31 will of course not match on months which do not have a 31st day;
+      the same goes for 28- or 29-day February.
+    EOS
+
+    validate do |value|
+      month = value.to_i
+      if month >= 1 and month <=31
+        value
+      else
+        raise ArgumentError,
+          "month_days must be in the range of 1-31"
+      end
+    end
+  end
+
+  newproperty(:week_days, :required_features => :iptables) do
+    desc <<-EOS
+      Only match on the given weekdays. Possible values are Mon, Tue, Wed, Thu, Fri, Sat, Sun.
+    EOS
+
+    newvalues(:Mon, :Tue, :Wed, :Thu, :Fri, :Sat, :Sun)
+  end
+
+  newproperty(:time_contiguous, :required_features => :iptables) do
+    desc <<-EOS
+      When time_stop is smaller than time_start value, match this as a single time period instead distinct intervals.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:kernel_timezone, :required_features => :iptables) do
+    desc <<-EOS
+      Use the kernel timezone instead of UTC to determine whether a packet meets the time regulations.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil

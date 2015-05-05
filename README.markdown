@@ -467,6 +467,10 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `ctstate`: Matches a packet based on its state in the firewall stateful inspection table, using the conntrack module. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'. Requires the `state_match` feature.
 
+* `date_start`: Start Date/Time for the rule to match, which must be in ISO 8601 "T" notation. The possible time range is '1970-01-01T00:00:00' to '2038-01-19T04:17:07'
+
+* `date_stop`: End Date/Time for the rule to match, which must be in ISO 8601 "T" notation. The possible time range is '1970-01-01T00:00:00' to '2038-01-19T04:17:07'
+
 * `destination`: The destination address to match. For example: `destination => '192.168.1.0/24'`. You can also negate a mask by putting ! in front. For example: `destination  => '! 192.168.2.0/24'`. The destination can also be an IPv6 address if your provider supports it.
 
   For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
@@ -525,6 +529,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
   If you set both `accept` and `jump` parameters, you will get an error, because only one of the options should be set. Requires the `iptables` feature.
 
+* `kernel_timezone`: Use the kernel timezone instead of UTC to determine whether a packet meets the time regulations.
+
 * `limit`: Rate limiting value for matched packets. The format is: 'rate/[/second/|/minute|/hour|/day]'. Example values are: '50/sec', '40/min', '30/hour', '10/day'. Requires the  `rate_limiting` feature.
 
 * `line`: Read-only property for caching the rule line.
@@ -534,6 +540,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `log_prefix`: When combined with `jump => 'LOG'` specifies the log prefix to use when logging. Requires the `log_prefix` feature.
 
 * `mask`: Sets the mask to use when `recent` is enabled. Requires the `mask` feature.
+
+* `month_days`: Only match on the given days of the month. Possible values are '1' to '31'. Note that specifying 31 will of course not match on months which do not have a 31st day; the same goes for 28- or 29-day February.
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
@@ -668,6 +676,12 @@ firewall { '101 blacklist strange traffic':
 
    Note that you specify flags in the order that iptables `--list` rules would list them to avoid having Puppet think you changed the flags. For example, 'FIN,SYN,RST,ACK SYN' matches packets with the SYN bit set and the ACK, RST and FIN bits cleared. Such packets are used to request TCP connection initiation. Requires the `tcp_flags` feature.
 
+* `time_contiguous`: When time_stop is smaller than time_start value, match this as a single time period instead distinct intervals.
+
+* `time_start`: Start time for the rule to match. The possible time range is '00:00:00' to '23:59:59'. Leading zeroes are allowed (e.g. '06:03') and correctly interpreted as base-10.
+
+* `time_stop`: End time for the rule to match. The possible time range is '00:00:00' to '23:59:59'. Leading zeroes are allowed (e.g. '06:03') and correctly interpreted as base-10.
+
 * `todest`: When using `jump => 'DNAT'`, you can specify the new destination address using this parameter. Requires the `dnat` feature.
 
 * `toports`: For DNAT this is the port that will replace the destination port. Requires the `dnat` feature.
@@ -677,6 +691,8 @@ firewall { '101 blacklist strange traffic':
 * `to`: When using `jump => 'NETMAP'`, you can specify a source or destination subnet to nat to. Requires the `netmap` feature`.
 
 * `uid`: UID or Username owner matching rule. Accepts a string argument only, as iptables does not accept multiple uid in a single statement. Requires the `owner` feature.
+
+* `week_days`: Only match on the given weekdays. Possible values are 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'.
 
 ###Type: firewallchain
 
