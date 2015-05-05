@@ -39,6 +39,14 @@ class firewall::linux::redhat (
     }
   }
 
+  if ($::operatingsystem != 'Amazon')
+  and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
+  or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
+    exec { '/usr/bin/systemctl daemon-reload':
+      require   => Package[$package_name],
+    }
+  }
+
   service { $service_name:
     ensure    => $ensure,
     enable    => $enable,
