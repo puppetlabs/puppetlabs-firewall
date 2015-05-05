@@ -42,8 +42,12 @@ class firewall::linux::redhat (
   if ($::operatingsystem != 'Amazon')
   and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
   or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
-    exec { '/usr/bin/systemctl daemon-reload':
-      require   => Package[$package_name],
+    if $ensure == 'running' {
+      exec { '/usr/bin/systemctl daemon-reload':
+        require   => Package[$package_name],
+        before    => Service[$service_name],
+        unless    => '/usr/bin/systemctl is-active iptables'
+      }
     }
   }
 
