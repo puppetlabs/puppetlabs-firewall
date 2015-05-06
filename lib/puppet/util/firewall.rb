@@ -28,6 +28,7 @@ module Puppet::Util::Firewall
     elsif protocol == 'inet6'
       case value_icmp
         when "destination-unreachable" then "1"
+        when "too-big" then "2"
         when "time-exceeded" then "3"
         when "parameter-problem" then "4"
         when "echo-request" then "128"

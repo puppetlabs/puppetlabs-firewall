@@ -275,6 +275,7 @@ describe firewall do
       },
       :ip6tables => {
         '1' => 'destination-unreachable',
+        '2' => 'too-big',
         '3' => 'time-exceeded',
         '4' => 'parameter-problem',
         '128' => 'echo-request',
