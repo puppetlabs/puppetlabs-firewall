@@ -33,7 +33,7 @@ class firewall::params {
         'Debian': {
           if versioncmp($::operatingsystemrelease, '8.0') >= 0 {
             $service_name = 'netfilter-persistent'
-            $package_name = 'netfilter-persistent'
+            $package_name = 'iptables-persistent'
           } else {
             $service_name = 'iptables-persistent'
             $package_name = 'iptables-persistent'
@@ -43,7 +43,7 @@ class firewall::params {
         'Ubuntu': {
           if versioncmp($::operatingsystemrelease, '14.10') >= 0 {
             $service_name = 'netfilter-persistent'
-            $package_name = 'netfilter-persistent'
+            $package_name = 'iptables-persistent'
           } else {
             $service_name = 'iptables-persistent'
             $package_name = 'iptables-persistent'
