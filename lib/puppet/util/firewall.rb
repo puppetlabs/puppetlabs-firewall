@@ -35,6 +35,8 @@ module Puppet::Util::Firewall
         when "echo-reply" then "129"
         when "router-solicitation" then "133"
         when "router-advertisement" then "134"
+        when "neighbour-solicitation" then "135"
+        when "neighbour-advertisement" then "136"
         when "redirect" then "137"
         else nil
       end
