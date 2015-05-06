@@ -1305,7 +1305,7 @@ Puppet::Type.newtype(:firewall) do
 
     if value(:jump).to_s == "TCPMSS"
       unless value(:set_mss)
-        self.fail "Parameter jump => TCPMSS set_mss is required"
+        self.fail "When using jump => TCPMSS, the set_mss property is required"
       end
     end
 
