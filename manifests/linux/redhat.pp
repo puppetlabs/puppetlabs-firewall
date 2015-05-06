@@ -44,9 +44,9 @@ class firewall::linux::redhat (
   or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
     if $ensure == 'running' {
       exec { '/usr/bin/systemctl daemon-reload':
-        require   => Package[$package_name],
-        before    => Service[$service_name],
-        unless    => '/usr/bin/systemctl is-active iptables'
+        require => Package[$package_name],
+        before  => Service[$service_name],
+        unless  => '/usr/bin/systemctl is-active iptables'
       }
     }
   }
