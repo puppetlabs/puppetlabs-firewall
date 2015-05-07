@@ -292,6 +292,7 @@ firewall { '100 snat for network foo2':
 }
 ```
 
+
 You can also change the TCP MSS value for VPN client traffic:
 
 ```puppet
@@ -304,6 +305,18 @@ firewall { '110 TCPMSS for VPN clients':
   mss       => '1361:1541',
   set_mss   => '1360',
   jump      => 'TCPMSS',
+}
+```
+
+The following will mirror all traffic sent to the server to a secondary host on the LAN with the TEE target:
+
+```puppet
+firewall { '503 Mirror traffic to IDS':
+  proto   => all,
+  jump    => 'TEE',
+  gateway => '10.0.0.2',
+  chain   => 'PREROUTING',
+  table   => 'mangle',
 }
 ```
 
@@ -517,6 +530,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
   Requires the `address_type` feature.
 
 * `ensure`: Ensures that the resource is present. Valid values are 'present', 'absent'. The default is 'present'.
+
+* `gateway`: Used with TEE target to mirror traffic of a machine to a secondary host on the LAN.
 
 * `gid`: GID or Group owner matching rule. Accepts a string argument only, as iptables does not accept multiple gid in a single statement. Requires the `owner` feature.
 
