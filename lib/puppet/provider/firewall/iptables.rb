@@ -75,6 +75,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :log_prefix         => "--log-prefix",
     :mac_source         => ["-m mac --mac-source", "--mac-source"],
     :mask               => '--mask',
+    :match_mark         => "-m mark --mark",
     :mss                => '-m tcpmss --mss',
     :name               => "-m comment --comment",
     :outiface           => "-o",
@@ -240,7 +241,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :src_type, :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :gateway, :set_mss, :todest,
-    :tosource, :toports, :to, :checksum_fill, :random, :log_prefix, :log_level, :reject, :set_mark, :mss,
+    :tosource, :toports, :to, :checksum_fill, :random, :log_prefix, :log_level, :reject, :set_mark, :match_mark, :mss,
     :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone
   ]
 

@@ -575,6 +575,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `month_days`: Only match on the given days of the month. Possible values are '1' to '31'. Note that specifying 31 will of course not match on months which do not have a 31st day; the same goes for 28- or 29-day February.
 
+* `match_mark`: Match the Netfilter mark value associated with the packet.  Accepts either of mark/mask or mark. These will be converted to hex if they are not already. Requires the `mark` feature.
+
 * `mss`: Sets a given TCP MSS value or range to match.
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:

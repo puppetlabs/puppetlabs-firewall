@@ -543,6 +543,17 @@ ARGS_TO_HASH = {
       :proto => 'udp',
     },
   },
+  'match_mark' => {
+    :line => '-A INPUT -p tcp -m comment --comment "066 REJECT connlimit_above 10 with mask 32 and mark matches" -m mark --mark 0x1 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable',
+    :table => 'filter',
+    :params => {
+      :proto           => 'tcp',
+      :connlimit_above => '10',
+      :connlimit_mask  => '32',
+      :match_mark      => '0x1',
+      :action          => 'reject',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -1045,5 +1056,17 @@ HASH_TO_ARGS = {
       :proto       => 'udp',
     },
     :args => ["-t", :filter, "-s", "0.0.0.0/32", "-d", "255.255.255.255/32", "-p", :udp, "-m", "multiport", "!", "--sports", "68,69", "-m", "multiport", "!", "--dports", "67,66", "-m", "comment", "--comment", "065 negate dport and sport", "-j", "ACCEPT"],
+  },
+  'match_mark' => {
+    :params => {
+      :name            => '066 REJECT connlimit_above 10 with mask 32 and mark matches',
+      :table           => 'filter',
+      :proto           => 'tcp',
+      :connlimit_above => '10',
+      :connlimit_mask  => '32',
+      :match_mark      => '0x1',
+      :action          => 'reject',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches", "-j", "REJECT", "-m", "mark", "--mark", "0x1", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32"],
   },
 }
