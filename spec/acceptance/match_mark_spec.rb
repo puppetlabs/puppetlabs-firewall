@@ -2,6 +2,11 @@ require 'spec_helper_acceptance'
 
 describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
 
+  before(:all) do
+    shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
+    shell('ip6tables --flush; ip6tables -t nat --flush; ip6tables -t mangle --flush')
+  end
+
   if default['platform'] !~ /el-5/
     describe 'match_mark' do
       context '0x1' do
