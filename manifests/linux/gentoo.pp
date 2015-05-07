@@ -1,7 +1,7 @@
 # = Class: firewall::linux::gentoo
 #
 # Manages `iptables` and `ip6tables` services, and creates files used for
-# persistence, on Arch Linux systems.
+# persistence, on Gentoo Linux systems.
 #
 # == Parameters:
 #
