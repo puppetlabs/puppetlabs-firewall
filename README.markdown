@@ -824,6 +824,11 @@ when the "Unbreakable" kernel is used. These may function correctly when using
 the stock RedHat kernel instead. Declaring either of these parameters on an
 unsupported system will result in iptable rules failing to apply.
 
+### Debian 8 Support
+
+As Puppet Enterprise itself does not yet support Debian 8, use of this module with Puppet Enterprise under a Debian 8
+system should be regarded as experimental.
+
 ###Other
 
 Bugs can be reported using JIRA issues
