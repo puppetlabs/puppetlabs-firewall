@@ -67,6 +67,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   @resource_map = {
     :burst              => "--limit-burst",
     :checksum_fill      => "--checksum-fill",
+    :clamp_mss_to_pmtu  => "--clamp-mss-to-pmtu",
     :connlimit_above    => "-m connlimit --connlimit-above",
     :connlimit_mask     => "--connlimit-mask",
     :connmark           => "-m connmark --mark",
@@ -143,6 +144,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # to true if they exist.
   @known_booleans = [
     :checksum_fill,
+    :clamp_mss_to_pmtu,
     :ishasmorefrags,
     :islastfrag,
     :isfirstfrag,
@@ -215,7 +217,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
     :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :gateway, :todest,
+    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject, :set_mss, :mss,
     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone]
 
