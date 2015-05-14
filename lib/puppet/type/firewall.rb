@@ -860,6 +860,14 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:clamp_mss_to_pmtu, :required_features => :iptables) do
+    desc <<-EOS
+      Sets the clamp mss to pmtu flag.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
   newproperty(:set_mss, :required_features => :iptables) do
     desc <<-EOS
       Sets the TCP MSS value for packets.
@@ -1341,8 +1349,8 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == "TCPMSS"
-      unless value(:set_mss)
-        self.fail "When using jump => TCPMSS, the set_mss property is required"
+      unless value(:set_mss) || value(:clamp_mss_to_pmtu)
+        self.fail "When using jump => TCPMSS, the set_mss or clamp_mss_to_pmtu property is required"
       end
     end
 

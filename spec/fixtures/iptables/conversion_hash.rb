@@ -554,6 +554,18 @@ ARGS_TO_HASH = {
       :action          => 'reject',
     },
   },
+  'clamp_mss_to_pmtu' => {
+    :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "067 change max segment size" -j TCPMSS --clamp-mss-to-pmtu',
+    :table => 'filter',
+    :params => {
+      :name              => '067 change max segment size',
+      :table             => 'filter',
+      :proto             => 'tcp',
+      :tcp_flags         => 'SYN,RST SYN',
+      :jump              => 'TCPMSS',
+      :clamp_mss_to_pmtu => true,
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -1068,5 +1080,16 @@ HASH_TO_ARGS = {
       :action          => 'reject',
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches", "-j", "REJECT", "-m", "mark", "--mark", "0x1", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32"],
+  },
+  'clamp_mss_to_pmtu' => {
+    :params => {
+      :name              => '067 change max segment size',
+      :table             => 'filter',
+      :proto             => 'tcp',
+      :tcp_flags         => 'SYN,RST SYN',
+      :jump              => 'TCPMSS',
+      :clamp_mss_to_pmtu => true,
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "tcp", "--tcp-flags", "SYN,RST", "SYN", "-m", "comment", "--comment", "067 change max segment size", "-j", "TCPMSS", "--clamp-mss-to-pmtu"],
   },
 }
