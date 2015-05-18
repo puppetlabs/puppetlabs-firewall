@@ -487,7 +487,9 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `chain`: Name of the chain to use. You can provide a user-based chain or use one of the following built-in chains:'INPUT','FORWARD','OUTPUT','PREROUTING', or 'POSTROUTING'. The default value is 'INPUT'. Values must match '/^[a-zA-Z0-9\-_]+$/'. Requires the `iptables` feature.
 
- * `checksum_fill`: When using a `jump` value of 'CHECKSUM' this boolean will make sure that a checksum is calculated and filled in a packet that lacks a checksum. Valid values are true or false. Requires the `iptables` feature.
+* `checksum_fill`: When using a `jump` value of 'CHECKSUM' this boolean will make sure that a checksum is calculated and filled in a packet that lacks a checksum. Valid values are true or false. Requires the `iptables` feature.
+
+* `clamp_mss_to_pmtu`: Enables PMTU Clamping support when using a jump target of 'TCPMSS'. Valid values are true or false.
 
 * `connlimit_above`: Connection limiting value for matched connections above n. Values must match '/^\d+$/'. Requires the `connection_limiting` feature.
 
