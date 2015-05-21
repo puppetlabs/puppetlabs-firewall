@@ -70,7 +70,7 @@ Therefore, the run order is:
 The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity and that you drop unmatched packets appropriately. The rules you define in your manifests are likely specific to the applications you run.
 
 1.) Add the `pre` class to my_fw/manifests/pre.pp. Your pre.pp file should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.2. 
-  ```puppet
+  ~~~puppet
   class my_fw::pre {
     Firewall {
       require => undef,
@@ -98,12 +98,13 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
       action  => 'accept',
     }
   }
-  ```
+  ~~~
 
   The rules in `pre` should allow basic networking (such as ICMP and TCP) and ensure that existing connections are not closed.
 
 2.) Add the `post` class to my_fw/manifests/post.pp and include any default rules to be applied last.
-  ```puppet
+
+  ~~~puppet
   class my_fw::post {
     firewall { '999 drop all':
       proto   => 'all',
@@ -111,17 +112,17 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
       before  => undef,
     }
   }
-  ```
+  ~~~
 
 Alternatively, the [firewallchain](#type-firewallchain) type can be used to set the default policy:
 
-  ```puppet
+  ~~~puppet
   firewallchain { 'INPUT:filter:IPv4':
     ensure => present,
     policy => drop,
     before => undef,
   }
-  ```
+  ~~~
 
 ####Create Firewall Rules
 
@@ -132,41 +133,43 @@ Rules are persisted automatically between reboots, although there are known issu
 1.) In site.pp or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
 
   **Note** - This only purges IPv4 rules.
-  ```puppet
+  
+  ~~~puppet
   resources { 'firewall':
     purge => true
   }
-  ```
+  ~~~
 
   To purge unmanaged firewall chains, also add:
 
-  ```puppet
+  ~~~puppet
   resources { 'firewallchain':
     purge => true
   }
-  ```
-  **Note** - If there are unmanaged rules in unmanaged chains it will take two Puppet runs before the firewall chain is purged. This is different than the `purge` parameter available in `firewallchain`.
+  ~~~
+  
+  **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs before the firewall chain is purged. This is different than the `purge` parameter available in `firewallchain`.
 
 2.)  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
 
-  ```puppet
+  ~~~puppet
   Firewall {
     before  => Class['my_fw::post'],
     require => Class['my_fw::pre'],
   }
-  ```
+  ~~~
 
 3.) Then, declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an External Node Classifier or the following code:
 
-  ```puppet
+  ~~~puppet
   class { ['my_fw::pre', 'my_fw::post']: }
-  ```
+  ~~~
 
 4.) Include the `firewall` class to ensure the correct packages are installed.
 
-  ```puppet
+  ~~~puppet
   class { 'firewall': }
-  ```
+  ~~~
 
 ###Upgrading
 
@@ -194,32 +197,33 @@ In iptables, the title of the rule is stored using the comment feature of the un
 
 Basic accept ICMP request example:
 
-```puppet
+~~~puppet
 firewall { "000 accept all icmp requests":
   proto  => "icmp",
   action => "accept",
 }
-```
+~~~
+
 Drop all:
 
-```puppet
+~~~puppet
 firewall { "999 drop all other requests":
   action => "drop",
 }
-```
+~~~
 
 #### Example of an IPv6 rule
 
 IPv6 rules can be specified using the _ip6tables_ provider:
 
-```puppet
+~~~puppet
 firewall { "006 Allow inbound SSH (v6)":
   port     => 22,
   proto    => tcp,
   action   => accept,
   provider => 'ip6tables',
 }
-```
+~~~
 
 ###Application-Specific Rules
 
@@ -232,7 +236,7 @@ remain close to the services managed by the profile.
 
 This is an example of firewall rules in a profile:
 
-```puppet
+~~~puppet
 class profile::apache {
   include apache
   apache::vhost { 'mysite': ensure => present }
@@ -243,7 +247,7 @@ class profile::apache {
     action => accept,
   }
 }
-```
+~~~
 
 ###Rule inversion
 Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
@@ -252,7 +256,7 @@ Parameters that understand inversion are: connmark, ctstate, destination, dport,
 
 Examples:
 
-```puppet
+~~~puppet
 firewall { '001 disallow esp protocol':
   action => 'accept',
   proto  => '! esp',
@@ -266,22 +270,23 @@ firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN u
   source    => '! 10.0.0.0/8',
   tcp_flags => '! FIN,SYN,RST,ACK SYN',
 }
-```
+~~~
 
 ###Additional Uses for the Firewall Module
 
 You can apply firewall rules to specific nodes. Usually, you will want to put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows:
 
-```puppet
+~~~puppet
 node 'some.node.com' {
   firewall { '111 open port 111':
     dport => 111
   }
 }
-```
+~~~
 
 You can also do more complex things with the `firewall` resource. This example sets up static NAT for the source network 10.1.2.0/24:
-```puppet
+
+~~~puppet
 firewall { '100 snat for network foo2':
   chain    => 'POSTROUTING',
   jump     => 'MASQUERADE',
@@ -290,12 +295,12 @@ firewall { '100 snat for network foo2':
   source   => '10.1.2.0/24',
   table    => 'nat',
 }
-```
+~~~
 
 
 You can also change the TCP MSS value for VPN client traffic:
 
-```puppet
+~~~puppet
 firewall { '110 TCPMSS for VPN clients':
   chain     => 'FORWARD',
   table     => 'mangle',
@@ -306,11 +311,11 @@ firewall { '110 TCPMSS for VPN clients':
   set_mss   => '1360',
   jump      => 'TCPMSS',
 }
-```
+~~~
 
 The following will mirror all traffic sent to the server to a secondary host on the LAN with the TEE target:
 
-```puppet
+~~~puppet
 firewall { '503 Mirror traffic to IDS':
   proto   => all,
   jump    => 'TEE',
@@ -318,10 +323,10 @@ firewall { '503 Mirror traffic to IDS':
   chain   => 'PREROUTING',
   table   => 'mangle',
 }
-```
+~~~
 
 The following example creates a new chain and forwards any port 5000 access to it.
-```puppet
+~~~puppet
 firewall { '100 forward to MY_CHAIN':
   chain   => 'INPUT',
   jump    => 'MY_CHAIN',
@@ -336,7 +341,7 @@ firewall { '100 my rule':
   proto   => 'tcp',
   dport   => 5000,
 }
-```
+~~~
 
 ###Additional Information
 
@@ -487,9 +492,9 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `chain`: Name of the chain to use. You can provide a user-based chain or use one of the following built-in chains:'INPUT','FORWARD','OUTPUT','PREROUTING', or 'POSTROUTING'. The default value is 'INPUT'. Values must match '/^[a-zA-Z0-9\-_]+$/'. Requires the `iptables` feature.
 
-* `checksum_fill`: When using a `jump` value of 'CHECKSUM' this boolean will make sure that a checksum is calculated and filled in a packet that lacks a checksum. Valid values are true or false. Requires the `iptables` feature.
+* `checksum_fill`: When using a `jump` value of 'CHECKSUM', this boolean makes sure that a checksum is calculated and filled in a packet that lacks a checksum. Valid values are 'true' or 'false'. Requires the `iptables` feature.
 
-* `clamp_mss_to_pmtu`: Enables PMTU Clamping support when using a jump target of 'TCPMSS'. Valid values are true or false.
+* `clamp_mss_to_pmtu`: Enables PMTU Clamping support when using a jump target of 'TCPMSS'. Valid values are 'true' or 'false'.
 
 * `connlimit_above`: Connection limiting value for matched connections above n. Values must match '/^\d+$/'. Requires the `connection_limiting` feature.
 
@@ -575,22 +580,22 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `mask`: Sets the mask to use when `recent` is enabled. Requires the `mask` feature.
 
-* `month_days`: Only match on the given days of the month. Possible values are '1' to '31'. Note that specifying 31 will of course not match on months which do not have a 31st day; the same goes for 28- or 29-day February.
+* `month_days`: Only match on the given days of the month. Possible values are '1' to '31'. Note that specifying '31' will not match on months that do not have a 31st day; the same goes for 28- or 29-day February.
 
-* `match_mark`: Match the Netfilter mark value associated with the packet.  Accepts either of mark/mask or mark. These will be converted to hex if they are not already. Requires the `mark` feature.
+* `match_mark`: Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark. These will be converted to hex if they are not already. Requires the `mark` feature.
 
 * `mss`: Sets a given TCP MSS value or range to match.
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
-```puppet
+~~~puppet
 firewall { '000 this runs first':
   # this rule will run first
 }
 firewall { '999 this runs last':
   # this rule will run last
 }
- ```
+ ~~~
 
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/'.
 
@@ -632,7 +637,7 @@ firewall { '999 this runs last':
 
 * `recent`: Enable the recent module. Valid values are: 'set', 'update', 'rcheck', or 'remove'. For example:
 
-```puppet
+~~~puppet
 # If anyone's appeared on the 'badguy' blacklist within
 # the last 60 seconds, drop their traffic, and update the timestamp.
 firewall { '100 Drop badguy traffic':
@@ -654,7 +659,7 @@ firewall { '101 blacklist strange traffic':
   action      => 'DROP',
   chain       => 'FORWARD',
 }
-```
+~~~
 
   Requires the `recent_limiting` feature.
 
@@ -716,7 +721,7 @@ firewall { '101 blacklist strange traffic':
 
    Note that you specify flags in the order that iptables `--list` rules would list them to avoid having Puppet think you changed the flags. For example, 'FIN,SYN,RST,ACK SYN' matches packets with the SYN bit set and the ACK, RST and FIN bits cleared. Such packets are used to request TCP connection initiation. Requires the `tcp_flags` feature.
 
-* `time_contiguous`: When time_stop is smaller than time_start value, match this as a single time period instead distinct intervals.
+* `time_contiguous`: When the `time_stop` value is smaller than the `time_start` value, match this as a single time period instead of distinct intervals.
 
 * `time_start`: Start time for the rule to match. The possible time range is '00:00:00' to '23:59:59'. Leading zeroes are allowed (e.g. '06:03') and correctly interpreted as base-10.
 
@@ -758,7 +763,7 @@ Currently this type supports only iptables, ip6tables, and ebtables on Linux. It
 * `ignore`: Regex to perform on firewall rules to exempt unmanaged rules from purging (when enabled). This is matched against the output of iptables-save. This can be a single regex or an array of them. To support flags, use the ruby inline flag mechanism: a regex such as '/foo/i' can be written as '(?i)foo' or '(?i:foo)'. Only when purge is 'true'.
 
   Full example:
-```puppet
+~~~puppet
 firewallchain { 'INPUT:filter:IPv4':
   purge  => true,
   ignore => [
@@ -768,7 +773,7 @@ firewallchain { 'INPUT:filter:IPv4':
     '--comment "[^"](?i:ignore)[^"]"',
     ],
 }
-```
+~~~
 
 * `name`: Specify the canonical name of the chain. For iptables the format must be {chain}:{table}:{protocol}.
 
@@ -791,11 +796,11 @@ firewallchain { 'INPUT:filter:IPv4':
 
 **Note** This `purge` is purging unmanaged rules in a firewall chain, not unmanaged firewall chains. To purge unmanaged firewall chains, use the following instead.
 
-```puppet
+~~~puppet
 resources { 'firewallchain':
   purge => true
 }
-```
+~~~
 
 ###Fact: ip6tables_version
 
@@ -824,9 +829,14 @@ when the "Unbreakable" kernel is used. These may function correctly when using
 the stock RedHat kernel instead. Declaring either of these parameters on an
 unsupported system will result in iptable rules failing to apply.
 
+### Debian 8 Support
+
+As Puppet Enterprise itself does not yet support Debian 8, use of this module with Puppet Enterprise under a Debian 8
+system should be regarded as experimental.
+
 ###Other
 
-Bugs can be reported using JIRA issues
+Bugs can be reported in JIRA:
 
 <http://tickets.puppetlabs.com>
 
