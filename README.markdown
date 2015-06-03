@@ -78,24 +78,24 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
 
     # Default firewall rules
     firewall { '000 accept all icmp':
-      proto   => 'icmp',
-      action  => 'accept',
+      proto  => 'icmp',
+      action => 'accept',
     }->
     firewall { '001 accept all to lo interface':
       proto   => 'all',
       iniface => 'lo',
       action  => 'accept',
     }->
-    firewall { "002 reject local traffic not on loopback interface":
+    firewall { '002 reject local traffic not on loopback interface':
       iniface     => '! lo',
       proto       => 'all',
       destination => '127.0.0.1/8',
       action      => 'reject',
     }->
     firewall { '003 accept related established rules':
-      proto   => 'all',
-      state => ['RELATED', 'ESTABLISHED'],
-      action  => 'accept',
+      proto  => 'all',
+      state  => ['RELATED', 'ESTABLISHED'],
+      action => 'accept',
     }
   }
   ~~~
@@ -107,9 +107,9 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
   ~~~puppet
   class my_fw::post {
     firewall { '999 drop all':
-      proto   => 'all',
-      action  => 'drop',
-      before  => undef,
+      proto  => 'all',
+      action => 'drop',
+      before => undef,
     }
   }
   ~~~
