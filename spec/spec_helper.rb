@@ -26,4 +26,5 @@ RSpec.configure do |config|
   end
   config.module_path = File.join(fixture_path, 'modules')
   config.manifest_dir = File.join(fixture_path, 'manifests')
+  config.environmentpath = File.expand_path(File.join(Dir.pwd, 'spec'))
 end
