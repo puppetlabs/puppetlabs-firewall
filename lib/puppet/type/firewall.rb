@@ -57,6 +57,7 @@ Puppet::Type.newtype(:firewall) do
   feature :ipsec_dir, "Match IPsec policy direction"
   feature :mask, "Ability to match recent rules based on the ipv4 mask"
   feature :ipset, "Match against specified ipset list"
+  feature :clusterip, "Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them."
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -1253,6 +1254,58 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     newvalues(:true, :false)
+  end
+
+  newproperty(:clusterip_new, :required_features => :clusterip) do
+    desc <<-EOS
+      Used with the CLUSTERIP jump target.
+      Create a new ClusterIP. You always have to set this on the first rule for a given ClusterIP.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:clusterip_hashmode, :required_features => :clusterip) do
+    desc <<-EOS
+      Used with the CLUSTERIP jump target.
+      Specify the hashing mode. Valid values: sourceip, sourceip-sourceport, sourceip-sourceport-destport.
+    EOS
+
+    newvalues(:sourceip, :'sourceip-sourceport', :'sourceip-sourceport-destport')
+  end
+
+  newproperty(:clusterip_clustermac, :required_features => :clusterip) do
+    desc <<-EOS
+      Used with the CLUSTERIP jump target.
+      Specify the ClusterIP MAC address. Has to be a link-layer multicast address.
+    EOS
+
+    newvalues(/^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$/i)
+  end
+
+  newproperty(:clusterip_total_nodes, :required_features => :clusterip) do
+    desc <<-EOS
+      Used with the CLUSTERIP jump target.
+      Number of total nodes within this cluster.
+    EOS
+
+    newvalues(/\d+/)
+  end
+
+  newproperty(:clusterip_local_node, :required_features => :clusterip) do
+    desc <<-EOS
+      Used with the CLUSTERIP jump target.
+      Specify the random seed used for hash initialization.
+    EOS
+
+    newvalues(/\d+/)
+  end
+
+  newproperty(:clusterip_hash_init, :required_features => :clusterip) do
+    desc <<-EOS
+      Used with the CLUSTERIP jump target.
+      Specify the random seed used for hash initialization.
+    EOS
   end
 
 

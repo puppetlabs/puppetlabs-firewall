@@ -411,7 +411,7 @@ This type enables you to manage firewall rules within Puppet.
 * `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
     * Default for `kernel` == `linux`.
-    * Supported features: `address_type`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `mask`, `mss`, `netmap`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
+    * Supported features: `address_type`, `clusterip`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `mask`, `mss`, `netmap`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
 
 **Autorequires:**
 
@@ -422,6 +422,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 #### Features
 
 * `address_type`: The ability to match on source or destination address type.
+
+* `clusterip`: Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them.
 
 * `connection_limiting`: Connection limiting features.
 
@@ -489,6 +491,18 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
    If you specify no value it will simply match the rule but perform no action unless you provide a provider-specific parameter (such as `jump`).
 
 * `burst`: Rate limiting burst value (per second) before limit checks apply. Values must match '/^\d+$/'. Requires the `rate_limiting` feature.
+
+* `clusterip_new`: Create a new ClusterIP. You always have to set this on the first rule for a given ClusterIP. Requires the `clusterip` feature.
+
+* `clusterip_hashmode`: Specify the hashing mode. Valid values are sourceip, sourceip-sourceport, sourceip-sourceport-destport. Requires the `clusterip` feature.
+
+* `clusterip_clustermac`: Specify the ClusterIP MAC address. Has to be a link-layer multicast address. Requires the `clusterip` feature.
+
+* `clusterip_total_nodes`: Number of total nodes within this cluster. Requires the `clusterip` feature.
+
+* `clusterip_local_node`: Local node number within this cluster. Requires the `clusterip` feature.
+
+* `clusterip_hash_init`: Specify the random seed used for hash initialization. Requires the `clusterip` feature.
 
 * `chain`: Name of the chain to use. You can provide a user-based chain or use one of the following built-in chains:'INPUT','FORWARD','OUTPUT','PREROUTING', or 'POSTROUTING'. The default value is 'INPUT'. Values must match '/^[a-zA-Z0-9\-_]+$/'. Requires the `iptables` feature.
 
