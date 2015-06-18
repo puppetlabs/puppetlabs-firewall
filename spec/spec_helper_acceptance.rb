@@ -13,21 +13,6 @@ def ip6tables_flush_all_tables
   end
 end
 
-def is_rhel7(osfamily, operatingsystem, operatingsystemrelease)
-  if osfamily == 'RedHat'
-    case operatingsystem
-    when 'Amazon'
-      false
-    when 'Fedora'
-      operatingsystemrelease >= '7.0'
-    else
-      operatingsystemrelease >= '15'
-    end
-  else
-    false
-  end
-end
-
 run_puppet_install_helper
 
 UNSUPPORTED_PLATFORMS = ['windows','Solaris','Darwin']
