@@ -392,8 +392,16 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values.slice!('-A')
     keys << :chain
 
-    # Here we generate the main hash
-    keys.zip(values.scan(/"[^"]*"|\S+/).reverse) { |f, v| hash[f] = v.gsub(/"/, '') }
+    # Here we generate the main hash by scanning arguments off the values
+    # string, handling any quoted characters present in the value, and then
+    # zipping the values with the array of keys.
+    keys.zip(values.scan(/("([^"\\]|\\.)*"|\S+)/).transpose[0].reverse) do |f, v|
+      if v =~ /^".*"$/ then
+        hash[f] = v.sub(/^"(.*)"$/, '\1').gsub(/\\(\\|'|")/, '\1')
+      else
+        hash[f] = v.dup
+      end
+    end
 
     #####################
     # POST PARSE CLUDGING
