@@ -191,7 +191,7 @@ All rules employ a numbering system in the resource's title that is used for ord
 
 You can place default rules in either `my_fw::pre` or `my_fw::post`, depending on when you would like them to run. Rules placed in the `pre` class will run first, and rules in the `post` class, last.
 
-In iptables, the title of the rule is stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/'.
+In iptables, the title of the rule is stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
 ####Examples of Default Rules
 
@@ -611,7 +611,7 @@ firewall { '999 this runs last':
 }
  ~~~
 
-  Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/'.
+  Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
 * `outiface`: Output interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.
 

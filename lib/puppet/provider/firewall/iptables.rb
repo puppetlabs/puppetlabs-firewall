@@ -480,9 +480,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     if ! hash[:name]
       num = 9000 + counter
       hash[:name] = "#{num} #{Digest::MD5.hexdigest(line)}"
-    elsif not /^\d+[[:alpha:][:digit:][:punct:][:space:]]+$/ =~ hash[:name]
+    elsif not /^\d+[[:graph:][:space:]]+$/ =~ hash[:name]
       num = 9000 + counter
-      hash[:name] = "#{num} #{/([[:alpha:][:digit:][:punct:][:space:]]+)/.match(hash[:name])[1]}"
+      hash[:name] = "#{num} #{/([[:graph:][:space:]]+)/.match(hash[:name])[1]}"
     end
 
     # Iptables defaults to log_level '4', so it is omitted from the output of iptables-save.

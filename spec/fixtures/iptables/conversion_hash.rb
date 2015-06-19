@@ -768,6 +768,13 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :filter, '-s', '192.168.0.1/32', '-p', :tcp, '-m', 'comment', '--comment', '000 allow from 192.168.0.1, please'],
   },
+  'comment_string_character_validation_2' => {
+    :params => {
+      :name => "000 allow symbols ( $+<=>^`|~ ) in ruby >= 1.9",
+      :table => 'filter',
+    },
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '000 allow symbols ( $+<=>^`|~ ) in ruby >= 1.9'],
+  },
   'port_property' => {
     :params => {
       :name => '001 port property',
