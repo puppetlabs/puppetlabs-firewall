@@ -29,7 +29,6 @@ RSpec.configure do |c|
     # Install module and dependencies
     hosts.each do |host|
       copy_module_to(host, :source => proj_root, :module_name => 'firewall')
-      on(host, "/bin/touch #{host['hieraconf']}")
       on host, puppet('module install puppetlabs-stdlib --version 3.2.0'), { :acceptable_exit_codes => [0,1] }
     end
   end
