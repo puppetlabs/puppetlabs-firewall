@@ -30,17 +30,6 @@ RSpec.configure do |c|
     hosts.each do |host|
       copy_module_to(host, :source => proj_root, :module_name => 'firewall')
       on host, puppet('module install puppetlabs-stdlib --version 3.2.0'), { :acceptable_exit_codes => [0,1] }
-      if ! UNSUPPORTED_PLATFORMS.include?(fact('osfamily'))
-        pp = <<-EOS
-          if $::osfamily == 'RedHat' {
-            exec { 'setenforce Permissive':
-              path   => ['/bin','/usr/bin','/sbin','/usr/sbin'],
-              onlyif => 'getenforce | grep Enforcing',
-            }
-          }
-        EOS
-        apply_manifest(pp, :catch_failures => true)
-      end
     end
   end
 end
