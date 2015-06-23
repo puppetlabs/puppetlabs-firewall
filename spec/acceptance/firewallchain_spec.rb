@@ -14,9 +14,7 @@ describe 'puppet resource firewallchain command:', :unless => UNSUPPORTED_PLATFO
         EOS
         # Run it twice and test for idempotency
         apply_manifest(pp, :catch_failures => true)
-        unless fact('selinux') == 'true'
-          apply_manifest(pp, :catch_changes => true)
-        end
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'finds the chain' do
@@ -35,9 +33,7 @@ describe 'puppet resource firewallchain command:', :unless => UNSUPPORTED_PLATFO
         EOS
         # Run it twice and test for idempotency
         apply_manifest(pp, :catch_failures => true)
-        unless fact('selinux') == 'true'
-          apply_manifest(pp, :catch_changes => true)
-        end
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'fails to find the chain' do
@@ -116,9 +112,7 @@ describe 'puppet resource firewallchain command:', :unless => UNSUPPORTED_PLATFO
         EOS
         # Run it twice and test for idempotency
         apply_manifest(pp, :catch_failures => true)
-        unless fact('selinux') == 'true'
-          apply_manifest(pp, :catch_changes => true)
-        end
+        apply_manifest(pp, :catch_changes => true)
       end
 
       it 'finds the chain' do
