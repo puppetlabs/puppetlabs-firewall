@@ -30,9 +30,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           EOS
 
           apply_manifest(pp, :catch_failures => true)
-          unless fact('selinux') == 'true'
-            apply_manifest(pp, :catch_changes => true)
-          end
+          apply_manifest(pp, :catch_changes => true)
         end
 
         it 'should contain the rule' do
@@ -65,9 +63,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           EOS
 
           apply_manifest(pp, :catch_failures => true)
-          unless fact('selinux') == 'true'
-            apply_manifest(pp, :catch_changes => true)
-          end
+          apply_manifest(pp, :catch_changes => true)
         end
 
         it 'should contain the rule' do

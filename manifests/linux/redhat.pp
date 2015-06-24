@@ -58,10 +58,19 @@ class firewall::linux::redhat (
     require   => File['/etc/sysconfig/iptables'],
   }
 
+  # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
+  case $::selinux {
+    #lint:ignore:quoted_booleans
+    'true',true: { $seluser = 'unconfined_u' }
+    #lint:endignore
+    default:     { $seluser = undef }
+  }
+
   file { '/etc/sysconfig/iptables':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0600',
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0600',
+    seluser => $seluser,
   }
 }
