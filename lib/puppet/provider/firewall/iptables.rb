@@ -329,6 +329,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values = values.gsub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
     values = values.gsub(/(?!-m tcp --tcp-flags)-m (tcp|udp) /, '')
+    # There is a bug in EL5 which puts 2 spaces before physdev, so we fix it
+    values = values.gsub(/\s{2}--physdev/, ' --physdev')
     # '--pol ipsec' takes many optional arguments; we cheat again by adding " around them
     values = values.sub(/
         --pol\sipsec
