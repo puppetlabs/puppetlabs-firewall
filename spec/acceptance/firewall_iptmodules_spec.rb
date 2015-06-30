@@ -34,7 +34,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        apply_manifest(pp, :catch_changes => do_catch_changes)
       end
 
       it 'should contain the rule' do
@@ -62,7 +62,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         EOS
 
         apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        apply_manifest(pp, :catch_changes => do_catch_changes)
       end
 
       it 'should contain the rule' do
@@ -99,7 +99,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
             EOS
 
             apply_manifest(pp, :catch_failures => true)
-            apply_manifest(pp, :catch_changes => true)
+            apply_manifest(pp, :catch_changes => do_catch_changes)
           end
 
           it 'should contain the rule' do
@@ -128,7 +128,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
             EOS
 
             apply_manifest(pp, :catch_failures => true)
-            apply_manifest(pp, :catch_changes => true)
+            apply_manifest(pp, :catch_changes => do_catch_changes)
           end
 
           it 'should contain the rule' do
@@ -163,7 +163,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
             EOS
 
             apply_manifest(pp, :catch_failures => true)
-            apply_manifest(pp, :catch_changes => true)
+            apply_manifest(pp, :catch_changes => do_catch_changes)
           end
 
           it 'should contain the rule' do
@@ -191,7 +191,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
             EOS
 
             apply_manifest(pp, :catch_failures => true)
-            apply_manifest(pp, :catch_changes => true)
+            apply_manifest(pp, :catch_changes => do_catch_changes)
           end
 
           it 'should contain the rule' do

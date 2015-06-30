@@ -13,6 +13,14 @@ def ip6tables_flush_all_tables
   end
 end
 
+def do_catch_changes
+  if default['platform'] =~ /el-5/
+    return false
+  else
+    return true
+  end
+end
+
 run_puppet_install_helper
 
 UNSUPPORTED_PLATFORMS = ['windows','Solaris','Darwin']
