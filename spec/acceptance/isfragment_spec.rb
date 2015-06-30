@@ -17,7 +17,7 @@ describe 'firewall isfragment property', :unless => UNSUPPORTED_PLATFORMS.includ
       EOS
 
       apply_manifest(pp, :catch_failures => true)
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, :catch_changes => do_catch_changes)
 
       shell('iptables-save') do |r|
         expect(r.stdout).to match(/#{line_match}/)
@@ -35,7 +35,7 @@ describe 'firewall isfragment property', :unless => UNSUPPORTED_PLATFORMS.includ
           }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, :catch_changes => do_catch_changes)
 
       shell('iptables-save') do |r|
         expect(r.stdout).to match(/#{line_match}/)

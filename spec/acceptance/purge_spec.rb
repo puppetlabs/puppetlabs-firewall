@@ -71,7 +71,7 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
         }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, :catch_changes => do_catch_changes)
     end
 
     it 'ignores specified rules' do
@@ -85,7 +85,7 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
         }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, :catch_changes => do_catch_changes)
     end
 
     it 'adds managed rules with ignored rules' do
@@ -167,7 +167,7 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
         }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, :catch_changes => do_catch_changes)
     end
 
     it 'ignores specified rules' do
@@ -181,7 +181,7 @@ describe "purge tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamil
         }
       EOS
 
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, :catch_changes => do_catch_changes)
     end
 
     it 'adds managed rules with ignored rules' do

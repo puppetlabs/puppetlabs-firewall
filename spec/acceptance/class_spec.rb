@@ -6,7 +6,9 @@ describe "firewall class:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfa
 
     # Run it twice and test for idempotency
     apply_manifest(pp, :catch_failures => true)
-    expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+    if do_catch_changes
+      expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+    end
   end
 
   it 'ensure => stopped:' do
@@ -14,7 +16,9 @@ describe "firewall class:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfa
 
     # Run it twice and test for idempotency
     apply_manifest(pp, :catch_failures => true)
-    expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+    if do_catch_changes
+      expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+    end
   end
 
   it 'ensure => running:' do
@@ -22,6 +26,8 @@ describe "firewall class:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfa
 
     # Run it twice and test for idempotency
     apply_manifest(pp, :catch_failures => true)
-    expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+    if do_catch_changes
+      expect(apply_manifest(pp, :catch_failures => true).exit_code).to be_zero
+    end
   end
 end
