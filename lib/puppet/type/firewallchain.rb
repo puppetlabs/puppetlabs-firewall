@@ -157,6 +157,15 @@ Puppet::Type.newtype(:firewallchain) do
     end
   end
 
+  autorequire(:service) do
+    case value(:provider)
+    when :iptables, :ip6tables
+      %w{firewalld iptables ip6tables iptables-persistent netfilter-persistent}
+    else
+      []
+    end
+  end
+
   validate do
     debug("[validate]")
 
