@@ -2330,4 +2330,44 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
+  context 'comment containing "-A "' do
+    it 'adds the rule' do
+      pp = <<-EOS
+      class { '::firewall': }
+      firewall { '700 - blah-A Test Rule':
+        jump       => 'LOG',
+        log_prefix => 'FW-A-INPUT: ',
+      }
+      EOS
+
+      apply_manifest(pp, :catch_failures => true)
+    end
+
+    it 'should contain the rule' do
+      shell('iptables-save') do |r|
+        expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "700 - blah-A Test Rule" -j LOG --log-prefix "FW-A-INPUT: "/)
+      end
+    end
+
+    it 'removes the rule' do
+      pp = <<-EOS
+      class { '::firewall': }
+      firewall { '700 - blah-A Test Rule':
+        ensure     => absent,
+        jump       => 'LOG',
+        log_prefix => 'FW-A-INPUT: ',
+      }
+      EOS
+
+      apply_manifest(pp, :catch_failures => true)
+    end
+
+    it 'should not contain the rule' do
+      shell('iptables-save') do |r|
+        expect(r.stdout).to_not match(/-A INPUT -p tcp -m comment --comment "700 - blah-A Test Rule" -j LOG --log-prefix "FW-A-INPUT: "/)
+      end
+    end
+  end
+
+
 end
