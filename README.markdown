@@ -132,8 +132,6 @@ Rules are persisted automatically between reboots, although there are known issu
 
 1.) In site.pp or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
 
-  **Note** - This only purges IPv4 rules.
-  
   ~~~puppet
   resources { 'firewall':
     purge => true
