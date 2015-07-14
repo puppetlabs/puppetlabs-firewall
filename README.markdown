@@ -134,7 +134,7 @@ Rules are persisted automatically between reboots, although there are known issu
 
   ~~~puppet
   resources { 'firewall':
-    purge => true
+    purge => true,
   }
   ~~~
 
@@ -142,7 +142,7 @@ Rules are persisted automatically between reboots, although there are known issu
 
   ~~~puppet
   resources { 'firewallchain':
-    purge => true
+    purge => true,
   }
   ~~~
   
@@ -196,17 +196,17 @@ In iptables, the title of the rule is stored using the comment feature of the un
 Basic accept ICMP request example:
 
 ~~~puppet
-firewall { "000 accept all icmp requests":
-  proto  => "icmp",
-  action => "accept",
+firewall { '000 accept all icmp requests':
+  proto  => 'icmp',
+  action => 'accept',
 }
 ~~~
 
 Drop all:
 
 ~~~puppet
-firewall { "999 drop all other requests":
-  action => "drop",
+firewall { '999 drop all other requests':
+  action => 'drop',
 }
 ~~~
 
@@ -215,7 +215,7 @@ firewall { "999 drop all other requests":
 IPv6 rules can be specified using the _ip6tables_ provider:
 
 ~~~puppet
-firewall { "006 Allow inbound SSH (v6)":
+firewall { '006 Allow inbound SSH (v6)':
   port     => 22,
   proto    => tcp,
   action   => accept,
@@ -277,7 +277,7 @@ You can apply firewall rules to specific nodes. Usually, you will want to put th
 ~~~puppet
 node 'some.node.com' {
   firewall { '111 open port 111':
-    dport => 111
+    dport => 111,
   }
 }
 ~~~
@@ -289,7 +289,7 @@ firewall { '100 snat for network foo2':
   chain    => 'POSTROUTING',
   jump     => 'MASQUERADE',
   proto    => 'all',
-  outiface => "eth0",
+  outiface => 'eth0',
   source   => '10.1.2.0/24',
   table    => 'nat',
 }
@@ -810,7 +810,7 @@ firewallchain { 'INPUT:filter:IPv4':
 
 ~~~puppet
 resources { 'firewallchain':
-  purge => true
+  purge => true,
 }
 ~~~
 
