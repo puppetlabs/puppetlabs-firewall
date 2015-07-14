@@ -42,7 +42,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   defaultfor :kernel => :linux
   confine :kernel => :linux
 
-  iptables_version = Facter.fact('iptables_version').value
+  iptables_version = Facter.value('iptables_version')
   if (iptables_version and Puppet::Util::Package.versioncmp(iptables_version, '1.4.1') < 0)
     mark_flag = '--set-mark'
   else

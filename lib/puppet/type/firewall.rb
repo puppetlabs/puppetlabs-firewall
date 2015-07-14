@@ -841,7 +841,7 @@ Puppet::Type.newtype(:firewall) do
       end
 
       # Old iptables does not support a mask. New iptables will expect one.
-      iptables_version = Facter.fact('iptables_version').value
+      iptables_version = Facter.value('iptables_version')
       mask_required = (iptables_version and Puppet::Util::Package.versioncmp(iptables_version, '1.4.1') >= 0)
 
       if mask_required
