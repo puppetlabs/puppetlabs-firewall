@@ -1106,4 +1106,15 @@ HASH_TO_ARGS = {
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "tcp", "--tcp-flags", "SYN,RST", "SYN", "-m", "comment", "--comment", "067 change max segment size", "-j", "TCPMSS", "--clamp-mss-to-pmtu"],
   },
+  'set_dscp_class' => {
+    :params => {
+      :name              => '068 set dscp class to EF',
+      :table             => 'mangle',
+      :proto             => 'tcp',
+      :port              => '997',
+      :jump              => 'DSCP',
+      :set_dscp_class    => 'ef',
+    },
+    :args => ["-t", :mangle, "-p", :tcp, "-m", "multiport", '--ports', '997', "-m", "comment", "--comment", "068 set dscp class to EF", "-j", "DSCP", "--set-dscp-class", "ef"],
+  },
 }

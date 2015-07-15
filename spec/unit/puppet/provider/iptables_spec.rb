@@ -215,7 +215,6 @@ describe 'iptables provider' do
     ARGS_TO_HASH.each do |test_name,data|
       describe "for test data '#{test_name}'" do
         let(:resource) { provider.rule_to_hash(data[:line], data[:table], 0) }
-
         # If this option is enabled, make sure the parameters exactly match
         if data[:compare_all] then
           it "the parameter hash keys should be the same as returned by rules_to_hash" do

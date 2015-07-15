@@ -94,6 +94,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :rseconds              => "--seconds",
     :rsource               => "--rsource",
     :rttl                  => "--rttl",
+    :set_dscp              => '--set-dscp',
+    :set_dscp_class        => '--set-dscp-class',
     :set_mark              => mark_flag,
     :set_mss               => '--set-mss',
     :socket                => "-m socket",
@@ -252,7 +254,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state, :ctstate, :icmp, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :clusterip_new, :clusterip_hashmode,
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init,
-    :clamp_mss_to_pmtu, :gateway, :set_mss, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
+    :clamp_mss_to_pmtu, :gateway, :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
     :log_level, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone
   ]
@@ -412,6 +414,37 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     [:dport, :sport, :port, :state, :ctstate].each do |prop|
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
+  
+    ## clean up DSCP class to HEX mappings 
+    valid_dscp_classes = {
+      '0x0a' => 'af11',
+      '0x0c' => 'af12',
+      '0x0e' => 'af13',
+      '0x12' => 'af21',
+      '0x14' => 'af22',
+      '0x16' => 'af23',
+      '0x1a' => 'af31',
+      '0x1c' => 'af32',
+      '0x1e' => 'af33',
+      '0x22' => 'af41',
+      '0x24' => 'af42',
+      '0x26' => 'af43',
+      '0x08' => 'cs1',
+      '0x10' => 'cs2',
+      '0x18' => 'cs3',
+      '0x20' => 'cs4',
+      '0x28' => 'cs5',
+      '0x30' => 'cs6',
+      '0x38' => 'cs7',
+      '0x2e' => 'ef'
+    }
+    [:set_dscp_class].each do |prop|
+      [:set_dscp].each do |dmark|
+        next unless hash[dmark]
+        hash[prop] = valid_dscp_classes[hash[dmark]]
+     end
+    end
+
 
     # Convert booleans removing the previous cludge we did
     @known_booleans.each do |bool|
@@ -515,7 +548,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[:action] = hash[:jump].downcase
       hash.delete(:jump)
     end
-
     hash
   end
 
