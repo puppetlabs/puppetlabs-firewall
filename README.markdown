@@ -574,7 +574,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `islastfrag`: If true, matches when the packet is the last fragment of a fragmented ipv6 packet. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `islastfrag`.
 
-* `jump`: The value for the iptables `--jump` parameter. Any valid chain name is allowed, but normal values are: 'QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK', 'TCPMSS'.
+* `jump`: The value for the iptables `--jump` parameter. Any valid chain name is allowed, but normal values are: 'QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK', 'TCPMSS', 'DSCP'.
 
   For the values 'ACCEPT', 'DROP', and 'REJECT', you must use the generic `action` parameter. This is to enforce the use of generic parameters where possible for maximum cross-platform modeling.
 
@@ -686,6 +686,10 @@ firewall { '101 blacklist strange traffic':
 * `rsource`: If boolean 'true', adds the source IP address to the list. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
 
 * `rttl`: May only be used in conjunction with `recent => 'rcheck'` or `recent => 'update'`. If boolean 'true', this will narrow the match to happen only when the address is in the list and the TTL of the current packet matches that of the packet that hit the `recent => 'set'` rule. If you have problems with DoS attacks via bogus packets from fake source addresses, this parameter may help. Valid values are 'true', 'false'. Requires the `recent_limiting` feature and the `recent` parameter.
+
+* `set_dscp`: When combined with `jump => 'DSCP'` specifies the dscp marking associated with the packet.
+
+* `set_dscp_class`: When combined with `jump => 'DSCP'` specifies the class associated with the packet (valid values found here: http://www.cisco.com/c/en/us/support/docs/quality-of-service-qos/qos-packet-marking/10103-dscpvalues.html#packetclassification).
 
 * `set_mark`: Set the Netfilter mark value associated with the packet. Accepts either  'mark/mask' or 'mark'. These will be converted to hex if they are not already. Requires the `mark` feature.
 

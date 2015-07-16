@@ -873,6 +873,30 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:true, :false)
   end
 
+  newproperty(:set_dscp, :required_features => :iptables) do
+    desc <<-EOS
+      Set DSCP Markings.
+    EOS
+  end
+  
+  newproperty(:set_dscp_class, :required_features => :iptables) do
+    desc <<-EOS
+      This sets the DSCP field according to a predefined DiffServ class.
+    EOS
+    #  iptables uses the cisco DSCP classes as the basis for this flag. Values may be found here:
+    #  'http://www.cisco.com/c/en/us/support/docs/quality-of-service-qos/qos-packet-marking/10103-dscpvalues.html'
+    valid_codes = [
+      'af11','af12','af13','af21','af22','af23','af31','af32','af33','af41',
+      'af42','af43','cs1','cs2','cs3','cs4','cs5','cs6','cs7','ef'
+    ]
+    munge do |value|
+      unless valid_codes.include? value.downcase
+        raise ArgumentError, "#{value} is not a valid DSCP Class"
+      end
+      value.downcase
+    end
+  end
+
   newproperty(:set_mss, :required_features => :iptables) do
     desc <<-EOS
       Sets the TCP MSS value for packets.
@@ -1411,6 +1435,12 @@ Puppet::Type.newtype(:firewall) do
         self.fail "[%s] Parameter dport only applies to sctp, tcp and udp " \
           "protocols. Current protocol is [%s] and dport is [%s]" %
           [value(:name), should(:proto), should(:dport)]
+      end
+    end
+
+    if value(:jump).to_s == "DSCP"
+      unless value(:set_dscp) || value(:set_dscp_class)
+        self.fail "When using jump => DSCP, the set_dscp or set_dscp_class property is required"
       end
     end
 
