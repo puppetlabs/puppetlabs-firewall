@@ -37,7 +37,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
 
   confine :kernel => :linux
 
-  ip6tables_version = Facter.fact('ip6tables_version').value
+  ip6tables_version = Facter.value('ip6tables_version')
   if (ip6tables_version and Puppet::Util::Package.versioncmp(ip6tables_version, '1.4.1') < 0)
     mark_flag = '--set-mark'
   else
