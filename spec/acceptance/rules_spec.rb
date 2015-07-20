@@ -195,10 +195,6 @@ describe 'complex ruleset 2' do
         action  => 'accept',
         iniface => 'eth0:3',
       }
-      firewall { '999 reject':
-        action => 'reject',
-        reject => 'icmp-host-prohibited',
-      }
 
       firewallchain { 'LOCAL_INPUT_PRE:filter:IPv4': }
       firewall { '001 LOCAL_INPUT_PRE':
@@ -264,7 +260,6 @@ describe 'complex ruleset 2' do
         /-A OUTPUT (! -o|-o !) eth0:2 -p tcp -m multiport --dports 25 -m comment --comment \"025 smtp\" -m state --state NEW -j ACCEPT/,
         /-A INPUT -i eth0:3 -p tcp -m multiport --dports 443 -m comment --comment \"443 ssl on aliased interface\" -m state --state NEW -j ACCEPT/,
         /-A INPUT -m comment --comment \"900 LOCAL_INPUT\" -j LOCAL_INPUT/,
-        /-A INPUT -m comment --comment \"999 reject\" -j REJECT --reject-with icmp-host-prohibited/,
         /-A FORWARD -m comment --comment \"010 allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT/
       ].each do |line|
         expect(r.stdout).to match(line)
