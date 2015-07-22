@@ -59,7 +59,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
-  if default['platform'] !~ /el-5/
+  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
     describe 'dscp ipv6 tests' do
       context 'set_dscp 0x01' do
         it 'applies' do
