@@ -957,7 +957,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
   end
 
   #iptables version 1.3.5 is not suppored by the ip6tables provider
-  if default['platform'] !~ /el-5/
+  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
     describe 'hop_limit' do
       context '5' do
         it 'applies' do
@@ -1801,7 +1801,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
   end
 
   #iptables version 1.3.5 does not support masks on MARK rules
-  if default['platform'] !~ /el-5/
+  if default['platform'] !~ /el-5/ or default['platform'] !~ /sles-10/
     describe 'set_mark' do
       context '0x3e8/0xffffffff' do
         it 'applies' do
