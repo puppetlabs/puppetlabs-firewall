@@ -140,7 +140,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     # Older OSes don't have addrtype so we leave those properties out.
     # el-5 doesn't support ipv6 by default
-    elsif default['platform'] !~ /el-5/
+    elsif default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
       describe 'ip6tables ipt_modules tests' do
         context 'all the modules with multiple args' do
           it 'applies' do

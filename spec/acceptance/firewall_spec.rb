@@ -903,7 +903,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
   end
 
   # RHEL5 does not support --random
-  if default['platform'] !~ /el-5/
+  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
     describe 'random' do
       context '192.168.1.1' do
         it 'applies' do
@@ -1801,7 +1801,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
   end
 
   #iptables version 1.3.5 does not support masks on MARK rules
-  if default['platform'] !~ /el-5/ or default['platform'] !~ /sles-10/
+  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
     describe 'set_mark' do
       context '0x3e8/0xffffffff' do
         it 'applies' do
@@ -2217,7 +2217,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          if (fact('osfamily') == 'RedHat' and fact('operatingsystemmajrelease') == '5')
+          if (fact('osfamily') == 'RedHat' and fact('operatingsystemmajrelease') == '5') or (fact('osfamily') == 'SLES' and fact('operatingsystemmajrelease') == '10')
             expect(r.stdout).to match(/-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
           else
             expect(r.stdout).to match(/-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"/)
