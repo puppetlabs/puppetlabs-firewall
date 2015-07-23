@@ -7,7 +7,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     shell('ip6tables --flush; ip6tables -t nat --flush; ip6tables -t mangle --flush')
   end
 
-  if default['platform'] !~ /el-5/
+  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
     describe 'match_mark' do
       context '0x1' do
         it 'applies' do
