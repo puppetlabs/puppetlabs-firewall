@@ -1,3 +1,28 @@
+##2015-07-28 - Supported Release 1.7.0
+###Summary
+
+This release includes numerous features, bugfixes and other improvements including Puppet 4 & PE 2015.2 support as well as ClusterIP and DSCP jump target support.
+
+####Features
+- Puppet 4 and PE 2015.2 official support
+- ClusterIP jump target (including options) now supported
+- DSCP jump target (including options) now supported
+- SLES 10 now compatible (but not supported)
+
+####Bugfixes
+- (MODULES-1967) Parse escape sequences from iptables
+- (MODULES-1592) Allow src_type and dst_type prefixed with '!' to pass validation
+- (MODULES-2186) - iptables rules with -A in comment now supported
+- (MODULES-1976) Revise rule name validation for ruby 1.9
+- Fix installation hang on Debian Jessie
+- Fix for physdev idempotency on EL5
+
+####Improvements
+- Documentation improvements
+- Enforce the seluser on selinux systems
+- All the relevent services are now autorequired by the firewall and firewallchain types
+- Replace Facter.fact().value() calls with Facter.value() to support Facter 3
+
 ##2015-05-19 - Supported Release 1.6.0
 ###Summary
 
