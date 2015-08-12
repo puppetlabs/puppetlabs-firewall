@@ -216,7 +216,7 @@ IPv6 rules can be specified using the _ip6tables_ provider:
 
 ~~~puppet
 firewall { '006 Allow inbound SSH (v6)':
-  port     => 22,
+  dport     => 22,
   proto    => tcp,
   action   => accept,
   provider => 'ip6tables',
@@ -240,7 +240,7 @@ class profile::apache {
   apache::vhost { 'mysite': ensure => present }
 
   firewall { '100 allow http and https access':
-    port   => [80, 443],
+    dport   => [80, 443],
     proto  => tcp,
     action => accept,
   }
