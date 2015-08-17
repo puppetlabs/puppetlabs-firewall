@@ -181,6 +181,13 @@ describe firewall do
     end
   end
 
+  describe 'port deprecated' do
+    it "raises a warning" do
+      expect(Puppet).to receive(:warning).with /port is deprecated/
+      @resource[:port] = "22"
+    end
+  end
+
   [:dst_type, :src_type].each do |addrtype|
     describe addrtype do
       it "should have no default" do

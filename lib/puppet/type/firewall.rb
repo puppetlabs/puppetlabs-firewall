@@ -272,6 +272,8 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:port, :array_matching => :all) do
     desc <<-EOS
+      DEPRECATED
+
       The destination or source port to match for this filter (if the protocol
       supports ports). Will accept a single element or an array.
 
@@ -285,6 +287,10 @@ Puppet::Type.newtype(:firewall) do
 
       This would cover ports 1 to 1024.
     EOS
+
+    validate do |value|
+      Puppet.warning("port is deprecated and will be removed. Use dport and/or sport instead.")
+    end
 
     munge do |value|
       @resource.string_to_port(value, :proto)
