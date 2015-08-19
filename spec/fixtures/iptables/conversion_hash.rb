@@ -775,14 +775,6 @@ HASH_TO_ARGS = {
     },
     :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '000 allow symbols ( $+<=>^`|~ ) in ruby >= 1.9'],
   },
-  'port_property' => {
-    :params => {
-      :name => '001 port property',
-      :table => 'filter',
-      :port => '80',
-    },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--ports', '80', '-m', 'comment', '--comment', '001 port property'],
-  },
   'log_level_debug' => {
     :params => {
       :name => '956 INPUT log-level',

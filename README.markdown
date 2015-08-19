@@ -621,7 +621,7 @@ firewall { '999 this runs last':
 
 * `pkttype`: Sets the packet type to match. Valid values are: 'unicast', 'broadcast', and'multicast'. Requires the `pkttype` feature.
 
-* `port`: The destination or source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
+* `port`: *DEPRECATED* The destination or source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
 * `proto`: The specific protocol to match for this rule. This is 'tcp' by default. Valid values are:
   * 'tcp'
