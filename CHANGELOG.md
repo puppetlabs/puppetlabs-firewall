@@ -1,3 +1,11 @@
+##2015-08-25 - Supported Release 1.7.1
+###Summary
+
+This is a bugfix release to deprecate the port parameter. Using the unspecific 'port' parameter can lead to firewall rules that are unexpectedly too lax. It is recommended to always use the specific dport and sport parameters to avoid this ambiguity.
+
+####Bugfixes
+- Deprecate the port parameter
+
 ##2015-07-28 - Supported Release 1.7.0
 ###Summary
 
