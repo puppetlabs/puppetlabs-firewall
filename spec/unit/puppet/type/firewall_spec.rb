@@ -183,7 +183,7 @@ describe firewall do
 
   describe 'port deprecated' do
     it "raises a warning" do
-      expect(Puppet).to receive(:warning).with /port is deprecated/
+      expect(Puppet).to receive(:warning).with /port to firewall is deprecated/
       @resource[:port] = "22"
     end
   end
