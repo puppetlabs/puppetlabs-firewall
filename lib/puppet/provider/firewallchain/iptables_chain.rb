@@ -38,7 +38,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
     }
   }
   InternalChains = /^(PREROUTING|POSTROUTING|BROUTING|INPUT|FORWARD|OUTPUT)$/
-  Tables = 'nat|mangle|filter|raw|rawpost|broute'
+  Tables = 'nat|mangle|filter|raw|rawpost|broute|security'
   Nameformat = /^(.+):(#{Tables}):(IP(v[46])?|ethernet)$/
 
   def create

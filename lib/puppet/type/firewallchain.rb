@@ -59,9 +59,6 @@ Puppet::Type.newtype(:firewallchain) do
           if chain =~ /^(BROUTING|FORWARD)$/
             raise ArgumentError, "PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table 'nat'"
           end
-          if protocol =~/^(IP(v6)?)?$/
-            raise ArgumentError, "table nat isn't valid in IPv6. You must specify ':IPv4' as the name suffix"
-          end
         when 'raw'
           if chain =~ /^(POSTROUTING|BROUTING|INPUT|FORWARD)$/
             raise ArgumentError,'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\''
