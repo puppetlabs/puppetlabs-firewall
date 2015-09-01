@@ -289,7 +289,7 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     validate do |value|
-      Puppet.warning("port is deprecated and will be removed. Use dport and/or sport instead.")
+      Puppet.warning('Passing port to firewall is deprecated and will be removed. Use dport and/or sport instead.')
     end
 
     munge do |value|
