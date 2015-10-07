@@ -61,7 +61,12 @@ class firewall::linux::redhat (
   # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
   case $::selinux {
     #lint:ignore:quoted_booleans
-    'true',true: { $seluser = 'unconfined_u' }
+    'true',true: {
+      case $::operatingsystemrelease {
+        /^7.*/: { $seluser = 'unconfined_u' }
+        default: { $seluser = 'system_u' }
+      }
+    }
     #lint:endignore
     default:     { $seluser = undef }
   }
