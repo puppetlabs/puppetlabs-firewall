@@ -63,7 +63,7 @@ class firewall::linux::redhat (
     #lint:ignore:quoted_booleans
     'true',true: {
       case $::operatingsystemrelease {
-        /^7.*/: { $seluser = 'unconfined_u' }
+        /^(6|7)\..*/: { $seluser = 'unconfined_u' }
         default: { $seluser = 'system_u' }
       }
     }
