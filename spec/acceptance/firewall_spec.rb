@@ -2330,6 +2330,47 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
     end
   end
 
+  context 'log_uid is true' do
+    it 'adds the rule' do
+      pp = <<-EOS
+      class { '::firewall': }
+      firewall { '700 - test log_uid':
+        chain   => 'OUTPUT',
+        jump    => 'LOG',
+        log_uid => true,
+      }
+      EOS
+
+      apply_manifest(pp, :catch_failures => true)
+    end
+
+    it 'should contain the rule' do
+      shell('iptables-save') do |r|
+        expect(r.stdout).to match(/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j LOG --log_uid "/)
+      end
+    end
+
+    if 'removes the rule' do
+      pp = <<-EOS
+      class  { '::firewall': }
+      firewall { '700 - test log_uid':
+        chain   => 'OUTPUT',
+        jump    => 'LOG',
+        log_uid => false'
+        ensure  => absent,
+      }
+      EOS
+
+      appy_manifest(pp, :catch_failures => true)
+    end
+
+    it 'should not contain the rule' do
+      shell('iptables-save') do |r|
+        expect(r.stdout).to_not match('/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j --log-uid "/)
+      end
+    end
+  end
+
   context 'comment containing "-A "' do
     it 'adds the rule' do
       pp = <<-EOS

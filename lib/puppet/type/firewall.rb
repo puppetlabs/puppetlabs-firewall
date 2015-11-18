@@ -42,6 +42,7 @@ Puppet::Type.newtype(:firewall) do
   feature :reject_type, "The ability to control reject messages"
   feature :log_level, "The ability to control the log level"
   feature :log_prefix, "The ability to add prefixes to log messages"
+  feature :log_uid, "Add UIDs to log messages"
   feature :mark, "Match or Set the netfilter mark value associated with the packet"
   feature :mss, "Match a given TCP MSS value or range."
   feature :tcp_flags, "The ability to match on particular TCP flag settings"
@@ -568,6 +569,15 @@ Puppet::Type.newtype(:firewall) do
       When combined with jump => "LOG" specifies the log prefix to use when
       logging.
     EOS
+  end
+
+  newproperty(:log_uid, :required_features => :log_uid) do
+    desc <<-EOS
+      When combined with jump => "LOG" specifies the uid of the process making
+      the connection.
+    EOS
+
+    newvalues(:true, :false)
   end
 
   # ICMP matching property
@@ -1488,9 +1498,9 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
-    if value(:log_prefix) || value(:log_level)
+    if value(:log_prefix) || value(:log_level) || value(:log_uid)
       unless value(:jump).to_s == "LOG"
-        self.fail "Parameter log_prefix and log_level require jump => LOG"
+        self.fail "Parameter log_prefix, log_level and log_uid require jump => LOG"
       end
     end
 

@@ -15,6 +15,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :reject_type
   has_feature :log_level
   has_feature :log_prefix
+  has_feature :log_uid
   has_feature :mark
   has_feature :mss
   has_feature :tcp_flags
@@ -91,6 +92,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :limit              => "-m limit --limit",
     :log_level          => "--log-level",
     :log_prefix         => "--log-prefix",
+    :log_uid            => "--log-uid",
     :mask               => "--mask",
     :match_mark         => "-m mark --mark",
     :name               => "-m comment --comment",
@@ -150,6 +152,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ishasmorefrags,
     :islastfrag,
     :isfirstfrag,
+    :log_uid,
     :rsource,
     :rdest,
     :reap,
@@ -220,7 +223,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
-    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss,
+    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss,
     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone]
 
 end
