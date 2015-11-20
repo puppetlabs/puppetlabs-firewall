@@ -30,7 +30,8 @@ describe firewallchain do
      'mangle' => [ 'PREROUTING', 'POSTROUTING', 'INPUT', 'FORWARD', 'OUTPUT' ],
      'filter' => ['INPUT','OUTPUT','FORWARD'],
      'raw' => [ 'PREROUTING', 'OUTPUT'],
-     'broute' => ['BROUTING']
+     'broute' => ['BROUTING'],
+     'security' => ['INPUT','OUTPUT','FORWARD']
     }.each_pair do |table, allowedinternalchains|
       ['IPv4', 'IPv6', 'ethernet'].each do |protocol|
         [ 'test', '$5()*&%\'"^$09):' ].each do |chainname|
