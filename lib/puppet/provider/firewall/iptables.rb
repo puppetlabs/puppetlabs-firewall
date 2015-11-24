@@ -271,7 +271,22 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def delete
     debug 'Deleting rule %s' % resource[:name]
-    iptables delete_args
+    begin
+      iptables delete_args
+    rescue Puppet::ExecutionFailure => e
+      # Check to see if the iptables rule is already gone. This can sometimes
+      # happen as a side effect of other resource changes. If it's not gone,
+      # raise the error as per usual.
+      raise e unless self.resource.property(:ensure).insync?(:absent)
+
+      # If it's already gone, there is no error. Still record a change, but
+      # adjust the change message to indicate ambiguity over what work Puppet
+      # actually did to remove the resource, vs. what could have been a side
+      # effect of something else puppet did.
+      resource.property(:ensure).singleton_class.send(:define_method, :change_to_s) do |a,b|
+        "ensured absent"
+      end
+    end
   end
 
   def exists?
