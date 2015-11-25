@@ -13,6 +13,7 @@
 #
 class firewall (
   $ensure       = running,
+  $pkg_ensure   = present,
   $service_name = $::firewall::params::service_name,
   $package_name = $::firewall::params::package_name,
 ) inherits ::firewall::params {
@@ -29,6 +30,7 @@ class firewall (
     'Linux': {
       class { "${title}::linux":
         ensure       => $ensure,
+        pkg_ensure   => $pkg_ensure,
         service_name => $service_name,
         package_name => $package_name,
       }
