@@ -24,5 +24,4 @@ CONFIG:
   resourcepool: delivery/Quality Assurance/Enterprise/Dynamic
   pooling_api: http://vcloud.delivery.puppetlabs.net/
   ssh:
-    timeout: 600  ssh:
     timeout: 600
