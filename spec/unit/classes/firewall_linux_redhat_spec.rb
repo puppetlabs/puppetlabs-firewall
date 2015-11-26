@@ -1,5 +1,27 @@
 require 'spec_helper'
 
+RSpec.shared_examples "ensures iptables service" do
+  context 'default' do
+    it { should contain_service('iptables').with(
+      :ensure => 'running',
+      :enable => 'true'
+    )}
+  end
+      
+  context 'ensure => stopped' do
+    let(:params) {{ :ensure => 'stopped' }}
+    it { should contain_service('iptables').with(
+      :ensure => 'stopped'
+    )}
+  end
+  context 'enable => false' do
+    let(:params) {{ :enable => 'false' }}
+    it { should contain_service('iptables').with(
+      :enable => 'false'
+    )}
+  end
+end
+
 describe 'firewall::linux::redhat', :type => :class do
   %w{RedHat CentOS Fedora}.each do |os|
     oldreleases = (os == 'Fedora' ? ['14'] : ['6.5'])
@@ -15,6 +37,8 @@ describe 'firewall::linux::redhat', :type => :class do
 
         it { should_not contain_service('firewalld') }
         it { should_not contain_package('iptables-services') }
+        
+        it_behaves_like "ensures iptables service"
       end
     end
 
@@ -36,27 +60,8 @@ describe 'firewall::linux::redhat', :type => :class do
           :ensure => 'present',
           :before => 'Service[iptables]'
         )}
-      end
-    end
 
-    describe 'ensure' do
-      context 'default' do
-        it { should contain_service('iptables').with(
-          :ensure => 'running',
-          :enable => 'true'
-        )}
-      end
-      context 'ensure => stopped' do
-        let(:params) {{ :ensure => 'stopped' }}
-        it { should contain_service('iptables').with(
-          :ensure => 'stopped'
-        )}
-      end
-      context 'enable => false' do
-        let(:params) {{ :enable => 'false' }}
-        it { should contain_service('iptables').with(
-          :enable => 'false'
-        )}
+        it_behaves_like "ensures iptables service"
       end
     end
   end
