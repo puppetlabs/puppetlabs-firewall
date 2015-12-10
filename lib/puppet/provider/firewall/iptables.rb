@@ -371,7 +371,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         # -f requires special matching:
         # only replace those -f that are not followed by an l to
         # distinguish between -f and the '-f' inside of --tcp-flags.
-        values = values.sub(/-f(?!l)(?=.*--comment)/, '-f true')
+        values = values.sub(/\s-f(?!l)(?=.*--comment)/, ' -f true')
       else
         values = values.sub(/#{resource_map[bool]}/, "#{resource_map[bool]} true")
       end

@@ -573,6 +573,14 @@ ARGS_TO_HASH = {
       :clamp_mss_to_pmtu => true,
     },
   },
+  'mangled_chain_name_with_-f' => {
+    :line => '-A foo-filter -p tcp -m comment --comment "068 chain name containing -f" -j ACCEPT',
+    :params => {
+      :name              => '068 chain name containing -f',
+      :action            => 'accept',
+      :chain             => 'foo-filter',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
