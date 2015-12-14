@@ -404,12 +404,12 @@ This type enables you to manage firewall rules within Puppet.
 
  * `ip6tables`: Ip6tables type provider
     * Required binaries: `ip6tables-save`, `ip6tables`.
-    * Supported features: `address_type`, `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `log_level`, `log_prefix`, `mark`, `mask`, `mss`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
+    * Supported features: `address_type`, `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
 
 * `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
     * Default for `kernel` == `linux`.
-    * Supported features: `address_type`, `clusterip`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `mark`, `mask`, `mss`, `netmap`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
+    * Supported features: `address_type`, `clusterip`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `netmap`, `owner`, `pkttype`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `tcp_flags`.
 
 **Autorequires:**
 
@@ -452,6 +452,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `log_level`: The ability to control the log level.
 
 * `log_prefix`: The ability to add prefixes to log messages.
+
+* `log_uid`: The ability to log the userid of the process which generated the packet.
 
 * `mark`: The ability to match or set the netfilter mark value associated with the packet.
 
@@ -589,6 +591,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `log_level`: When combined with `jump => 'LOG'` specifies the system log level to log to. Requires the `log_level` feature.
 
 * `log_prefix`: When combined with `jump => 'LOG'` specifies the log prefix to use when logging. Requires the `log_prefix` feature.
+
+* `log_uid`: The ability to log the userid of the process which generated the packet.
 
 * `mask`: Sets the mask to use when `recent` is enabled. Requires the `mask` feature.
 
