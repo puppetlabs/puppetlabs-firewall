@@ -2350,7 +2350,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       end
     end
 
-    if 'removes the rule' do
+    it 'removes the rule' do
       pp = <<-EOS
       class  { '::firewall': }
       firewall { '700 - test log_uid':
