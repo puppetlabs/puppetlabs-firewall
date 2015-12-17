@@ -2346,7 +2346,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
     it 'should contain the rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to match(/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j LOG --log_uid "/)
+        expect(r.stdout).to match(/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j LOG --log-uid/)
       end
     end
 
@@ -2356,17 +2356,17 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
       firewall { '700 - test log_uid':
         chain   => 'OUTPUT',
         jump    => 'LOG',
-        log_uid => false'
+        log_uid => false,
         ensure  => absent,
       }
       EOS
 
-      appy_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_failures => true)
     end
 
     it 'should not contain the rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to_not match('/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j --log-uid "/')
+        expect(r.stdout).to_not match(/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j --log-uid/)
       end
     end
   end
