@@ -2366,7 +2366,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
 
     it 'should not contain the rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to_not match('/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j --log-uid "/)
+        expect(r.stdout).to_not match('/-A OUTPUT -p tcp -m comment --comment "700 - test log_uid" -j --log-uid "/')
       end
     end
   end
