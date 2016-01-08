@@ -46,7 +46,7 @@ class firewall::linux::redhat (
       exec { '/usr/bin/systemctl daemon-reload':
         require => Package[$package_name],
         before  => Service[$service_name],
-        unless  => '/usr/bin/systemctl is-active iptables'
+        unless  => "/usr/bin/systemctl is-active ${service_name}",
       }
     }
   }
@@ -55,7 +55,7 @@ class firewall::linux::redhat (
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
-    require   => File['/etc/sysconfig/iptables'],
+    require   => File["/etc/sysconfig/${service_name}"],
   }
 
   # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
@@ -71,7 +71,7 @@ class firewall::linux::redhat (
     default:     { $seluser = undef }
   }
 
-  file { '/etc/sysconfig/iptables':
+  file { "/etc/sysconfig/${service_name}":
     ensure  => present,
     owner   => 'root',
     group   => 'root',
