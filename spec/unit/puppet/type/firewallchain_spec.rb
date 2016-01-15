@@ -37,7 +37,13 @@ describe firewallchain do
         [ 'test', '$5()*&%\'"^$09):' ].each do |chainname|
           name = "#{chainname}:#{table}:#{protocol}"
           if table == 'nat' && protocol == 'IPv6'
-            it "should fail #{name}" do
+            it "should accept #{name} for Linux 3.7+" do
+              allow(Facter.fact(:kernelmajversion)).to receive(:value).and_return('3.7')
+              resource[:name] = name
+              resource[:name].should == name
+            end
+            it "should fail #{name} for Linux 2.6" do
+              allow(Facter.fact(:kernelmajversion)).to receive(:value).and_return('2.6')
               expect { resource[:name] = name }.to raise_error(Puppet::Error)
             end
           elsif protocol != 'ethernet' && table == 'broute'
