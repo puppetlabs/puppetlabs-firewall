@@ -313,8 +313,15 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     rules = []
     counter = 1
 
+    # If iptables-save isn't available then assume that no rules are active
+    begin
+      output = iptables_save.split("\n")
+    rescue
+      output = []
+    end
+
     # String#lines would be nice, but we need to support Ruby 1.8.5
-    iptables_save.split("\n").each do |line|
+    output.each do |line|
       unless line =~ /^\#\s+|^\:\S+|^COMMIT|^FATAL/
         if line =~ /^\*/
           table = line.sub(/\*/, "")
