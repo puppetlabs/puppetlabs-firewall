@@ -1,30 +1,7 @@
-dir = File.expand_path(File.dirname(__FILE__))
-$LOAD_PATH.unshift File.join(dir, 'lib')
+require 'puppetlabs_spec_helper/module_spec_helper'
 
-# Don't want puppet getting the command line arguments for rake or autotest
-ARGV.clear
-
-require 'rubygems'
-require 'bundler/setup'
-require 'rspec-puppet'
-
-Bundler.require :default, :test
-
-require 'pathname'
-require 'tmpdir'
-
-Pathname.glob("#{dir}/shared_behaviours/**/*.rb") do |behaviour|
-  require behaviour.relative_path_from(Pathname.new(dir))
-end
-
-fixture_path = File.expand_path(File.join(__FILE__, '..', 'fixtures'))
-
-RSpec.configure do |config|
-  config.tty = true
-  config.mock_with :rspec do |c|
-    c.syntax = :expect
-  end
-  config.module_path = File.join(fixture_path, 'modules')
-  config.manifest_dir = File.join(fixture_path, 'manifests')
-  config.environmentpath = File.expand_path(File.join(Dir.pwd, 'spec'))
+# put local configuration and setup into spec_helper_local
+begin
+  require 'spec_helper_local'
+rescue LoadError
 end
