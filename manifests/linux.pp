@@ -13,6 +13,7 @@
 #
 class firewall::linux (
   $ensure       = running,
+  $pkg_ensure   = present,
   $service_name = $::firewall::params::service_name,
   $package_name = $::firewall::params::package_name,
 ) inherits ::firewall::params {
@@ -22,7 +23,7 @@ class firewall::linux (
   }
 
   package { 'iptables':
-    ensure => present,
+    ensure => $pkg_ensure,
   }
 
   case $::operatingsystem {

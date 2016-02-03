@@ -1,4 +1,5 @@
 class firewall::params {
+  $package_ensure = 'present'
   case $::osfamily {
     'RedHat': {
       case $::operatingsystem {

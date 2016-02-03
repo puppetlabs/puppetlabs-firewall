@@ -14,14 +14,15 @@
 #   Default: true
 #
 class firewall::linux::gentoo (
-  $ensure       = 'running',
-  $enable       = true,
-  $service_name = $::firewall::params::service_name,
-  $package_name = $::firewall::params::package_name,
+  $ensure         = 'running',
+  $enable         = true,
+  $service_name   = $::firewall::params::service_name,
+  $package_name   = $::firewall::params::package_name,
+  $package_ensure = $::firewall::params::package_ensure,
 ) inherits ::firewall::params {
   if $package_name {
     package { $package_name:
-      ensure => present,
+      ensure => $package_ensure,
     }
   }
 
