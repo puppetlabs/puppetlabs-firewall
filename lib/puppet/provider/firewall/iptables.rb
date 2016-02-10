@@ -364,6 +364,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         (\s--next)?/x,
         '--pol "ipsec\1\2\3\4\5\6\7\8" '
     )
+    # on some iptables versions, --connlimit-saddr switch is added after the rule is applied
+    values = values.gsub(/--connlimit-saddr/, '')
 
     resource_map = munge_resource_map_from_existing_values(@resource_map, values)
 
