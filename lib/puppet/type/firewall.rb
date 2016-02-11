@@ -374,7 +374,7 @@ Puppet::Type.newtype(:firewall) do
     end.flatten)
     defaultto "tcp"
   end
-  
+
   # tcp-specific
   newproperty(:mss) do
     desc <<-EOS
@@ -469,6 +469,40 @@ Puppet::Type.newtype(:firewall) do
       if ["accept","reject","drop"].include?(value.downcase)
         raise ArgumentError, <<-EOS
           Jump destination should not be one of ACCEPT, REJECT or DROP. Use
+          the action property instead.
+        EOS
+      end
+
+    end
+  end
+
+  newproperty(:goto, :required_features => :iptables) do
+    desc <<-EOS
+      The value for the iptables --goto parameter. Normal values are:
+
+      * QUEUE
+      * RETURN
+      * DNAT
+      * SNAT
+      * LOG
+      * MASQUERADE
+      * REDIRECT
+      * MARK
+
+      But any valid chain name is allowed.
+    EOS
+
+    validate do |value|
+      unless value =~ /^[a-zA-Z0-9\-_]+$/
+        raise ArgumentError, <<-EOS
+          Goto destination must consist of alphanumeric characters, an
+          underscore or a yphen.
+        EOS
+      end
+
+      if ["accept","reject","drop"].include?(value.downcase)
+        raise ArgumentError, <<-EOS
+          Goto destination should not be one of ACCEPT, REJECT or DROP. Use
           the action property instead.
         EOS
       end
@@ -894,7 +928,7 @@ Puppet::Type.newtype(:firewall) do
       Set DSCP Markings.
     EOS
   end
-  
+
   newproperty(:set_dscp_class, :required_features => :iptables) do
     desc <<-EOS
       This sets the DSCP field according to a predefined DiffServ class.

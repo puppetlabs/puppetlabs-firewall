@@ -431,4 +431,3 @@ describe 'ip6tables provider' do
     end
   end
 end
-
