@@ -79,6 +79,15 @@ ARGS_TO_HASH = {
       :action => nil,
     },
   },
+  'jump_goto' => {
+    :line => '-A w--instance-cfmhvrgpmq6 -g w--default',
+    :table => 'filter',
+    :params => {
+      :goto => "w--default",
+      :action => nil,
+    },
+
+  },
   'source_destination_ipv4_no_cidr' => {
     :line => '-A INPUT -s 1.1.1.1 -d 2.2.2.2 -m comment --comment "000 source destination ipv4 no cidr"',
     :table => 'filter',
