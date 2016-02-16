@@ -1,4 +1,4 @@
-##2016-02-16 - Supported Release 1.8.0
+## Supported Release 1.8.0
 ###Summary
 
 This release includes numerous features, bugfixes and other improvements including better handling when trying to delete already absent rules.
