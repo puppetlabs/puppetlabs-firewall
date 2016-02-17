@@ -82,7 +82,7 @@ describe firewall do
   end
 
   describe ':proto' do
-    [:tcp, :udp, :icmp, :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :all].each do |proto|
+    [:ip, :tcp, :udp, :icmp, :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :pim, :all].each do |proto|
       it "should accept proto value #{proto}" do
         @resource[:proto] = proto
         @resource[:proto].should == proto
