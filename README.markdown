@@ -641,6 +641,7 @@ firewall { '999 this runs last':
   * 'ipencap'
   * 'ospf'
   * 'gre'
+  * 'pim'
   * 'all'
 
 * `provider`: The specific backend to use for this firewall resource. You will seldom need to specify this --- Puppet will usually discover the appropriate provider for your platform. Available providers are ip6tables and iptables. See the [Providers](#providers) section above for details about these providers.
