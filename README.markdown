@@ -385,11 +385,17 @@ Include the `firewall` class for nodes that need to use the resources in this mo
 
 Parameter that controls the state of the iptables service on your system, allowing you to disable iptables if you want.
 
-`ensure` can either be 'running' or 'stopped'. Default to 'running'.
+`ensure` can either be 'running' or 'stopped'. Defaults to 'running'.
 
 ####package
 
 Specify the platform-specific package(s) to install. Defaults defined in `firewall::params`.
+
+####pkg_ensure
+
+Parameter that controls the state of the iptables package on your system, allowing you to update it if you wish.
+
+`ensure` can either be 'present' or 'latest'. Defaults to 'present'.
 
 ####service
 

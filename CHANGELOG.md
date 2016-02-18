@@ -1,3 +1,27 @@
+## Supported Release 1.8.0
+###Summary
+
+This release includes numerous features, bugfixes and other improvements including better handling when trying to delete already absent rules.
+
+####Features
+- Added new 'pkg_ensure' parameter to allow the updating of the iptables package.
+- Added new 'log_uid' property.
+- Added 'sctp' to the 'proto' property.
+- Added support for IPv6 NAT in Linux kernels >= 3.7.
+- Added support for the security table.
+
+####Bugfixes
+- (MODULES-2783) Replaced hardcoded iptables service references with $service_name variable.
+- (MODULES-1341) Recover when deleting absent rules.
+- (MODULES-3032) Facter flush is called to clear Facter cache get up to date value for ':iptables_persistent_version'.
+- (MODULES-2159) Fixed idempotency issue when using connlimit.
+- Fixed the handling of chain names that contain '-f'.
+
+####Improvements
+- Numerous unit and acceptance test improvements.
+- Improved handling/use of the '$::iptables_persistent_version' custom fact.
+- Better handling of operating systems that use SELinux.
+
 ## Supported Release 1.7.2
 ###Summary
 
