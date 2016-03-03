@@ -339,6 +339,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # PRE-PARSE CLUDGING
     ####################
 
+    # The match for ttl
+    values = values.gsub(/(!\s+)?-m ttl (!\s+)?--ttl-(eq|lt|gt) [0-9]+/, '')
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')

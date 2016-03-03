@@ -150,6 +150,21 @@ describe 'puppet resource firewall command:', :unless => UNSUPPORTED_PLATFORMS.i
     end
   end
 
+  context 'accepts rules with -m ttl' do
+    before :all do
+      iptables_flush_all_tables
+      shell('iptables -t nat -A OUTPUT -s 10.0.0.0/8 -p tcp -m ttl ! --ttl-eq 42 -j REDIRECT --to-ports 12299')
+    end
+
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
+      end
+    end
+  end
+
   # version of iptables that ships with el5 doesn't work with the
   # ip6tables provider
   if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
