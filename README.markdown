@@ -216,7 +216,7 @@ IPv6 rules can be specified using the _ip6tables_ provider:
 
 ~~~puppet
 firewall { '006 Allow inbound SSH (v6)':
-  dport     => 22,
+  dport    => 22,
   proto    => tcp,
   action   => accept,
   provider => 'ip6tables',
