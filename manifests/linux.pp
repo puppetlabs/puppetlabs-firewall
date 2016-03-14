@@ -28,7 +28,8 @@ class firewall::linux (
 
   case $::operatingsystem {
     'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos',
-    'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer': {
+    'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer',
+    'VirtuozzoLinux': {
       class { "${title}::redhat":
         ensure       => $ensure,
         enable       => $enable,
