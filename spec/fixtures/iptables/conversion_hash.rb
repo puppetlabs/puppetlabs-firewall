@@ -661,6 +661,13 @@ ARGS_TO_HASH = {
       :destination  => "4.3.2.1/32",
       :jump         => "NFQUEUE",
       :proto        => "tcp",
+  },
+  'negative_physdev_is_bridged_with_jump' => {
+    :line => '-A FORWARD -m physdev ! --physdev-is-bridged -j REJECT --reject-with icmp-host-prohibited',
+    :params => {
+      :physdev_is_bridged => '!',
+      :action             => 'reject',
+      :chain              => 'true',
     },
   },
 }

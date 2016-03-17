@@ -367,6 +367,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
+    # catch negated rules with two values
+    values = values.gsub(/(!)\s*(-\S+)\s*-/, '\2 "\1" -')
     # the actual rule will have the ! mark before the option.
     values = values.gsub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
@@ -493,7 +495,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Convert booleans removing the previous cludge we did
     @known_booleans.each do |bool|
       if hash[bool] != nil then
-        if hash[bool] != "true" then
+        if hash[bool] != "true" && hash[bool] != "!" then
           raise "Parser error: #{bool} was meant to be a boolean but received value: #{hash[bool]}."
         end
       end
@@ -527,6 +529,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       :src_range,
       :src_type,
       :state,
+      :physdev_is_bridged,
     ].each do |prop|
       if hash[prop] and hash[prop].is_a?(Array)
         # find if any are negated, then negate all if so
