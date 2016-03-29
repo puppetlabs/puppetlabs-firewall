@@ -25,6 +25,16 @@ describe 'Puppet::Util::IPCidr' do
     specify { subject.netmask.should == '255.255.255.0' }
   end
 
+  # https://tickets.puppetlabs.com/browse/MODULES-3215
+  describe 'ipv4 address range with invalid cidr' do
+    before { @ipcidr = Puppet::Util::IPCidr.new('96.126.112.20/24') }
+    subject { @ipcidr }
+    specify { subject.cidr.should == '96.126.112.0/24' }  # .20 is expected to 
+                                                          # be silently dropped.
+    specify { subject.prefixlen.should == 24 }
+    specify { subject.netmask.should == '255.255.255.0' }
+  end
+
   describe 'ipv4 open range with cidr' do
     before { @ipcidr = Puppet::Util::IPCidr.new('0.0.0.0/0') }
     subject { @ipcidr }
