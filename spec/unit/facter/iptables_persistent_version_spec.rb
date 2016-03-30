@@ -26,7 +26,7 @@ describe "Facter::Util::Fact iptables_persistent_version" do
           allow(Facter::Util::Resolution).to receive(:exec).with(dpkg_cmd).
             and_return(ver)
         }
-        it { Facter.fact(:iptables_persistent_version).value.should == ver }
+        it { expect(Facter.fact(:iptables_persistent_version).value).to eql ver }
       end
     end
 
@@ -37,13 +37,13 @@ describe "Facter::Util::Fact iptables_persistent_version" do
         allow(Facter::Util::Resolution).to receive(:exec).with(dpkg_cmd).
           and_return(nil)
       }
-      it { Facter.fact(:iptables_persistent_version).value.should be_nil }
+      it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
 
     describe 'CentOS not supported' do
       before { allow(Facter.fact(:operatingsystem)).to receive(:value).
                  and_return("CentOS") }
-      it { Facter.fact(:iptables_persistent_version).value.should be_nil }
+      it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
 
   end
@@ -71,7 +71,7 @@ describe "Facter::Util::Fact iptables_persistent_version" do
           allow(Facter::Util::Resolution).to receive(:exec).with(dpkg_cmd).
             and_return(ver)
         }
-        it { Facter.fact(:iptables_persistent_version).value.should == ver }
+        it { expect(Facter.fact(:iptables_persistent_version).value).to eql ver }
       end
     end
 
@@ -83,18 +83,15 @@ describe "Facter::Util::Fact iptables_persistent_version" do
         allow(Facter::Util::Resolution).to receive(:exec).with(dpkg_cmd).
           and_return(nil)
       }
-      it { Facter.fact(:iptables_persistent_version).value.should be_nil }
+      it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
 
     describe 'CentOS not supported' do
       before { allow(Facter.fact(:operatingsystem)).to receive(:value).
                  and_return("CentOS") }
-      it { Facter.fact(:iptables_persistent_version).value.should be_nil }
+      it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
 
   end
-
-
-
 
 end

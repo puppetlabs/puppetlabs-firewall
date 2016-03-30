@@ -22,7 +22,7 @@ describe firewallchain do
   }
 
   it 'should have :name be its namevar' do
-    klass.key_attributes.should == [:name]
+    expect(klass.key_attributes).to eql [:name]
   end
 
   describe ':name' do
@@ -40,7 +40,7 @@ describe firewallchain do
             it "should accept #{name} for Linux 3.7+" do
               allow(Facter.fact(:kernelmajversion)).to receive(:value).and_return('3.7')
               resource[:name] = name
-              resource[:name].should == name
+              expect(resource[:name]).to eql name
             end
             it "should fail #{name} for Linux 2.6" do
               allow(Facter.fact(:kernelmajversion)).to receive(:value).and_return('2.6')
@@ -53,7 +53,7 @@ describe firewallchain do
           else
             it "should accept name #{name}" do
               resource[:name] = name
-              resource[:name].should == name
+              expect(resource[:name]).to eql name
             end
           end
         end # chainname
@@ -71,7 +71,7 @@ describe firewallchain do
         if allowedinternalchains.include? internalchain
           it "should allow #{name}" do
             resource[:name] = name
-            resource[:name].should == name
+            expect(resource[:name]).to eql name
           end
         else
           it "should fail #{name}" do
@@ -97,7 +97,7 @@ describe firewallchain do
     [:accept, :drop, :queue, :return].each do |policy|
       it "should accept policy #{policy}" do
         resource[:policy] = policy
-        resource[:policy].should == policy
+        expect(resource[:policy]).to eql policy
       end
     end
 
@@ -118,18 +118,18 @@ describe firewallchain do
 
   describe 'autorequire packages' do
     it "provider iptables_chain should autorequire package iptables" do
-      resource[:provider].should == :iptables_chain
+      expect(resource[:provider]).to eql :iptables_chain
       package = Puppet::Type.type(:package).new(:name => 'iptables')
       catalog = Puppet::Resource::Catalog.new
       catalog.add_resource resource
       catalog.add_resource package
       rel = resource.autorequire[0]
-      rel.source.ref.should == package.ref
-      rel.target.ref.should == resource.ref
+      expect(rel.source.ref).to eql package.ref
+      expect(rel.target.ref).to eql resource.ref
     end
 
     it "provider iptables_chain should autorequire packages iptables, iptables-persistent, and iptables-services" do
-      resource[:provider].should == :iptables_chain
+      expect(resource[:provider]).to eql :iptables_chain
       packages = [
         Puppet::Type.type(:package).new(:name => 'iptables'),
         Puppet::Type.type(:package).new(:name => 'iptables-persistent'),
@@ -141,8 +141,8 @@ describe firewallchain do
         catalog.add_resource package
       end
       packages.zip(resource.autorequire) do |package, rel|
-        rel.source.ref.should == package.ref
-        rel.target.ref.should == resource.ref
+        expect(rel.source.ref).to eql package.ref
+        expect(rel.target.ref).to eql resource.ref
       end
     end
   end
