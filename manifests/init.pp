@@ -35,6 +35,8 @@ class firewall (
         package_name => $package_name,
       }
     }
+    'FreeBSD': {
+    }
     default: {
       fail("${title}: Kernel '${::kernel}' is not currently supported")
     }
