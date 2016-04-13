@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall basics' do
+describe 'firewall basics', docker: true do
   before :all do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
