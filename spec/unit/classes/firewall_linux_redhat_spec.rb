@@ -7,13 +7,14 @@ RSpec.shared_examples "ensures iptables service" do
       :enable => 'true'
     )}
   end
-      
+
   context 'ensure => stopped' do
     let(:params) {{ :ensure => 'stopped' }}
     it { should contain_service('iptables').with(
       :ensure => 'stopped'
     )}
   end
+
   context 'enable => false' do
     let(:params) {{ :enable => 'false' }}
     it { should contain_service('iptables').with(
@@ -30,14 +31,15 @@ describe 'firewall::linux::redhat', :type => :class do
     oldreleases.each do |osrel|
       context "os #{os} and osrel #{osrel}" do
         let(:facts) {{
-          :osfamily               => 'RedHat',
           :operatingsystem        => os,
-          :operatingsystemrelease => osrel
+          :operatingsystemrelease => osrel,
+          :osfamily               => 'RedHat',
+          :selinux                => false,
         }}
 
         it { should_not contain_service('firewalld') }
         it { should_not contain_package('iptables-services') }
-        
+
         it_behaves_like "ensures iptables service"
       end
     end
@@ -45,9 +47,10 @@ describe 'firewall::linux::redhat', :type => :class do
     newreleases.each do |osrel|
       context "os #{os} and osrel #{osrel}" do
         let(:facts) {{
-          :osfamily               => 'RedHat',
           :operatingsystem        => os,
-          :operatingsystemrelease => osrel
+          :operatingsystemrelease => osrel,
+          :osfamily               => 'RedHat',
+          :selinux                => false,
         }}
 
         it { should contain_service('firewalld').with(

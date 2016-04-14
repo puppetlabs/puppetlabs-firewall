@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'firewall', :type => :class do
   context 'kernel => Linux' do
-    let(:facts) {{ :kernel => 'Linux' }}
+    with_debian_facts
     it { should contain_class('firewall::linux').with_ensure('running') }
   end
 
@@ -22,7 +22,7 @@ describe 'firewall', :type => :class do
   end
 
   context 'ensure => stopped' do
-    let(:facts) {{ :kernel => 'Linux' }}
+    with_debian_facts
     let(:params) {{ :ensure => 'stopped' }}
     it { should contain_class('firewall::linux').with_ensure('stopped') }
   end
