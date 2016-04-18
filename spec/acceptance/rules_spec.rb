@@ -1,8 +1,9 @@
 require 'spec_helper_acceptance'
 
-describe 'complex ruleset 1', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
+describe 'complex ruleset 1' do
   before :all do
     iptables_flush_all_tables
+    ip6tables_flush_all_tables
   end
 
   after :all do
@@ -127,7 +128,7 @@ describe 'complex ruleset 2' do
   it 'applies cleanly' do
     pp = <<-EOS
       class { '::firewall': }
-      
+
       Firewall {
         proto => 'all',
         stage => 'pre',

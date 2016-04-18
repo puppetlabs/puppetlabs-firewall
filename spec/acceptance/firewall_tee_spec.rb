@@ -1,10 +1,9 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-
-  before(:all) do
-    shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
-    shell('ip6tables --flush; ip6tables -t nat --flush; ip6tables -t mangle --flush')
+describe 'firewall tee' do
+  before :all do
+    iptables_flush_all_tables
+    ip6tables_flush_all_tables
   end
 
   if default['platform'] =~ /ubuntu-1404/ or default['platform'] =~ /ubuntu-1204/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /debian-8/ or default['platform'] =~ /el-7/
@@ -13,7 +12,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         it 'applies' do
           pp = <<-EOS
             class { '::firewall': }
-            firewall { 
+            firewall {
               '810 - tee_gateway':
                 chain   => 'PREROUTING',
                 table   => 'mangle',
@@ -39,7 +38,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
         it 'applies' do
           pp = <<-EOS
             class { '::firewall': }
-            firewall { 
+            firewall {
               '811 - tee_gateway6':
                 chain    => 'PREROUTING',
                 table    => 'mangle',

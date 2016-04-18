@@ -1,14 +1,9 @@
  require 'spec_helper_acceptance'
 
-describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-
-  describe 'reset' do
-    it 'deletes all iptables rules' do
-      shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
-    end
-    it 'deletes all ip6tables rules' do
-      shell('ip6tables --flush; ip6tables -t nat --flush; ip6tables -t mangle --flush')
-    end
+describe 'firewall iptmodules' do
+  before :all do
+    iptables_flush_all_tables
+    ip6tables_flush_all_tables
   end
 
   describe 'iptables ipt_modules tests' do
