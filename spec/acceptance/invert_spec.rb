@@ -1,8 +1,9 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  before(:all) do
+describe 'firewall inverting' do
+  before :all do
     iptables_flush_all_tables
+    ip6tables_flush_all_tables
   end
 
   context "inverting rules" do
