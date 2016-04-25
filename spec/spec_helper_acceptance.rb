@@ -8,7 +8,7 @@ def iptables_flush_all_tables
 end
 
 def ip6tables_flush_all_tables
-  ['filter', 'nat', 'mangle'].each do |t|
+  ['filter', 'mangle'].each do |t|
     expect(shell("ip6tables -t #{t} -F").stderr).to eq("")
   end
 end
