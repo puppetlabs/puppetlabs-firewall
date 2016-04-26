@@ -590,6 +590,13 @@ ARGS_TO_HASH = {
       :chain             => 'foo-filter',
     },
   },
+  'negative_physdev_is_bridged_with_jump' => {
+    :line => '-A FORWARD -m physdev ! --physdev-is-bridged -j REJECT --reject-with icmp-host-prohibited',
+    :params => {
+      :action            => 'reject',
+      :chain             => 'true',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
