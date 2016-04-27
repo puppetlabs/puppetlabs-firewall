@@ -1548,6 +1548,12 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
+    [:exist, :timeout, :add_set, :del_set].each do |val|
+        if value(val) && value(:jump).to_s != "SET"
+            self.fail "'%s' property requires jump => SET" % val.to_s
+        end
+    end
+
     if value(:jump).to_s == "DNAT"
       unless value(:table).to_s =~ /nat/
         self.fail "Parameter jump => DNAT only applies to table => nat"
