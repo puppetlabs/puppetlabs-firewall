@@ -135,6 +135,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :clusterip_total_nodes => "--total-nodes",
     :clusterip_local_node  => "--local-node",
     :clusterip_hash_init   => "--hash-init",
+    :add_set               => "--add-set",
+    :del_set               => "--del-set",
+    :timeout               => "--timeout",
+    :exist                 => "--exist",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -154,6 +158,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :time_contiguous,
     :kernel_timezone,
     :clusterip_new,
+    :exist,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
@@ -260,7 +265,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init,
     :clamp_mss_to_pmtu, :gateway, :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
     :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
-    :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone
+    :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
+    :add_set, :exist, :timeout, :del_set
   ]
 
   def insert
@@ -346,6 +352,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
     # ditto for --match-set
     values = values.sub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set "\1\2 \3"')
+    # ditto for --add-set and --del-set
+    values = values.sub(/--(add|del)-set (\S*) (\S*)/, '--\1-set "\2 \3"')
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
@@ -669,10 +677,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         end
       end
 
-      # our tcp_flags takes a single string with comma lists separated
-      # by space
-      # --tcp-flags expects two arguments
-      if res == :tcp_flags or res == :ipset
+      # Some options consist of two values. The provider stores those values
+      # in a single string separating them by spaces (see rule_to_hash PRE-PARSE CLUDGING).
+      # But we must present those values as separate command line arguments to 'iptables' utility.
+      if [:tcp_flags, :ipset, :add_set, :del_set].include?(res) then
         one, two = resource_value.split(' ')
         args << one
         args << two

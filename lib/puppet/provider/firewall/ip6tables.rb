@@ -142,6 +142,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :week_days          => "--weekdays",
     :time_contiguous    => "--contiguous",
     :kernel_timezone    => "--kerneltz",
+    :add_set               => "--add-set",
+    :del_set               => "--del-set",
+    :timeout               => "--timeout",
+    :exist                 => "--exist",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -161,6 +165,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :physdev_is_bridged,
     :time_contiguous,
     :kernel_timezone,
+    :exist,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple 
@@ -224,6 +229,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ctstate, :icmp, :hop_limit, :limit, :burst, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss,
-    :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone]
+    :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
+    :add_set, :exist, :timeout, :del_set
+  ]
 
 end
