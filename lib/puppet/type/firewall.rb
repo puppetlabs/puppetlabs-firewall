@@ -1386,6 +1386,42 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:add_set, :required_features => :ipset) do
+    desc <<-EOS
+      Add the address(es)/port(s) of the packet to the set.
+      Requires ipset kernel module.
+      The value is the name of the set, followed by a space, and then
+      'src' and/or 'dst' separated by a comma.
+      For example: 'blacklist src,dst'
+    EOS
+  end
+
+  newproperty(:timeout, :required_features => :ipset) do
+    desc <<-EOS
+      When adding an entry, the timeout value to use instead of the default one from the set definition
+      Requires ipset kernel module.
+    EOS
+  end
+
+  newproperty(:exist, :required_features => :ipset) do
+    desc <<-EOS
+      When adding an entry if it already exists, reset the timeout value to the specified one or to the default from the set definition
+      Requires ipset kernel module.
+    EOS
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:del_set, :required_features => :ipset) do
+    desc <<-EOS
+      Delete the address(es)/port(s) of the packet from the set.
+      Requires ipset kernel module.
+      The value is the name of the set, followed by a space, and then
+      'src' and/or 'dst' separated by a comma.
+      For example: 'blacklist src,dst'
+    EOS
+  end
+
 
   autorequire(:firewallchain) do
     reqs = []
@@ -1504,6 +1540,18 @@ Puppet::Type.newtype(:firewall) do
       unless value(:gateway)
         self.fail "When using jump => TEE, the gateway property is required"
       end
+    end
+
+    if value(:jump).to_s == "SET"
+      unless value(:add_set) || value(:del_set)
+        self.fail "When using jump => SET, the add_set or del_set property is required"
+      end
+    end
+
+    [:exist, :timeout, :add_set, :del_set].each do |val|
+        if value(val) && value(:jump).to_s != "SET"
+            self.fail "'%s' property requires jump => SET" % val.to_s
+        end
     end
 
     if value(:jump).to_s == "DNAT"
