@@ -20,19 +20,19 @@
 7. [Development - Guide for contributing to the module](#development)
     * [Tests - Testing your configuration](#tests)
 
-##Overview
+## Overview
 
 The firewall module lets you manage firewall rules with Puppet.
 
-##Module Description
+## Module Description
 
 PuppetLabs' firewall module introduces the `firewall` resource, which is used to manage and configure firewall rules from within the Puppet DSL. This module offers support for iptables and ip6tables. The module also introduces the `firewallchain` resource, which allows you to manage chains or firewall lists and ebtables for bridging support. At the moment, only iptables and ip6tables chains are supported.
 
 The firewall module acts on your running firewall, making immediate changes as the catalog executes. Defining default pre and post rules allows you to provide global defaults for your hosts before and after any custom rules. Defining `pre` and `post` rules is also necessary to help you avoid locking yourself out of your own boxes when Puppet runs.
 
-##Setup
+## Setup
 
-###What firewall Affects
+### What firewall Affects
 
 * Every node running a firewall
 * Firewall settings in your system
@@ -40,11 +40,11 @@ The firewall module acts on your running firewall, making immediate changes as t
 * Unmanaged resources (get purged)
 
 
-###Setup Requirements
+### Setup Requirements
 
 Firewall uses Ruby-based providers, so you must enable [pluginsync](http://docs.puppetlabs.com/guides/plugins_in_modules.html#enabling-pluginsync).
 
-###Beginning with firewall
+### Beginning with firewall
 
 In the following two sections, you create new classes and then create firewall rules related to those classes. These steps are optional but provide a framework for firewall rules, which is helpful if you’re just starting to create them.
 
@@ -52,7 +52,7 @@ If you already have rules in place, then you don’t need to do these two sectio
 
 The following steps are designed to ensure that you keep your SSH and other connections, primarily your connection to your Puppet master. If you create the `pre` and `post` classes described in the first section, then you also need to create the rules described in the second section.
 
-####Create the `my_fw::pre` and `my_fw::post` Classes
+#### Create the `my_fw::pre` and `my_fw::post` Classes
 
 This approach employs a whitelist setup, so you can define what rules you want and everything else is ignored rather than removed.
 
@@ -124,7 +124,7 @@ Alternatively, the [firewallchain](#type-firewallchain) type can be used to set 
   }
   ~~~
 
-####Create Firewall Rules
+#### Create Firewall Rules
 
 The rules you create here are helpful if you don’t have any existing rules; they help you order your firewall configurations so you don’t lock yourself out of your box.
 
@@ -169,29 +169,29 @@ Rules are persisted automatically between reboots, although there are known issu
   class { 'firewall': }
   ~~~
 
-###Upgrading
+### Upgrading
 
 Use these steps if you already have a version of the firewall module installed.
 
-####From version 0.2.0 and more recent
+#### From version 0.2.0 and more recent
 
 Upgrade the module with the puppet module tool as normal:
 
     puppet module upgrade puppetlabs/firewall
 
-##Usage
+## Usage
 
 There are two kinds of firewall rules you can use with firewall: default rules and application-specific rules. Default rules apply to general firewall settings, whereas application-specific rules manage firewall settings for a specific application, node, etc.
 
 All rules employ a numbering system in the resource's title that is used for ordering. When titling your rules, make sure you prefix the rule with a number, for example, '000 accept all icmp requests'. _000_ runs first, _999_ runs last.
 
-###Default Rules
+### Default Rules
 
 You can place default rules in either `my_fw::pre` or `my_fw::post`, depending on when you would like them to run. Rules placed in the `pre` class will run first, and rules in the `post` class, last.
 
 In iptables, the title of the rule is stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
-####Examples of Default Rules
+#### Examples of Default Rules
 
 Basic accept ICMP request example:
 
@@ -223,7 +223,7 @@ firewall { '006 Allow inbound SSH (v6)':
 }
 ~~~
 
-###Application-Specific Rules
+### Application-Specific Rules
 
 Puppet doesn't care where you define rules, and this means that you can place
 your firewall resources as close to the applications and services that you
@@ -247,7 +247,7 @@ class profile::apache {
 }
 ~~~
 
-###Rule inversion
+### Rule inversion
 Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
 
 Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, iniface, outiface, port, proto, source, sport, src\_range, src\_type, and state.
@@ -270,7 +270,7 @@ firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN u
 }
 ~~~
 
-###Additional Uses for the Firewall Module
+### Additional Uses for the Firewall Module
 
 You can apply firewall rules to specific nodes. Usually, you will want to put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows:
 
@@ -341,7 +341,7 @@ firewall { '100 my rule':
 }
 ~~~
 
-###Additional Information
+### Additional Information
 
 Access the inline documentation:
 
@@ -352,7 +352,7 @@ Or
     puppet doc -r type
     (and search for firewall)
 
-##Reference
+## Reference
 
 Classes:
 
@@ -369,7 +369,7 @@ Facts:
 * [iptables_version](#fact-iptablesversion)
 * [iptables_persistent_version](#fact-iptablespersistentversion)
 
-###Class: firewall
+### Class: firewall
 
 Performs the basic setup tasks required for using the firewall resources.
 
@@ -381,23 +381,23 @@ Include the `firewall` class for nodes that need to use the resources in this mo
 
     class { 'firewall': }
 
-####ensure
+#### ensure
 
 Parameter that controls the state of the iptables service on your system, allowing you to disable iptables if you want.
 
 `ensure` can either be 'running' or 'stopped'. Defaults to 'running'.
 
-####package
+#### package
 
 Specify the platform-specific package(s) to install. Defaults defined in `firewall::params`.
 
-####pkg_ensure
+#### pkg_ensure
 
 Parameter that controls the state of the iptables package on your system, allowing you to update it if you wish.
 
 `ensure` can either be 'present' or 'latest'. Defaults to 'present'.
 
-####service
+#### service
 
 Specify the platform-specific service(s) to start or stop. Defaults defined in `firewall::params`.
 
@@ -405,7 +405,7 @@ Specify the platform-specific service(s) to start or stop. Defaults defined in `
 
 This type enables you to manage firewall rules within Puppet.
 
-####Providers
+#### Providers
 **Note:** Not all features are available with all providers.
 
  * `ip6tables`: Ip6tables type provider
@@ -610,14 +610,14 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
-~~~puppet
+  ~~~puppet
 firewall { '000 this runs first':
   # this rule will run first
 }
 firewall { '999 this runs last':
   # this rule will run last
 }
- ~~~
+  ~~~
 
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
@@ -765,7 +765,7 @@ firewall { '101 blacklist strange traffic':
 
 * `week_days`: Only match on the given weekdays. Possible values are 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'.
 
-###Type: firewallchain
+### Type: firewallchain
 
 Enables you to manage rule chains for firewalls.
 
@@ -773,16 +773,16 @@ Currently this type supports only iptables, ip6tables, and ebtables on Linux. It
 
 **Autorequires**: If Puppet is managing the iptables or iptables-persistent packages, and the provider is iptables_chain, the firewall resource will autorequire those packages to ensure that any required binaries are installed.
 
-####Providers
+#### Providers
 
 `iptables_chain` is the only provider that supports firewallchain.
 
-####Features
+#### Features
 
 * `iptables_chain`: The provider provides iptables chain features.
 * `policy`: Default policy (inbuilt chains only).
 
-####Parameters
+#### Parameters
 
 * `ensure`: Ensures that the resource is present. Valid values are 'present', 'absent'.
 
@@ -828,27 +828,27 @@ resources { 'firewallchain':
 }
 ~~~
 
-###Fact: ip6tables_version
+### Fact: ip6tables_version
 
 A Facter fact that can be used to determine what the default version of ip6tables is for your operating system/distribution.
 
-###Fact: iptables_version
+### Fact: iptables_version
 
 A Facter fact that can be used to determine what the default version of iptables is for your operating system/distribution.
 
-###Fact: iptables_persistent_version
+### Fact: iptables_persistent_version
 
 Retrieves the version of iptables-persistent from your OS. This is a Debian/Ubuntu specific fact.
 
-##Limitations
+## Limitations
 
-###SLES
+### SLES
 
 The `socket` parameter is not supported on SLES.  In this release it will cause
 the catalog to fail with iptables failures, rather than correctly warn you that
 the features are unusable.
 
-###Oracle Enterprise Linux
+### Oracle Enterprise Linux
 
 The `socket` and `owner` parameters are unsupported on Oracle Enterprise Linux
 when the "Unbreakable" kernel is used. These may function correctly when using
@@ -860,13 +860,29 @@ unsupported system will result in iptable rules failing to apply.
 As Puppet Enterprise itself does not yet support Debian 8, use of this module with Puppet Enterprise under a Debian 8
 system should be regarded as experimental.
 
-###Other
+### Known Issues
+ 
+#### MCollective causes PE to reverse firewall rule order
 
-Bugs can be reported in JIRA:
+Firewall rules appear in reverse order if you use MCollective to run Puppet in Puppet Enterprise 2016.1, 2015.3, 2015.2, or 3.8.x.
+
+If you use MCollective to kick off Puppet runs (`mco puppet runonce -I agent.example.com`) while also using the [`puppetlabs/firewall`](https://forge.puppet.com/puppetlabs/firewall) module, your firewall rules might be listed in reverse order.
+
+In many firewall configurations, the last rule drops all packets. If the rule order is reversed, this rule is listed first and network connectivity fails.
+
+To prevent this issue, do not use MCollective to kick off Puppet runs. Use any of the following instead:
+
+* Run `puppet agent -t` on the command line.
+* Use a cron job.
+* Click [Run Puppet](https://docs.puppet.com/pe/2016.1/console_classes_groups_running_puppet.html#run-puppet-on-an-individual-node) in the console.
+
+#### Reporting Issues
+
+Report found bugs in JIRA:
 
 <http://tickets.puppetlabs.com>
 
-##Development
+## Development
 
 Puppet Labs modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can’t access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
 
@@ -882,7 +898,7 @@ Currently we support:
 * ip6tables
 * ebtables (chains only)
 
-###Testing
+### Testing
 
 Make sure you have:
 
