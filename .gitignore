@@ -9,3 +9,4 @@ coverage/
 log/
 .idea/
 *.iml
+*.swp

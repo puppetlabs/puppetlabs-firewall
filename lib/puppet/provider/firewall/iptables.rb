@@ -16,18 +16,29 @@ def copy_file(source, destination)
 		f.puts(dest);
 	end
 end
+
 def backup_path(provider)
-  case provider
-  when "iptables"
-	rootpath = "/etc/sysconfig/iptables-backup";
-    return rootpath + "/" + Time.now.strftime("%Y-%m-%d-%H-%M-%S")
-  end
+	case provider
+	when "iptables"
+		rootpath = "/etc/sysconfig/iptables-backup";
+		return rootpath + "/" + Time.now.strftime("%Y-%m-%d-%H-%M-%S")
+	end
 end
+
 def backup_rules(path)
-  unless Dir.exist?("/etc/sysconfig/iptables-backup")
-	  Dir.mkdir("/etc/sysconfig/iptables-backup");
+  begin
+  	unless Dir.exist?("/etc/sysconfig")
+		Dir.mkdir("/etc/sysconfig");
+  	end
+	unless Dir.exist?("/etc/sysconfig/iptables-backup")
+		Dir.mkdir("/etc/sysconfig/iptables-backup");
+	end
+	if File.exist?("/etc/sysconfig/iptables")
+		copy_file("/etc/sysconfig/iptables", path);
+	end
+  rescue
+	  return nil
   end
-  copy_file("/etc/sysconfig/iptables", path);
 end
 Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
