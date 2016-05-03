@@ -60,6 +60,7 @@ Puppet::Type.newtype(:firewall) do
   feature :ipset, "Match against specified ipset list"
   feature :clusterip, "Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them."
   feature :length, "Match the length of layer-3 payload"
+  feature :string_matching, "String matching features"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -1414,6 +1415,37 @@ Puppet::Type.newtype(:firewall) do
       end
       value
     end
+  end
+
+  newproperty(:string, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature. Matches the packet against the pattern
+      given as an argument.
+    EOS
+
+    munge do |value|
+       value = "'" + value + "'"
+    end
+  end
+
+  newproperty(:string_algo, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature, pattern matching strategy.
+    EOS
+
+    newvalues(:bm, :kmp)
+  end
+
+  newproperty(:string_from, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature, offset from which we start looking for any matching.
+    EOS
+  end
+
+  newproperty(:string_to, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature, offset  up  to which we should scan.
+    EOS
   end
 
 

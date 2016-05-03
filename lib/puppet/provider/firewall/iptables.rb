@@ -35,6 +35,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :ipset
   has_feature :clusterip
   has_feature :length
+  has_feature :string_matching
 
   optional_commands({
     :iptables => 'iptables',
@@ -113,6 +114,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :stat_packet           => '--packet',
     :stat_probability      => '--probability',
     :state                 => "-m state --state",
+    :string                => "-m string --string",
+    :string_algo           => "--algo",
+    :string_from           => "--from",
+    :string_to             => "--to",
     :table                 => "-t",
     :tcp_flags             => "-m tcp --tcp-flags",
     :todest                => "--to-destination",
@@ -258,7 +263,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
     :src_type, :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
-    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :jump, :goto, :clusterip_new, :clusterip_hashmode,
+    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
+    :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init,
     :clamp_mss_to_pmtu, :gateway, :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
     :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
