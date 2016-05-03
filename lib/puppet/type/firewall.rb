@@ -59,6 +59,7 @@ Puppet::Type.newtype(:firewall) do
   feature :mask, "Ability to match recent rules based on the ipv4 mask"
   feature :ipset, "Match against specified ipset list"
   feature :clusterip, "Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them."
+  feature :length, "Match the length of layer-3 payload"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -1384,6 +1385,33 @@ Puppet::Type.newtype(:firewall) do
       Used with the CLUSTERIP jump target.
       Specify the random seed used for hash initialization.
     EOS
+  end
+
+  newproperty(:length, :required_features => :length) do
+    desc <<-EOS
+      Sets the length of layer-3 payload to match.
+    EOS
+
+    munge do |value|
+      match = value.to_s.match("([0-9]+)(-)?([0-9]+)?")
+      low   = match[1].to_int
+      high  = match[3].to_int
+
+      if low.nil? or (low and match[2] and high.nil?)
+        raise ArgumentError, "Length value must either be an integer or a range"
+      end
+
+      if (low < 0 or low > 65535)
+        or (high and (high < 0 or high > 65535 or high < low))
+        raise ArgumentError, "Length values must be between 0 and 65535"
+      end
+
+      value = low
+      if high
+        value = value + ":#{high}"
+      end
+      value
+    end
   end
 
 
