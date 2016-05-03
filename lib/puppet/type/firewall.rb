@@ -1393,22 +1393,24 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
-      match = value.to_s.match("([0-9]+)(-)?([0-9]+)?")
-      low   = match[1].to_int
-      high  = match[3].to_int
-
-      if low.nil? or (low and match[2] and high.nil?)
+      match = value.to_s.match("^([0-9]+)(-)?([0-9]+)?$")
+      if match.nil?
         raise ArgumentError, "Length value must either be an integer or a range"
       end
 
-      if (low < 0 or low > 65535)
-        or (high and (high < 0 or high > 65535 or high < low))
+      low = match[1].to_i
+      if !match[3].nil?
+        high = match[3].to_i
+      end
+
+      if (low < 0 or low > 65535) or \
+        (!high.nil? and (high < 0 or high > 65535 or high < low))
         raise ArgumentError, "Length values must be between 0 and 65535"
       end
 
-      value = low
-      if high
-        value = value + ":#{high}"
+      value = low.to_s
+      if !high.nil?
+        value << ":" << high.to_s
       end
       value
     end
