@@ -59,6 +59,8 @@ Puppet::Type.newtype(:firewall) do
   feature :mask, "Ability to match recent rules based on the ipv4 mask"
   feature :ipset, "Match against specified ipset list"
   feature :clusterip, "Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them."
+  feature :length, "Match the length of layer-3 payload"
+  feature :string_matching, "String matching features"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -1383,6 +1385,66 @@ Puppet::Type.newtype(:firewall) do
     desc <<-EOS
       Used with the CLUSTERIP jump target.
       Specify the random seed used for hash initialization.
+    EOS
+  end
+
+  newproperty(:length, :required_features => :length) do
+    desc <<-EOS
+      Sets the length of layer-3 payload to match.
+    EOS
+
+    munge do |value|
+      match = value.to_s.match("^([0-9]+)(-)?([0-9]+)?$")
+      if match.nil?
+        raise ArgumentError, "Length value must either be an integer or a range"
+      end
+
+      low = match[1].to_i
+      if !match[3].nil?
+        high = match[3].to_i
+      end
+
+      if (low < 0 or low > 65535) or \
+        (!high.nil? and (high < 0 or high > 65535 or high < low))
+        raise ArgumentError, "Length values must be between 0 and 65535"
+      end
+
+      value = low.to_s
+      if !high.nil?
+        value << ":" << high.to_s
+      end
+      value
+    end
+  end
+
+  newproperty(:string, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature. Matches the packet against the pattern
+      given as an argument.
+    EOS
+
+    munge do |value|
+       value = "'" + value + "'"
+    end
+  end
+
+  newproperty(:string_algo, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature, pattern matching strategy.
+    EOS
+
+    newvalues(:bm, :kmp)
+  end
+
+  newproperty(:string_from, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature, offset from which we start looking for any matching.
+    EOS
+  end
+
+  newproperty(:string_to, :required_features => :string_matching) do
+    desc <<-EOS
+      String matching feature, offset up to which we should scan.
     EOS
   end
 
