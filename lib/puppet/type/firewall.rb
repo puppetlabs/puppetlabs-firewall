@@ -1444,7 +1444,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:string_to, :required_features => :string_matching) do
     desc <<-EOS
-      String matching feature, offset  up  to which we should scan.
+      String matching feature, offset up to which we should scan.
     EOS
   end
 

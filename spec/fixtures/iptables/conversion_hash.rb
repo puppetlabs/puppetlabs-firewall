@@ -590,6 +590,43 @@ ARGS_TO_HASH = {
       :chain             => 'foo-filter',
     },
   },
+  'length_1' => {
+    :line   => '-A INPUT -m length --length 42000',
+    :table  => 'filter',
+    :params => {
+      :length => '42000',
+    },
+  },
+  'length_2' => {
+    :line   => '-A INPUT -m length --length 1492:65535',
+    :table  => 'filter',
+    :params => {
+      :length => '1492-65535',
+    },
+  },
+  'string_matching_1' => {
+    :line   => '-A INPUT -m string --string "GET /index.html"',
+    :table  => 'filter',
+    :params => {
+      :string => 'GET /index.html',
+    },
+  },
+  'string_matching_2' => {
+    :line   => '-A INPUT -m string --string "GET /index.html" --algo bm',
+    :table  => 'filter',
+    :params => {
+      :string      => 'GET /index.html',
+      :string_algo => 'bm',
+    },
+  },
+  'string_matching_3' => {
+    :line   => '-A INPUT -m string --string "GET /index.html" --from 1',
+    :table  => 'filter',
+    :params => {
+      :string      => 'GET /index.html',
+      :string_from => '1',
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -1125,5 +1162,48 @@ HASH_TO_ARGS = {
       :set_dscp_class    => 'ef',
     },
     :args => ["-t", :mangle, "-p", :tcp, "-m", "multiport", '--ports', '997', "-m", "comment", "--comment", "068 set dscp class to EF", "-j", "DSCP", "--set-dscp-class", "ef"],
+  },
+  'length_1' => {
+    :params => {
+      :name   => '000 length',
+      :table  => 'filter',
+      :length => '42000',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 length", "-m", "length", "--length", "42000"],
+  },
+  'length_2' => {
+    :params => {
+      :name   => '000 length',
+      :table  => 'filter',
+      :length => '1492-65535',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 length", "-m", "length", "--length", "1492:65535"],
+  },
+  'string_matching_1' => {
+    :params => {
+      :name   => '000 string_matching',
+      :table  => 'filter',
+      :string => 'GET /index.html',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 string_matching", "-m", "string", "--string", "'GET /index.html'"],
+  },
+  'string_matching_2' => {
+    :params => {
+      :name        => '000 string_matching',
+      :table       => 'filter',
+      :string      => 'GET /index.html',
+      :string_algo => 'bm',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 string_matching", "-m", "string", "--string", "'GET /index.html'", "--algo", :bm],
+  },
+  'string_matching_3' => {
+    :params => {
+      :name        => '000 string_matching',
+      :table       => 'filter',
+      :string      => 'GET /index.html',
+      :string_from => '1',
+      :string_to   => '65535',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 string_matching", "-m", "string", "--string", "'GET /index.html'", "--from", "1", "--to", "65535"],
   },
 }

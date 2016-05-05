@@ -495,6 +495,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         elem.gsub(/:/,'-')
       end
     end
+    if hash[:length]
+      hash[:length].gsub!(/:/,'-')
+    end
 
     # Invert any rules that are prefixed with a '!'
     [
