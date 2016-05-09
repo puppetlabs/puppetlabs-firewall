@@ -1,8 +1,9 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall isfragment property', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
+describe 'firewall isfragment property' do
   before :all do
     iptables_flush_all_tables
+    ip6tables_flush_all_tables
   end
 
   shared_examples "is idempotent" do |value, line_match|

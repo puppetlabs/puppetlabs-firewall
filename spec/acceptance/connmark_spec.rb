@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
+describe 'connmark property' do
 
   describe 'connmark' do
     context '50' do
@@ -9,7 +9,7 @@ describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfami
           class { '::firewall': }
           firewall { '502 - test':
             proto    => 'all',
-	    connmark => '0x1',
+            connmark => '0x1',
             action   => reject,
           }
         EOS

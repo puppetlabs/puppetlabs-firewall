@@ -1,17 +1,16 @@
 require 'spec_helper_acceptance'
 
-describe "param based tests:", :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-
-  before(:all) do
-    shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
-    shell('ip6tables --flush; ip6tables -t nat --flush; ip6tables -t mangle --flush')
+describe 'param based tests' do
+  before :all do
+    iptables_flush_all_tables
+    ip6tables_flush_all_tables
   end
 
   it 'test various params', :unless => (default['platform'].match(/el-5/) || fact('operatingsystem') == 'SLES') do
     iptables_flush_all_tables
 
     ppm = <<-EOS
-    firewall { '100 test': 
+    firewall { '100 test':
       table     => 'raw',
       socket    => 'true',
       chain     => 'PREROUTING',
