@@ -1531,24 +1531,31 @@ describe 'firewall basics', docker: true do
               require => Package['ipset'],
             }
             class { '::firewall': }
-            exec { 'create ipset':
+            exec { 'create ipset blacklist':
               command => 'ipset create blacklist hash:ip,port family inet6 maxelem 1024 hashsize 65535 timeout 120',
               path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
               require => Package['ipset'],
             }
-            exec { 'add blacklist':
+            -> exec { 'create ipset honeypot':
+              command => 'ipset create honeypot hash:ip family inet6 maxelem 1024 hashsize 65535 timeout 120',
+              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+            }
+            -> exec { 'add blacklist':
               command => 'ipset add blacklist 2001:db8::1,80',
               path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-              require => Exec['create ipset'],
+            }
+            -> exec { 'add honeypot':
+              command => 'ipset add honeypot 2001:db8::5',
+              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
             }
             firewall { '612 - test':
               ensure   => present,
               chain    => 'INPUT',
               proto    => tcp,
               action   => drop,
-              ipset    => 'blacklist src,src',
+              ipset    => ['blacklist src,dst', '! honeypot dst'],
               provider => 'ip6tables',
-              require  => Exec['add blacklist'],
+              require  => Exec['add honeypot'],
             }
             EOS
 
@@ -1557,7 +1564,7 @@ describe 'firewall basics', docker: true do
 
           it 'should contain the rule' do
             shell('ip6tables-save') do |r|
-              expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "612 - test" -m set --match-set blacklist src,src -j DROP/)
+              expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "612 - test" -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -j DROP/)
             end
           end
         end

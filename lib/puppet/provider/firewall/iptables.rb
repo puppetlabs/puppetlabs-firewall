@@ -352,8 +352,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
     values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
-    # ditto for --match-set
-    values = values.sub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set "\1\2 \3"')
+    # --match-set can have multiple values with weird iptables format
+    if values =~ /-m set --match-set/
+      values = values.gsub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set \1\2 \3')
+      ind  = values.index('-m set --match-set')
+      sets = values.scan(/-m set --match-set ((?:!\s+)?\S* \S*)/)
+      values = values.gsub(/-m set --match-set (!\s+)?\S* \S* /, '')
+      values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
+    end
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
     # the actual rule will have the ! mark before the option.
@@ -446,6 +452,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
     end
 
+    hash[:ipset] = hash[:ipset].split(';') if ! hash[:ipset].nil?
+
     ## clean up DSCP class to HEX mappings
     valid_dscp_classes = {
       '0x0a' => 'af11',
@@ -507,7 +515,6 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       :dport,
       :dst_range,
       :dst_type,
-      :ipset,
       :port,
       :proto,
       :source,
@@ -649,7 +656,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         #ruby 1.8.7 can't .match Symbols ------------------ ^
         resource_value = resource_value.to_s.sub!(/^!\s*/, '').to_sym
         args.insert(-2, '!')
-      elsif resource_value.is_a?(Array)
+      elsif resource_value.is_a?(Array) and res != :ipset
         should_negate = resource_value.index do |value|
           #ruby 1.8.7 can't .match symbols
           value.to_s.match(/^(!)\s+/)
@@ -680,10 +687,20 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         end
       end
 
+      # ipset can accept multiple values with weird iptables arguments
+      if res == :ipset
+        resource_value.join(" #{[resource_map[res]].flatten.first} ").split(' ').each do |a|
+          if a.sub!(/^!\s*/, '')
+            # Negate ipset options
+            args.insert(-2, '!')
+          end
+
+          args << a if a.length > 0
+        end
       # our tcp_flags takes a single string with comma lists separated
       # by space
       # --tcp-flags expects two arguments
-      if res == :tcp_flags or res == :ipset
+      elsif res == :tcp_flags
         one, two = resource_value.split(' ')
         args << one
         args << two

@@ -1190,14 +1190,23 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
-  newproperty(:ipset, :required_features => :ipset) do
+  newproperty(:ipset, :required_features => :ipset, :array_matching => :all) do
     desc <<-EOS
       Matches against the specified ipset list.
-      Requires ipset kernel module.
+      Requires ipset kernel module. Will accept a single element or an array.
       The value is the name of the blacklist, followed by a space, and then
       'src' and/or 'dst' separated by a comma.
       For example: 'blacklist src,dst'
     EOS
+
+    def is_to_s(value)
+      should_to_s(value)
+    end
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(', ')
+    end
   end
 
   newproperty(:checksum_fill, :required_features => :iptables) do
