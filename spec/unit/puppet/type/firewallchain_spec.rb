@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 firewallchain = Puppet::Type.type(:firewallchain)
+firewallchain_ignore = Puppet::Type.type(:firewallchain_ignore)
 
 describe firewallchain do
   before(:each) do
@@ -162,6 +163,7 @@ describe firewallchain do
 :LOCAL_INPUT_PRE - [0:0]
 :fail2ban-ssh - [0:0]
 -A INPUT -p tcp -m multiport --dports 22 -j fail2ban-ssh
+-A INPUT -p tcp -m multiport --dports 22 -j fail2ban-postfix
 -A INPUT -i lo -m comment --comment "012 accept loopback" -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 22 -m comment --comment "020 ssh" -j ACCEPT
 -A OUTPUT -d 1.2.1.2 -j DROP
@@ -176,13 +178,21 @@ EOS
     it 'should generate iptables resources' do
       allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return("1.4.21")
       resource = Puppet::Type::Firewallchain.new(:name => 'INPUT:filter:IPv4', :purge => true)
-
-      expect(resource.generate.size).to eq(3)
+      
+      catalog = Puppet::Resource::Catalog.new
+      catalog.add_resource resource
+      
+      expect(resource.generate.size).to eq(4)
     end
 
     it 'should not generate ignored iptables rules' do
       allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return("1.4.21")
       resource = Puppet::Type::Firewallchain.new(:name => 'INPUT:filter:IPv4', :purge => true, :ignore => ['-j fail2ban-ssh'])
+      ignored = Puppet::Type.type(:firewallchain_ignore).new(:name => 'ignored', :regex => ['-j fail2ban-postfix'], :chain => 'INPUT:filter:IPv4')
+        
+      catalog = Puppet::Resource::Catalog.new
+      catalog.add_resource resource
+      catalog.add_resource ignored
 
       expect(resource.generate.size).to eq(2)
     end

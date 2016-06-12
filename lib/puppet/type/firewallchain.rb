@@ -226,10 +226,27 @@ Puppet::Type.newtype(:firewallchain) do
 
     # Remove rules which match our ignore filter
     rules_resources.delete_if {|res| value(:ignore).find_index{|f| res.provider.properties[:line].match(f)}} if value(:ignore)
+    
+    # Remove rules which match created firewallchain_ignore types
+    catalog.resources.select {
+      |r| r.is_a?(Puppet::Type.type(:firewallchain_ignore)) && r[:chain] == self[:name]
+    }.select {
+      |res| res[:chain] == name
+    }.each { 
+      |ignored_resource| rules_resources.delete_if {|res| ignored_resource[:regex].find_index{|f| res.provider.properties[:line].match(f) }}
+    }
 
     # We mark all remaining rules for deletion, and then let the catalog override us on rules which should be present
     rules_resources.each {|res| res[:ensure] = :absent}
 
     rules_resources
+  end
+  
+  autorequire(:firewallchain_ignore) do
+    catalog.resources.collect do |r|
+      if r.is_a?(Puppet::Type.type(:firewallchain_ignore)) && r[:chain] == self[:name]
+        r.name
+      end
+    end.compact
   end
 end
