@@ -63,6 +63,27 @@ describe 'purge tests' do
       end
     end
 
+    it 'purges rules added during apply' do
+      pp = <<-EOS
+        class { 'firewall': }
+        exec { 'add_rule':
+          command => '/sbin/iptables -A INPUT -p udp -s 1.2.1.3',
+        }->
+        firewallchain { 'INPUT:filter:IPv4':
+          purge => true,
+        }
+      EOS
+
+      apply_manifest(pp, :expect_changes => true)
+
+      shell('iptables-save') do |r|
+        expect(r.stdout).to match(/010 output-1\.2\.1\.2/)
+        expect(r.stdout).to_not match(/1\.2\.1\.1/)
+        expect(r.stdout).to_not match(/1\.2\.1\.3/)
+        expect(r.stderr).to eq("")
+      end
+    end
+
     it 'ignores managed rules' do
       pp = <<-EOS
         class { 'firewall': }
