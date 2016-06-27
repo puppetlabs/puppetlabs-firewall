@@ -177,20 +177,20 @@ EOS
       allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return("1.4.21")
       resource = Puppet::Type::Firewallchain.new(:name => 'INPUT:filter:IPv4', :purge => true)
 
-      expect(resource.generate.size).to eq(3)
+      expect(resource.eval_generate.size).to eq(3)
     end
 
     it 'should not generate ignored iptables rules' do
       allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return("1.4.21")
       resource = Puppet::Type::Firewallchain.new(:name => 'INPUT:filter:IPv4', :purge => true, :ignore => ['-j fail2ban-ssh'])
 
-      expect(resource.generate.size).to eq(2)
+      expect(resource.eval_generate.size).to eq(2)
     end
 
     it 'should not generate iptables resources when not enabled' do
       resource = Puppet::Type::Firewallchain.new(:name => 'INPUT:filter:IPv4')
 
-      expect(resource.generate.size).to eq(0)
+      expect(resource.eval_generate.size).to eq(0)
     end
   end
   it 'is suitable' do

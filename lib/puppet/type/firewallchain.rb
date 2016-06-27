@@ -203,7 +203,10 @@ Puppet::Type.newtype(:firewallchain) do
     end
   end
 
-  def generate
+  # Use eval_generate instead of generate to notice introduction of new fw rules during
+  # the puppet run. An example of new rules being introduced is starting the iptables
+  # service during puppet run with predefined rules (eg. /etc/sysconfig/iptables) in place.
+  def eval_generate
     return [] unless self.purge?
 
     value(:name).match(Nameformat)
