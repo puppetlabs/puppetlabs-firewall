@@ -69,7 +69,7 @@ Therefore, the run order is:
 
 The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity and that you drop unmatched packets appropriately. The rules you define in your manifests are likely specific to the applications you run.
 
-1.) Add the `pre` class to my_fw/manifests/pre.pp. Your pre.pp file should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.2. 
+1.) Add the `pre` class to my_fw/manifests/pre.pp. Your pre.pp file should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.2.
   ~~~puppet
   class my_fw::pre {
     Firewall {
@@ -145,7 +145,7 @@ Rules are persisted automatically between reboots, although there are known issu
     purge => true,
   }
   ~~~
-  
+
   **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs before the firewall chain is purged. This is different than the `purge` parameter available in `firewallchain`.
 
 2.)  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
@@ -387,19 +387,23 @@ Parameter that controls the state of the iptables service on your system, allowi
 
 `ensure` can either be 'running' or 'stopped'. Defaults to 'running'.
 
-#### package
-
-Specify the platform-specific package(s) to install. Defaults defined in `firewall::params`.
-
 #### pkg_ensure
 
 Parameter that controls the state of the iptables package on your system, allowing you to update it if you wish.
 
 `ensure` can either be 'present' or 'latest'. Defaults to 'present'.
 
-#### service
+#### service_name
 
-Specify the platform-specific service(s) to start or stop. Defaults defined in `firewall::params`.
+Specify the name of the IPv4 iptables service. Defaults defined in `firewall::params`.
+
+#### service_name_v6
+
+Specify the name of the IPv6 ip6tables service. Defaults defined in `firewall::params`.
+
+#### package_name
+
+Specify the platform-specific package(s) to install. Defaults defined in `firewall::params`.
 
 ###Type: firewall
 
@@ -877,7 +881,7 @@ As Puppet Enterprise itself does not yet support Debian 8, use of this module wi
 system should be regarded as experimental.
 
 ### Known Issues
- 
+
 #### MCollective causes PE to reverse firewall rule order
 
 Firewall rules appear in reverse order if you use MCollective to run Puppet in Puppet Enterprise 2016.1, 2015.3, 2015.2, or 3.8.x.
