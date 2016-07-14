@@ -627,6 +627,42 @@ ARGS_TO_HASH = {
       :string_from => '1',
     },
   },
+  'nfqueue_jump1' => {
+    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -m comment --comment "000 nfqueue specify queue_num" -j NFQUEUE --queue-num 50',
+    :table  => 'filter',
+    :params => {
+      :name        => "000 nfqueue specify queue_num",
+      :source      => "1.2.3.4/32",
+      :destination => "4.3.2.1/32",
+      :jump        => "NFQUEUE",
+      :queue_num   => "50",
+      :proto       => "tcp",
+    },
+  },
+  'nfqueue_jump2' => {
+    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -m comment --comment "002 nfqueue specify queue_num and queue_bypass" -j NFQUEUE --queue-num 50 --queue-bypass',
+    :table  => "filter",
+    :params => {
+      :name         => "002 nfqueue specify queue_num and queue_bypass",
+      :source       => "1.2.3.4/32",
+      :destination  => "4.3.2.1/32",
+      :jump         => "NFQUEUE",
+      :queue_num    => "50",
+      :queue_bypass => true,
+      :proto        => "tcp",
+    },
+  },
+  'nfqueue_jump3' => {
+    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -m comment --comment "003 nfqueue dont specify queue_num or queue_bypass" -j NFQUEUE',
+    :table  => "filter",
+    :params => {
+      :name         => "003 nfqueue dont specify queue_num or queue_bypass",
+      :source       => "1.2.3.4/32",
+      :destination  => "4.3.2.1/32",
+      :jump         => "NFQUEUE",
+      :proto        => "tcp",
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -1206,4 +1242,37 @@ HASH_TO_ARGS = {
     },
     :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 string_matching", "-m", "string", "--string", "'GET /index.html'", "--from", "1", "--to", "65535"],
   },
+  'nfqueue_jump1' => {
+    :params => {
+      :name        => '000 nfqueue specify queue_num',
+      :table       => 'filter',
+      :jump        => 'NFQUEUE',
+      :source      => "1.2.3.4/32",
+      :destination => "4.3.2.1/32",
+      :queue_num   => "50",
+    },
+    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "000 nfqueue specify queue_num", "-j", "NFQUEUE", "--queue-num", "50"]
+  },
+  'nfqueue_jump2' => {
+    :params => {
+      :name         => '002 nfqueue specify queue_num and queue_bypass',
+      :table        => 'filter',
+      :jump         => "NFQUEUE",
+      :source       => '1.2.3.4/32',
+      :destination  => '4.3.2.1/32',
+      :queue_num    => "50",
+      :queue_bypass => true,
+    },
+    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "002 nfqueue specify queue_num and queue_bypass", "-j", "NFQUEUE", "--queue-num", "50", "--queue-bypass"]
+  },
+  'nfqueue_jump3' => {
+    :params => {
+      :name         => '003 nfqueue dont specify queue_num or queue_bypass',
+      :table        => 'filter',
+      :jump         => "NFQUEUE",
+      :source       => '1.2.3.4/32',
+      :destination  => '4.3.2.1/32',
+    },
+    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "003 nfqueue dont specify queue_num or queue_bypass", "-j", "NFQUEUE"]
+  }  
 }
