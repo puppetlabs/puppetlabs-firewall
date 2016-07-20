@@ -61,6 +61,8 @@ Puppet::Type.newtype(:firewall) do
   feature :clusterip, "Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them."
   feature :length, "Match the length of layer-3 payload"
   feature :string_matching, "String matching features"
+  feature :queue_num, "Which NFQUEUE to send packets to"
+  feature :queue_bypass, "If nothing is listening on queue_num, allow packets to bypass the queue"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -1457,6 +1459,32 @@ Puppet::Type.newtype(:firewall) do
     EOS
   end
 
+  newproperty(:queue_num, :required_features => :queue_num) do
+    desc <<-EOS
+      Used with NFQUEUE jump target.
+      What queue number to send packets to
+    EOS
+    munge do |value|
+      match = value.to_s.match("^([0-9])*$")
+      if match.nil?
+        raise ArgumentError, "queue_num must be an integer"
+      end
+
+      if match[1].to_i > 65535 || match[1].to_i < 0
+        raise ArgumentError, "queue_num must be between 0 and 65535"
+      end
+      value
+    end
+  end
+
+  newproperty(:queue_bypass, :required_features => :queue_bypass) do
+    desc <<-EOS
+      Used with NFQUEUE jump target
+      Allow packets to bypass :queue_num if userspace process is not listening
+    EOS
+    newvalues(:true, :false)
+  end
+
 
   autorequire(:firewallchain) do
     reqs = []
@@ -1648,6 +1676,12 @@ Puppet::Type.newtype(:firewall) do
         self.fail "Parameter checksum_fill requires jump => CHECKSUM and table => mangle"
       end
     end
+
+    if value(:queue_num) || value(:queue_bypass)
+      unless value(:jump).to_s == "NFQUEUE"
+        self.fail "Paramter queue_number and queue_bypass require jump => NFQUEUE"
+      end
+    end  
 
   end
 end

@@ -32,6 +32,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   has_feature :ipset
   has_feature :length
   has_feature :string_matching
+  has_feature :queue_num
+  has_feature :queue_bypass
 
   optional_commands({
     :ip6tables      => 'ip6tables',
@@ -105,6 +107,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :pkttype            => "-m pkttype --pkt-type",
     :port               => '-m multiport --ports',
     :proto              => "-p",
+    :queue_num          => "--queue-num",
+    :queue_bypass       => "--queue-bypass",
     :rdest              => "--rdest",
     :reap               => "--reap",
     :recent             => "-m recent",
@@ -168,6 +172,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :physdev_is_bridged,
     :time_contiguous,
     :kernel_timezone,
+    :queue_bypass,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple 
@@ -231,7 +236,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :ctstate, :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
     :string_from, :string_to, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
-    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss,
+    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone]
 
 end

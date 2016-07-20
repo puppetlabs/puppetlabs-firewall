@@ -36,6 +36,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :clusterip
   has_feature :length
   has_feature :string_matching
+  has_feature :queue_num
+  has_feature :queue_bypass
 
   optional_commands({
     :iptables => 'iptables',
@@ -90,6 +92,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :pkttype               => "-m pkttype --pkt-type",
     :port                  => '-m multiport --ports',
     :proto                 => "-p",
+    :queue_num             => "--queue-num",
+    :queue_bypass          => "--queue-bypass",
     :random                => "--random",
     :rdest                 => "--rdest",
     :reap                  => "--reap",
@@ -161,6 +165,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :time_contiguous,
     :kernel_timezone,
     :clusterip_new,
+    :queue_bypass,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
@@ -265,7 +270,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state, :ctstate, :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
     :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
-    :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init,
+    :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
     :clamp_mss_to_pmtu, :gateway, :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
     :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone
