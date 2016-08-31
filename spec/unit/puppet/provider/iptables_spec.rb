@@ -166,8 +166,8 @@ describe 'iptables provider' do
         '-A INPUT -s 8.0.0.2/32 -p tcp -m multiport --ports 150 -m comment --comment "150 test" -j ACCEPT',
         '-A INPUT -s 8.0.0.3/32 -p tcp -m multiport --ports 200 -j ACCEPT',
         '-A INPUT -s 8.0.0.3/32 -p tcp -m multiport --ports 250 -j ACCEPT',
-        '-A INPUT -s 8.0.0.4/32 -p tcp -m multiport --ports 300 -m comment --comment "300 test" -j ACCEPT',
-        '-A INPUT -s 8.0.0.4/32 -p tcp -m multiport --ports 350 -m comment --comment "350 test" -j ACCEPT',
+        '-A INPUT -s 8.0.0.4/32 -p tcp -m multiport --ports 900 -m comment --comment "900 test" -j ACCEPT',
+        '-A INPUT -s 8.0.0.4/32 -p tcp -m multiport --ports 950 -m comment --comment "950 test" -j ACCEPT',
         '-A INPUT -s 8.0.0.5/32 -p tcp -m multiport --ports 400 -j ACCEPT',
         '-A INPUT -s 8.0.0.5/32 -p tcp -m multiport --ports 450 -j ACCEPT',
       ] }
@@ -192,7 +192,7 @@ describe 'iptables provider' do
         expect(resource.provider.insert_order).to eq(5)
       end
       it 'understands offsets for adding rules after unnamed rules' do
-        resource = Puppet::Type.type(:firewall).new({ :name => '351 test', })
+        resource = Puppet::Type.type(:firewall).new({ :name => '951 test', })
         allow(resource.provider.class).to receive(:instances).and_return(providers)
         expect(resource.provider.insert_order).to eq(9)
       end
