@@ -376,6 +376,7 @@ Performs the basic setup tasks required for using the firewall resources.
 At the moment this takes care of:
 
 * iptables-persistent package installation
+* On Red Hat-derived systems, managing /etc/sysconfig/iptables-config
 
 Include the `firewall` class for nodes that need to use the resources in this module:
 
