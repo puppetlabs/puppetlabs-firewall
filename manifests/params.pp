@@ -53,6 +53,10 @@ class firewall::params {
         }
       }
     }
+    'Archlinux': {
+      $service_name = ['iptables','ip6tables']
+      $package_name = undef
+     }
     'Gentoo': {
       $service_name = ['iptables','ip6tables']
       $package_name = 'net-firewall/iptables'
