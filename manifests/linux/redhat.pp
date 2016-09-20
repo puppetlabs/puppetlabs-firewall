@@ -21,10 +21,6 @@ class firewall::linux::redhat (
   $package_ensure  = $::firewall::params::package_ensure,
 ) inherits ::firewall::params {
 
-  # there is only one service per address family on RedHat
-  validate_string($service_name)
-  validate_string($service_name_v6)
-
   # RHEL 7 / CentOS 7 and later and Fedora 15 and later require the iptables-services
   # package, which provides the /usr/libexec/iptables/iptables.init used by
   # lib/puppet/util/firewall.rb.
