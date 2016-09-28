@@ -1,5 +1,5 @@
 Facter.add(:iptables_version) do
-  confine :kernel => :linux
+  confine :kernel => :Linux
   setcode do
     version = Facter::Util::Resolution.exec('iptables --version')
     if version
