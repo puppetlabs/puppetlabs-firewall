@@ -62,6 +62,7 @@ Puppet::Type.newtype(:firewall) do
   feature :length, "Match the length of layer-3 payload"
   feature :string_matching, "String matching features"
   feature :queue_num, "Which NFQUEUE to send packets to"
+  feature :queue_balance, "Specify a range of queues to use. Packets are then balanced across multiple queues"
   feature :queue_bypass, "If nothing is listening on queue_num, allow packets to bypass the queue"
 
   # provider specific features
@@ -1477,6 +1478,27 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:queue_balance, :required_features => :queue_balance) do
+    desc <<-EOS
+      Used with NFQUEUE jump target.
+      Specifies a range of queues that packets are then balanced across
+    EOS
+    munge do |value|
+      match = value.to_s.match("^([0-9]+)(-)([0-9]+)$")
+
+      if match.nil?
+        raise ArgumentError, "queue_balance is in format of :queue_balance => X-Y"
+      end
+
+      startq = match[1].to_i
+      endq = match[3].to_i
+
+      value = startq.to_s
+      value << ":" << endq.to_s
+      value
+    end
+  end
+
   newproperty(:queue_bypass, :required_features => :queue_bypass) do
     desc <<-EOS
       Used with NFQUEUE jump target
@@ -1677,11 +1699,14 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
-    if value(:queue_num) || value(:queue_bypass)
+    if value(:queue_num) || value(:queue_bypass) || value(:queue_balance)
       unless value(:jump).to_s == "NFQUEUE"
-        self.fail "Paramter queue_number and queue_bypass require jump => NFQUEUE"
+        self.fail "Paramter queue_number, queue_balance, and queue_bypass require jump => NFQUEUE"
       end
-    end  
+    end
 
+    if value(:queue_num) && value(:queue_balance)
+      self.fail "Parameter 'queue_num' cannot be used with 'queue_balance'"
+    end
   end
 end

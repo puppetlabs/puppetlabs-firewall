@@ -663,6 +663,18 @@ ARGS_TO_HASH = {
       :proto        => "tcp",
     },
   },
+  'nfqueue_jump4' => {
+    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -m comment --comment "004 nfqueue queue_balance" -j NFQUEUE --queue-balance 0:31',
+    :table  => "filter",
+    :params => {
+      :name          => "004 nfqueue queue_balance",
+      :source        => "1.2.3.4/32",
+      :destination   => "4.3.2.1/32",
+      :jump          => "NFQUEUE",
+      :proto         => "tcp",
+      :queue_balance => "0-31"
+    }
+  }
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -1274,5 +1286,16 @@ HASH_TO_ARGS = {
       :destination  => '4.3.2.1/32',
     },
     :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "003 nfqueue dont specify queue_num or queue_bypass", "-j", "NFQUEUE"]
-  }  
+  },
+  'nfqueue_jump4' => {
+    :params => {
+      :name          => '004 nfqueue queue_balance',
+      :table         => 'filter',
+      :jump          => "NFQUEUE",
+      :source        => '1.2.3.4/32',
+      :destination   => '4.3.2.1/32',
+      :queue_balance => "0-31",
+    },
+    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "004 nfqueue queue_balance", "-j", "NFQUEUE", "--queue-balance", "0:31"]
+  }
 }

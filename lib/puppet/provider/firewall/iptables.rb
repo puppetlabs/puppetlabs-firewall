@@ -38,6 +38,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :string_matching
   has_feature :queue_num
   has_feature :queue_bypass
+  has_feature :queue_balance
+
 
   optional_commands({
     :iptables => 'iptables',
@@ -93,6 +95,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :port                  => '-m multiport --ports',
     :proto                 => "-p",
     :queue_num             => "--queue-num",
+    :queue_balance         => "--queue-balance",
     :queue_bypass          => "--queue-bypass",
     :random                => "--random",
     :rdest                 => "--rdest",
@@ -270,7 +273,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :state, :ctstate, :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
     :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
-    :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
+    :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass, :queue_balance,
     :clamp_mss_to_pmtu, :gateway, :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
     :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone
@@ -510,6 +513,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
     if hash[:length]
       hash[:length].gsub!(/:/,'-')
+    end
+    if hash[:queue_balance]
+      hash[:queue_balance].gsub!(/:/,'-')
     end
 
     # Invert any rules that are prefixed with a '!'
