@@ -672,9 +672,9 @@ ARGS_TO_HASH = {
       :destination   => "4.3.2.1/32",
       :jump          => "NFQUEUE",
       :proto         => "tcp",
-      :queue_balance => "0-31"
-    }
-  }
+      :queue_balance => "0:31"
+    },
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
@@ -692,7 +692,7 @@ HASH_TO_ARGS = {
       :sport => ["7061","7062"],
       :table => "filter",
     },
-    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "1.1.1.1/32", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-m", "comment", "--comment", "000 allow foo", "-j", "ACCEPT"],
+   :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "1.1.1.1/32", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-m", "comment", "--comment", "000 allow foo", "-j", "ACCEPT"],
   },
   'long_rule_2' => {
     :params => {

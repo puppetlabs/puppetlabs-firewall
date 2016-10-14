@@ -514,9 +514,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     if hash[:length]
       hash[:length].gsub!(/:/,'-')
     end
-    if hash[:queue_balance]
-      hash[:queue_balance].gsub!(/:/,'-')
-    end
+
 
     # Invert any rules that are prefixed with a '!'
     [
