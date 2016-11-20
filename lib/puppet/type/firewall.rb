@@ -1527,6 +1527,14 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  # autobefore is only provided since puppet 4.0
+  if Puppet.version.to_f >= 4.0
+    # On RHEL 7 this needs to be threaded correctly to manage SE Linux permissions after persisting the rules
+    autobefore(:file) do
+      [ '/etc/sysconfig/iptables' ]
+    end
+  end
+
   validate do
     debug("[validate]")
 
@@ -1681,7 +1689,7 @@ Puppet::Type.newtype(:firewall) do
       unless value(:jump).to_s == "NFQUEUE"
         self.fail "Paramter queue_number and queue_bypass require jump => NFQUEUE"
       end
-    end  
+    end
 
   end
 end
