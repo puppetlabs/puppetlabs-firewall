@@ -64,4 +64,22 @@ class firewall::linux::redhat (
     group  => 'root',
     mode   => '0600',
   }
+
+  # Before puppet 4, the autobefore on the firewall type does not work - therefore
+  # we need to keep this workaround here
+  if versioncmp($::puppetversion, '4.0') <= 0 {
+    File["/etc/sysconfig/${service_name}"] -> Service[$service_name]
+
+    # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
+    case $::selinux {
+      #lint:ignore:quoted_booleans
+      'true',true: {
+        case $::operatingsystemrelease {
+          /^(6|7)\..*/: { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u' } }
+          default: { File["/etc/sysconfig/${service_name}"] { seluser => 'system_u' } }
+        }
+      }
+      #lint:endignore
+    }
+  }
 }
