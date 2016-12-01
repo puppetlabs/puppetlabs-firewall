@@ -71,12 +71,13 @@ class firewall::linux::redhat (
     File["/etc/sysconfig/${service_name}"] -> Service[$service_name]
 
     # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
+    # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to etc_t
     case $::selinux {
       #lint:ignore:quoted_booleans
       'true',true: {
         case $::operatingsystemrelease {
-          /^(6|7)\..*/: { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u' } }
-          default:      { File["/etc/sysconfig/${service_name}"] { seluser => 'system_u' } }
+          /^(6|7)\..*/: { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' } }
+          default:      { File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' } }
         }
       }
       default:     {}
