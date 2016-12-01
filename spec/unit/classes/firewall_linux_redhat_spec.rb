@@ -35,6 +35,7 @@ describe 'firewall::linux::redhat', :type => :class do
           :operatingsystemrelease => osrel,
           :osfamily               => 'RedHat',
           :selinux                => false,
+          :puppetversion          => Puppet.version,
         }}
 
         it { should_not contain_service('firewalld') }
@@ -51,6 +52,7 @@ describe 'firewall::linux::redhat', :type => :class do
           :operatingsystemrelease => osrel,
           :osfamily               => 'RedHat',
           :selinux                => false,
+          :puppetversion          => Puppet.version,
         }}
 
         it { should contain_service('firewalld').with(
