@@ -13,6 +13,7 @@ describe 'firewall::linux', :type => :class do
               :operatingsystemrelease => osrel,
               :osfamily               => 'RedHat',
               :selinux                => false,
+              :puppetversion          => Puppet.version,
             }}
             it { should contain_class('firewall::linux::redhat').with_require('Package[iptables]') }
             it { should contain_package('iptables').with_ensure('present') }
@@ -33,6 +34,7 @@ describe 'firewall::linux', :type => :class do
             :operatingsystemrelease => osrel,
             :osfamily               => 'Debian',
             :selinux                => false,
+            :puppetversion          => Puppet.version,
           }}
 
           it { should contain_class('firewall::linux::debian').with_require('Package[iptables]') }
