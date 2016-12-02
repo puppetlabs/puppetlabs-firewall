@@ -76,7 +76,12 @@ class firewall::linux::redhat (
       #lint:ignore:quoted_booleans
       'true',true: {
         case $::operatingsystemrelease {
-          /^(6|7)\..*/: { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' } }
+          /^(6|7)\..*/: {
+            case $::operatingsystem {
+              'CentOS': { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' } }
+              default : { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' } }
+            }
+          }
           default:      { File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' } }
         }
       }
