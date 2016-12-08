@@ -440,6 +440,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       keys << :chain
     end
 
+    # Manually remove table (used in some tests)
+    if values =~ /^-t\s/
+      values = values.sub(/^-t\s/, '')
+      keys << :table
+    end
+
     valrev = values.scan(/("([^"\\]|\\.)*"|\S+)/).transpose[0].reverse
 
     if keys.length != valrev.length then
