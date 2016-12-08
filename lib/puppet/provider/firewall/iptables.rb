@@ -438,10 +438,16 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     values.slice!('-A')
     keys << :chain
 
+    valrev = values.scan(/("([^"\\]|\\.)*"|\S+)/).transpose[0].reverse
+
+    if keys.length != valrev.length then
+      raise "Parser error: keys (#{keys.length}) and values (#{valrev.length}) count mismatch on line: #{line}"
+    end
+
     # Here we generate the main hash by scanning arguments off the values
     # string, handling any quoted characters present in the value, and then
     # zipping the values with the array of keys.
-    keys.zip(values.scan(/("([^"\\]|\\.)*"|\S+)/).transpose[0].reverse) do |f, v|
+    keys.zip(valrev) do |f, v|
       if v =~ /^".*"$/ then
         hash[f] = v.sub(/^"(.*)"$/, '\1').gsub(/\\(\\|'|")/, '\1')
       else
