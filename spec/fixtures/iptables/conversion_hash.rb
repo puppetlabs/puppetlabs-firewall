@@ -663,6 +663,12 @@ ARGS_TO_HASH = {
       :proto        => "tcp",
     },
   },
+  'parser_sanity_check' => {
+    :line   => '-A INPUT -s 1.2.3.4/32 -p tcp -m tcp --dport 80 --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "004 parser sanity check" -j ACCEPT',
+    :table  => 'filter',
+    :raise_error => true,
+    :params => {},
+  },
 }
 
 # This hash is for testing converting a hash to an argument line.
