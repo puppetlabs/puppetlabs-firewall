@@ -435,8 +435,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
 
     # Manually remove chain
-    values.slice!('-A')
-    keys << :chain
+    if values =~ /(\s|^)-A\s/
+      values = values.sub(/(\s|^)-A\s/, '\1')
+      keys << :chain
+    end
 
     valrev = values.scan(/("([^"\\]|\\.)*"|\S+)/).transpose[0].reverse
 
