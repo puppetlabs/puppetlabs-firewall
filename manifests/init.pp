@@ -14,6 +14,7 @@
 class firewall (
   $ensure       = running,
   $pkg_ensure   = present,
+  $rules        = {},
   $service_name = $::firewall::params::service_name,
   $package_name = $::firewall::params::package_name,
 ) inherits ::firewall::params {
@@ -41,4 +42,8 @@ class firewall (
       fail("${title}: Kernel '${::kernel}' is not currently supported")
     }
   }
+  if $rules {
+    create_resources(firewall, $rules)
+  }
+
 }
