@@ -34,6 +34,7 @@ class firewall (
         service_name => $service_name,
         package_name => $package_name,
       }
+      contain "${title}::linux"
     }
     'FreeBSD': {
     }
