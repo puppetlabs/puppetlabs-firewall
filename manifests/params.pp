@@ -4,7 +4,7 @@ class firewall::params {
     'RedHat': {
       case $::operatingsystem {
         'Amazon': {
-          $service_name = 'iptables'
+          $service_name = ['iptables', 'ip6tables']
           $package_name = undef
         }
         'Fedora': {
@@ -13,7 +13,7 @@ class firewall::params {
           } else {
             $package_name = undef
           }
-          $service_name = 'iptables'
+          $service_name = ['iptables', 'ip6tables']
         }
         default: {
           if versioncmp($::operatingsystemrelease, '7.0') >= 0 {
@@ -21,7 +21,7 @@ class firewall::params {
           } else {
             $package_name = 'iptables-ipv6'
           }
-          $service_name = 'iptables'
+          $service_name = ['iptables', 'ip6tables']
         }
       }
     }
