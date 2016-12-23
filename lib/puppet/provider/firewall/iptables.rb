@@ -628,6 +628,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     resource_map = self.class.instance_variable_get('@resource_map')
     resource_map = munge_resource_map_from_resource(resource_map, resource)
 
+    # Always attempt to wait for a lock for iptables to prevent failures when
+    # puppet is running at the same time something else is managing the rules
+    # note: --wait wasn't added untip iptables version 1.4.20
+    iptables_version = Facter.value('iptables_version')
+    if (iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.4.20') >= 0)
+      args << ['--wait']
+    end
+
     resource_list.each do |res|
       resource_value = nil
       if (resource[res]) then
