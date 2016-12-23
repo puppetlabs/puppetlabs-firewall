@@ -1,5 +1,5 @@
 Facter.add(:ip6tables_version) do
-  confine :kernel => :linux
+  confine :kernel => :Linux
   setcode do
     version = Facter::Util::Resolution.exec('ip6tables --version')
     if version
