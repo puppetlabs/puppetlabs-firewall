@@ -72,6 +72,13 @@ class firewall::linux::redhat (
     mode   => '0600',
   }
 
+  file { "/etc/sysconfig/${service_name_v6}":
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0600',
+  }
+
   # Before puppet 4, the autobefore on the firewall type does not work - therefore
   # we need to keep this workaround here
   if versioncmp($::puppetversion, '4.0') <= 0 {
@@ -85,23 +92,28 @@ class firewall::linux::redhat (
         case $::operatingsystemrelease {
           /^7\..*/: {
             case $::operatingsystem {
-              'CentOS': { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' } }
-              default : { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' } }
+              'CentOS': {
+                File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+                File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+              }
+              default : {
+                File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
+                File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
+              }
             }
           }
-          /^6\..*/:     { File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' } }
-          default:      { File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' } }
+          /^6\..*/:     {
+            File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+            File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+          }
+          default:      {
+            File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' }
+            File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+          }
         }
       }
       default:     {}
       #lint:endignore
     }
-  }
-  file { "/etc/sysconfig/${service_name_v6}":
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0600',
-    seluser => $seluser,
   }
 }
