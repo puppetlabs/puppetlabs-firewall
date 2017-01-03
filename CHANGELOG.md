@@ -1,3 +1,19 @@
+## Supported Release 1.8.2
+### Summary
+This release includes numerous features and bugfixes, See below.
+
+#### Bugfixes
+- Fixing issue with double quotes being removed when part of the rule comment
+- Add the --wait flag to the insert/update/delete iptables actions to prevent failures from occuring when iptables is running outside of puppet for iptables >= 1.4.20
+- Fix iptables_version and ip6tables_version facts not returning the version
+
+#### Features
+- Support for multiple IP sets in a single rule
+- Implement queue_bypass and queue_num parameters for NFQUEUE jump target
+- Tighten SELinux permissions on persistent files
+- RHEL7 SELinux support for puppet 3
+- Manage ip6tables service for Redhat Family
+
 ## Supported Release 1.8.1
 ### Summary
 This release documents an important issue with mcollective that may impact users of the firewall module. Workarounds are suggested as part of this advisory until mcollective can be patched.
