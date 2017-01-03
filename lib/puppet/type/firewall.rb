@@ -1531,7 +1531,7 @@ Puppet::Type.newtype(:firewall) do
   if Puppet.version.to_f >= 4.0
     # On RHEL 7 this needs to be threaded correctly to manage SE Linux permissions after persisting the rules
     autobefore(:file) do
-      [ '/etc/sysconfig/iptables' ]
+      [ '/etc/sysconfig/iptables', '/etc/sysconfig/ip6tables' ]
     end
   end
 
