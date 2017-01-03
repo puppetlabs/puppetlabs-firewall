@@ -25,8 +25,8 @@ class firewall::linux::redhat (
   # package, which provides the /usr/libexec/iptables/iptables.init used by
   # lib/puppet/util/firewall.rb.
   if ($::operatingsystem != 'Amazon')
-  and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
-  or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
+    and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
+    or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
     service { 'firewalld':
       ensure => stopped,
       enable => false,
@@ -42,8 +42,8 @@ class firewall::linux::redhat (
   }
 
   if ($::operatingsystem != 'Amazon')
-  and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
-  or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
+    and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
+    or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
     if $ensure == 'running' {
       exec { '/usr/bin/systemctl daemon-reload':
         require => Package[$package_name],
@@ -62,7 +62,6 @@ class firewall::linux::redhat (
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
-    require   => File["/etc/sysconfig/${service_name_v6}"],
   }
 
   file { "/etc/sysconfig/${service_name}":
@@ -71,7 +70,6 @@ class firewall::linux::redhat (
     group  => 'root',
     mode   => '0600',
   }
-
   file { "/etc/sysconfig/${service_name_v6}":
     ensure => present,
     owner  => 'root',
@@ -82,38 +80,39 @@ class firewall::linux::redhat (
   # Before puppet 4, the autobefore on the firewall type does not work - therefore
   # we need to keep this workaround here
   if versioncmp($::puppetversion, '4.0') <= 0 {
-    File["/etc/sysconfig/${service_name}"] -> Service[$service_name]
+    File["/etc/sysconfig/${service_name}"]    -> Service[$service_name]
+    File["/etc/sysconfig/${service_name_v6}"] -> Service[$service_name_v6]
+  }
 
-    # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
-    # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to etc_t
-    case $::selinux {
-      #lint:ignore:quoted_booleans
-      'true',true: {
-        case $::operatingsystemrelease {
-          /^7\..*/: {
-            case $::operatingsystem {
-              'CentOS': {
-                File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-                File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-              }
-              default : {
-                File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
-                File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
-              }
+  # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
+  # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to etc_t
+  case $::selinux {
+    #lint:ignore:quoted_booleans
+    'true',true: {
+      case $::operatingsystemrelease {
+        /^7\..*/: {
+          case $::operatingsystem {
+            'CentOS': {
+              File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+              File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+            }
+            default : {
+              File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
+              File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
             }
           }
-          /^6\..*/:     {
-            File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-            File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-          }
-          default:      {
-            File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' }
-            File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-          }
+        }
+        /^6\..*/: {
+          File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+          File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+        }
+        default: {
+          File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' }
+          File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
         }
       }
-      default:     {}
-      #lint:endignore
     }
+    default:     {}
+    #lint:endignore
   }
 }
