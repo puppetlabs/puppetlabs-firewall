@@ -1,4 +1,4 @@
-## Supported Release 2.0.0
+## Supported Release 1.8.2
 ### Summary
 This release includes numerous features and bugfixes, See below.
 
