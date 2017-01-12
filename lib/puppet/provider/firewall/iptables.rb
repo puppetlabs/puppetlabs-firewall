@@ -146,6 +146,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :clusterip_total_nodes => "--total-nodes",
     :clusterip_local_node  => "--local-node",
     :clusterip_hash_init   => "--hash-init",
+    :src_cc                => "--src-cc",
+    :dst_cc                => "--dst-cc",
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -185,7 +187,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :addrtype  => [:src_type, :dst_type],
     :iprange   => [:src_range, :dst_range],
     :owner     => [:uid, :gid],
-    :time      => [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone]
+    :time      => [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
+    :geoip     => [:src_cc, :dst_cc]
   }
 
   def self.munge_resource_map_from_existing_values(resource_map_original, compare)
@@ -273,7 +276,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
     :clamp_mss_to_pmtu, :gateway, :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
     :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
-    :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone
+    :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
+    :src_cc, :dst_cc
   ]
 
   def insert

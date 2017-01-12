@@ -1485,6 +1485,19 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:true, :false)
   end
 
+  newproperty(:src_cc) do
+    desc <<-EOS
+      src attribute for the module geoip
+    EOS
+    newvalues(/^[A-Z]{2}(,[A-Z]{2})*$/)
+  end
+
+  newproperty(:dst_cc) do
+    desc <<-EOS
+      dst attribute for the module geoip
+    EOS
+    newvalues(/^[A-Z]{2}(,[A-Z]{2})*$/)
+  end
 
   autorequire(:firewallchain) do
     reqs = []
