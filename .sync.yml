@@ -1,4 +1,6 @@
 ---
+appveyor.yml:
+  delete: true
 # only run a minimal subset of tests on travis, as many of the tests exercise the kernel, which is the "wrong" one anyways
 .travis.yml:
   docker_sets:
