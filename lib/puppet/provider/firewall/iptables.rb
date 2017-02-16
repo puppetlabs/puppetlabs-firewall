@@ -132,6 +132,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :physdev_in            => "--physdev-in",
     :physdev_out           => "--physdev-out",
     :physdev_is_bridged    => "--physdev-is-bridged",
+    :physdev_is_in         => "--physdev-is-in",
+    :physdev_is_out        => "--physdev-is-out",
     :date_start            => "--datestart",
     :date_stop             => "--datestop",
     :time_start            => "--timestart",
@@ -164,6 +166,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :rttl,
     :socket,
     :physdev_is_bridged,
+    :physdev_is_in,
+    :physdev_is_out,
     :time_contiguous,
     :kernel_timezone,
     :clusterip_new,
@@ -183,7 +187,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   #                ones.
   #
   @module_to_argument_mapping = {
-    :physdev   => [:physdev_in, :physdev_out, :physdev_is_bridged],
+    :physdev   => [:physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out],
     :addrtype  => [:src_type, :dst_type],
     :iprange   => [:src_range, :dst_range],
     :owner     => [:uid, :gid],
@@ -266,8 +270,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   # changes between puppet runs, the changed rules will be re-applied again.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
-    :table, :source, :destination, :iniface, :outiface, :physdev_in, :physdev_out, :physdev_is_bridged, :proto, :isfragment,
-    :stat_mode, :stat_every, :stat_packet, :stat_probability,
+    :table, :source, :destination, :iniface, :outiface,
+    :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
+    :proto, :isfragment, :stat_mode, :stat_every, :stat_packet, :stat_probability,
     :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
     :src_type, :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,

@@ -1253,6 +1253,20 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:true, :false)
   end
 
+  newproperty(:physdev_is_in, :required_features => :iptables) do
+    desc <<-EOS
+      Matches if the packet has entered through a bridge interface.
+    EOS
+    newvalues(:true, :false)
+  end
+
+  newproperty(:physdev_is_out, :required_features => :iptables) do
+    desc <<-EOS
+      Matches if the packet will leave through a bridge interface.
+    EOS
+    newvalues(:true, :false)
+  end
+
   newproperty(:date_start, :required_features => :iptables) do
     desc <<-EOS
       Only match during the given time, which must be in ISO 8601 "T" notation.
