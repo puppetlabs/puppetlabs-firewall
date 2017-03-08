@@ -145,6 +145,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :physdev_in         => "--physdev-in",
     :physdev_out        => "--physdev-out",
     :physdev_is_bridged => "--physdev-is-bridged",
+    :physdev_is_in      => "--physdev-is-in",
+    :physdev_is_out     => "--physdev-is-out",
     :date_start         => "--datestart",
     :date_stop          => "--datestop",
     :time_start         => "--timestart",
@@ -172,12 +174,14 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :rttl,
     :socket,
     :physdev_is_bridged,
+    :physdev_is_in,
+    :physdev_is_out,
     :time_contiguous,
     :kernel_timezone,
     :queue_bypass,
   ]
 
-  # Properties that use "-m <ipt module name>" (with the potential to have multiple 
+  # Properties that use "-m <ipt module name>" (with the potential to have multiple
   # arguments against the same IPT module) must be in this hash. The keys in this
   # hash are the IPT module names, with the values being an array of the respective
   # supported arguments for this IPT module.
@@ -190,7 +194,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   #                ones.
   #
   @module_to_argument_mapping = {
-    :physdev   => [:physdev_in, :physdev_out, :physdev_is_bridged],
+    :physdev   => [:physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out],
     :addrtype  => [:src_type, :dst_type],
     :iprange   => [:src_range, :dst_range],
     :owner     => [:uid, :gid],
@@ -233,7 +237,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
   @resource_list = [:table, :source, :destination, :iniface, :outiface, :physdev_in,
-    :physdev_out, :physdev_is_bridged, :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
+    :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
+    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
     :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
     :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,

@@ -366,4 +366,54 @@ describe 'firewall bridging' do
         end
       end
     end
+
+    context 'physdev_is_in' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '708 - test':
+            provider => 'ip6tables',
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '708',
+            action => accept,
+            physdev_is_in => true,
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => do_catch_changes)
+      end
+
+      it 'should contain the rule' do
+         shell('ip6tables-save') do |r|
+           expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-in -m multiport --ports 708 -m comment --comment "708 - test" -j ACCEPT/)
+         end
+      end
+    end
+
+    context 'physdev_is_out' do
+      it 'applies' do
+        pp = <<-EOS
+          class { '::firewall': }
+          firewall { '709 - test':
+            provider => 'ip6tables',
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '709',
+            action => accept,
+            physdev_is_out => true,
+          }
+        EOS
+
+        apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => do_catch_changes)
+      end
+
+      it 'should contain the rule' do
+         shell('ip6tables-save') do |r|
+           expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-out -m multiport --ports 709 -m comment --comment "709 - test" -j ACCEPT/)
+         end
+      end
+    end
 end

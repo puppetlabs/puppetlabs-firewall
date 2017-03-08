@@ -35,7 +35,7 @@ group :development do
   gem 'metadata-json-lint',                 :require => false, :platforms => 'ruby'
   gem 'puppet_facts',                       :require => false
   gem 'puppet-blacksmith', '>= 3.4.0',      :require => false, :platforms => 'ruby'
-  gem 'puppetlabs_spec_helper', '>= 1.2.1', :require => false
+  gem 'puppetlabs_spec_helper', '~> 1.2',   :require => false
   gem 'rspec-puppet', '>= 2.3.2',           :require => false
   gem 'rspec-puppet-facts',                 :require => false, :platforms => 'ruby'
   gem 'mocha', '< 1.2.0',                   :require => false
@@ -53,14 +53,14 @@ group :development do
 end
 
 group :system_tests do
-  gem 'beaker', *location_for(ENV['BEAKER_VERSION'] || '>= 3')                  
+  gem 'beaker', *location_for(ENV['BEAKER_VERSION'] || '>= 3')
   gem 'beaker-pe',                                                               :require => false
-  gem 'beaker-rspec', *location_for(ENV['BEAKER_RSPEC_VERSION'])                
+  gem 'beaker-rspec', *location_for(ENV['BEAKER_RSPEC_VERSION'])
   gem 'beaker-puppet_install_helper',                                            :require => false
   gem 'beaker-module_install_helper',                                            :require => false
   gem 'master_manipulator',                                                      :require => false
   gem 'beaker-hostgenerator', *location_for(ENV['BEAKER_HOSTGENERATOR_VERSION'])
-  gem 'beaker-abs', *location_for(ENV['BEAKER_ABS_VERSION'] || '~> 0.1')        
+  gem 'beaker-abs', *location_for(ENV['BEAKER_ABS_VERSION'] || '~> 0.1')
 end
 
 gem 'puppet', *location_for(ENV['PUPPET_GEM_VERSION'])

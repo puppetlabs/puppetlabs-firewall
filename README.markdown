@@ -639,6 +639,10 @@ firewall { '999 this runs last':
 
 * `physdev_is_bridged`: Match if the packet is transversing a bridge. Valid values are true or false.
 
+* `physdev_is_in`: Match if the packet has entered through a bridge interface. Valid values are true or false.
+
+* `physdev_is_bridged`: Match if the packet will leave through a bridge interface. Valid values are true or false.
+
 * `pkttype`: Sets the packet type to match. Valid values are: 'unicast', 'broadcast', and'multicast'. Requires the `pkttype` feature.
 
 * `port`: *DEPRECATED* Using the unspecific 'port' parameter can lead to firewall rules that are unexpectedly too lax. It is recommended to always use the specific dport and sport parameters to avoid this ambiguity. The destination or source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
