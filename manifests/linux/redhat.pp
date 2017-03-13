@@ -84,35 +84,42 @@ class firewall::linux::redhat (
     File["/etc/sysconfig/${service_name_v6}"] -> Service[$service_name_v6]
   }
 
-  # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to unconfined_u
-  # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to etc_t
+  # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to system_u
+  # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to system_conf_t
   case $::selinux {
     #lint:ignore:quoted_booleans
     'true',true: {
-      case $::operatingsystemrelease {
-        /^7\..*/: {
-          case $::operatingsystem {
-            'CentOS': {
+      case $::operatingsystem {
+        'CentOS': {
+          case $::operatingsystemrelease {
+            /^6\..*/: {
               File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
               File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
             }
+
+            /^7\..*/: {
+              File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' }
+              File["/etc/sysconfig/${service_name_v6}"] { seluser => 'system_u', seltype => 'system_conf_t' }
+            }
+
             default : {
               File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
               File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
             }
           }
         }
-        /^6\..*/: {
-          File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-          File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-        }
-        default: {
+
+        # Fedora uses the same SELinux context as Redhat
+        'Fedora': {
           File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' }
-          File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
+          File["/etc/sysconfig/${service_name_v6}"] { seluser => 'system_u', seltype => 'system_conf_t' }
         }
+
+        default: {}
+
       }
     }
-    default:     {}
+    default: {}
     #lint:endignore
   }
 }
