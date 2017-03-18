@@ -155,8 +155,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :week_days          => "--weekdays",
     :time_contiguous    => "--contiguous",
     :kernel_timezone    => "--kerneltz",
-    :src_cc             => "--src-cc",
-    :dst_cc             => "--dst-cc",
+    :src_cc             => "--source-country",
+    :dst_cc             => "--destination-country",
   }
 
   # These are known booleans that do not take a value, but we want to munge
