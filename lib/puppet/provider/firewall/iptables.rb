@@ -148,8 +148,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :clusterip_total_nodes => "--total-nodes",
     :clusterip_local_node  => "--local-node",
     :clusterip_hash_init   => "--hash-init",
-    :src_cc                => "--src-cc",
-    :dst_cc                => "--dst-cc",
+    :src_cc                => "--source-country",
+    :dst_cc                => "--destination-country",
   }
 
   # These are known booleans that do not take a value, but we want to munge
