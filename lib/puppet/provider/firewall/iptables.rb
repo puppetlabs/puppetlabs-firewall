@@ -376,6 +376,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
+    # fix negated physdev rules
+    values = values.gsub(/-m physdev ! (--physdev-is-\S+)/, '-m physdev \1 "!"')
     # the actual rule will have the ! mark before the option.
     values = values.gsub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
@@ -409,7 +411,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         # distinguish between -f and the '-f' inside of --tcp-flags.
         values = values.sub(/\s-f(?!l)(?=.*--comment)/, ' -f true')
       else
-        values = values.sub(/#{resource_map[bool]}/, "#{resource_map[bool]} true")
+        # append `true` to booleans that are not already negated (followed by "!")
+        values = values.sub(/#{resource_map[bool]}(?! "!")/, "#{resource_map[bool]} true")
       end
     end
 
@@ -501,10 +504,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     # Convert booleans removing the previous cludge we did
     @known_booleans.each do |bool|
-      if hash[bool] != nil then
-        if hash[bool] != "true" then
-          raise "Parser error: #{bool} was meant to be a boolean but received value: #{hash[bool]}."
-        end
+      unless [nil, 'true', '!'].include?(hash[bool])
+        raise "Parser error: #{bool} was meant to be a boolean but received value: #{hash[bool]}."
       end
     end
 
@@ -530,6 +531,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       :dst_range,
       :dst_type,
       :port,
+      :physdev_is_bridged,
+      :physdev_is_in,
+      :physdev_is_out,
       :proto,
       :source,
       :sport,
