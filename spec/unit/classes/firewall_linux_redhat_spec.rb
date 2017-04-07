@@ -60,8 +60,8 @@ describe 'firewall::linux::redhat', :type => :class do
           :enable   => 'true'
         )}
         it { should contain_service('ip6tables').with(
-          :ensure   => 'running',
-          :enable   => 'true'
+          :ensure    => 'running',
+          :enable    => 'true'
         )}
 
         context 'ensure => stopped' do
@@ -69,8 +69,12 @@ describe 'firewall::linux::redhat', :type => :class do
           it { should contain_service('iptables').with(
             :ensure   => 'stopped'
           )}
+        end
+
+        context 'ensure_v6 => stopped' do
+          let(:params) {{ :ensure_v6 => 'stopped' }}
           it { should contain_service('ip6tables').with(
-            :ensure   => 'stopped'
+            :ensure  => 'stopped'
           )}
         end
 
@@ -79,8 +83,12 @@ describe 'firewall::linux::redhat', :type => :class do
           it { should contain_service('iptables').with(
             :enable   => 'false'
           )}
+        end
+
+        context 'enable_v6 => false' do
+          let(:params) {{ :enable_v6 => 'false' }}
           it { should contain_service('ip6tables').with(
-            :enable   => 'false'
+            :enable  => 'false'
           )}
         end
 
