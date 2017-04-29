@@ -17,6 +17,7 @@ class firewall::linux (
   $service_name    = $::firewall::params::service_name,
   $service_name_v6 = $::firewall::params::service_name_v6,
   $package_name    = $::firewall::params::package_name,
+  $ebtables_manage = false,
 ) inherits ::firewall::params {
   $enable = $ensure ? {
     running => true,
@@ -25,6 +26,12 @@ class firewall::linux (
 
   package { 'iptables':
     ensure => $pkg_ensure,
+  }
+
+  if $ebtables_manage {
+    package { 'ebtables':
+      ensure => $pkg_ensure,
+    }
   }
 
   case $::operatingsystem {

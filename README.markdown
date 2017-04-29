@@ -393,6 +393,10 @@ Parameter that controls the state of the iptables package on your system, allowi
 
 `ensure` can either be 'present' or 'latest'. Defaults to 'present'.
 
+#### ebtables_manage
+
+Parameter that controls whether puppet manages the ebtables package or not. If managed, the package will use the value of `pkg_ensure` as its ensure value.
+
 #### service_name
 
 Specify the name of the IPv4 iptables service. Defaults defined in `firewall::params`.
