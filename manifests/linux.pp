@@ -19,8 +19,8 @@ class firewall::linux (
   $package_name    = $::firewall::params::package_name,
 ) inherits ::firewall::params {
   $enable = $ensure ? {
-    running => true,
-    stopped => false,
+    'running' => true,
+    'stopped' => false,
   }
 
   package { 'iptables':
