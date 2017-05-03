@@ -680,7 +680,7 @@ HASH_TO_ARGS = {
       :sport => ["7061","7062"],
       :table => "filter",
     },
-    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "1.1.1.1/32", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-m", "comment", "--comment", "000 allow foo", "-j", "ACCEPT"],
+    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "1.1.1.1/32", "-p", :tcp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061,7062", "-j", "ACCEPT", "-m", "comment", "--comment", "000 allow foo"],
   },
   'long_rule_2' => {
     :params => {
@@ -695,7 +695,7 @@ HASH_TO_ARGS = {
       :sport => ["7061","7062"],
       :table => "filter",
     },
-    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "2.10.13.0/24", "-p", :udp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061", "-m", "comment", "--comment", "700 allow bar", "-j", "my_custom_chain"],
+    :args => ["-t", :filter, "-s", "1.1.1.1/32", "-d", "2.10.13.0/24", "-p", :udp, "-m", "multiport", "--sports", "7061,7062", "-m", "multiport", "--dports", "7061", "-j", "my_custom_chain", "-m", "comment", "--comment", "700 allow bar"],
   },
   'no_action' => {
     :params => {
@@ -838,8 +838,7 @@ HASH_TO_ARGS = {
       :table => "filter",
       :state => ['ESTABLISHED', 'INVALID']
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 states_set_from_array",
-      "-m", "state", "--state", "ESTABLISHED,INVALID"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "state", "--state", "ESTABLISHED,INVALID", "-m", "comment", "--comment", "100 states_set_from_array"],
   },
   'ctstates_set_from_array' => {
     :params => {
@@ -847,8 +846,7 @@ HASH_TO_ARGS = {
       :table => "filter",
       :ctstate => ['ESTABLISHED', 'INVALID']
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 ctstates_set_from_array",
-      "-m", "conntrack", "--ctstate", "ESTABLISHED,INVALID"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "conntrack", "--ctstate", "ESTABLISHED,INVALID", "-m", "comment", "--comment", "100 ctstates_set_from_array"],
   },
   'comment_string_character_validation' => {
     :params => {
@@ -873,7 +871,7 @@ HASH_TO_ARGS = {
       :jump => 'LOG',
       :log_level => 'debug'
     },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '956 INPUT log-level', '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '7'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '7', '-m', 'comment', '--comment', '956 INPUT log-level'],
   },
   'log_level_warn' => {
     :params => {
@@ -883,7 +881,7 @@ HASH_TO_ARGS = {
       :jump => 'LOG',
       :log_level => 'warn'
     },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'comment', '--comment', '956 INPUT log-level', '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '4'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'state', '--state', 'NEW', '-j', 'LOG', '--log-level', '4', '-m', 'comment', '--comment', '956 INPUT log-level'],
   },
   'load_limit_module_and_implicit_burst' => {
     :params => {
@@ -892,7 +890,7 @@ HASH_TO_ARGS = {
       :dport => '123',
       :limit => '15/hour'
     },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '15/hour'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'limit', '--limit', '15/hour', '-m', 'comment', '--comment', '057 INPUT limit NTP'],
   },
   'limit_with_explicit_burst' => {
     :params => {
@@ -902,7 +900,7 @@ HASH_TO_ARGS = {
       :limit => '30/hour',
       :burst => '10'
     },
-    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'comment', '--comment', '057 INPUT limit NTP', '-m', 'limit', '--limit', '30/hour', '--limit-burst', '10'],
+    :args => ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '123', '-m', 'limit', '--limit', '30/hour', '--limit-burst', '10', '-m', 'comment', '--comment', '057 INPUT limit NTP'],
   },
   'proto_ipencap' => {
     :params => {
@@ -921,7 +919,7 @@ HASH_TO_ARGS = {
       :chain => 'OUTPUT',
       :proto => 'all',
     },
-    :args => ['-t', :filter, '-p', :all, '-m', 'owner', '--uid-owner', 'root', '-m', 'comment', '--comment', '057 OUTPUT uid root only', '-j', 'ACCEPT'],
+    :args => ['-t', :filter, '-p', :all, '-m', 'owner', '--uid-owner', 'root', '-j', 'ACCEPT', '-m', 'comment', '--comment', '057 OUTPUT uid root only'],
   },
   'load_uid_owner_postrouting_module' => {
     :params => {
@@ -932,7 +930,7 @@ HASH_TO_ARGS = {
       :chain => 'POSTROUTING',
       :proto => 'all',
     },
-    :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--uid-owner', 'root', '-m', 'comment', '--comment', '057 POSTROUTING uid root only', '-j', 'ACCEPT'],
+    :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--uid-owner', 'root', '-j', 'ACCEPT', '-m', 'comment', '--comment', '057 POSTROUTING uid root only'],
   },
   'load_gid_owner_filter_module' => {
     :params => {
@@ -943,7 +941,7 @@ HASH_TO_ARGS = {
       :action => 'accept',
       :proto => 'all',
     },
-    :args => ['-t', :filter, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-m', 'comment', '--comment', '057 OUTPUT gid root only', '-j', 'ACCEPT'],
+    :args => ['-t', :filter, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-j', 'ACCEPT', '-m', 'comment', '--comment', '057 OUTPUT gid root only'],
   },
   'load_gid_owner_postrouting_module' => {
     :params => {
@@ -954,7 +952,7 @@ HASH_TO_ARGS = {
       :chain => 'POSTROUTING',
       :proto => 'all',
     },
-    :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-m', 'comment', '--comment', '057 POSTROUTING gid root only', '-j', 'ACCEPT'],
+    :args => ['-t', :mangle, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-j', 'ACCEPT', '-m', 'comment', '--comment', '057 POSTROUTING gid root only'],
   },
   'mark_set-mark_int' => {
     :params => {
@@ -964,7 +962,7 @@ HASH_TO_ARGS = {
       :chain    => 'PREROUTING',
       :set_mark => '1000',
     },
-    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 1000', '-j', 'MARK', '--set-xmark', '0x3e8/0xffffffff'],
+    :args => ['-t', :mangle, '-p', :tcp, '-j', 'MARK', '--set-xmark', '0x3e8/0xffffffff', '-m', 'comment', '--comment', '058 set-mark 1000'],
   },
   'mark_set-mark_hex' => {
     :params => {
@@ -974,7 +972,7 @@ HASH_TO_ARGS = {
       :chain    => 'PREROUTING',
       :set_mark => '0x32',
     },
-    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 0x32', '-j', 'MARK', '--set-xmark', '0x32/0xffffffff'],
+    :args => ['-t', :mangle, '-p', :tcp, '-j', 'MARK', '--set-xmark', '0x32/0xffffffff', '-m', 'comment', '--comment', '058 set-mark 0x32'],
   },
   'mark_set-mark_hex_with_hex_mask' => {
     :params => {
@@ -984,7 +982,7 @@ HASH_TO_ARGS = {
       :chain    => 'PREROUTING',
       :set_mark => '0x32/0xffffffff',
     },
-    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 0x32/0xffffffff', '-j', 'MARK', '--set-xmark', '0x32/0xffffffff'],
+    :args => ['-t', :mangle, '-p', :tcp, '-j', 'MARK', '--set-xmark', '0x32/0xffffffff', '-m', 'comment', '--comment', '058 set-mark 0x32/0xffffffff'],
     },
   'mark_set-mark_hex_with_mask' => {
     :params => {
@@ -994,7 +992,7 @@ HASH_TO_ARGS = {
       :chain    => 'PREROUTING',
       :set_mark => '0x32/4',
     },
-    :args => ['-t', :mangle, '-p', :tcp, '-m', 'comment', '--comment', '058 set-mark 0x32/4', '-j', 'MARK', '--set-xmark', '0x32/0x4'],
+    :args => ['-t', :mangle, '-p', :tcp, '-j', 'MARK', '--set-xmark', '0x32/0x4', '-m', 'comment', '--comment', '058 set-mark 0x32/4'],
     },
     'iniface_1' => {
     :params => {
@@ -1004,7 +1002,7 @@ HASH_TO_ARGS = {
       :chain => 'INPUT',
       :iniface => 'eth0',
     },
-    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "comment", "--comment", "060 iniface", "-j", "DROP"],
+    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-j", "DROP", "-m", "comment", "--comment", "060 iniface"],
   },
   'iniface_with_vlans_1' => {
     :params => {
@@ -1014,7 +1012,7 @@ HASH_TO_ARGS = {
       :chain => 'INPUT',
       :iniface => 'eth0.234',
     },
-    :args => ["-t", :filter, "-i", "eth0.234", "-p", :tcp, "-m", "comment", "--comment", "060 iniface", "-j", "DROP"],
+    :args => ["-t", :filter, "-i", "eth0.234", "-p", :tcp, "-j", "DROP", "-m", "comment", "--comment", "060 iniface"],
   },
   'iniface_with_plus_1' => {
     :params => {
@@ -1024,7 +1022,7 @@ HASH_TO_ARGS = {
       :chain => 'INPUT',
       :iniface => 'eth+',
     },
-    :args => ["-t", :filter, "-i", "eth+", "-p", :tcp, "-m", "comment", "--comment", "060 iniface", "-j", "DROP"],
+    :args => ["-t", :filter, "-i", "eth+", "-p", :tcp, "-j", "DROP", "-m", "comment", "--comment", "060 iniface"],
   },
   'outiface_1' => {
     :params => {
@@ -1034,7 +1032,7 @@ HASH_TO_ARGS = {
       :chain => 'OUTPUT',
       :outiface => 'eth0',
     },
-    :args => ["-t", :filter, "-o", "eth0", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
+    :args => ["-t", :filter, "-o", "eth0", "-p", :tcp, "-j", "DROP", "-m", "comment", "--comment", "060 outiface"],
   },
   'outiface_with_vlans_1' => {
     :params => {
@@ -1044,7 +1042,7 @@ HASH_TO_ARGS = {
       :chain => 'OUTPUT',
       :outiface => 'eth0.234',
     },
-    :args => ["-t", :filter, "-o", "eth0.234", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
+    :args => ["-t", :filter, "-o", "eth0.234", "-p", :tcp, "-j", "DROP", "-m", "comment", "--comment", "060 outiface"],
   },
   'outiface_with_plus_1' => {
     :params => {
@@ -1054,7 +1052,7 @@ HASH_TO_ARGS = {
       :chain => 'OUTPUT',
       :outiface => 'eth+',
     },
-    :args => ["-t", :filter, "-o", "eth+", "-p", :tcp, "-m", "comment", "--comment", "060 outiface", "-j", "DROP"],
+    :args => ["-t", :filter, "-o", "eth+", "-p", :tcp, "-j", "DROP", "-m", "comment", "--comment", "060 outiface"],
   },
   'pkttype multicast' => {
     :params => {
@@ -1065,7 +1063,7 @@ HASH_TO_ARGS = {
       :iniface => 'eth0',
       :pkttype => 'multicast',
     },
-    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "pkttype", "--pkt-type", :multicast, "-m", "comment", "--comment", "062 pkttype multicast", "-j", "ACCEPT"],
+    :args => ["-t", :filter, "-i", "eth0", "-p", :tcp, "-m", "pkttype", "--pkt-type", :multicast, "-j", "ACCEPT", "-m", "comment", "--comment", "062 pkttype multicast"],
   },
   'socket_option' => {
     :params => {
@@ -1075,7 +1073,7 @@ HASH_TO_ARGS = {
       :chain => 'PREROUTING',
       :socket => true,
     },
-    :args => ['-t', :mangle, '-p', :tcp, '-m', 'socket', '-m', 'comment', '--comment', '050 socket option', '-j', 'ACCEPT'],
+    :args => ['-t', :mangle, '-p', :tcp, '-m', 'socket', '-j', 'ACCEPT', '-m', 'comment', '--comment', '050 socket option'],
   },
   'isfragment_option' => {
     :params => {
@@ -1085,7 +1083,7 @@ HASH_TO_ARGS = {
       :action => 'accept',
       :isfragment => true,
     },
-    :args => ['-t', :filter, '-p', :all, '-f', '-m', 'comment', '--comment', '050 isfragment option', '-j', 'ACCEPT'],
+    :args => ['-t', :filter, '-p', :all, '-f', '-j', 'ACCEPT', '-m', 'comment', '--comment', '050 isfragment option'],
   },
   'isfragment_option not changing -f in comment' => {
     :params => {
@@ -1094,7 +1092,7 @@ HASH_TO_ARGS = {
       :proto => :all,
       :action => 'accept',
     },
-    :args => ['-t', :filter, '-p', :all, '-m', 'comment', '--comment', '050 testcomment-with-fdashf', '-j', 'ACCEPT'],
+    :args => ['-t', :filter, '-p', :all, '-m', '-j', 'ACCEPT', 'comment', '--comment', '050 testcomment-with-fdashf'],
   },
   'connlimit_above' => {
     :params => {
@@ -1105,7 +1103,7 @@ HASH_TO_ARGS = {
       :connlimit_above => '10',
       :action => 'reject',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "22", "-m", "comment", "--comment", "061 REJECT connlimit_above 10", "-j", "REJECT", "-m", "connlimit", "--connlimit-above", "10"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "22", "-j", "REJECT", "-m", "connlimit", "--connlimit-above", "10", "-m", "comment", "--comment", "061 REJECT connlimit_above 10"],
   },
   'connlimit_above_with_connlimit_mask' => {
     :params => {
@@ -1117,7 +1115,7 @@ HASH_TO_ARGS = {
       :connlimit_mask => '24',
       :action => 'reject',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "22", "-m", "comment", "--comment", "061 REJECT connlimit_above 10 with mask 24", "-j", "REJECT", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "24"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "multiport", "--dports", "22", "-j", "REJECT", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "24", "-m", "comment", "--comment", "061 REJECT connlimit_above 10 with mask 24"],
   },
   'connmark' => {
     :params => {
@@ -1127,7 +1125,7 @@ HASH_TO_ARGS = {
       :connmark => '0x1',
       :action => 'reject',
     },
-    :args => ["-t", :filter, "-p", :all, "-m", "comment", "--comment", "062 REJECT connmark", "-j", "REJECT", "-m", "connmark", "--mark", "0x1"],
+    :args => ["-t", :filter, "-p", :all, "-j", "REJECT", "-m", "connmark", "--mark", "0x1", "-m", "comment", "--comment", "062 REJECT connmark"],
   },
   'disallow_esp_protocol' => {
     :params => {
@@ -1136,7 +1134,7 @@ HASH_TO_ARGS = {
       :action => 'accept',
       :proto  => '! esp',
     },
-    :args => ["-t", :filter, "!", "-p", :esp, "-m", "comment", "--comment", "063 disallow esp protocol", "-j", "ACCEPT"],
+    :args => ["-t", :filter, "!", "-p", :esp, "-j", "ACCEPT", "-m", "comment", "--comment", "063 disallow esp protocol"],
   },
   'drop_new_packets_without_syn' => {
     :params => {
@@ -1149,7 +1147,7 @@ HASH_TO_ARGS = {
       :source    => '! 10.0.0.0/8',
       :tcp_flags => '! FIN,SYN,RST,ACK SYN',
     },
-    :args => ["-t", :filter, "!", "-s", "10.0.0.0/8", "!", "-p", :tcp, "-m", "tcp", "!", "--tcp-flags", "FIN,SYN,RST,ACK", "SYN", "-m", "comment", "--comment", "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset", "-m", "state", "--state", "NEW", "-j", "DROP"]
+    :args => ["-t", :filter, "!", "-s", "10.0.0.0/8", "!", "-p", :tcp, "-m", "tcp", "!", "--tcp-flags", "FIN,SYN,RST,ACK", "SYN", "-m", "state", "--state", "NEW", "-j", "DROP", "-m", "comment", "--comment", "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset"]
   },
   'negate_dport_and_sport' => {
     :params => {
@@ -1163,7 +1161,7 @@ HASH_TO_ARGS = {
       :dport       => ['! 67','! 66'],
       :proto       => 'udp',
     },
-    :args => ["-t", :filter, "-s", "0.0.0.0/32", "-d", "255.255.255.255/32", "-p", :udp, "-m", "multiport", "!", "--sports", "68,69", "-m", "multiport", "!", "--dports", "67,66", "-m", "comment", "--comment", "065 negate dport and sport", "-j", "ACCEPT"],
+    :args => ["-t", :filter, "-s", "0.0.0.0/32", "-d", "255.255.255.255/32", "-p", :udp, "-m", "multiport", "!", "--sports", "68,69", "-m", "multiport", "!", "--dports", "67,66", "-j", "ACCEPT", "-m", "comment", "--comment", "065 negate dport and sport"],
   },
   'match_mark' => {
     :params => {
@@ -1175,7 +1173,7 @@ HASH_TO_ARGS = {
       :match_mark      => '0x1',
       :action          => 'reject',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches", "-j", "REJECT", "-m", "mark", "--mark", "0x1", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "-j", "REJECT", "-m", "mark", "--mark", "0x1", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches"],
   },
   'clamp_mss_to_pmtu' => {
     :params => {
@@ -1186,7 +1184,7 @@ HASH_TO_ARGS = {
       :jump              => 'TCPMSS',
       :clamp_mss_to_pmtu => true,
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "tcp", "--tcp-flags", "SYN,RST", "SYN", "-m", "comment", "--comment", "067 change max segment size", "-j", "TCPMSS", "--clamp-mss-to-pmtu"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "tcp", "--tcp-flags", "SYN,RST", "SYN", "-j", "TCPMSS", "--clamp-mss-to-pmtu", "-m", "comment", "--comment", "067 change max segment size"],
   },
   'set_dscp_class' => {
     :params => {
@@ -1197,7 +1195,7 @@ HASH_TO_ARGS = {
       :jump              => 'DSCP',
       :set_dscp_class    => 'ef',
     },
-    :args => ["-t", :mangle, "-p", :tcp, "-m", "multiport", '--ports', '997', "-m", "comment", "--comment", "068 set dscp class to EF", "-j", "DSCP", "--set-dscp-class", "ef"],
+    :args => ["-t", :mangle, "-p", :tcp, "-m", "multiport", '--ports', '997', "-j", "DSCP", "--set-dscp-class", "ef", "-m", "comment", "--comment", "068 set dscp class to EF"],
   },
   'length_1' => {
     :params => {
@@ -1205,7 +1203,7 @@ HASH_TO_ARGS = {
       :table  => 'filter',
       :length => '42000',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 length", "-m", "length", "--length", "42000"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "length", "--length", "42000", "-m", "comment", "--comment", "000 length"],
   },
   'length_2' => {
     :params => {
@@ -1213,7 +1211,7 @@ HASH_TO_ARGS = {
       :table  => 'filter',
       :length => '1492-65535',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 length", "-m", "length", "--length", "1492:65535"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "length", "--length", "1492:65535", "-m", "comment", "--comment", "000 length"],
   },
   'string_matching_1' => {
     :params => {
@@ -1221,7 +1219,7 @@ HASH_TO_ARGS = {
       :table  => 'filter',
       :string => 'GET /index.html',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 string_matching", "-m", "string", "--string", "'GET /index.html'"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "string", "--string", "'GET /index.html'", "-m", "comment", "--comment", "000 string_matching"],
   },
   'string_matching_2' => {
     :params => {
@@ -1230,7 +1228,7 @@ HASH_TO_ARGS = {
       :string      => 'GET /index.html',
       :string_algo => 'bm',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 string_matching", "-m", "string", "--string", "'GET /index.html'", "--algo", :bm],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "string", "--string", "'GET /index.html'", "--algo", :bm, "-m", "comment", "--comment", "000 string_matching"],
   },
   'string_matching_3' => {
     :params => {
@@ -1240,7 +1238,7 @@ HASH_TO_ARGS = {
       :string_from => '1',
       :string_to   => '65535',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "000 string_matching", "-m", "string", "--string", "'GET /index.html'", "--from", "1", "--to", "65535"],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "string", "--string", "'GET /index.html'", "--from", "1", "--to", "65535", "-m", "comment", "--comment", "000 string_matching"],
   },
   'nfqueue_jump1' => {
     :params => {
@@ -1251,7 +1249,7 @@ HASH_TO_ARGS = {
       :destination => "4.3.2.1/32",
       :queue_num   => "50",
     },
-    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "000 nfqueue specify queue_num", "-j", "NFQUEUE", "--queue-num", "50"]
+    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-j", "NFQUEUE", "--queue-num", "50", "-m", "comment", "--comment", "000 nfqueue specify queue_num"]
   },
   'nfqueue_jump2' => {
     :params => {
@@ -1263,7 +1261,7 @@ HASH_TO_ARGS = {
       :queue_num    => "50",
       :queue_bypass => true,
     },
-    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "002 nfqueue specify queue_num and queue_bypass", "-j", "NFQUEUE", "--queue-num", "50", "--queue-bypass"]
+    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-j", "NFQUEUE", "--queue-num", "50", "--queue-bypass", "-m", "comment", "--comment", "002 nfqueue specify queue_num and queue_bypass"]
   },
   'nfqueue_jump3' => {
     :params => {
@@ -1273,6 +1271,6 @@ HASH_TO_ARGS = {
       :source       => '1.2.3.4/32',
       :destination  => '4.3.2.1/32',
     },
-    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-m", "comment", "--comment", "003 nfqueue dont specify queue_num or queue_bypass", "-j", "NFQUEUE"]
+    :args => ["-t", :filter, "-s", "1.2.3.4/32", "-d", "4.3.2.1/32", "-p", :tcp, "-j", "NFQUEUE", "-m", "comment", "--comment", "003 nfqueue dont specify queue_num or queue_bypass"]
   }  
 }
