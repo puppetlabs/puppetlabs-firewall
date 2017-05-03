@@ -104,10 +104,10 @@ describe 'complex ruleset 1' do
         /INPUT ACCEPT/,
         /FORWARD ACCEPT/,
         /OUTPUT ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) -d 10.0.0.0\/(8|255\.0\.0\.0) -m comment --comment \"090 forward allow local\" -j ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m comment --comment \"100 forward standard allow tcp\" -m state --state NEW -j ACCEPT/,
-        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --ports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT/
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) -d 10.0.0.0\/(8|255\.0\.0\.0) -j ACCEPT -m comment --comment \"090 forward allow local\"/,
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -j ACCEPT -m comment --comment \"100 forward standard allow icmp\"/,
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m state --state NEW -j ACCEPT -m comment --comment \"100 forward standard allow tcp\"/,
+        /-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --ports 53,123 -j ACCEPT -m comment --comment \"100 forward standard allow udp\"/
       ].each do |line|
         expect(r.stdout).to match(line)
       end
@@ -259,19 +259,19 @@ describe 'complex ruleset 2' do
         /OUTPUT ACCEPT/,
         /LOCAL_INPUT/,
         /LOCAL_INPUT_PRE/,
-        /-A INPUT -m comment --comment \"001 LOCAL_INPUT_PRE\" -j LOCAL_INPUT_PRE/,
-        /-A INPUT -m comment --comment \"010 INPUT allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT/,
-        /-A INPUT -d 127.0.0.0\/(8|255\.0\.0\.0) (! -i|-i !) lo -m comment --comment \"011 reject local traffic not on loopback interface\" -j REJECT --reject-with icmp-port-unreachable/,
-        /-A INPUT -i lo -m comment --comment \"012 accept loopback\" -j ACCEPT/,
-        /-A INPUT -p icmp -m comment --comment \"013 icmp destination-unreachable\" -m icmp --icmp-type 3 -j ACCEPT/,
-        /-A INPUT -s 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"013 icmp echo-request\" -m icmp --icmp-type 8 -j ACCEPT/,
-        /-A INPUT -p icmp -m comment --comment \"013 icmp time-exceeded\" -m icmp --icmp-type 11 -j ACCEPT/,
-        /-A INPUT -p tcp -m multiport --dports 22 -m comment --comment \"020 ssh\" -m state --state NEW -j ACCEPT/,
-        /-A INPUT -p tcp -m multiport --dports 22 -m comment --comment \"001 ssh needed for beaker testing\" -j ACCEPT/,
-        /-A OUTPUT (! -o|-o !) eth0:2 -p tcp -m multiport --dports 25 -m comment --comment \"025 smtp\" -m state --state NEW -j ACCEPT/,
-        /-A INPUT -i eth0:3 -p tcp -m multiport --dports 443 -m comment --comment \"443 ssl on aliased interface\" -m state --state NEW -j ACCEPT/,
-        /-A INPUT -m comment --comment \"900 LOCAL_INPUT\" -j LOCAL_INPUT/,
-        /-A FORWARD -m comment --comment \"010 allow established and related\" -m state --state RELATED,ESTABLISHED -j ACCEPT/
+        /-A INPUT -j LOCAL_INPUT_PRE -m comment --comment \"001 LOCAL_INPUT_PRE\"/,
+        /-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT -m comment --comment \"010 INPUT allow established and related\"/,
+        /-A INPUT -d 127.0.0.0\/(8|255\.0\.0\.0) (! -i|-i !) lo -j REJECT --reject-with icmp-port-unreachable -m comment --comment \"011 reject local traffic not on loopback interface\"/,
+        /-A INPUT -i lo -j ACCEPT -m comment --comment \"012 accept loopback\"/,
+        /-A INPUT -p icmp -m icmp --icmp-type 3 -j ACCEPT -m comment --comment \"013 icmp destination-unreachable\"/,
+        /-A INPUT -s 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m icmp --icmp-type 8 -j ACCEPT -m comment --comment \"013 icmp echo-request\"/,
+        /-A INPUT -p icmp -m icmp --icmp-type 11 -j ACCEPT -m comment --comment \"013 icmp time-exceeded\"/,
+        /-A INPUT -p tcp -m multiport --dports 22 -m state --state NEW -j ACCEPT -m comment --comment \"020 ssh\"/,
+        /-A INPUT -p tcp -m multiport --dports 22 -j ACCEPT -m comment --comment \"001 ssh needed for beaker testing\"/,
+        /-A OUTPUT (! -o|-o !) eth0:2 -p tcp -m multiport --dports 25 -m state --state NEW -j ACCEPT -m comment --comment \"025 smtp\"/,
+        /-A INPUT -i eth0:3 -p tcp -m multiport --dports 443 -m state --state NEW -j ACCEPT -m comment --comment \"443 ssl on aliased interface\"/,
+        /-A INPUT -j LOCAL_INPUT -m comment --comment \"900 LOCAL_INPUT\"/,
+        /-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT -m comment --comment \"010 allow established and related\"/
       ].each do |line|
         expect(r.stdout).to match(line)
       end
