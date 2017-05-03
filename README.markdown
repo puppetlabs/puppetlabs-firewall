@@ -341,6 +341,19 @@ firewall { '100 my rule':
 }
 ~~~
 
+Setup NFLOG for a rule.
+
+~~~puppet
+firewall {'666 for NFLOG':
+  proto => 'all',
+  jump  => 'NFLOG',
+  nflog_group => 3,
+  nflog_prefix => "nflog-test",
+  nflog_range = 256,
+  nflog_threshold => 1,
+}
+~~~
+
 ### Additional Information
 
 Access the inline documentation:
@@ -590,7 +603,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `islastfrag`: If true, matches when the packet is the last fragment of a fragmented ipv6 packet. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `islastfrag`.
 
-* `jump`: The value for the iptables `--jump` parameter. Any valid chain name is allowed, but normal values are: 'QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK', 'TCPMSS', 'DSCP'.
+* `jump`: The value for the iptables `--jump` parameter. Any valid chain name is allowed, but normal values are: 'QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'MASQUERADE', 'REDIRECT', 'MARK', 'TCPMSS', 'DSCP', 'NFLOG'.
 
   For the values 'ACCEPT', 'DROP', and 'REJECT', you must use the generic `action` parameter. This is to enforce the use of generic parameters where possible for maximum cross-platform modeling.
 
@@ -609,6 +622,14 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `log_prefix`: When combined with `jump => 'LOG'` specifies the log prefix to use when logging. Requires the `log_prefix` feature.
 
 * `log_uid`: The ability to log the userid of the process which generated the packet.
+
+* `nflog_group`: When combined with `jump => 'NFLOG'` grants the ability to specify the NFLOG group number. Requires the `nflog_group` feature.
+
+* `nflog_prefix`: When combined with `jump => 'NFLOG'` grants the ability to specify a prefix for log entries. Requires the `nflog_prefix` feature.
+
+* `nflog_range`: When combined with `jump => 'NFLOG'` grants the ability to specify the number of bytes to be copied to userspace. Requires the `nflog_range` feature.
+
+* `nflog_threshold`: When combined with `jump => 'NFLOG'` grants the ability to specify the size of the NFLOG threshold. Requires the `nflog_threshold` feature.
 
 * `mask`: Sets the mask to use when `recent` is enabled. Requires the `mask` feature.
 
