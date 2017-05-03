@@ -29,7 +29,7 @@ ARGS_TO_HASH = {
     },
   },
   'long_rule_1' => {
-    :line => '-A INPUT -s 1.1.1.1/32 -d 1.1.1.1/32 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
+    :line => '-A INPUT -s 1.1.1.1/32 -d 1.1.1.1/32 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -j ACCEPT -m comment --comment "000 allow foo"',
     :table => 'filter',
     :compare_all => true,
     :params => {
@@ -38,7 +38,7 @@ ARGS_TO_HASH = {
       :destination => "1.1.1.1/32",
       :dport => ["7061","7062"],
       :ensure => :present,
-      :line => '-A INPUT -s 1.1.1.1/32 -d 1.1.1.1/32 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -m comment --comment "000 allow foo" -j ACCEPT',
+      :line => '-A INPUT -s 1.1.1.1/32 -d 1.1.1.1/32 -p tcp -m multiport --dports 7061,7062 -m multiport --sports 7061,7062 -j ACCEPT -m comment --comment "000 allow foo"',
       :name => "000 allow foo",
       :proto => "tcp",
       :provider => "iptables",
@@ -48,7 +48,7 @@ ARGS_TO_HASH = {
     },
   },
   'action_drop_1' => {
-    :line => '-A INPUT -m comment --comment "000 allow foo" -j DROP',
+    :line => '-A INPUT -j DROP -m comment --comment "000 allow foo"',
     :table => 'filter',
     :params => {
       :jump => nil,
@@ -56,7 +56,7 @@ ARGS_TO_HASH = {
     },
   },
   'action_reject_1' => {
-    :line => '-A INPUT -m comment --comment "000 allow foo" -j REJECT',
+    :line => '-A INPUT -j REJECT -m comment --comment "000 allow foo"',
     :table => 'filter',
     :params => {
       :jump => nil,
@@ -72,7 +72,7 @@ ARGS_TO_HASH = {
     },
   },
   'jump_custom_chain_1' => {
-    :line => '-A INPUT -m comment --comment "000 allow foo" -j custom_chain',
+    :line => '-A INPUT -j custom_chain -m comment --comment "000 allow foo"',
     :table => 'filter',
     :params => {
       :jump => "custom_chain",
@@ -248,7 +248,7 @@ ARGS_TO_HASH = {
     },
   },
   'log_level_debug' => {
-    :line => '-A INPUT -m comment --comment "956 INPUT log-level" -m state --state NEW -j LOG --log-level 7',
+    :line => '-A INPUT -m state --state NEW -j LOG --log-level 7 -m comment --comment "956 INPUT log-level"',
     :table => 'filter',
     :params => {
       :state => ['NEW'],
@@ -257,7 +257,7 @@ ARGS_TO_HASH = {
     },
   },
   'log_level_warn' => {
-    :line => '-A INPUT -m comment --comment "956 INPUT log-level" -m state --state NEW -j LOG',
+    :line => '-A INPUT -m state --state NEW -j LOG -m comment --comment "956 INPUT log-level"',
     :table => 'filter',
     :params => {
       :state => ['NEW'],
@@ -266,7 +266,7 @@ ARGS_TO_HASH = {
     },
   },
   'load_limit_module_and_implicit_burst' => {
-    :line => '-A INPUT -m multiport --dports 123 -m comment --comment "057 INPUT limit NTP" -m limit --limit 15/hour',
+    :line => '-A INPUT -m multiport --dports 123 -m limit --limit 15/hour -m comment --comment "057 INPUT limit NTP"',
     :table => 'filter',
     :params => {
       :dport => ['123'],
@@ -275,7 +275,7 @@ ARGS_TO_HASH = {
     },
   },
   'limit_with_explicit_burst' => {
-    :line => '-A INPUT -m multiport --dports 123 -m comment --comment "057 INPUT limit NTP" -m limit --limit 30/hour --limit-burst 10',
+    :line => '-A INPUT -m multiport --dports 123 -m limit --limit 30/hour --limit-burst 10 -m comment --comment "057 INPUT limit NTP"',
     :table => 'filter',
     :params => {
       :dport => ['123'],
@@ -291,7 +291,7 @@ ARGS_TO_HASH = {
     }
   },
   'load_uid_owner_filter_module' => {
-    :line => '-A OUTPUT -m owner --uid-owner root -m comment --comment "057 OUTPUT uid root only" -j ACCEPT',
+    :line => '-A OUTPUT -m owner --uid-owner root -j ACCEPT -m comment --comment "057 OUTPUT uid root only"',
     :table => 'filter',
     :params => {
       :action => 'accept',
@@ -300,7 +300,7 @@ ARGS_TO_HASH = {
     },
   },
   'load_uid_owner_postrouting_module' => {
-    :line => '-t mangle -A POSTROUTING -m owner --uid-owner root -m comment --comment "057 POSTROUTING uid root only" -j ACCEPT',
+    :line => '-t mangle -A POSTROUTING -m owner --uid-owner root -j ACCEPT -m comment --comment "057 POSTROUTING uid root only"',
     :table => 'mangle',
     :params => {
       :action => 'accept',
@@ -309,7 +309,7 @@ ARGS_TO_HASH = {
     },
   },
   'load_gid_owner_filter_module' => {
-    :line => '-A OUTPUT -m owner --gid-owner root -m comment --comment "057 OUTPUT gid root only" -j ACCEPT',
+    :line => '-A OUTPUT -m owner --gid-owner root -j ACCEPT -m comment --comment "057 OUTPUT gid root only"',
     :table => 'filter',
     :params => {
       :action => 'accept',
@@ -318,7 +318,7 @@ ARGS_TO_HASH = {
     },
   },
   'load_gid_owner_postrouting_module' => {
-    :line => '-t mangle -A POSTROUTING -m owner --gid-owner root -m comment --comment "057 POSTROUTING gid root only" -j ACCEPT',
+    :line => '-t mangle -A POSTROUTING -m owner --gid-owner root -j ACCEPT -m comment --comment "057 POSTROUTING gid root only"',
     :table => 'mangle',
     :params => {
       :action => 'accept',
@@ -336,7 +336,7 @@ ARGS_TO_HASH = {
     }
   },
   'iniface_1' => {
-    :line => '-A INPUT -i eth0 -m comment --comment "060 iniface" -j DROP',
+    :line => '-A INPUT -i eth0 -j DROP -m comment --comment "060 iniface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -345,7 +345,7 @@ ARGS_TO_HASH = {
     },
   },
   'iniface_1_negated' => {
-    :line => '-A INPUT ! -i eth0 -m comment --comment "060 iniface" -j DROP',
+    :line => '-A INPUT ! -i eth0 -j DROP -m comment --comment "060 iniface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -354,7 +354,7 @@ ARGS_TO_HASH = {
     },
   },
   'iniface_1_aliased' => {
-    :line => '-A INPUT -i eth0:1 -m comment --comment "060 iniface" -j DROP',
+    :line => '-A INPUT -i eth0:1 -j DROP -m comment --comment "060 iniface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -363,7 +363,7 @@ ARGS_TO_HASH = {
     },
   },
   'iniface_with_vlans_1' => {
-    :line => '-A INPUT -i eth0.234 -m comment --comment "060 iniface" -j DROP',
+    :line => '-A INPUT -i eth0.234 -j DROP -m comment --comment "060 iniface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -372,7 +372,7 @@ ARGS_TO_HASH = {
     },
   },
   'iniface_with_plus_1' => {
-    :line => '-A INPUT -i eth+ -m comment --comment "060 iniface" -j DROP',
+    :line => '-A INPUT -i eth+ -j DROP -m comment --comment "060 iniface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -381,7 +381,7 @@ ARGS_TO_HASH = {
     },
   },
   'outiface_1' => {
-    :line => '-A OUTPUT -o eth0 -m comment --comment "060 outiface" -j DROP',
+    :line => '-A OUTPUT -o eth0 -j DROP -m comment --comment "060 outiface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -390,7 +390,7 @@ ARGS_TO_HASH = {
     },
   },
   'outiface_1_negated' => {
-    :line => '-A OUTPUT ! -o eth0 -m comment --comment "060 outiface" -j DROP',
+    :line => '-A OUTPUT ! -o eth0 -j DROP -m comment --comment "060 outiface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -399,7 +399,7 @@ ARGS_TO_HASH = {
     },
   },
   'outiface_1_aliased' => {
-    :line => '-A OUTPUT -o eth0:2 -m comment --comment "060 outiface" -j DROP',
+    :line => '-A OUTPUT -o eth0:2 -j DROP -m comment --comment "060 outiface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -408,7 +408,7 @@ ARGS_TO_HASH = {
     },
   },
   'outiface_with_vlans_1' => {
-    :line => '-A OUTPUT -o eth0.234 -m comment --comment "060 outiface" -j DROP',
+    :line => '-A OUTPUT -o eth0.234 -j DROP -m comment --comment "060 outiface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -417,7 +417,7 @@ ARGS_TO_HASH = {
     },
   },
   'outiface_with_plus_1' => {
-    :line => '-A OUTPUT -o eth+ -m comment --comment "060 outiface" -j DROP',
+    :line => '-A OUTPUT -o eth+ -j DROP -m comment --comment "060 outiface"',
     :table => 'filter',
     :params => {
       :action => 'drop',
@@ -443,7 +443,7 @@ ARGS_TO_HASH = {
     },
   },
   'isfragment_option' => {
-    :line => '-A INPUT -f -m comment --comment "010 a-f comment with dashf" -j ACCEPT',
+    :line => '-A INPUT -f -j ACCEPT -m comment --comment "010 a-f comment with dashf"',
     :table => 'filter',
     :params => {
       :name => '010 a-f comment with dashf',
@@ -496,7 +496,7 @@ ARGS_TO_HASH = {
     },
   },
   'connlimit_above' => {
-    :line => '-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "061 REJECT connlimit_above 10" -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable',
+    :line => '-A INPUT -p tcp -m multiport --dports 22 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "061 REJECT connlimit_above 10"',
     :table => 'filter',
     :params => {
       :proto => 'tcp',
@@ -506,7 +506,7 @@ ARGS_TO_HASH = {
     },
   },
   'connlimit_above_with_connlimit_mask' => {
-    :line => '-A INPUT -p tcp -m multiport --dports 22 -m comment --comment "061 REJECT connlimit_above 10 with mask 24" -m connlimit --connlimit-above 10 --connlimit-mask 24 -j REJECT --reject-with icmp-port-unreachable',
+    :line => '-A INPUT -p tcp -m multiport --dports 22 -m connlimit --connlimit-above 10 --connlimit-mask 24 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "061 REJECT connlimit_above 10 with mask 24"',
     :table => 'filter',
     :params => {
       :proto => 'tcp',
@@ -517,7 +517,7 @@ ARGS_TO_HASH = {
     },
   },
   'connmark' => {
-    :line => '-A INPUT -m comment --comment "062 REJECT connmark" -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable',
+    :line => '-A INPUT -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "062 REJECT connmark"',
     :table => 'filter',
     :params => {
       :proto => 'all',
@@ -526,7 +526,7 @@ ARGS_TO_HASH = {
     },
   },
   'disallow_esp_protocol' => {
-    :line   => '-t filter ! -p esp -m comment --comment "063 disallow esp protocol" -j ACCEPT',
+    :line   => '-t filter ! -p esp -j ACCEPT -m comment --comment "063 disallow esp protocol"',
     :table  => 'filter',
     :params => {
       :name   => '063 disallow esp protocol',
@@ -535,7 +535,7 @@ ARGS_TO_HASH = {
     },
   },
   'drop_new_packets_without_syn' => {
-    :line   => '-t filter ! -s 10.0.0.0/8 ! -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset" -m state --state NEW -j DROP',
+    :line   => '-t filter ! -s 10.0.0.0/8 ! -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP -m comment --comment "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset"',
     :table  => 'filter',
     :params => {
       :name      => '064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset',
@@ -560,7 +560,7 @@ ARGS_TO_HASH = {
     },
   },
   'match_mark' => {
-    :line => '-A INPUT -p tcp -m comment --comment "066 REJECT connlimit_above 10 with mask 32 and mark matches" -m mark --mark 0x1 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable',
+    :line => '-A INPUT -p tcp -m mark --mark 0x1 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "066 REJECT connlimit_above 10 with mask 32 and mark matches"',
     :table => 'filter',
     :params => {
       :proto           => 'tcp',
@@ -571,7 +571,7 @@ ARGS_TO_HASH = {
     },
   },
   'clamp_mss_to_pmtu' => {
-    :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "067 change max segment size" -j TCPMSS --clamp-mss-to-pmtu',
+    :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu -m comment --comment "067 change max segment size"',
     :table => 'filter',
     :params => {
       :name              => '067 change max segment size',
@@ -583,7 +583,7 @@ ARGS_TO_HASH = {
     },
   },
   'mangled_chain_name_with_-f' => {
-    :line => '-A foo-filter -p tcp -m comment --comment "068 chain name containing -f" -j ACCEPT',
+    :line => '-A foo-filter -p tcp -j ACCEPT -m comment --comment "068 chain name containing -f"',
     :params => {
       :name              => '068 chain name containing -f',
       :action            => 'accept',
@@ -628,7 +628,7 @@ ARGS_TO_HASH = {
     },
   },
   'nfqueue_jump1' => {
-    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -m comment --comment "000 nfqueue specify queue_num" -j NFQUEUE --queue-num 50',
+    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -j NFQUEUE --queue-num 50 -m comment --comment "000 nfqueue specify queue_num"',
     :table  => 'filter',
     :params => {
       :name        => "000 nfqueue specify queue_num",
@@ -640,7 +640,7 @@ ARGS_TO_HASH = {
     },
   },
   'nfqueue_jump2' => {
-    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -m comment --comment "002 nfqueue specify queue_num and queue_bypass" -j NFQUEUE --queue-num 50 --queue-bypass',
+    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -j NFQUEUE --queue-num 50 --queue-bypass -m comment --comment "002 nfqueue specify queue_num and queue_bypass"',
     :table  => "filter",
     :params => {
       :name         => "002 nfqueue specify queue_num and queue_bypass",
@@ -653,7 +653,7 @@ ARGS_TO_HASH = {
     },
   },
   'nfqueue_jump3' => {
-    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -m comment --comment "003 nfqueue dont specify queue_num or queue_bypass" -j NFQUEUE',
+    :line   => '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -j NFQUEUE -m comment --comment "003 nfqueue dont specify queue_num or queue_bypass"',
     :table  => "filter",
     :params => {
       :name         => "003 nfqueue dont specify queue_num or queue_bypass",
