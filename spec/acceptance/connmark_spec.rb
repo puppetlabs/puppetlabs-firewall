@@ -19,7 +19,7 @@ describe 'connmark property' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -m comment --comment "502 - test" -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable/)
+          expect(r.stdout).to match(/-A INPUT -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "502 - test"/)
         end
       end
     end

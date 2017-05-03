@@ -28,7 +28,7 @@ describe 'firewall MSS' do
 
       it 'should contain the rule' do
         shell('iptables-save -t mangle') do |r|
-          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360/)
+          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360 -m comment --comment "502 - set_mss"/)
         end
       end
     end
@@ -52,7 +52,7 @@ describe 'firewall MSS' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu/)
+          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu -m comment --comment "503 - clamp_mss_to_pmtu"/)
         end
       end
     end
@@ -82,7 +82,7 @@ describe 'firewall MSS' do
 
         it 'should contain the rule' do
           shell('ip6tables-save -t mangle') do |r|
-            expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "502 - set_mss" -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360/)
+            expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -j TCPMSS --set-mss 1360 -m comment --comment "502 - set_mss"/)
           end
         end
       end
@@ -107,7 +107,7 @@ describe 'firewall MSS' do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu/)
+            expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu -m comment --comment "503 - clamp_mss_to_pmtu"/)
           end
         end
       end
