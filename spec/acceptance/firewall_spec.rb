@@ -976,7 +976,7 @@ describe 'firewall basics', docker: true do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 571 -m comment --comment "571 - test" -m hl --hl-eq 5 -j ACCEPT/)
+            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 571 -m hl --hl-eq 5 -m comment --comment "571 - test" -j ACCEPT/)
           end
         end
       end
@@ -1390,7 +1390,7 @@ describe 'firewall basics', docker: true do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "607 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp6-adm-prohibited/)
+            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "607 - test" -j REJECT --reject-with icmp6-adm-prohibited/)
           end
         end
       end
@@ -1418,7 +1418,7 @@ describe 'firewall basics', docker: true do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "608 - test" -m policy --dir out --pol none -j REJECT --reject-with icmp6-adm-prohibited/)
+            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol none -m comment --comment "608 - test" -j REJECT --reject-with icmp6-adm-prohibited/) 
           end
         end
       end
@@ -1448,7 +1448,7 @@ describe 'firewall basics', docker: true do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "609 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp6-adm-prohibited/)
+            expect(r.stdout).to match(/-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "609 - test" -j REJECT --reject-with icmp6-adm-prohibited/)
           end
         end
       end
@@ -1476,7 +1476,7 @@ describe 'firewall basics', docker: true do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A INPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m comment --comment "610 - test" -m policy --dir in --pol none -j REJECT --reject-with icmp6-adm-prohibited/)
+            expect(r.stdout).to match(/-A INPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir in --pol none -m comment --comment "610 - test" -j REJECT --reject-with icmp6-adm-prohibited/) 
           end
         end
       end
@@ -1564,7 +1564,7 @@ describe 'firewall basics', docker: true do
 
           it 'should contain the rule' do
             shell('ip6tables-save') do |r|
-              expect(r.stdout).to match(/-A INPUT -p tcp -m comment --comment "612 - test" -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -j DROP/)
+              expect(r.stdout).to match(/-A INPUT -p tcp -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP/)
             end
           end
         end
@@ -1593,7 +1593,7 @@ describe 'firewall basics', docker: true do
 
           it 'should contain the rule' do
             shell('ip6tables-save') do |r|
-              expect(r.stdout).to match(/-A FORWARD -p tcp -m comment --comment "613 - test" -m recent --update --seconds 60 --name test --mask ffff:: --rsource -j DROP/)
+              expect(r.stdout).to match(/-A FORWARD -p tcp -m recent --update --seconds 60 --name test --mask ffff:: --rsource -m comment --comment "613 - test" -j DROP/)
             end
           end
         end
@@ -1695,7 +1695,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 572 -m comment --comment "572 - test" -m limit --limit 500\/sec -j ACCEPT/)
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 572 -m limit --limit 500\/sec -m comment --comment "572 - test" -j ACCEPT/)
         end
       end
     end
@@ -1721,7 +1721,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 573 -m comment --comment "573 - test" -m limit --limit 500\/sec --limit-burst 1500 -j ACCEPT/)
+          expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --ports 573 -m limit --limit 500\/sec --limit-burst 1500 -m comment --comment "573 - test" -j ACCEPT/)
         end
       end
     end
@@ -2009,7 +2009,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "593 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp-net-unreachable/)
+          expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir out --pol ipsec -m comment --comment "593 - test" -j REJECT --reject-with icmp-net-unreachable/) 
         end
       end
     end
@@ -2036,7 +2036,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "594 - test" -m policy --dir out --pol none -j REJECT --reject-with icmp-net-unreachable/)
+          expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir out --pol none -m comment --comment "594 - test" -j REJECT --reject-with icmp-net-unreachable/) 
         end
       end
     end
@@ -2065,7 +2065,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "595 - test" -m policy --dir out --pol ipsec -j REJECT --reject-with icmp-net-unreachable/)
+          expect(r.stdout).to match(/-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir out --pol ipsec -m comment --comment "595 - test" -j REJECT --reject-with icmp-net-unreachable/)
         end
       end
     end
@@ -2092,7 +2092,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "596 - test" -m policy --dir in --pol none -j REJECT --reject-with icmp-net-unreachable/)
+          expect(r.stdout).to match(/-A INPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir in --pol none -m comment --comment "596 - test" -j REJECT --reject-with icmp-net-unreachable/) 
         end
       end
     end
@@ -2121,7 +2121,7 @@ describe 'firewall basics', docker: true do
       it 'should contain the rule' do
         shell('iptables-save') do |r|
           # Mask added as of Ubuntu 14.04.
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "597 - test" -m recent --set --name list1 (--mask 255.255.255.255 )?--rdest/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --set --name list1 (--mask 255.255.255.255 )? --rdest -m comment --comment "597 - test"/)
         end
       end
     end
@@ -2150,7 +2150,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "598 - test" -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )? --rsource -m comment --comment "598 - test"/)
         end
       end
     end
@@ -2174,7 +2174,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "599 - test" -m recent --update/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --update --name DEFAULT (--mask 255.255.255.255 )? --rsource -m comment --comment "599 - test"/)
         end
       end
     end
@@ -2198,7 +2198,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m comment --comment "600 - test" -m recent --remove/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255 )? --rsource -m comment --comment "600 - test"/)
         end
       end
     end
