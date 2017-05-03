@@ -1092,7 +1092,7 @@ HASH_TO_ARGS = {
       :proto => :all,
       :action => 'accept',
     },
-    :args => ['-t', :filter, '-p', :all, '-m', '-j', 'ACCEPT', 'comment', '--comment', '050 testcomment-with-fdashf'],
+    :args => ['-t', :filter, '-p', :all, '-j', 'ACCEPT', '-m', 'comment', '--comment', '050 testcomment-with-fdashf'],
   },
   'connlimit_above' => {
     :params => {
@@ -1173,7 +1173,7 @@ HASH_TO_ARGS = {
       :match_mark      => '0x1',
       :action          => 'reject',
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "-j", "REJECT", "-m", "mark", "--mark", "0x1", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches"],
+    :args => ["-t", :filter, "-p", :tcp, "-j", "REJECT", "-m", "mark", "--mark", "0x1", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32", "-m", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches"],
   },
   'clamp_mss_to_pmtu' => {
     :params => {
