@@ -112,6 +112,6 @@ HASH_TO_ARGS6 = {
       :provider => 'ip6tables',
       :table => "filter",
     },
-    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "100 hop limit", "-m", "hl", "--hl-eq", 255],
+    :args => ["-t", :filter, "-p", :tcp, "-m", "hl", "--hl-eq", 255, "-m", "comment", "--comment", "100 hop limit"],
   },
 }
