@@ -24,7 +24,7 @@ describe 'firewall match marks' do
 
         it 'should contain the rule' do
           shell('iptables-save') do |r|
-            expect(r.stdout).to match(/-A INPUT -m mark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "503 match_mark - test"/)
+            expect(r.stdout).to match(/-A INPUT -m comment --comment "503 match_mark - test" -m mark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable/)
           end
         end
       end
@@ -48,7 +48,7 @@ describe 'firewall match marks' do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A INPUT -m mark --mark 0x1 -j REJECT --reject-with icmp6-port-unreachable -m comment --comment "503 match_mark ip6tables - test"/)
+            expect(r.stdout).to match(/-A INPUT -m comment --comment "503 match_mark ip6tables - test" -m mark --mark 0x1 -j REJECT --reject-with icmp6-port-unreachable/)
           end
         end
       end

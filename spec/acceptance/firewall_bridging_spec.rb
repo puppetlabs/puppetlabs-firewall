@@ -26,7 +26,7 @@ describe 'firewall bridging' do
 
         it 'should contain the rule' do
            shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 701 -j ACCEPT -m comment --comment "701 - test"/)
+             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 701 -m comment --comment "701 - test" -j ACCEPT/)
            end
         end
       end
@@ -50,7 +50,7 @@ describe 'firewall bridging' do
 
         it 'should contain the rule' do
            shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 702 -j ACCEPT -m comment --comment "702 - test"/)
+             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 702 -m comment --comment "702 - test" -j ACCEPT/)
            end
         end
       end
@@ -75,7 +75,7 @@ describe 'firewall bridging' do
 
         it 'should contain the rule' do
            shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 -m multiport --ports 703 -j ACCEPT -m comment --comment "703 - test"/)
+             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 -m multiport --ports 703 -m comment --comment "703 - test" -j ACCEPT/)
            end
         end
       end
@@ -99,7 +99,7 @@ describe 'firewall bridging' do
 
         it 'should contain the rule' do
            shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-bridged -m multiport --ports 704 -j ACCEPT -m comment --comment "704 - test"/)
+             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-bridged -m multiport --ports 704 -m comment --comment "704 - test" -j ACCEPT/)
            end
         end
       end
@@ -124,7 +124,7 @@ describe 'firewall bridging' do
 
         it 'should contain the rule' do
            shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-is-bridged -m multiport --ports 705 -j ACCEPT -m comment --comment "705 - test"/)
+             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-is-bridged -m multiport --ports 705 -m comment --comment "705 - test" -j ACCEPT/)
            end
         end
       end
@@ -149,7 +149,7 @@ describe 'firewall bridging' do
 
         it 'should contain the rule' do
            shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m multiport --ports 706 -j ACCEPT -m comment --comment "706 - test"/)
+             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m multiport --ports 706 -m comment --comment "706 - test" -j ACCEPT/)
            end
         end
       end
@@ -175,7 +175,7 @@ describe 'firewall bridging' do
 
         it 'should contain the rule' do
            shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 707 -j ACCEPT -m comment --comment "707 - test"/)
+             expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 707 -m comment --comment "707 - test" -j ACCEPT/)
            end
         end
       end
@@ -205,7 +205,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 701 -j ACCEPT -m comment --comment "701 - test"/)
+               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 701 -m comment --comment "701 - test" -j ACCEPT/)
              end
           end
         end
@@ -230,7 +230,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 702 -j ACCEPT -m comment --comment "702 - test"/)
+               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 702 -m comment --comment "702 - test" -j ACCEPT/)
              end
           end
         end
@@ -256,7 +256,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 -m multiport --ports 703 -j ACCEPT -m comment --comment "703 - test"/)
+               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 -m multiport --ports 703 -m comment --comment "703 - test" -j ACCEPT/)
              end
           end
         end
@@ -281,7 +281,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-bridged -m multiport --ports 704 -j ACCEPT -m comment --comment "704 - test"/)
+               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-bridged -m multiport --ports 704 -m comment --comment "704 - test" -j ACCEPT/)
              end
           end
         end
@@ -307,7 +307,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-is-bridged -m multiport --ports 705 -j ACCEPT -m comment --comment "705 - test"/)
+               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-is-bridged -m multiport --ports 705 -m comment --comment "705 - test" -j ACCEPT/)
              end
           end
         end
@@ -333,7 +333,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m multiport --ports 706 -j ACCEPT -m comment --comment "706 - test"/)
+               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m multiport --ports 706 -m comment --comment "706 - test" -j ACCEPT/)
              end
           end
         end
@@ -360,7 +360,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 707 -j ACCEPT -m comment --comment "707 - test"/)
+               expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 707 -m comment --comment "707 - test" -j ACCEPT/)
              end
           end
         end
@@ -385,7 +385,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
             shell('ip6tables-save') do |r|
-              expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-in -m multiport --ports 708 -j ACCEPT -m comment --comment "708 - test"/)
+              expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-in -m multiport --ports 708 -m comment --comment "708 - test" -j ACCEPT/)
             end
           end
         end
@@ -410,7 +410,7 @@ describe 'firewall bridging' do
 
           it 'should contain the rule' do
             shell('ip6tables-save') do |r|
-              expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-out -m multiport --ports 709 -j ACCEPT -m comment --comment "709 - test"/)
+              expect(r.stdout).to match(/-A FORWARD -p tcp -m physdev\s+--physdev-is-out -m multiport --ports 709 -m comment --comment "709 - test" -j ACCEPT/)
             end
           end
         end

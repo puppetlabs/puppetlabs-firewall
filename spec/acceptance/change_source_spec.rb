@@ -34,12 +34,12 @@ describe 'changing the source' do
 
     it 'contains the changable 8.0.0.1 rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.1(\/32)? -p tcp -m multiport --ports 101 -j ACCEPT -m comment --comment "101 test source changes"/)
+        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.1(\/32)? -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT/)
       end
     end
     it 'contains the static 8.0.0.2 rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -j ACCEPT -m comment --comment "100 test source static"/)
+        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT/)
       end
     end
 
@@ -64,12 +64,12 @@ describe 'changing the source' do
     end
     it 'contains the staic 8.0.0.2 rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -j ACCEPT -m comment --comment "100 test source static"/)
+        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT/)
       end
     end
     it 'contains the changing new 8.0.0.4 rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.4(\/32)? -p tcp -m multiport --ports 101 -j ACCEPT -m comment --comment "101 test source changes"/)
+        expect(r.stdout).to match(/-A INPUT -s 8\.0\.0\.4(\/32)? -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT/)
       end
     end
   end

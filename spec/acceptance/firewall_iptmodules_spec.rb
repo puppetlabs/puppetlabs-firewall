@@ -34,7 +34,7 @@ describe 'firewall iptmodules' do
 
       it 'should contain the rule' do
          shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -j REJECT --reject-with icmp-port-unreachable -m comment --comment "801 - ipt_modules tests"/)
+           expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable/)
          end
       end
     end
@@ -62,7 +62,7 @@ describe 'firewall iptmodules' do
 
       it 'should contain the rule' do
          shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 100.0.0.1-100.0.0.2 -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -j REJECT --reject-with icmp-port-unreachable -m comment --comment "802 - ipt_modules tests"/)
+           expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 100.0.0.1-100.0.0.2 -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable/)
          end
       end
     end
@@ -99,7 +99,7 @@ describe 'firewall iptmodules' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -j REJECT --reject-with icmp6-port-unreachable -m comment --comment "801 - ipt_modules tests"/)
+               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
              end
           end
         end
@@ -128,7 +128,7 @@ describe 'firewall iptmodules' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -j REJECT --reject-with icmp6-port-unreachable -m comment --comment "802 - ipt_modules tests"/)
+               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
              end
           end
         end
@@ -163,7 +163,7 @@ describe 'firewall iptmodules' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -j REJECT --reject-with icmp6-port-unreachable -m comment --comment "801 - ipt_modules tests"/)
+               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
              end
           end
         end
@@ -191,7 +191,7 @@ describe 'firewall iptmodules' do
 
           it 'should contain the rule' do
              shell('ip6tables-save') do |r|
-               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -j REJECT --reject-with icmp6-port-unreachable -m comment --comment "802 - ipt_modules tests"/)
+               expect(r.stdout).to match(/-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable/)
              end
           end
         end

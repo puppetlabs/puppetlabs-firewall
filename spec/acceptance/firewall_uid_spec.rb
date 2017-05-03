@@ -25,7 +25,7 @@ describe 'firewall uid' do
 
       it 'should contain the rule' do
          shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A OUTPUT -m owner --uid-owner (0|root) -j ACCEPT -m comment --comment "801 - test"/)
+           expect(r.stdout).to match(/-A OUTPUT -m owner --uid-owner (0|root) -m comment --comment "801 - test" -j ACCEPT/)
          end
       end
     end
@@ -48,7 +48,7 @@ describe 'firewall uid' do
 
       it 'should contain the rule' do
          shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A OUTPUT -m owner ! --uid-owner (0|root) -j ACCEPT -m comment --comment "802 - test"/)
+           expect(r.stdout).to match(/-A OUTPUT -m owner ! --uid-owner (0|root) -m comment --comment "802 - test" -j ACCEPT/)
          end
       end
     end
@@ -71,7 +71,7 @@ describe 'firewall uid' do
 
       it 'should contain the rule' do
          shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A OUTPUT -m owner --uid-owner (0|root) -j ACCEPT -m comment --comment "803 - test"/)
+           expect(r.stdout).to match(/-A OUTPUT -m owner --uid-owner (0|root) -m comment --comment "803 - test" -j ACCEPT/)
          end
       end
     end
@@ -94,7 +94,7 @@ describe 'firewall uid' do
 
       it 'should contain the rule' do
          shell('iptables-save') do |r|
-           expect(r.stdout).to match(/-A OUTPUT -m owner ! --uid-owner (0|root) -j ACCEPT -m comment --comment "804 - test"/)
+           expect(r.stdout).to match(/-A OUTPUT -m owner ! --uid-owner (0|root) -m comment --comment "804 - test" -j ACCEPT/)
          end
       end
     end

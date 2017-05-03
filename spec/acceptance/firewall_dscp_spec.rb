@@ -27,7 +27,7 @@ describe 'firewall DSCP' do
 
       it 'should contain the rule' do
         shell('iptables-save -t mangle') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -j DSCP --set-dscp 0x01 -m comment --comment "1000 - set_dscp"/)
+          expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1000 - set_dscp" -j DSCP --set-dscp 0x01/)
         end
       end
     end
@@ -52,7 +52,7 @@ describe 'firewall DSCP' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -j DSCP --set-dscp 0x2e -m comment --comment "1001 EF - set_dscp_class"/)
+          expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1001 EF - set_dscp_class" -j DSCP --set-dscp 0x2e/)
         end
       end
     end
@@ -81,7 +81,7 @@ describe 'firewall DSCP' do
 
         it 'should contain the rule' do
           shell('ip6tables-save -t mangle') do |r|
-            expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -j DSCP --set-dscp 0x01 -m comment --comment "1002 - set_dscp"/)
+            expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1002 - set_dscp" -j DSCP --set-dscp 0x01/)
           end
         end
       end
@@ -107,7 +107,7 @@ describe 'firewall DSCP' do
 
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -j DSCP --set-dscp 0x2e -m comment --comment "1003 EF - set_dscp_class"/)
+            expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1003 EF - set_dscp_class" -j DSCP --set-dscp 0x2e/)
           end
         end
       end

@@ -27,7 +27,7 @@ describe 'firewall tee' do
 
         it 'should contain the rule' do
           shell('iptables-save -t mangle') do |r|
-            expect(r.stdout).to match(/-A PREROUTING -j TEE --gateway 10.0.0.2 -m comment --comment "810 - tee_gateway"/)
+            expect(r.stdout).to match(/-A PREROUTING -m comment --comment "810 - tee_gateway" -j TEE --gateway 10.0.0.2/)
           end
         end
       end
@@ -54,7 +54,7 @@ describe 'firewall tee' do
 
         it 'should contain the rule' do
           shell('ip6tables-save -t mangle') do |r|
-            expect(r.stdout).to match(/-A PREROUTING -j TEE --gateway 2001:db8::1 -m comment --comment "811 - tee_gateway6"/)
+            expect(r.stdout).to match(/-A PREROUTING -m comment --comment "811 - tee_gateway6" -j TEE --gateway 2001:db8::1/)
           end
         end
       end
