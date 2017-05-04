@@ -274,7 +274,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
     :proto, :isfragment, :stat_mode, :stat_every, :stat_packet, :stat_probability,
     :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
-    :src_type, :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy,
+    :src_type, :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
     :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
@@ -282,7 +282,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :clamp_mss_to_pmtu, :gateway, :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
     :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
-    :src_cc, :dst_cc
+    :src_cc, :dst_cc, :name
   ]
 
   def insert
