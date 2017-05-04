@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'puppet/util/ipcidr'
 
 describe 'Puppet::Util::IPCidr' do
   describe 'ipv4 address' do

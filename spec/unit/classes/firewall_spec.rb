@@ -32,4 +32,10 @@ describe 'firewall', :type => :class do
     let(:params) {{ :ensure => 'test' }}
     it { expect { should contain_class('firewall::linux') }.to raise_error(Puppet::Error) }
   end
+
+  context 'ebtables_manage => true' do
+    let(:facts) {{ :kernel => 'Linux' }}
+    let(:params) {{ :ebtables_manage => true }}
+    it { expect { should contain_package('ebtables') }.to raise_error(Puppet::Error) }
+  end
 end
