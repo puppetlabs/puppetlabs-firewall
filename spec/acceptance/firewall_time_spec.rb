@@ -66,7 +66,7 @@ describe 'firewall time' do
 
         it 'should contain the rule' do
            shell('ip6tables-save') do |r|
-             expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --dports 8080 -m comment --comment "805 - test" -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -j ACCEPT/)
+             expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT/)
            end
         end
       end
