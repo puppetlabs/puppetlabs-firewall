@@ -63,6 +63,7 @@ Puppet::Type.newtype(:firewall) do
   feature :string_matching, "String matching features"
   feature :queue_num, "Which NFQUEUE to send packets to"
   feature :queue_bypass, "If nothing is listening on queue_num, allow packets to bypass the queue"
+  feature :u32_matching, "The netfilter u32 module for matching raw packet bytes"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -1497,6 +1498,31 @@ Puppet::Type.newtype(:firewall) do
       Allow packets to bypass :queue_num if userspace process is not listening
     EOS
     newvalues(:true, :false)
+  end
+
+  newproperty(:u32, :required_features => :u32_matching) do
+    desc <<-EOS
+      Enable the u32 module. Takes as an argument one of set, update,
+      rcheck or remove. For example:
+
+        # Checks to see if the IPv4 packet's fragment offset is
+	# 0 and if the internet header length (IHL) is exactly
+	# 20 bytes (the minimum length) and jumps to a chain
+	# "0_frag_20_ihl_ip4_ing" if so.
+        firewall { '100_0_frag_20_ihl_ip4_entry':
+          u32      => '0x4&0x1fff=0x0&&0x0&0xf000000=0x5000000',
+          action   => 'DROP',
+	  jump     => '0_frag_20_ihl_ip4_ing',
+	  provider => 'iptables',
+	  table    => 'mangle'
+        }
+    EOS
+
+    validate do |value|
+      if not matches = /^0x[0-9a-fA-F]+&0x[0-9a-fA-F]+=0x[0-9a-fA-F]+(?::0x[0-9a-fA-F]+)?(?:&&0x[0-9a-fA-F]+&0x[0-9a-fA-F]+=0x[0-9a-fA-F]+(?::0x[0-9a-fA-F]+)?)*$/.match(value)
+        raise(ArgumentError, "u32 string \"#{value}\" is malformed; Must be of the form \"OFFSET&MASK=RESULT\" or \"OFFSET&MASK=START:END\" with \"&&\" seperating multiple matches where OFFSET, MASK, RESULT, START, and END are all hexidecimal numbers")
+      end
+    end
   end
 
   newproperty(:src_cc) do
