@@ -42,7 +42,7 @@ describe 'nflog' do
 
     it 'contains the rule' do
       shell('iptables-save') do |r|
-        expect(r.stdout).to match(/NFLOG --nflog-prefix  "#{prefix}"/)
+        expect(r.stdout).to match(/NFLOG --nflog-prefix +"#{prefix}"/)
       end
     end
   end
