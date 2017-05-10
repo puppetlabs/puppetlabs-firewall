@@ -57,6 +57,10 @@ Puppet::Type.newtype(:firewall) do
   feature :ipsec_policy, "Match IPsec policy"
   feature :ipsec_dir, "Match IPsec policy direction"
   feature :mask, "Ability to match recent rules based on the ipv4 mask"
+  feature :nflog_group, "netlink group to subscribe to for logging"
+  feature :nflog_prefix, ""
+  feature :nflog_range, ""
+  feature :nflog_threshold, ""
   feature :ipset, "Match against specified ipset list"
   feature :clusterip, "Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them."
   feature :length, "Match the length of layer-3 payload"
@@ -448,6 +452,7 @@ Puppet::Type.newtype(:firewall) do
       * DNAT
       * SNAT
       * LOG
+      * NFLOG
       * MASQUERADE
       * REDIRECT
       * MARK
@@ -616,6 +621,67 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     newvalues(:true, :false)
+  end
+
+  newproperty(:nflog_group, :required_features => :nflog_group) do
+    desc <<-EOS
+      Used with the jump target NFLOG.
+      The netlink group (0 - 2^16-1) to which packets are (only applicable
+      for nfnetlink_log). Defaults to 0.
+    EOS
+
+    validate do |value|
+      if value.to_i > (2**16)-1 || value.to_i < 0
+        raise ArgumentError, "nflog_group must be between 0 and 2^16-1"
+      end
+    end
+
+    munge do |value|
+      if value.is_a?(String) and value =~ /^[-0-9]+$/
+        Integer(value)
+      else
+        value
+      end
+    end
+  end
+
+  newproperty(:nflog_prefix, :required_features => :nflog_prefix) do
+    desc <<-EOS
+      Used with the jump target NFLOG.
+      A prefix string to include in the log message, up to 64 characters long,
+      useful for distinguishing messages in the logs.
+    EOS
+
+    validate do |value|
+      if value.length > 64
+        raise ArgumentError, "nflog_prefix must be less than 64 characters."
+      end
+    end
+  end
+
+  newproperty(:nflog_range, :required_features => :nflog_range) do
+    desc <<-EOS
+      Used with the jump target NFLOG.
+      The number of bytes to be copied to userspace (only applicable for nfnetlink_log).
+      nfnetlink_log instances may specify their own range, this option overrides it.
+    EOS
+  end
+
+  newproperty(:nflog_threshold, :required_features => :nflog_threshold) do
+    desc <<-EOS
+      Used with the jump target NFLOG.
+      Number of packets to queue inside the kernel before sending them to userspace
+      (only applicable for nfnetlink_log). Higher values result in less overhead
+      per packet, but increase delay until the packets reach userspace. Defaults to 1.
+    EOS
+
+    munge do |value|
+      if value.is_a?(String) and value =~ /^[-0-9]+$/
+        Integer(value)
+      else
+        value
+      end
+    end
   end
 
   # ICMP matching property
