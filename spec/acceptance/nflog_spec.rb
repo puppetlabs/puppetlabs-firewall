@@ -1,6 +1,21 @@
 require 'spec_helper_acceptance'
 
-describe 'nflog' do
+describe 'nflog on older OSes', :if => fact('iptables_version') < '1.3.7' do
+  let(:pp) { <<-EOS
+        class {'::firewall': }
+        firewall { '503 - test':
+          jump  => 'NFLOG',
+          proto => 'all',
+          nflog_group => 3,
+        }
+      EOS
+  }
+  it 'should throw an error' do
+    apply_manifest(pp, :acceptable_error_codes => [0])
+  end
+end
+
+describe 'nflog', :unless => fact('iptables_version') < '1.3.7' do
   describe 'nflog_group' do
 
     let(:group) { 3 }
@@ -14,7 +29,7 @@ describe 'nflog' do
           nflog_group => #{group},
         }
       EOS
-       apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_failures => true)
     end
 
     it 'contains the rule' do

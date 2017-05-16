@@ -656,6 +656,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       args << ['--wait']
     end
 
+    #nflog options are not available on older OSes
+    [:nflog_group,:nflog_prefix,:nflog_threshold,:nflog_range].each do |nflog_feature|
+      fail "#{nflog_feature} is not available on iptables version #{iptables_version}" if resource[nflog_feature] && (iptables_version && iptables_version < '1.3.7')
+    end
+
     resource_list.each do |res|
       resource_value = nil
       if (resource[res]) then
