@@ -1,8 +1,6 @@
-#firewall
+# firewall
 
-[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-firewall.png?branch=master)](https://travis-ci.org/puppetlabs/puppetlabs-firewall)
-
-####Table of Contents
+#### Table of Contents
 
 1. [Overview - What is the firewall module?](#overview)
 2. [Module Description - What does the module do?](#module-description)
@@ -422,7 +420,7 @@ Specify the name of the IPv6 ip6tables service. Defaults defined in `firewall::p
 
 Specify the platform-specific package(s) to install. Defaults defined in `firewall::params`.
 
-###Type: firewall
+### Type: firewall
 
 This type enables you to manage firewall rules within Puppet.
 
@@ -436,7 +434,7 @@ This type enables you to manage firewall rules within Puppet.
 * `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
     * Default for `kernel` == `linux`.
-    * Supported features: `address_type`, `clusterip`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `length`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `netmap`, `owner`, `pkttype`, `queue_bypass`, `queue_num`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `string_matching`, `tcp_flags`.
+    * Supported features: `address_type`, `clusterip`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `length`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `netmap`, `nflog_group`, `nflog_prefix`, `nflog_range`, `nflog_threshold`, `owner`, `pkttype`, `queue_bypass`, `queue_num`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `string_matching`, `tcp_flags`.
 
 **Autorequires:**
 
@@ -487,6 +485,14 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `mark`: The ability to match or set the netfilter mark value associated with the packet.
 
 * `mask`:  The ability to match recent rules based on the ipv4 mask.
+
+* `nflog_group`: The ability to set the group number for NFLOG.
+
+* `nflog_prefix`: The ability to set a prefix for nflog messages.
+
+* `nflog_range`: The ability to set nflog\_range.
+
+* `nflog_threshold`: The ability to set nflog\_threshold.
 
 * `owner`: The ability to match owners.
 
@@ -645,14 +651,14 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
-  ~~~puppet
+~~~puppet
 firewall { '000 this runs first':
   # this rule will run first
 }
 firewall { '999 this runs last':
   # this rule will run last
 }
-  ~~~
+~~~
 
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
