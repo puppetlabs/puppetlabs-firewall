@@ -589,7 +589,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `hop_limit`: Hop limiting value for matched packets. Values must match '/^\d+$/'. Requires the `hop_limiting` feature.
 
-* `icmp`: When matching ICMP packets, this indicates the type of ICMP packet to match. A value of 'any' is not supported. To match any type of ICMP packet, the parameter should be omitted or undefined. Requires the `icmp_match` feature.
+* `icmp`: When matching ICMP packets, this indicates the type of ICMP packet to match. A value of 'any' is not supported. To match any type of ICMP packet, the parameter should be omitted or undefined. Passing in an array of values is not supported. You can either create separate rules for each ICMP type, or alternatively look at the firewall_multi module (https://forge.puppetlabs.com/alexharvey/firewall_multi). Requires the `icmp_match` feature.
 
 * `iniface`: Input interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.
 
@@ -692,7 +692,7 @@ firewall { '999 this runs last':
 
 * `provider`: The specific backend to use for this firewall resource. You will seldom need to specify this --- Puppet will usually discover the appropriate provider for your platform. Available providers are ip6tables and iptables. See the [Providers](#providers) section above for details about these providers.
 
-* `queue_bypass`: When using a `jump` value of 'NFQUEUE' this boolean will allow packets to bypass `queue_num`. This is useful when the process in userspace may not be listening on `queue_num` all the time. 
+* `queue_bypass`: When using a `jump` value of 'NFQUEUE' this boolean will allow packets to bypass `queue_num`. This is useful when the process in userspace may not be listening on `queue_num` all the time.
 
 * `queue_num`: When using a `jump` value of 'NFQUEUE' this parameter specifies the queue number to send packets to.
 
