@@ -346,7 +346,7 @@ describe firewall do
       expect(lambda { @resource[:icmp] = 'any' }).to raise_error(Puppet::Error)
     end
     it 'should fail if icmp type is an array' do
-      expect(lambda { @resource[:icmp] = ['0', '8'] }).to raise_error(Puppet::Error)
+      expect(lambda { @resource[:icmp] = "['0', '8']" }).to raise_error(Puppet::Error)
     end
 
     it 'should fail if icmp type cannot be mapped to a numeric' do
