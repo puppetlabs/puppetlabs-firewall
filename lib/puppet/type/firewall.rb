@@ -691,6 +691,8 @@ Puppet::Type.newtype(:firewall) do
 
       A value of "any" is not supported. To achieve this behaviour the
       parameter should simply be omitted or undefined.
+      An array of values is also not supported. To match against multiple ICMP
+      types, please use separate rules for each ICMP type.
     EOS
 
     validate do |value|
@@ -698,6 +700,11 @@ Puppet::Type.newtype(:firewall) do
         raise ArgumentError,
           "Value 'any' is not valid. This behaviour should be achieved " \
           "by omitting or undefining the ICMP parameter."
+      end
+      if value.kind_of?(Array)
+        raise ArgumentError,
+          "Argument must not be an array of values. To match multiple " \
+          "ICMP types, please use separate rules for each ICMP type."
       end
     end
 
@@ -722,6 +729,7 @@ Puppet::Type.newtype(:firewall) do
         self.fail("cannot work out icmp type")
       end
       value
+      
     end
   end
 
