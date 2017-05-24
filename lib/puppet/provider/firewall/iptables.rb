@@ -608,9 +608,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Proto should equal 'all' if undefined
     hash[:proto] = "all" if !hash.include?(:proto)
 
-    # If the jump parameter is set to one of: ACCEPT, REJECT or DROP then
-    # we should set the action parameter instead.
-    if ['ACCEPT','REJECT','DROP'].include?(hash[:jump]) then
+    # If the jump parameter is set to one of: ACCEPT, NOTRACK, REJECT or DROP
+    # then we should set the action parameter instead.
+    if ['ACCEPT','NOTRACK','REJECT','DROP'].include?(hash[:jump]) then
       hash[:action] = hash[:jump].downcase
       hash.delete(:jump)
     end
