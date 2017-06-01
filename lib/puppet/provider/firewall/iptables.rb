@@ -1,9 +1,41 @@
 require 'puppet/provider/firewall'
-require 'digest/md5'
 
+require 'digest/md5'
+def copy_file(source, destination)
+	dest = [];
+	File.foreach(source) do |line|
+		if (line =~ /^:/)
+			prefix = line.split("[")[0];
+			dest << prefix + "[0:0]"
+		elsif (line =~ /^#/)
+		else
+			dest << line
+		end
+	end
+	File.open(destination, "w+") do |f|
+		f.puts(dest);
+	end
+end
+def backup_path(provider)
+  case provider
+  when "iptables"
+	rootpath = "/etc/sysconfig/iptables-backup";
+    return rootpath + "/" + Time.now.strftime("%Y-%m-%d-%H-%M-%S")
+  end
+end
+def backup_rules(path)
+  unless Dir.exist?("/etc/sysconfig/iptables-backup")
+	  Dir.mkdir("/etc/sysconfig/iptables-backup");
+  end
+  copy_file("/etc/sysconfig/iptables", path);
+end
 Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
+  
 
+  $backup = backup_path("iptables");
+  backup_rules($backup);
+  
   @doc = "Iptables type provider"
 
   has_feature :iptables
@@ -337,7 +369,22 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     persist_iptables(self.class.instance_variable_get(:@protocol))
     @property_hash.clear
   end
-
+  def self.post_resource_eval
+	newpath = "/etc/sysconfig/iptables-backup/new";
+	if File.exist?(newpath)
+	  File.delete(newpath)
+	end
+    copy_file("/etc/sysconfig/iptables", newpath);
+	currentmd5 = Digest::MD5.file(newpath).hexdigest;
+	previousmd5 = Digest::MD5.file($backup).hexdigest;
+	debug "current= #{currentmd5}"
+	debug "previous=#{previousmd5}"
+	if currentmd5 == previousmd5
+		File.delete($backup)
+	end
+	File.delete(newpath);
+	$backup = nil;
+  end
   def self.instances
     debug "[instances]"
     table = nil
