@@ -1,8 +1,8 @@
-#firewall
+# firewall
 
 [![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-firewall.png?branch=master)](https://travis-ci.org/puppetlabs/puppetlabs-firewall)
 
-####Table of Contents
+#### Table of Contents
 
 1. [Overview - What is the firewall module?](#overview)
 2. [Module Description - What does the module do?](#module-description)
@@ -422,7 +422,7 @@ Specify the name of the IPv6 ip6tables service. Defaults defined in `firewall::p
 
 Specify the platform-specific package(s) to install. Defaults defined in `firewall::params`.
 
-###Type: firewall
+### Type: firewall
 
 This type enables you to manage firewall rules within Puppet.
 
@@ -645,14 +645,14 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
-  ~~~puppet
+~~~puppet
 firewall { '000 this runs first':
   # this rule will run first
 }
 firewall { '999 this runs last':
   # this rule will run last
 }
-  ~~~
+~~~
 
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
