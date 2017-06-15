@@ -240,12 +240,12 @@ Puppet::Type.type(:firewall).provide :ip6tables, :parent => :iptables, :source =
     :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
     :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
-    :dst_type, :socket, :pkttype, :name, :ipsec_dir, :ipsec_policy, :state,
+    :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy, :state,
     :ctstate, :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
     :string_from, :string_to, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
-    :src_cc, :dst_cc]
+    :src_cc, :dst_cc, :name]
 
 end
