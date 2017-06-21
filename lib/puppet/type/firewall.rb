@@ -744,9 +744,10 @@ Puppet::Type.newtype(:firewall) do
       * ESTABLISHED
       * NEW
       * RELATED
+      * UNTRACKED
     EOS
 
-    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
+    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED,:UNTRACKED)
 
     # States should always be sorted. This normalizes the resource states to
     # keep it consistent with the sorted result from iptables-save.
@@ -775,9 +776,10 @@ Puppet::Type.newtype(:firewall) do
       * ESTABLISHED
       * NEW
       * RELATED
+      * UNTRACKED
     EOS
 
-    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
+    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED,:UNTRACKED)
 
     # States should always be sorted. This normalizes the resource states to
     # keep it consistent with the sorted result from iptables-save.

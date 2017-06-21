@@ -547,7 +547,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `connmark`: Match the Netfilter mark value associated with the packet. Accepts values `mark/mask` or `mark`. These will be converted to hex if they are not hex already. Requires the `mark` feature.
 
-* `ctstate`: Matches a packet based on its state in the firewall stateful inspection table, using the conntrack module. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'. Requires the `state_match` feature.
+* `ctstate`: Matches a packet based on its state in the firewall stateful inspection table, using the conntrack module. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED', 'UNTRACKED'. Requires the `state_match` feature.
 
 * `date_start`: Start Date/Time for the rule to match, which must be in ISO 8601 "T" notation. The possible time range is '1970-01-01T00:00:00' to '2038-01-19T04:17:07'
 
@@ -784,7 +784,7 @@ firewall { '101 blacklist strange traffic':
 
 * `stat_probability`: Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
 
-* `state`: Matches a packet based on its state in the firewall stateful inspection table. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED'. Requires the `state_match` feature.
+* `state`: Matches a packet based on its state in the firewall stateful inspection table. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED', 'UNTRACKED'. Requires the `state_match` feature.
 
 * `string`: Set the pattern for string matching. Requires the `string_matching` feature.
 
