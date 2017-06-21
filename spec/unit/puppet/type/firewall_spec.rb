@@ -360,14 +360,19 @@ describe firewall do
       expect(@resource[:state]).to eql [:INVALID]
     end
 
+    it 'should accept value as a string' do
+      @resource[:state] = :UNTRACKED
+      expect(@resource[:state]).to eql [:UNTRACKED]
+    end
+
     it 'should accept value as an array' do
       @resource[:state] = [:INVALID, :NEW]
       expect(@resource[:state]).to eql [:INVALID, :NEW]
     end
 
     it 'should sort values alphabetically' do
-      @resource[:state] = [:NEW, :ESTABLISHED]
-      expect(@resource[:state]).to eql [:ESTABLISHED, :NEW]
+      @resource[:state] = [:NEW, :UNTRACKED, :ESTABLISHED]
+      expect(@resource[:state]).to eql [:ESTABLISHED, :NEW, :UNTRACKED]
     end
   end
 
@@ -375,6 +380,11 @@ describe firewall do
     it 'should accept value as a string' do
       @resource[:ctstate] = :INVALID
       expect(@resource[:ctstate]).to eql [:INVALID]
+    end
+
+    it 'should accept value as a string' do
+      @resource[:state] = :UNTRACKED
+      expect(@resource[:state]).to eql [:UNTRACKED]
     end
 
     it 'should accept value as an array' do
