@@ -20,8 +20,8 @@ class firewall::linux (
   $ebtables_manage = false,
 ) inherits ::firewall::params {
   $enable = $ensure ? {
-    running => true,
-    stopped => false,
+    'running' => true,
+    'stopped' => false,
   }
 
   package { 'iptables':
