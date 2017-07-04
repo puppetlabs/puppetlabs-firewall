@@ -954,8 +954,9 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  #iptables version 1.3.5 is not suppored by the ip6tables provider
-  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
+  # iptables version 1.3.5 is not suppored by the ip6tables provider
+  # iptables version 1.4.7 fails for multiple hl entries
+  if default['platform'] !~ /(el-5|el-6)/ and default['platform'] !~ /sles-10/
     describe 'hop_limit' do
       context '5' do
         it 'applies' do
@@ -2121,7 +2122,7 @@ describe 'firewall basics', docker: true do
       it 'should contain the rule' do
         shell('iptables-save') do |r|
           # Mask added as of Ubuntu 14.04.
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --set --name list1 (--mask 255.255.255.255)? --rdest -m comment --comment "597 - test"/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --set --name list1 (--mask 255.255.255.255 )?--rdest -m comment --comment "597 - test"/)
         end
       end
     end
@@ -2150,7 +2151,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255)? --rsource -m comment --comment "598 - test"/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - test"/)
         end
       end
     end
@@ -2174,7 +2175,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --update --name DEFAULT (--mask 255.255.255.255)? --rsource -m comment --comment "599 - test"/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --update --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "599 - test"/)
         end
       end
     end
@@ -2198,7 +2199,7 @@ describe 'firewall basics', docker: true do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255)? --rsource -m comment --comment "600 - test"/)
+          expect(r.stdout).to match(/-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "600 - test"/)
         end
       end
     end
