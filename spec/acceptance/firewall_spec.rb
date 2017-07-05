@@ -956,7 +956,7 @@ describe 'firewall basics', docker: true do
 
   # iptables version 1.3.5 is not suppored by the ip6tables provider
   # iptables version 1.4.7 fails for multiple hl entries
-  if default['platform'] !~ /(el-5|el-6)/ and default['platform'] !~ /sles-10/
+  if default['platform'] !~ /(el-5|el-6|sles-10|sles-11)/
     describe 'hop_limit' do
       context '5' do
         it 'applies' do
