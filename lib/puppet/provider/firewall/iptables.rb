@@ -375,7 +375,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # so it behaves like --comment
     values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
     # --match-set can have multiple values with weird iptables format
-    if values =~ /-m set --match-set/
+    if values =~ /-m set (!\s+)?--match-set/
       values = values.gsub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set \1\2 \3')
       ind  = values.index('-m set --match-set')
       sets = values.scan(/-m set --match-set ((?:!\s+)?\S* \S*)/)
