@@ -431,12 +431,12 @@ This type enables you to manage firewall rules within Puppet.
 
  * `ip6tables`: Ip6tables type provider
     * Required binaries: `ip6tables-save`, `ip6tables`.
-    * Supported features: `address_type`, `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `length`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `owner`, `pkttype`, `queue_bypass`, `queue_num`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `string_matching`, `tcp_flags`.
+    * Supported features: `address_type`, `connection_limiting`, `dnat`, `hop_limiting`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfirstfrag`, `ishasmorefrags`, `islastfrag`, `length`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `owner`, `pkttype`, `queue_bypass`, `queue_num`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `string_matching`, `tcp_flags`, `hashlimit`.
 
 * `iptables`: Iptables type provider
     * Required binaries: `iptables-save`, `iptables`.
     * Default for `kernel` == `linux`.
-    * Supported features: `address_type`, `clusterip`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `length`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `netmap`, `owner`, `pkttype`, `queue_bypass`, `queue_num`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `string_matching`, `tcp_flags`.
+    * Supported features: `address_type`, `clusterip`, `connection_limiting`, `dnat`, `icmp_match`, `interface_match`, `iprange`, `ipsec_dir`, `ipsec_policy`, `ipset`, `iptables`, `isfragment`, `length`, `log_level`, `log_prefix`, `log_uid`, `mark`, `mask`, `mss`, `netmap`, `owner`, `pkttype`, `queue_bypass`, `queue_num`, `rate_limiting`, `recent_limiting`, `reject_type`, `snat`, `socket`, `state_match`, `string_matching`, `tcp_flags`, `hashlimit`.
 
 **Autorequires:**
 
@@ -512,6 +512,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `netmap`: The ability to map entire subnets via source or destination nat rules.
 
+* `hashlimit`: The ability to use the hashlimit-module
+
 #### Parameters
 
 * `action`: This is the action to perform on a match. Valid values for this action are:
@@ -586,6 +588,28 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `gateway`: Used with TEE target to mirror traffic of a machine to a secondary host on the LAN.
 
 * `gid`: GID or Group owner matching rule. Accepts a string argument only, as iptables does not accept multiple gid in a single statement. Requires the `owner` feature.
+
+* `hashlimit_above`: Match if the rate is above amount/quantum. A hash limit option (--hashlimit-upto, --hashlimit-above) and --hashlimit-name are required.
+
+* `hashlimit_burst`: Maximum initial number of packets to match: this number gets recharged by one every time the limit specified above is not reached, up to this number; the default is 5.
+
+* `hashlimit_dstmask`: Like --hashlimit-srcmask, but for destination addresses.
+
+* `hashlimit_htable_expire`: After how many miliseconds do hash entries expire. Corresponds to --hashlimit-htable-expire.
+
+* `hashlimit_htable_gcinterval`: How many miliseconds between garbage collection intervals. Corresponds to --hashlimit-htable-gcinterval.
+
+* `hashlimit_htable_max`: Maximum entries in the hash. Corresponds to --hashlimit-htable-max.
+
+* `hashlimit_htable_size`: The number of buckets of the hash table. Corresponds to --hashlimit-htable-size.
+
+* `hashlimit_mode`: {srcip|srcport|dstip|dstport} A comma-separated list of objects to take into consideration. If no --hashlimit-mode option is given, hashlimit acts like limit, but at the expensive of doing the hash housekeeping.
+
+* `hashlimit_name`: The name for the /proc/net/ipt_hashlimit/foo entry. A hash limit option (--hashlimit-upto, --hashlimit-above) and --hashlimit-name are required.
+
+* `hashlimit_srcmask`: When --hashlimit-mode srcip is used, all source addresses encountered will be grouped according to the given prefix length and the so-created subnet will be subject to hashlimit. prefix must be between (inclusive) 0 and 32. Note that --hashlimit-srcmask 0 is basically doing the same thing as not specifying srcip for --hashlimit-mode, but is technically more expensive.
+
+* `hashlimit_upto`: Match if the rate is below or equal to amount/quantum. It is specified as a number, with an optional time quantum suffix; the default is 3/hour. A hash limit option (--hashlimit-upto, --hashlimit-above) and --hashlimit-name are required.
 
 * `hop_limit`: Hop limiting value for matched packets. Values must match '/^\d+$/'. Requires the `hop_limiting` feature.
 
