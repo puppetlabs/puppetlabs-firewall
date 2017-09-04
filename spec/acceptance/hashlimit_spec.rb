@@ -16,7 +16,7 @@ describe 'hashlimit property' do
             chain                       => 'INPUT',
             proto                       => 'tcp',
             hashlimit_name              => 'above',
-            hashlimit_above             => '512kb/s',
+            hashlimit_above             => '526/sec',
             hashlimit_htable_gcinterval => '10',
             hashlimit_mode              => 'srcip,dstip',
             action                      => accept,
@@ -29,7 +29,7 @@ describe 'hashlimit property' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-above 512kb\/s --hashlimit-mode srcip,dstip --hashlimit-name above --hashlimit-htable-gcinterval 10 -m comment --comment "800 - hashlimit_above test" -j ACCEPT/)
+          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-above 526\/sec --hashlimit-mode srcip,dstip --hashlimit-name above --hashlimit-htable-gcinterval 10 -m comment --comment "800 - hashlimit_above test" -j ACCEPT/)
         end
       end
     end
@@ -43,7 +43,7 @@ describe 'hashlimit property' do
             provider                    => 'ip6tables',
             proto                       => 'tcp',
             hashlimit_name              => 'above-ip6',
-            hashlimit_above             => '512kb/s',
+            hashlimit_above             => '526/sec',
             hashlimit_htable_gcinterval => '10',
             hashlimit_mode              => 'srcip,dstip',
             action                      => accept,
@@ -56,7 +56,7 @@ describe 'hashlimit property' do
 
       it 'should contain the rule' do
         shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-above 512kb\/s --hashlimit-mode srcip,dstip --hashlimit-name above-ip6 --hashlimit-htable-gcinterval 10 -m comment --comment "801 - hashlimit_above test ipv6" -j ACCEPT/)
+          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-above 526\/sec --hashlimit-mode srcip,dstip --hashlimit-name above-ip6 --hashlimit-htable-gcinterval 10 -m comment --comment "801 - hashlimit_above test ipv6" -j ACCEPT/)
         end
       end
     end
