@@ -425,6 +425,7 @@ describe 'ip6tables provider' do
         let(:instance) { provider6.new(resource) }
 
         it 'general_args should be valid' do
+          data[:args].unshift("--wait") if instance.general_args.flatten.include? '--wait'
           expect(instance.general_args.flatten).to eql data[:args]
         end
       end
