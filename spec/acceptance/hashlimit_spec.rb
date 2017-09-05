@@ -29,7 +29,13 @@ describe 'hashlimit property' do
 
       it 'should contain the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-above 526\/sec --hashlimit-burst 5 --hashlimit-mode srcip,dstip --hashlimit-name above --hashlimit-htable-gcinterval 10 -m comment --comment "800 - hashlimit_above test" -j ACCEPT/)
+          expect(r.stdout).to match(/-A INPUT/)
+          expect(r.stdout).to match(/-p tcp/)
+          expect(r.stdout).to match(/--hashlimit-above 526\/sec/)
+          expect(r.stdout).to match(/--hashlimit-mode srcip,dstip/)
+          expect(r.stdout).to match(/--hashlimit-name above/)
+          expect(r.stdout).to match(/--hashlimit-htable-gcinterval 10/)
+          expect(r.stdout).to match(/-j ACCEPT/)
         end
       end
     end
@@ -47,7 +53,7 @@ describe 'hashlimit property' do
             hashlimit_htable_gcinterval => '10',
             hashlimit_mode              => 'srcip,dstip',
             action                      => accept,
-          }  
+          }
         EOS
 
         apply_manifest(pp, :catch_failures => true)
@@ -56,7 +62,13 @@ describe 'hashlimit property' do
 
       it 'should contain the rule' do
         shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-above 526\/sec --hashlimit-burst 5 --hashlimit-mode srcip,dstip --hashlimit-name above-ip6 --hashlimit-htable-gcinterval 10 -m comment --comment "801 - hashlimit_above test ipv6" -j ACCEPT/)
+          expect(r.stdout).to match(/-A INPUT/)
+          expect(r.stdout).to match(/-p tcp/)
+          expect(r.stdout).to match(/--hashlimit-above 526\/sec/)
+          expect(r.stdout).to match(/--hashlimit-mode srcip,dstip/)
+          expect(r.stdout).to match(/--hashlimit-name above-ip6/)
+          expect(r.stdout).to match(/--hashlimit-htable-gcinterval 10/)
+          expect(r.stdout).to match(/-j ACCEPT/)
         end
       end
     end
