@@ -1,7 +1,7 @@
 
 require 'spec_helper_acceptance'
 
-describe 'hashlimit property' do
+describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (fact('operatingsystem') != 'Scientific' || fact('operatingsystem') != 'RedHat') do
   before :all do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
