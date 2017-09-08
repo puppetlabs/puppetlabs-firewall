@@ -58,7 +58,7 @@ This approach employs a whitelist setup, so you can define what rules you want a
 
 The code in this section does the following:
 
-* The 'require' parameter in `firewall {}` ensures `my_fw::pre` is run before any other rules.  
+* The 'require' parameter in `firewall {}` ensures `my_fw::pre` is run before any other rules.
 * In the `my_fw::post` class declaration, the 'before' parameter ensures `my_fw::post` is run after any other rules.
 
 Therefore, the run order is:
