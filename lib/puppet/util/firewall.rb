@@ -88,7 +88,9 @@ module Puppet::Util::Firewall
     end
   end
 
-  # Takes an address and returns it in CIDR notation.
+  # Takes an address and protocol and returns the address in CIDR notation.
+  #
+  # The protocol is only used when the address is a hostname.
   #
   # If the address is:
   #
@@ -105,27 +107,49 @@ module Puppet::Util::Firewall
   #   - Any address with a resulting prefix length of zero:
   #     It will return nil which is equivilent to not specifying an address
   #
-  def host_to_ip(value)
+  def host_to_ip(value, proto = nil)
     begin
       value = Puppet::Util::IPCidr.new(value)
     rescue
-      value = Puppet::Util::IPCidr.new(Resolv.getaddress(value))
+      family = case proto
+               when :IPv4
+                 Socket::AF_INET
+               when :IPv6
+                 Socket::AF_INET6
+               when nil
+                 raise ArgumentError, "Proto must be specified for a hostname"
+               else
+                 raise ArgumentError, "Unsupported address family: #{proto}"
+               end
+
+      new_value = nil
+      Resolv.each_address(value) do |addr|
+        begin
+          new_value = Puppet::Util::IPCidr.new(addr, family)
+          break
+        rescue
+        end
+      end
+
+      raise "Failed to resolve hostname #{value}" unless new_value != nil
+      value = new_value
     end
 
     return nil if value.prefixlen == 0
     value.cidr
   end
 
-  # Takes an address mask and converts the host portion to CIDR notation.
+  # Takes an address mask and protocol and converts the host portion to CIDR
+  # notation.
   #
   # This takes into account you can negate a mask but follows all rules
   # defined in host_to_ip for the host/address part.
   #
-  def host_to_mask(value)
+  def host_to_mask(value, proto)
     match = value.match /(!)\s?(.*)$/
-    return host_to_ip(value) unless match
+    return host_to_ip(value, proto) unless match
 
-    cidr = host_to_ip(match[2])
+    cidr = host_to_ip(match[2], proto)
     return nil if cidr == nil
     "#{match[1]} #{cidr}"
   end
