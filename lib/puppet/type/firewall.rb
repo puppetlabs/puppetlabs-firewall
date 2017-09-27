@@ -134,8 +134,17 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        self.fail("cannot work out protocol family")
+      end
+
       begin
-        @resource.host_to_mask(value)
+        @resource.host_to_mask(value, protocol)
       rescue Exception => e
         self.fail("host_to_ip failed for #{value}, exception #{e}")
       end
@@ -184,8 +193,17 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        self.fail("cannot work out protocol family")
+      end
+
       begin
-        @resource.host_to_mask(value)
+        @resource.host_to_mask(value, protocol)
       rescue Exception => e
         self.fail("host_to_ip failed for #{value}, exception #{e}")
       end
