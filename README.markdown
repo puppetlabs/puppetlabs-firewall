@@ -17,7 +17,8 @@
     * [Additional Uses for the Firewall Module](#other-rules)
 5. [Reference - An under-the-hood peek at what the module is doing](#reference)
 6. [Limitations - OS compatibility, etc.](#limitations)
-7. [Development - Guide for contributing to the module](#development)
+7. [Firewall_multi - Arrays for certain parameters](#firewall_multi)
+8. [Development - Guide for contributing to the module](#development)
     * [Tests - Testing your configuration](#tests)
 
 ## Overview
@@ -555,7 +556,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `date_stop`: End Date/Time for the rule to match, which must be in ISO 8601 "T" notation. The possible time range is '1970-01-01T00:00:00' to '2038-01-19T04:17:07'
 
-* `destination`: The destination address to match. For example: `destination => '192.168.1.0/24'`. You can also negate a mask by putting ! in front. For example: `destination  => '! 192.168.2.0/24'`. The destination can also be an IPv6 address if your provider supports it.
+* `destination`: The destination address to match. For example: `destination => '192.168.1.0/24'`. You can also negate a mask by putting ! in front. For example: `destination  => '! 192.168.2.0/24'`. The destination can also be an IPv6 address if your provider supports it. This parameter is supported by firewall_multi (see below).
 
   For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
@@ -613,7 +614,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `hop_limit`: Hop limiting value for matched packets. Values must match '/^\d+$/'. Requires the `hop_limiting` feature.
 
-* `icmp`: When matching ICMP packets, this indicates the type of ICMP packet to match. A value of 'any' is not supported. To match any type of ICMP packet, the parameter should be omitted or undefined. Passing in an array of values is not supported. You can either create separate rules for each ICMP type, or alternatively look at the firewall_multi module (https://forge.puppetlabs.com/alexharvey/firewall_multi). Requires the `icmp_match` feature.
+* `icmp`: When matching ICMP packets, this indicates the type of ICMP packet to match. A value of 'any' is not supported. To match any type of ICMP packet, the parameter should be omitted or undefined. Requires the `icmp_match` feature. This parameter is supported by firewall_multi (see below).
 
 * `iniface`: Input interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.
 
@@ -696,7 +697,7 @@ firewall { '999 this runs last':
 
 * `port`: *DEPRECATED* Using the unspecific 'port' parameter can lead to firewall rules that are unexpectedly too lax. It is recommended to always use the specific dport and sport parameters to avoid this ambiguity. The destination or source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format: 'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
-* `proto`: The specific protocol to match for this rule. This is 'tcp' by default. Valid values are:
+* `proto`: The specific protocol to match for this rule. This is 'tcp' by default. This parameter is supported by firewall_multi (see below). Valid values are:
   * 'ip'
   * 'tcp'
   * 'udp'
@@ -714,7 +715,7 @@ firewall { '999 this runs last':
   * 'pim'
   * 'all'
 
-* `provider`: The specific backend to use for this firewall resource. You will seldom need to specify this --- Puppet will usually discover the appropriate provider for your platform. Available providers are ip6tables and iptables. See the [Providers](#providers) section above for details about these providers.
+* `provider`: The specific backend to use for this firewall resource. You will seldom need to specify this --- Puppet will usually discover the appropriate provider for your platform. Available providers are ip6tables and iptables. See the [Providers](#providers) section above for details about these providers. This parameter is supported by firewall_multi (see below).
 
 * `queue_bypass`: When using a `jump` value of 'NFQUEUE' this boolean will allow packets to bypass `queue_num`. This is useful when the process in userspace may not be listening on `queue_num` all the time.
 
@@ -776,7 +777,7 @@ firewall { '101 blacklist strange traffic':
 
 * `socket`: If 'true', matches if an open socket can be found by doing a socket lookup on the packet. Valid values are 'true', 'false'. Requires the `socket` feature.
 
-* `source`: The source address. For example: `source => '192.168.2.0/24'`. You can also negate a mask by putting ! in front. For example: `source => '! 192.168.2.0/24'`. The source can also be an IPv6 address if your provider supports it.
+* `source`: The source address. For example: `source => '192.168.2.0/24'`. You can also negate a mask by putting ! in front. For example: `source => '! 192.168.2.0/24'`. The source can also be an IPv6 address if your provider supports it. This parameter is supported by firewall_multi (see below).
 
 * `sport`: The source port to match for this filter (if the protocol supports ports). Will accept a single element or an array. For some firewall providers you can pass a range of ports in the format:'start number-end number'. For example, '1-1024' would cover ports 1 to 1024.
 
@@ -936,6 +937,29 @@ unsupported system will result in iptable rules failing to apply.
 
 As Puppet Enterprise itself does not yet support Debian 8, use of this module with Puppet Enterprise under a Debian 8
 system should be regarded as experimental.
+
+## Firewall_multi
+
+It is common to require arrays of some of this module's parameters - e.g. arrays of source or destination addresses - in contexts where iptables itself does not allow arrays.
+
+An external module - `firewall_multi` - provides a defined type wrapper for spawning firewall resources for arrays of certain inputs.
+
+For example:
+
+~~~ puppet
+firewall_multi { '100 allow http and https access':
+  source => [
+    '10.0.10.0/24',
+    '10.0.12.0/24',
+    '10.1.1.128',
+  ],
+  dport  => [80, 443],
+  proto  => tcp,
+  action => accept,
+}
+~~~
+
+For more information see the documentation at that project.
 
 ### Known Issues
 
