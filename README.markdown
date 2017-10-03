@@ -703,7 +703,7 @@ firewall { '999 this runs last':
   * 'icmp'
   * 'ipv4'
   * 'ipv6'
-  * 'icmpv6'
+  * 'ipv6-icmp'
   * 'esp'
   * 'ah'
   * 'vrrp'
