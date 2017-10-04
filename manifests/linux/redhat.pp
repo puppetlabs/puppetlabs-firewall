@@ -43,7 +43,7 @@ class firewall::linux::redhat (
     service { 'firewalld':
       ensure => stopped,
       enable => false,
-      before => [Package[$package_name], Service[$service_name]],
+      before => Package[$package_name],
     }
   }
 
