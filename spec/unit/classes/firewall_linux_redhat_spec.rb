@@ -95,7 +95,7 @@ describe 'firewall::linux::redhat', :type => :class do
         it { should contain_service('firewalld').with(
           :ensure => 'stopped',
           :enable => false,
-          :before => ['Package[iptables-services]', 'Service[iptables]']
+          :before => 'Package[iptables-services]'
         )}
 
         it { should contain_package('iptables-services').with(
