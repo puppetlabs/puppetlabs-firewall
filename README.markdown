@@ -942,7 +942,7 @@ system should be regarded as experimental.
 
 It is common to require arrays of some of this module's parameters - e.g. arrays of source or destination addresses - in contexts where iptables itself does not allow arrays.
 
-An external module - `firewall_multi` - provides a defined type wrapper for spawning firewall resources for arrays of certain inputs.
+An external module - [firewall_multi](https://forge.puppetlabs.com/alexharvey/firewall_multi) - provides a defined type wrapper for spawning firewall resources for arrays of certain inputs.
 
 For example:
 
