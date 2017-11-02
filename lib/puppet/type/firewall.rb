@@ -940,6 +940,45 @@ Puppet::Type.newtype(:firewall) do
       only, as iptables does not accept multiple gid in a single
       statement.
     EOS
+    def insync?(is)
+      require 'etc'
+
+      # The following code allow us to take into consideration unix mappings
+      # between string group names and GIDs (integers). We also need to ignore
+      # spaces as they are irrelevant with respect to rule sync.
+
+      # Remove whitespace
+      is = is.gsub(/\s+/,'')
+      should = @should.first.to_s.gsub(/\s+/,'')
+
+      # Keep track of negation, but remove the '!'
+      is_negate = ''
+      should_negate = ''
+      if is.start_with?('!')
+        is = is.gsub(/^!/,'')
+        is_negate = '!'
+      end
+      if should.start_with?('!')
+        should = should.gsub(/^!/,'')
+        should_negate = '!'
+      end
+
+      # If 'should' contains anything other than digits,
+      # we assume that we have to do a lookup to convert
+      # to UID
+      unless should[/[0-9]+/] == should
+        should = Etc.getgrnam(should).gid
+      end
+
+      # If 'is' contains anything other than digits,
+      # we assume that we have to do a lookup to convert
+      # to UID
+      unless is[/[0-9]+/] == is
+        is = Etc.getgrnam(is).gid
+      end
+
+      return "#{is_negate}#{is}" == "#{should_negate}#{should}"
+    end
   end
 
   # match mark
