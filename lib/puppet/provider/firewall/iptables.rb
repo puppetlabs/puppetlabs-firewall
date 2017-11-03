@@ -799,7 +799,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     my_rule = resource[:name].to_s
     rules << my_rule
 
-    unmanaged_rule_regex = /^9[0-9]{3}\s[a-f0-9]{32}$/
+    unmanaged_rule_regex = /^9[0-9]{3}\s.*$/
     # Find if this is a new rule or an existing rule, then find how many
     # unmanaged rules preceed it.
     if rules.length == rules.uniq.length
