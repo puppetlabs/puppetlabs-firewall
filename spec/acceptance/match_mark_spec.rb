@@ -30,6 +30,29 @@ describe 'firewall match marks' do
       end
     end
 
+    describe 'match_mark_mask' do
+      context '0x1/0xff' do
+        it 'applies' do
+          pp = <<-EOS
+            class { '::firewall': }
+            firewall { '504 match_mark w mask - test':
+              proto      => 'all',
+              match_mark => '0x1/0xff',
+              action     => reject,
+            }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -m comment --comment "504 match_mark w mask - test" -m mark --mark 0x1\/0xff -j REJECT --reject-with icmp-port-unreachable/)
+          end
+        end
+      end
+    end
+
     describe 'match_mark_ip6' do
       context '0x1' do
         it 'applies' do
@@ -49,6 +72,30 @@ describe 'firewall match marks' do
         it 'should contain the rule' do
           shell('ip6tables-save') do |r|
             expect(r.stdout).to match(/-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark ip6tables - test" -j REJECT --reject-with icmp6-port-unreachable/)
+          end
+        end
+      end
+    end
+
+    describe 'match_mark_ip6_mask' do
+      context '0x1/0xff' do
+        it 'applies' do
+          pp = <<-EOS
+            class { '::firewall': }
+            firewall { '504 match_mark w mask ip6tables - test':
+              proto      => 'all',
+              match_mark => '0x1/0xff',
+              action     => reject,
+              provider => 'ip6tables',
+            }
+          EOS
+
+          apply_manifest(pp, :catch_failures => true)
+        end
+
+        it 'should contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(/-A INPUT -m comment --comment "504 match_mark w mask ip6tables - test" -m mark --mark 0x1\/0xff -j REJECT --reject-with icmp6-port-unreachable/)
           end
         end
       end

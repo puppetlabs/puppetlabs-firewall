@@ -582,6 +582,17 @@ ARGS_TO_HASH = {
       :action          => 'reject',
     },
   },
+  'match_mark_mask' => {
+    :line => '-A INPUT -p tcp -m comment --comment "066 REJECT connlimit_above 10 with mask 32 and mark matches" -m mark --mark 0x1/0xff -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable',
+    :table => 'filter',
+    :params => {
+      :proto           => 'tcp',
+      :connlimit_above => '10',
+      :connlimit_mask  => '32',
+      :match_mark      => '0x1/0xff',
+      :action          => 'reject',
+    },
+  },
   'clamp_mss_to_pmtu' => {
     :line => '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu -m comment --comment "067 change max segment size"',
     :table => 'filter',
@@ -1192,6 +1203,18 @@ HASH_TO_ARGS = {
       :action          => 'reject',
     },
     :args => ["-t", :filter, "-p", :tcp, "-j", "REJECT", "-m", "mark", "--mark", "0x1", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32", "-m", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches"],
+  },
+  'match_mark_mask' => {
+    :params => {
+      :name            => '066 REJECT connlimit_above 10 with mask 32 and mark matches',
+      :table           => 'filter',
+      :proto           => 'tcp',
+      :connlimit_above => '10',
+      :connlimit_mask  => '32',
+      :match_mark      => '0x1/0xff',
+      :action          => 'reject',
+    },
+    :args => ["-t", :filter, "-p", :tcp, "-m", "comment", "--comment", "066 REJECT connlimit_above 10 with mask 32 and mark matches", "-j", "REJECT", "-m", "mark", "--mark", "0x1/0xff", "-m", "connlimit", "--connlimit-above", "10", "--connlimit-mask", "32"],
   },
   'clamp_mss_to_pmtu' => {
     :params => {

@@ -988,7 +988,7 @@ Puppet::Type.newtype(:firewall) do
       mark/mask or mark.  These will be converted to hex if they are not already.
     EOS
     munge do |value|
-      mark_regex = %r{\A((?:0x)?[0-9A-F]+)(/)?((?:0x)?[0-9A-F]+)?\z}i
+      mark_regex = %r{\A((?:0x)?[0-9A-F]+)(/((?:0x)?[0-9A-F]+))?\z}i
       match = value.to_s.match(mark_regex)
       if match.nil?
         raise ArgumentError, "Match MARK value must be integer or hex between 0 and 0xffffffff"
@@ -997,15 +997,19 @@ Puppet::Type.newtype(:firewall) do
 
       # Values that can't be converted to hex.
       # Or contain a trailing slash with no mask.
-      if mark.nil? or (mark and match[2] and match[3].nil?)
+      if mark.nil?
         raise ArgumentError, "Match MARK value must be integer or hex between 0 and 0xffffffff"
       end
 
-      # There should not be a mask on match_mark
-      unless match[3].nil?
-        raise ArgumentError, "iptables does not support masks on MARK match rules"
-      end
       value = mark
+
+      unless match[2].nil?
+        mask = @resource.to_hex32(match[3])
+        if mask.nil?
+          raise ArgumentError, "When provided, match MARK mask must be integer or hex between 0 and 0xffffffff"
+        end
+        value = value + "/" + mask
+      end
 
       value
     end
