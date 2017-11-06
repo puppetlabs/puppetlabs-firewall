@@ -131,10 +131,8 @@ describe 'complex ruleset 2' do
 
       Firewall {
         proto => 'all',
-        stage => 'pre',
       }
       Firewallchain {
-        stage  => 'pre',
         purge  => 'true',
         ignore => [
           '--comment "[^"]*(?i:ignore)[^"]*"',
