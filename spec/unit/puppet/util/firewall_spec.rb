@@ -14,8 +14,9 @@ describe 'Puppet::Util::Firewall' do
   describe '#host_to_ip' do
     subject { resource }
     it {
-      expect(Resolv).to receive(:getaddress).with('puppetlabs.com').and_return('96.126.112.51')
-      expect(subject.host_to_ip('puppetlabs.com')).to eql '96.126.112.51/32'
+      expect(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
+      expect(subject.host_to_ip('puppetlabs.com', :IPv4)).to eql '96.126.112.51/32'
+      expect(subject.host_to_ip('puppetlabs.com', :IPv6)).to eql '2001:db8:4650::13:8a/128'
     }
     it { expect(subject.host_to_ip('96.126.112.51')).to eql '96.126.112.51/32' }
     it { expect(subject.host_to_ip('96.126.112.51/32')).to eql '96.126.112.51/32' }
@@ -28,22 +29,24 @@ describe 'Puppet::Util::Firewall' do
   describe '#host_to_mask' do
     subject { resource }
     it {
-      expect(Resolv).to receive(:getaddress).at_least(:once).with('puppetlabs.com').and_return('96.126.112.51')
-      expect(subject.host_to_mask('puppetlabs.com')).to eql '96.126.112.51/32'
-      expect(subject.host_to_mask('!puppetlabs.com')).to eql '! 96.126.112.51/32'
+      expect(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
+      expect(subject.host_to_mask('puppetlabs.com', :IPv4)).to eql '96.126.112.51/32'
+      expect(subject.host_to_mask('!puppetlabs.com', :IPv4)).to eql '! 96.126.112.51/32'
+      expect(subject.host_to_mask('puppetlabs.com', :IPv6)).to eql '2001:db8:4650::13:8a/128'
+      expect(subject.host_to_mask('!puppetlabs.com', :IPv6)).to eql '! 2001:db8:4650::13:8a/128'
     }
-    it { expect(subject.host_to_mask('96.126.112.51')).to eql '96.126.112.51/32' }
-    it { expect(subject.host_to_mask('!96.126.112.51')).to eql '! 96.126.112.51/32' }
-    it { expect(subject.host_to_mask('96.126.112.51/32')).to eql '96.126.112.51/32' }
-    it { expect(subject.host_to_mask('! 96.126.112.51/32')).to eql '! 96.126.112.51/32' }
-    it { expect(subject.host_to_mask('2001:db8:85a3:0:0:8a2e:370:7334')).to eql '2001:db8:85a3::8a2e:370:7334/128' }
-    it { expect(subject.host_to_mask('!2001:db8:85a3:0:0:8a2e:370:7334')).to eql '! 2001:db8:85a3::8a2e:370:7334/128' }
-    it { expect(subject.host_to_mask('2001:db8:1234::/48')).to eql '2001:db8:1234::/48' }
-    it { expect(subject.host_to_mask('! 2001:db8:1234::/48')).to eql '! 2001:db8:1234::/48' }
-    it { expect(subject.host_to_mask('0.0.0.0/0')).to eql nil }
-    it { expect(subject.host_to_mask('!0.0.0.0/0')).to eql nil }
-    it { expect(subject.host_to_mask('::/0')).to eql nil }
-    it { expect(subject.host_to_mask('! ::/0')).to eql nil }
+    it { expect(subject.host_to_mask('96.126.112.51', :IPv4)).to eql '96.126.112.51/32' }
+    it { expect(subject.host_to_mask('!96.126.112.51', :IPv4)).to eql '! 96.126.112.51/32' }
+    it { expect(subject.host_to_mask('96.126.112.51/32', :IPv4)).to eql '96.126.112.51/32' }
+    it { expect(subject.host_to_mask('! 96.126.112.51/32', :IPv4)).to eql '! 96.126.112.51/32' }
+    it { expect(subject.host_to_mask('2001:db8:85a3:0:0:8a2e:370:7334', :IPv6)).to eql '2001:db8:85a3::8a2e:370:7334/128' }
+    it { expect(subject.host_to_mask('!2001:db8:85a3:0:0:8a2e:370:7334', :IPv6)).to eql '! 2001:db8:85a3::8a2e:370:7334/128' }
+    it { expect(subject.host_to_mask('2001:db8:1234::/48', :IPv6)).to eql '2001:db8:1234::/48' }
+    it { expect(subject.host_to_mask('! 2001:db8:1234::/48', :IPv6)).to eql '! 2001:db8:1234::/48' }
+    it { expect(subject.host_to_mask('0.0.0.0/0', :IPv4)).to eql nil }
+    it { expect(subject.host_to_mask('!0.0.0.0/0', :IPv4)).to eql nil }
+    it { expect(subject.host_to_mask('::/0', :IPv6)).to eql nil }
+    it { expect(subject.host_to_mask('! ::/0', :IPv6)).to eql nil }
   end
 
   describe '#icmp_name_to_number' do

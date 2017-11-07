@@ -27,7 +27,7 @@ describe 'connlimit property' do
         it 'should contain the rule' do
           shell('iptables-save') do |r|
             #connlimit-saddr is added in Ubuntu 14.04.
-            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 2222 -m comment --comment "500 - test" -m connlimit --connlimit-above 10 --connlimit-mask 32 (--connlimit-saddr )?-j REJECT --reject-with icmp-port-unreachable/)
+            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 2222 -m connlimit --connlimit-above 10 --connlimit-mask 32 (--connlimit-saddr )?-m comment --comment "500 - test" -j REJECT --reject-with icmp-port-unreachable/)
           end
         end
       end
@@ -54,7 +54,7 @@ describe 'connlimit property' do
         it 'should contain the rule' do
           shell('iptables-save') do |r|
             #connlimit-saddr is added in Ubuntu 14.04.
-            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 2222 -m comment --comment "501 - test" -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-j REJECT --reject-with icmp-port-unreachable/)
+            expect(r.stdout).to match(/-A INPUT -p tcp -m multiport --dports 2222 -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-m comment --comment "501 - test" -j REJECT --reject-with icmp-port-unreachable/)
           end
         end
       end

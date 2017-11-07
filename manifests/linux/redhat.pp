@@ -8,18 +8,31 @@
 #   Ensure parameter passed onto Service[] resources.
 #   Default: running
 #
+# [*ensure_v6*]
+#   Ensure parameter passed onto Service[] resources.
+#   Default: running
+#
 # [*enable*]
 #   Enable parameter passed onto Service[] resources.
 #   Default: true
 #
+# [*enable_v6*]
+#   Enable parameter passed onto Service[] resources.
+#   Default: true
+#
+#
 class firewall::linux::redhat (
   $ensure          = running,
+  $ensure_v6       = undef,
   $enable          = true,
+  $enable_v6       = undef,
   $service_name    = $::firewall::params::service_name,
   $service_name_v6 = $::firewall::params::service_name_v6,
   $package_name    = $::firewall::params::package_name,
   $package_ensure  = $::firewall::params::package_ensure,
 ) inherits ::firewall::params {
+  $_ensure_v6 = pick($ensure_v6, $ensure)
+  $_enable_v6 = pick($enable_v6, $enable)
 
   # RHEL 7 / CentOS 7 and later and Fedora 15 and later require the iptables-services
   # package, which provides the /usr/libexec/iptables/iptables.init used by
@@ -46,9 +59,10 @@ class firewall::linux::redhat (
     or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
     if $ensure == 'running' {
       exec { '/usr/bin/systemctl daemon-reload':
-        require => Package[$package_name],
-        before  => Service[$service_name, $service_name_v6],
-        unless  => "/usr/bin/systemctl is-active ${service_name} ${service_name_v6}",
+        require     => Package[$package_name],
+        before      => Service[$service_name, $service_name_v6],
+        subscribe   => Package[$package_name],
+        refreshonly => true,
       }
     }
   }
@@ -59,8 +73,8 @@ class firewall::linux::redhat (
     hasstatus => true,
   }
   service { $service_name_v6:
-    ensure    => $ensure,
-    enable    => $enable,
+    ensure    => $_ensure_v6,
+    enable    => $_enable_v6,
     hasstatus => true,
   }
 

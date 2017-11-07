@@ -345,6 +345,9 @@ describe firewall do
     it 'should fail if icmp type is "any"' do
       expect(lambda { @resource[:icmp] = 'any' }).to raise_error(Puppet::Error)
     end
+    it 'should fail if icmp type is an array' do
+      expect(lambda { @resource[:icmp] = "['0', '8']" }).to raise_error(Puppet::Error)
+    end
 
     it 'should fail if icmp type cannot be mapped to a numeric' do
       expect(lambda { @resource[:icmp] = 'foo' }).to raise_error(Puppet::Error)
@@ -357,14 +360,19 @@ describe firewall do
       expect(@resource[:state]).to eql [:INVALID]
     end
 
+    it 'should accept value as a string' do
+      @resource[:state] = :UNTRACKED
+      expect(@resource[:state]).to eql [:UNTRACKED]
+    end
+
     it 'should accept value as an array' do
       @resource[:state] = [:INVALID, :NEW]
       expect(@resource[:state]).to eql [:INVALID, :NEW]
     end
 
     it 'should sort values alphabetically' do
-      @resource[:state] = [:NEW, :ESTABLISHED]
-      expect(@resource[:state]).to eql [:ESTABLISHED, :NEW]
+      @resource[:state] = [:NEW, :UNTRACKED, :ESTABLISHED]
+      expect(@resource[:state]).to eql [:ESTABLISHED, :NEW, :UNTRACKED]
     end
   end
 
@@ -372,6 +380,11 @@ describe firewall do
     it 'should accept value as a string' do
       @resource[:ctstate] = :INVALID
       expect(@resource[:ctstate]).to eql [:INVALID]
+    end
+
+    it 'should accept value as a string' do
+      @resource[:state] = :UNTRACKED
+      expect(@resource[:state]).to eql [:UNTRACKED]
     end
 
     it 'should accept value as an array' do

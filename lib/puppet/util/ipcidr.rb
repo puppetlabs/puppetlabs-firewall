@@ -4,9 +4,9 @@ require 'ipaddr'
 module Puppet
   module Util
     class IPCidr < IPAddr
-      def initialize(ipaddr)
+      def initialize(ipaddr, family = Socket::AF_UNSPEC)
         begin
-          super(ipaddr)
+          super(ipaddr, family)
         rescue ArgumentError => e
           if e.message =~ /invalid address/
             raise ArgumentError, "Invalid address from IPAddr.new: #{ipaddr}"

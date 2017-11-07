@@ -67,6 +67,7 @@ Puppet::Type.newtype(:firewall) do
   feature :string_matching, "String matching features"
   feature :queue_num, "Which NFQUEUE to send packets to"
   feature :queue_bypass, "If nothing is listening on queue_num, allow packets to bypass the queue"
+  feature :hashlimit, "Hashlimit features"
 
   # provider specific features
   feature :iptables, "The provider provides iptables features."
@@ -133,8 +134,17 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        self.fail("cannot work out protocol family")
+      end
+
       begin
-        @resource.host_to_mask(value)
+        @resource.host_to_mask(value, protocol)
       rescue Exception => e
         self.fail("host_to_ip failed for #{value}, exception #{e}")
       end
@@ -183,8 +193,17 @@ Puppet::Type.newtype(:firewall) do
     EOS
 
     munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        self.fail("cannot work out protocol family")
+      end
+
       begin
-        @resource.host_to_mask(value)
+        @resource.host_to_mask(value, protocol)
       rescue Exception => e
         self.fail("host_to_ip failed for #{value}, exception #{e}")
       end
@@ -691,6 +710,8 @@ Puppet::Type.newtype(:firewall) do
 
       A value of "any" is not supported. To achieve this behaviour the
       parameter should simply be omitted or undefined.
+      An array of values is also not supported. To match against multiple ICMP
+      types, please use separate rules for each ICMP type.
     EOS
 
     validate do |value|
@@ -698,6 +719,11 @@ Puppet::Type.newtype(:firewall) do
         raise ArgumentError,
           "Value 'any' is not valid. This behaviour should be achieved " \
           "by omitting or undefining the ICMP parameter."
+      end
+      if value.kind_of?(Array)
+        raise ArgumentError,
+          "Argument must not be an array of values. To match multiple " \
+          "ICMP types, please use separate rules for each ICMP type."
       end
     end
 
@@ -722,6 +748,7 @@ Puppet::Type.newtype(:firewall) do
         self.fail("cannot work out icmp type")
       end
       value
+      
     end
   end
 
@@ -736,9 +763,10 @@ Puppet::Type.newtype(:firewall) do
       * ESTABLISHED
       * NEW
       * RELATED
+      * UNTRACKED
     EOS
 
-    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
+    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED,:UNTRACKED)
 
     # States should always be sorted. This normalizes the resource states to
     # keep it consistent with the sorted result from iptables-save.
@@ -767,9 +795,10 @@ Puppet::Type.newtype(:firewall) do
       * ESTABLISHED
       * NEW
       * RELATED
+      * UNTRACKED
     EOS
 
-    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED)
+    newvalues(:INVALID,:ESTABLISHED,:NEW,:RELATED,:UNTRACKED)
 
     # States should always be sorted. This normalizes the resource states to
     # keep it consistent with the sorted result from iptables-save.
@@ -911,6 +940,45 @@ Puppet::Type.newtype(:firewall) do
       only, as iptables does not accept multiple gid in a single
       statement.
     EOS
+    def insync?(is)
+      require 'etc'
+
+      # The following code allow us to take into consideration unix mappings
+      # between string group names and GIDs (integers). We also need to ignore
+      # spaces as they are irrelevant with respect to rule sync.
+
+      # Remove whitespace
+      is = is.gsub(/\s+/,'')
+      should = @should.first.to_s.gsub(/\s+/,'')
+
+      # Keep track of negation, but remove the '!'
+      is_negate = ''
+      should_negate = ''
+      if is.start_with?('!')
+        is = is.gsub(/^!/,'')
+        is_negate = '!'
+      end
+      if should.start_with?('!')
+        should = should.gsub(/^!/,'')
+        should_negate = '!'
+      end
+
+      # If 'should' contains anything other than digits,
+      # we assume that we have to do a lookup to convert
+      # to UID
+      unless should[/[0-9]+/] == should
+        should = Etc.getgrnam(should).gid
+      end
+
+      # If 'is' contains anything other than digits,
+      # we assume that we have to do a lookup to convert
+      # to UID
+      unless is[/[0-9]+/] == is
+        is = Etc.getgrnam(is).gid
+      end
+
+      return "#{is_negate}#{is}" == "#{should_negate}#{should}"
+    end
   end
 
   # match mark
@@ -1579,6 +1647,79 @@ Puppet::Type.newtype(:firewall) do
     newvalues(/^[A-Z]{2}(,[A-Z]{2})*$/)
   end
 
+  newproperty(:hashlimit_name) do
+    desc <<-EOS
+      The name for the /proc/net/ipt_hashlimit/foo entry.
+      This parameter is required.
+    EOS
+  end
+
+  newproperty(:hashlimit_upto) do
+    desc <<-EOS
+      Match if the rate is below or equal to amount/quantum. It is specified either as a number, with an optional time quantum suffix (the default is 3/hour), or as amountb/second (number of bytes per second).
+      This parameter or hashlimit_above is required.
+      Allowed forms are '40','40/second','40/minute','40/hour','40/day'.
+    EOS
+  end
+
+  newproperty(:hashlimit_above) do
+    desc <<-EOS
+      Match if the rate is above amount/quantum.
+      This parameter or hashlimit_upto is required.
+      Allowed forms are '40','40/second','40/minute','40/hour','40/day'.
+    EOS
+  end
+
+  newproperty(:hashlimit_burst) do
+    desc <<-EOS
+      Maximum initial number of packets to match: this number gets recharged by one every time the limit specified above is not reached, up to this number; the default is 5. When byte-based rate matching is requested, this option specifies the amount of bytes that can exceed the given rate. This option should be used with caution -- if the entry expires, the burst value is reset too.
+    EOS
+    newvalue(/^\d+$/)
+  end
+
+  newproperty(:hashlimit_mode) do
+    desc <<-EOS
+      A comma-separated list of objects to take into consideration. If no --hashlimit-mode option is given, hashlimit acts like limit, but at the expensive of doing the hash housekeeping.
+      Allowed values are: srcip, srcport, dstip, dstport
+    EOS
+  end
+
+  newproperty(:hashlimit_srcmask) do
+    desc <<-EOS
+      When --hashlimit-mode srcip is used, all source addresses encountered will be grouped according to the given prefix length and the so-created subnet will be subject to hashlimit. prefix must be between (inclusive) 0 and 32. Note that --hashlimit-srcmask 0 is basically doing the same thing as not specifying srcip for --hashlimit-mode, but is technically more expensive.
+    EOS
+  end
+
+  newproperty(:hashlimit_dstmask) do
+    desc <<-EOS
+      Like --hashlimit-srcmask, but for destination addresses.
+    EOS
+  end
+
+  newproperty(:hashlimit_htable_size) do
+    desc <<-EOS
+      The number of buckets of the hash table
+    EOS
+  end
+
+  newproperty(:hashlimit_htable_max) do
+    desc <<-EOS
+      Maximum entries in the hash.
+    EOS
+  end
+
+  newproperty(:hashlimit_htable_expire) do
+    desc <<-EOS
+      After how many milliseconds do hash entries expire.
+    EOS
+  end
+
+  newproperty(:hashlimit_htable_gcinterval) do
+    desc <<-EOS
+      How many milliseconds between garbage collection intervals.
+    EOS
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
@@ -1784,5 +1925,10 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
+    if value(:hashlimit_name)
+      unless value(:hashlimit_upto) || value(:hashlimit_above)
+        self.fail "Either hashlimit_upto or hashlimit_above are required"
+      end
+    end
   end
 end

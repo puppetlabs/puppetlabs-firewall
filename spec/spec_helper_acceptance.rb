@@ -31,6 +31,7 @@ RSpec.configure do |c|
   c.before :suite do
     # Install module and dependencies
     hosts.each do |host|
+      on host, puppet('module', 'install', 'puppetlabs-stdlib'), { :acceptable_exit_codes => [0] }
       # the ubuntu-14.04 docker image doesn't carry the iptables command
       apply_manifest_on host, 'package { "iptables": ensure => installed }' if fact('osfamily') == 'Debian'
     end

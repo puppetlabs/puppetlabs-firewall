@@ -31,13 +31,11 @@ describe 'firewall inverting' do
 
     it 'should contain the rules' do
       shell('iptables-save') do |r|
-        if (fact('osfamily') == 'RedHat' and fact('operatingsystemmajrelease') == '5') or (default['platform'] =~ /sles-10/)
-          expect(r.stdout).to match(/-A INPUT -p ! esp -m comment --comment "601 disallow esp protocol" -j ACCEPT/)
-          expect(r.stdout).to match(/-A INPUT -s ! 10\.0\.0\.0\/255\.0\.0\.0 -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m multiport --sports ! 80,443 -m comment --comment "602 drop NEW external website packets with FIN\/RST\/ACK set and SYN unset" -m state --state NEW -j DROP/)
-        else
-          expect(r.stdout).to match(/-A INPUT ! -p esp -m comment --comment "601 disallow esp protocol" -j ACCEPT/)
-          expect(r.stdout).to match(/-A INPUT ! -s 10\.0\.0\.0\/8 -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m multiport ! --sports 80,443 -m comment --comment "602 drop NEW external website packets with FIN\/RST\/ACK set and SYN unset" -m state --state NEW -j DROP/)
-        end
+        expect(r.stdout).to match(/-A INPUT (-s !|! -s) (10\.0\.0\.0\/8|10\.0\.0\.0\/255\.0\.0\.0).*/)
+        expect(r.stdout).to match(/-A INPUT.*(--sports !|! --sports) 80,443.*/)
+        expect(r.stdout).to match(/-A INPUT.*-m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN.*/)
+        expect(r.stdout).to match(/-A INPUT.*-j DROP/)
+        expect(r.stdout).to match(/-A INPUT (! -p|-p !) esp -m comment --comment "601 disallow esp protocol" -j ACCEPT/)
       end
     end
   end
