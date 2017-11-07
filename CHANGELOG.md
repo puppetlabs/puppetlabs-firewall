@@ -1,3 +1,17 @@
+## Supported Release 1.9.0
+### Summary
+This release includes several bugfixes and NFLOG support.
+
+#### Added
+- Support for NFLOG including the `NFLOG` jump target and four commandline options ([FM-4896](https://tickets.puppetlabs.com/browse/FM-4896))
+- Support for the geoip module ([MODULES-4279](https://tickets.puppetlabs.com/browse/MODULES-4279))
+- Management of the ebtables package
+
+#### Fixed
+- iptables parser fails with "Invalid address from IPAddr.new: -m" ([MODULES-4234](https://tickets.puppetlabs.com/browse/MODULES-4234))
+- selinux context for iptables configuration
+- Replace Puppet.version.to_f with Puppet::Util::Package.versioncmp ( [MODULES-4528](https://tickets.puppetlabs.com/browse/MODULES-4528))
+
 ## Supported Release 1.8.2
 ### Summary
 This release includes numerous features and bugfixes, See below.
