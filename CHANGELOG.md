@@ -1,3 +1,30 @@
+## Supported Release 1.10.0
+### Summary
+This is a clean release prior to the module being run through rubocop.
+
+#### Added
+- Hashlimit module added.
+- Firewall multi notes added.
+- Gidd lookup now added.
+- Simple sanity check added to hash parser rule.
+
+### Changed
+- Version requirement has been updated.
+- An array is no lnger accepted for icmp types.
+- UNTRACKED is now considered to be a valid state.
+- Modulesync updates.
+- ip6tables can be disabled.
+- Readme format has been fixed.
+- Fixes made to accomodate Puppet lint.
+- Fix to regex i 'connlimit_spec.rb' and 'firewall_spec.rb'.
+- General test fixes.
+- Negated match sets know properly dealt with.
+- Correct IP version for hostname resolution now chosen.
+- Unmanaged rule regex regarding iptable has been fixed.
+
+### Removed
+- Ubuntu 10.04 and 12.04 removed.
+
 ## Supported Release 1.9.0
 ### Summary
 This release includes several bugfixes and NFLOG support.
