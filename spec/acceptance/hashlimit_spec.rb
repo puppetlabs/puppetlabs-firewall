@@ -9,8 +9,7 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
 
   describe 'hashlimit_tests' do
     context 'hashlimit_above' do
-      it 'applies' do
-        pp = <<-EOS
+      pp1 = <<-EOS
           class { '::firewall': }
           firewall { '800 - hashlimit_above test':
             chain                       => 'INPUT',
@@ -21,28 +20,25 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_mode              => 'srcip,dstip',
             action                      => accept,
           }
-        EOS
-
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => do_catch_changes)
+      EOS
+      it 'applies' do
+        apply_manifest(pp1, catch_failures: true)
+        apply_manifest(pp1, catch_changes: do_catch_changes)
       end
 
-      it 'should contain the rule' do
+      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip},
+                     %r{--hashlimit-name above}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
+      it 'contains the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT/)
-          expect(r.stdout).to match(/-p tcp/)
-          expect(r.stdout).to match(/--hashlimit-above 526\/sec/)
-          expect(r.stdout).to match(/--hashlimit-mode srcip,dstip/)
-          expect(r.stdout).to match(/--hashlimit-name above/)
-          expect(r.stdout).to match(/--hashlimit-htable-gcinterval 10/)
-          expect(r.stdout).to match(/-j ACCEPT/)
+          regex_array.each do |regex|
+            expect(r.stdout).to match(regex)
+          end
         end
       end
     end
 
     context 'hashlimit_above_ip6' do
-      it 'applies' do
-        pp = <<-EOS
+      pp2 = <<-EOS
           class { '::firewall': }
           firewall { '801 - hashlimit_above test ipv6':
             chain                       => 'INPUT',
@@ -54,28 +50,25 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_mode              => 'srcip,dstip',
             action                      => accept,
           }
-        EOS
-
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => do_catch_changes)
+      EOS
+      it 'applies' do
+        apply_manifest(pp2, catch_failures: true)
+        apply_manifest(pp2, catch_changes: do_catch_changes)
       end
 
-      it 'should contain the rule' do
+      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip},
+                     %r{--hashlimit-name above-ip6}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
+      it 'contains the rule' do
         shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT/)
-          expect(r.stdout).to match(/-p tcp/)
-          expect(r.stdout).to match(/--hashlimit-above 526\/sec/)
-          expect(r.stdout).to match(/--hashlimit-mode srcip,dstip/)
-          expect(r.stdout).to match(/--hashlimit-name above-ip6/)
-          expect(r.stdout).to match(/--hashlimit-htable-gcinterval 10/)
-          expect(r.stdout).to match(/-j ACCEPT/)
+          regex_array.each do |regex|
+            expect(r.stdout).to match(regex)
+          end
         end
       end
     end
 
     context 'hashlimit_upto' do
-      it 'applies' do
-        pp = <<-EOS
+      pp3 = <<-EOS
           class { '::firewall': }
           firewall { '802 - hashlimit_upto test':
             chain                   => 'INPUT',
@@ -87,22 +80,21 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_htable_expire => '36000000',
             action                  => accept,
           }
-        EOS
-
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => do_catch_changes)
+      EOS
+      it 'applies' do
+        apply_manifest(pp3, catch_failures: true)
+        apply_manifest(pp3, catch_changes: do_catch_changes)
       end
 
-      it 'should contain the rule' do
+      it 'contains the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "802 - hashlimit_upto test" -j ACCEPT/)
+          expect(r.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "802 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
         end
       end
     end
 
     context 'hashlimit_upto_ip6' do
-      it 'applies' do
-        pp = <<-EOS
+      pp4 = <<-EOS
           class { '::firewall': }
           firewall { '803 - hashlimit_upto test ip6':
             chain                   => 'INPUT',
@@ -115,19 +107,17 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_htable_expire => '36000000',
             action                  => accept,
           }
-        EOS
-
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => do_catch_changes)
+      EOS
+      it 'applies' do
+        apply_manifest(pp4, catch_failures: true)
+        apply_manifest(pp4, catch_changes: do_catch_changes)
       end
 
-      it 'should contain the rule' do
+      it 'contains the rule' do
         shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(/-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto-ip6 --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "803 - hashlimit_upto test ip6" -j ACCEPT/)
+          expect(r.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto-ip6 --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "803 - hashlimit_upto test ip6" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
         end
       end
     end
-
   end
-
 end

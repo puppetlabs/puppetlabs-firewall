@@ -2,8 +2,7 @@ require 'spec_helper_acceptance'
 
 # Some tests for the standard recommended usage
 describe 'standard usage tests' do
-  it 'applies twice' do
-    pp = <<-EOS
+  pp = <<-EOS
       class my_fw::pre {
         Firewall {
           require => undef,
@@ -51,10 +50,10 @@ describe 'standard usage tests' do
         proto => 'tcp',
         dport => 22,
       }
-    EOS
-
+  EOS
+  it 'applies twice' do
     # Run it twice and test for idempotency
-    apply_manifest(pp, :catch_failures => true)
-    apply_manifest(pp, :catch_changes => do_catch_changes)
+    apply_manifest(pp, catch_failures: true)
+    apply_manifest(pp, catch_changes: do_catch_changes)
   end
 end

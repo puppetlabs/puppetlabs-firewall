@@ -6,11 +6,10 @@ describe 'firewall time' do
     ip6tables_flush_all_tables
   end
 
-  if default['platform'] =~ /ubuntu-1404/ or default['platform'] =~ /debian-7/ or default['platform'] =~ /debian-8/ or default['platform'] =~ /el-7/
-    describe "time tests ipv4" do
+  if default['platform'] =~ %r{ubuntu-1404} || default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{debian-8} || default['platform'] =~ %r{el-7}
+    describe 'time tests ipv4' do
       context 'set all time parameters' do
-        it 'applies' do
-          pp = <<-EOS
+        pp1 = <<-EOS
             class { '::firewall': }
             firewall { '805 - test':
               proto              => tcp,
@@ -25,24 +24,23 @@ describe 'firewall time' do
               week_days          => 'Tue',
               kernel_timezone    => true,
             }
-          EOS
-
-          apply_manifest(pp, :catch_failures => true)
-          apply_manifest(pp, :catch_changes => do_catch_changes)
+        EOS
+        it 'applies' do
+          apply_manifest(pp1, catch_failures: true)
+          apply_manifest(pp1, catch_changes: do_catch_changes)
         end
 
-        it 'should contain the rule' do
-           shell('iptables-save') do |r|
-             expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT/)
-           end
+        it 'contains the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line length to the required size
+          end
         end
       end
     end
 
-    describe "time tests ipv6" do
+    describe 'time tests ipv6' do
       context 'set all time parameters' do
-        it 'applies' do
-          pp = <<-EOS
+        pp2 = <<-EOS
             class { '::firewall': }
             firewall { '805 - test':
               proto              => tcp,
@@ -58,16 +56,16 @@ describe 'firewall time' do
               kernel_timezone    => true,
               provider           => 'ip6tables',
             }
-          EOS
-
-          apply_manifest(pp, :catch_failures => true)
-          apply_manifest(pp, :catch_changes => do_catch_changes)
+        EOS
+        it 'applies' do
+          apply_manifest(pp2, catch_failures: true)
+          apply_manifest(pp2, catch_changes: do_catch_changes)
         end
 
-        it 'should contain the rule' do
-           shell('ip6tables-save') do |r|
-             expect(r.stdout).to match(/-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT/)
-           end
+        it 'contains the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line length to the required size
+          end
         end
       end
     end

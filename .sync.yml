@@ -10,3 +10,6 @@ appveyor.yml:
   - set: docker/centos-7
     options:
       env: PUPPET_INSTALL_TYPE=agent BEAKER_debug=true BEAKER_set=@@SET@@ SPEC_OPTS=""--tag docker"
+  extras:
+    - rvm: 2.1.9
+      script: bundle exec rake rubocop

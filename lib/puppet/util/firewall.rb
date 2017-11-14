@@ -6,39 +6,39 @@ require 'puppet/util/ipcidr'
 module Puppet::Util::Firewall
   # Translate the symbolic names for icmp packet types to integers
   def icmp_name_to_number(value_icmp, protocol)
-    if value_icmp =~ /\d{1,2}$/
+    if value_icmp =~ %r{\d{1,2}$}
       value_icmp
     elsif protocol == 'inet'
       case value_icmp
-        when "echo-reply" then "0"
-        when "destination-unreachable" then "3"
-        when "source-quench" then "4"
-        when "redirect" then "6"
-        when "echo-request" then "8"
-        when "router-advertisement" then "9"
-        when "router-solicitation" then "10"
-        when "time-exceeded" then "11"
-        when "parameter-problem" then "12"
-        when "timestamp-request" then "13"
-        when "timestamp-reply" then "14"
-        when "address-mask-request" then "17"
-        when "address-mask-reply" then "18"
-        else nil
+      when 'echo-reply' then '0'
+      when 'destination-unreachable' then '3'
+      when 'source-quench' then '4'
+      when 'redirect' then '6'
+      when 'echo-request' then '8'
+      when 'router-advertisement' then '9'
+      when 'router-solicitation' then '10'
+      when 'time-exceeded' then '11'
+      when 'parameter-problem' then '12'
+      when 'timestamp-request' then '13'
+      when 'timestamp-reply' then '14'
+      when 'address-mask-request' then '17'
+      when 'address-mask-reply' then '18'
+      else nil
       end
     elsif protocol == 'inet6'
       case value_icmp
-        when "destination-unreachable" then "1"
-        when "too-big" then "2"
-        when "time-exceeded" then "3"
-        when "parameter-problem" then "4"
-        when "echo-request" then "128"
-        when "echo-reply" then "129"
-        when "router-solicitation" then "133"
-        when "router-advertisement" then "134"
-        when "neighbour-solicitation" then "135"
-        when "neighbour-advertisement" then "136"
-        when "redirect" then "137"
-        else nil
+      when 'destination-unreachable' then '1'
+      when 'too-big' then '2'
+      when 'time-exceeded' then '3'
+      when 'parameter-problem' then '4'
+      when 'echo-request' then '128'
+      when 'echo-reply' then '129'
+      when 'router-solicitation' then '133'
+      when 'router-advertisement' then '134'
+      when 'neighbour-solicitation' then '135'
+      when 'neighbour-advertisement' then '136'
+      when 'redirect' then '137'
+      else nil
       end
     else
       raise ArgumentError, "unsupported protocol family '#{protocol}'"
@@ -47,23 +47,23 @@ module Puppet::Util::Firewall
 
   # Convert log_level names to their respective numbers
   def log_level_name_to_number(value)
-    #TODO make this 0-7 only
-    if value =~ /\d/
+    # TODO: make this 0-7 only
+    if value =~ %r{\d}
       value
     else
       case value
-        when "panic" then "0"
-        when "alert" then "1"
-        when "crit" then "2"
-        when "err" then "3"
-        when "error" then "3"
-        when "warn" then "4"
-        when "warning" then "4"
-        when "not" then "5"
-        when "notice" then "5"
-        when "info" then "6"
-        when "debug" then "7"
-        else nil
+      when 'panic' then '0'
+      when 'alert' then '1'
+      when 'crit' then '2'
+      when 'err' then '3'
+      when 'error' then '3'
+      when 'warn' then '4'
+      when 'warning' then '4'
+      when 'not' then '5'
+      when 'notice' then '5'
+      when 'info' then '6'
+      when 'debug' then '7'
+      else nil
       end
     end
   end
@@ -76,16 +76,13 @@ module Puppet::Util::Firewall
   # nothing.
   def string_to_port(value, proto)
     proto = proto.to_s
-    unless proto =~ /^(tcp|udp)$/
+    unless proto =~ %r{^(tcp|udp)$}
       proto = 'tcp'
     end
 
-    m = value.to_s.match(/^(!\s+)?(\S+)/)
-    if m[2].match(/^\d+(-\d+)?$/)
-      return "#{m[1]}#{m[2]}"
-    else
-      return "#{m[1]}#{Socket.getservbyname(m[2], proto).to_s}"
-    end
+    m = value.to_s.match(%r{^(!\s+)?(\S+)})
+    return "#{m[1]}#{m[2]}" if m[2] =~ %r{^\d+(-\d+)?$}
+    "#{m[1]}#{Socket.getservbyname(m[2], proto)}"
   end
 
   # Takes an address and protocol and returns the address in CIDR notation.
@@ -117,7 +114,7 @@ module Puppet::Util::Firewall
                when :IPv6
                  Socket::AF_INET6
                when nil
-                 raise ArgumentError, "Proto must be specified for a hostname"
+                 raise ArgumentError, 'Proto must be specified for a hostname'
                else
                  raise ArgumentError, "Unsupported address family: #{proto}"
                end
@@ -127,15 +124,15 @@ module Puppet::Util::Firewall
         begin
           new_value = Puppet::Util::IPCidr.new(addr, family)
           break
-        rescue
+        rescue # rubocop:disable Lint/HandleExceptions
         end
       end
 
-      raise "Failed to resolve hostname #{value}" unless new_value != nil
+      raise "Failed to resolve hostname #{value}" if new_value.nil?
       value = new_value
     end
 
-    return nil if value.prefixlen == 0
+    return nil if value.prefixlen.zero?
     value.cidr
   end
 
@@ -146,41 +143,41 @@ module Puppet::Util::Firewall
   # defined in host_to_ip for the host/address part.
   #
   def host_to_mask(value, proto)
-    match = value.match /(!)\s?(.*)$/
+    match = value.match %r{(!)\s?(.*)$}
     return host_to_ip(value, proto) unless match
 
     cidr = host_to_ip(match[2], proto)
-    return nil if cidr == nil
+    return nil if cidr.nil?
     "#{match[1]} #{cidr}"
   end
 
   # Validates the argument is int or hex, and returns valid hex
   # conversion of the value or nil otherwise.
   def to_hex32(value)
-      begin
-        value = Integer(value)
-        if value.between?(0, 0xffffffff)
-            return '0x' + value.to_s(16)
-        end
-      rescue ArgumentError
-        # pass
+    begin
+      value = Integer(value)
+      if value.between?(0, 0xffffffff)
+        return '0x' + value.to_s(16)
       end
-    return nil
+    rescue ArgumentError # rubocop:disable Lint/HandleExceptions
+      # pass
+    end
+    nil
   end
 
   def persist_iptables(proto)
-    debug("[persist_iptables]")
+    debug('[persist_iptables]')
 
     # Basic normalisation for older Facter
     os_key = Facter.value(:osfamily)
     os_key ||= case Facter.value(:operatingsystem)
-    when 'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos', 'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer', 'VirtuozzoLinux'
-      'RedHat'
-    when 'Debian', 'Ubuntu'
-      'Debian'
-    else
-      Facter.value(:operatingsystem)
-    end
+               when 'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos', 'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer', 'VirtuozzoLinux'
+                 'RedHat'
+               when 'Debian', 'Ubuntu'
+                 'Debian'
+               else
+                 Facter.value(:operatingsystem)
+               end
 
     # Older iptables-persistent doesn't provide save action.
     if os_key == 'Debian'
@@ -188,7 +185,7 @@ module Puppet::Util::Firewall
       # that the iptables-persistent package was potentially installed after the initial Fact gathering.
       Facter.fact(:iptables_persistent_version).flush
       persist_ver = Facter.value(:iptables_persistent_version)
-      if (persist_ver and Puppet::Util::Package.versioncmp(persist_ver, '0.5.0') < 0)
+      if persist_ver && Puppet::Util::Package.versioncmp(persist_ver, '0.5.0') < 0
         os_key = 'Debian_manual'
       end
     end
@@ -199,47 +196,48 @@ module Puppet::Util::Firewall
     end
 
     # RHEL 7 and newer also use systemd to persist iptable rules
-    if os_key == 'RedHat' && ['RedHat','CentOS','Scientific','SL','SLC','Ascendos','CloudLinux','PSBM','OracleLinux','OVS','OEL','XenServer','VirtuozzoLinux'].include?(Facter.value(:operatingsystem)) && Facter.value(:operatingsystemrelease).to_i >= 7
+    if os_key == 'RedHat' && %w[RedHat CentOS Scientific SL SLC Ascendos CloudLinux PSBM OracleLinux OVS OEL XenServer VirtuozzoLinux]
+       .include?(Facter.value(:operatingsystem)) && Facter.value(:operatingsystemrelease).to_i >= 7
       os_key = 'Fedora'
     end
 
     cmd = case os_key.to_sym
-    when :RedHat
-      case proto.to_sym
-      when :IPv4
-        %w{/sbin/service iptables save}
-      when :IPv6
-        %w{/sbin/service ip6tables save}
-      end
-    when :Fedora
-      case proto.to_sym
-      when :IPv4
-        %w{/usr/libexec/iptables/iptables.init save}
-      when :IPv6
-        %w{/usr/libexec/iptables/ip6tables.init save}
-      end
-    when :Debian
-      case proto.to_sym
-      when :IPv4, :IPv6
-        if (persist_ver and Puppet::Util::Package.versioncmp(persist_ver, '1.0') > 0)
-          %w{/usr/sbin/service netfilter-persistent save}
-        else
-          %w{/usr/sbin/service iptables-persistent save}
-        end
-      end
-    when :Debian_manual
-      case proto.to_sym
-      when :IPv4
-        ["/bin/sh", "-c", "/sbin/iptables-save > /etc/iptables/rules"]
-      end
-    when :Archlinux
-      case proto.to_sym
-      when :IPv4
-        ["/bin/sh", "-c", "/usr/sbin/iptables-save > /etc/iptables/iptables.rules"]
-      when :IPv6
-        ["/bin/sh", "-c", "/usr/sbin/ip6tables-save > /etc/iptables/ip6tables.rules"]
-      end
-    end
+          when :RedHat
+            case proto.to_sym
+            when :IPv4
+              %w[/sbin/service iptables save]
+            when :IPv6
+              %w[/sbin/service ip6tables save]
+            end
+          when :Fedora
+            case proto.to_sym
+            when :IPv4
+              %w[/usr/libexec/iptables/iptables.init save]
+            when :IPv6
+              %w[/usr/libexec/iptables/ip6tables.init save]
+            end
+          when :Debian
+            case proto.to_sym
+            when :IPv4, :IPv6
+              if persist_ver && Puppet::Util::Package.versioncmp(persist_ver, '1.0') > 0
+                %w[/usr/sbin/service netfilter-persistent save]
+              else
+                %w[/usr/sbin/service iptables-persistent save]
+              end
+            end
+          when :Debian_manual
+            case proto.to_sym
+            when :IPv4
+              ['/bin/sh', '-c', '/sbin/iptables-save > /etc/iptables/rules']
+            end
+          when :Archlinux
+            case proto.to_sym
+            when :IPv4
+              ['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/iptables/iptables.rules']
+            when :IPv6
+              ['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/iptables/ip6tables.rules']
+            end
+          end
 
     # Catch unsupported OSs from the case statement above.
     if cmd.nil?

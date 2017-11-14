@@ -8,8 +8,7 @@ describe 'firewall MSS' do
 
   describe 'mss ipv4 tests' do
     context '1360' do
-      it 'applies' do
-        pp = <<-EOS
+      pp1 = <<-EOS
           class { '::firewall': }
           firewall {
             '502 - set_mss':
@@ -21,21 +20,20 @@ describe 'firewall MSS' do
               chain     => 'FORWARD',
               table     => 'mangle',
           }
-        EOS
-
-        apply_manifest(pp, :catch_failures => true)
+      EOS
+      it 'applies' do
+        apply_manifest(pp1, catch_failures: true)
       end
 
-      it 'should contain the rule' do
+      it 'contains the rule' do
         shell('iptables-save -t mangle') do |r|
-          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360/)
+          expect(r.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360})
         end
       end
     end
 
     context 'clamp_mss_to_pmtu' do
-      it 'applies' do
-        pp = <<-EOS
+      pp2 = <<-EOS
           class { '::firewall': }
           firewall {
             '503 - clamp_mss_to_pmtu':
@@ -45,24 +43,23 @@ describe 'firewall MSS' do
               jump              => 'TCPMSS',
               clamp_mss_to_pmtu => true,
           }
-        EOS
-
-        apply_manifest(pp, :catch_failures => true)
+      EOS
+      it 'applies' do
+        apply_manifest(pp2, catch_failures: true)
       end
 
-      it 'should contain the rule' do
+      it 'contains the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu/)
+          expect(r.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu})
         end
       end
     end
   end
 
-  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
+  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'mss ipv6 tests' do
       context '1360' do
-        it 'applies' do
-          pp = <<-EOS
+        pp3 = <<-EOS
             class { '::firewall': }
             firewall {
               '502 - set_mss':
@@ -75,21 +72,20 @@ describe 'firewall MSS' do
                 table     => 'mangle',
                 provider  => 'ip6tables',
             }
-          EOS
-
-          apply_manifest(pp, :catch_failures => true)
+        EOS
+        it 'applies' do
+          apply_manifest(pp3, catch_failures: true)
         end
 
-        it 'should contain the rule' do
+        it 'contains the rule' do
           shell('ip6tables-save -t mangle') do |r|
-            expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360/)
+            expect(r.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360})
           end
         end
       end
 
       context 'clamp_mss_to_pmtu' do
-        it 'applies' do
-          pp = <<-EOS
+        pp4 = <<-EOS
             class { '::firewall': }
             firewall {
               '503 - clamp_mss_to_pmtu':
@@ -100,18 +96,17 @@ describe 'firewall MSS' do
                 clamp_mss_to_pmtu => true,
                 provider          => 'ip6tables',
             }
-          EOS
-
-          apply_manifest(pp, :catch_failures => true)
+        EOS
+        it 'applies' do
+          apply_manifest(pp4, catch_failures: true)
         end
 
-        it 'should contain the rule' do
+        it 'contains the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu/)
+            expect(r.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu})
           end
         end
       end
     end
   end
-
 end
