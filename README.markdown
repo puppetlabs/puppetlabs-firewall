@@ -5,16 +5,16 @@
 #### Table of Contents
 
 1. [Overview - What is the firewall module?](#overview)
-2. [Module Description - What does the module do?](#module-description)
+2. [Module description - What does the module do?](#module-description)
 3. [Setup - The basics of getting started with firewall](#setup)
-    * [What firewall Affects](#what-firewall-affects)
-    * [Setup Requirements](#setup-requirements)
+    * [What firewall affects](#what-firewall-affects)
+    * [Setup requirements](#setup-requirements)
     * [Beginning with firewall](#beginning-with-firewall)
     * [Upgrading](#upgrading)
 4. [Usage - Configuration and customization options](#usage)
     * [Default rules - Setting up general configurations for all firewalls](#default-rules)
-    * [Application-Specific Rules - Options for configuring and managing firewalls across applications](#application-specific-rules)
-    * [Additional Uses for the Firewall Module](#other-rules)
+    * [Application-specific rules - Options for configuring and managing firewalls across applications](#application-specific-rules)
+    * [Additional ses for the firewall module](#other-rules)
 5. [Reference - An under-the-hood peek at what the module is doing](#reference)
 6. [Limitations - OS compatibility, etc.](#limitations)
 7. [Firewall_multi - Arrays for certain parameters](#firewall_multi)
@@ -25,7 +25,7 @@
 
 The firewall module lets you manage firewall rules with Puppet.
 
-## Module Description
+## Module description
 
 PuppetLabs' firewall module introduces the `firewall` resource, which is used to manage and configure firewall rules from within the Puppet DSL. This module offers support for iptables and ip6tables. The module also introduces the `firewallchain` resource, which allows you to manage chains or firewall lists and ebtables for bridging support. At the moment, only iptables and ip6tables chains are supported.
 
@@ -33,7 +33,7 @@ The firewall module acts on your running firewall, making immediate changes as t
 
 ## Setup
 
-### What firewall Affects
+### What firewall affects
 
 * Every node running a firewall
 * Firewall settings in your system
@@ -41,7 +41,7 @@ The firewall module acts on your running firewall, making immediate changes as t
 * Unmanaged resources (get purged)
 
 
-### Setup Requirements
+### Setup requirements
 
 Firewall uses Ruby-based providers, so you must enable [pluginsync](http://docs.puppetlabs.com/guides/plugins_in_modules.html#enabling-pluginsync).
 
@@ -125,7 +125,7 @@ Alternatively, the [firewallchain](#type-firewallchain) type can be used to set 
   }
   ~~~
 
-#### Create Firewall Rules
+#### Create firewall rules
 
 The rules you create here are helpful if you don’t have any existing rules; they help you order your firewall configurations so you don’t lock yourself out of your box.
 
@@ -186,13 +186,13 @@ There are two kinds of firewall rules you can use with firewall: default rules a
 
 All rules employ a numbering system in the resource's title that is used for ordering. When titling your rules, make sure you prefix the rule with a number, for example, '000 accept all icmp requests'. _000_ runs first, _999_ runs last.
 
-### Default Rules
+### Default rules
 
 You can place default rules in either `my_fw::pre` or `my_fw::post`, depending on when you would like them to run. Rules placed in the `pre` class will run first, and rules in the `post` class, last.
 
 In iptables, the title of the rule is stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
-#### Examples of Default Rules
+#### Examples of default rules
 
 Basic accept ICMP request example:
 
@@ -224,7 +224,7 @@ firewall { '006 Allow inbound SSH (v6)':
 }
 ~~~
 
-### Application-Specific Rules
+### Application-specific rules
 
 Puppet doesn't care where you define rules, and this means that you can place
 your firewall resources as close to the applications and services that you
@@ -249,6 +249,7 @@ class profile::apache {
 ~~~
 
 ### Rule inversion
+
 Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
 
 Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, iniface, outiface, port, proto, source, sport, src\_range, src\_type, and state.
@@ -271,9 +272,9 @@ firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN u
 }
 ~~~
 
-### Additional Uses for the Firewall Module
+### Additional uses for the firewall module
 
-You can apply firewall rules to specific nodes. Usually, you will want to put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows:
+You can apply firewall rules to specific nodes. Usually, you should put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows:
 
 ~~~puppet
 node 'some.node.com' {
@@ -325,6 +326,7 @@ firewall { '503 Mirror traffic to IDS':
 ~~~
 
 The following example creates a new chain and forwards any port 5000 access to it.
+
 ~~~puppet
 firewall { '100 forward to MY_CHAIN':
   chain   => 'INPUT',
@@ -355,7 +357,7 @@ firewall {'666 for NFLOG':
 }
 ~~~
 
-### Additional Information
+### Additional information
 
 Access the inline documentation:
 
@@ -946,11 +948,11 @@ unsupported system will result in iptable rules failing to apply.
 As Puppet Enterprise itself does not yet support Debian 8, use of this module with Puppet Enterprise under a Debian 8
 system should be regarded as experimental.
 
-## Firewall_multi
+## Passing firewall parameter values as arrays with `firewall_multi` module
 
-It is common to require arrays of some of this module's parameters - e.g. arrays of source or destination addresses - in contexts where iptables itself does not allow arrays.
+You might sometimes need to pass arrays, such as arrays of source or destination addresses, to some parameters in contexts where iptables itself does not allow arrays.
 
-An external module - [firewall_multi](https://forge.puppetlabs.com/alexharvey/firewall_multi) - provides a defined type wrapper for spawning firewall resources for arrays of certain inputs.
+A community module, [alexharvey-firewall_multi](https://forge.puppet.com/alexharvey/firewall_multi), provides a defined type wrapper to spawn firewall resources for arrays of certain inputs.
 
 For example:
 
@@ -967,9 +969,9 @@ firewall_multi { '100 allow http and https access':
 }
 ~~~
 
-For more information see the documentation at that project.
+For more information see the documentation at [alexharvey-firewall_multi](https://forge.puppet.com/alexharvey/firewall_multi).
 
-### Known Issues
+### Known issues
 
 #### MCollective causes PE to reverse firewall rule order
 
@@ -993,15 +995,13 @@ Report found bugs in JIRA:
 
 ## Development
 
-Puppet Labs modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can’t access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
+Puppet modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can’t access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
 
 We want to keep it as easy as possible to contribute changes so that our modules work in your environment. There are a few guidelines that we need contributors to follow so that we can have a chance of keeping on top of things.
 
-You can read the complete module contribution guide [on the Puppet Labs wiki.](http://projects.puppetlabs.com/projects/module-site/wiki/Module_contributing)
+Read the module's CONTRIBUTING.md before contributing.
 
-For this particular module, please also read CONTRIBUTING.md before contributing.
-
-Currently we support:
+This module supports:
 
 * iptables
 * ip6tables
