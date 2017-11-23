@@ -216,9 +216,11 @@ describe 'iptables provider' do
       describe "for test data '#{test_name}'" do
         let(:resource) { provider.rule_to_hash(data[:line], data[:table], 0) }
         # If this option is enabled, make sure the error was raised
-        if data[:raise_error] then
-          it "the input rules should raise an error by rules_to_hash" do
-            expect{ resource }.to raise_error
+        if data[:produce_warning] then
+          puts data
+          it "the input rules should produce a warning by rules_to_hash" do
+            expect(provider).to receive(:warning).with(/Skipping unparsable iptables rule/)
+            resource  # force resource to get evaluated
           end
         end
 
