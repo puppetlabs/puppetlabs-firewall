@@ -484,7 +484,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     valrev = values.scan(/("([^"\\]|\\.)*"|\S+)/).transpose[0].reverse
 
     if keys.length != valrev.length then
-      raise "Parser error: keys (#{keys.length}) and values (#{valrev.length}) count mismatch on line: #{line}"
+      warning "Skipping unparsable iptables rule: keys (#{keys.length}) and values (#{valrev.length}) count mismatch on line: #{line}"
+      return
     end
 
     # Here we generate the main hash by scanning arguments off the values
