@@ -1448,7 +1448,7 @@ Puppet::Type.newtype(:firewall) do
 
     validate do |value|
       month = value.to_i
-      if month >= 1 && month <= 1
+      if month >= 1 && month <= 31
         value
       else
         raise ArgumentError,
