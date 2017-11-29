@@ -1,10 +1,10 @@
 require 'puppet/provider/firewall'
 require 'digest/md5'
 
-Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Firewall do
+Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
 
-  @doc = "Iptables type provider"
+  @doc = 'Iptables type provider'
 
   has_feature :iptables
   has_feature :connection_limiting
@@ -43,132 +43,130 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   has_feature :queue_num
   has_feature :queue_bypass
 
-  optional_commands({
-    :iptables => 'iptables',
-    :iptables_save => 'iptables-save',
-  })
+  optional_commands(iptables: 'iptables',
+                    iptables_save: 'iptables-save')
 
-  defaultfor :kernel => :linux
-  confine :kernel => :linux
+  defaultfor kernel: :linux
+  confine kernel: :linux
 
   iptables_version = Facter.value('iptables_version')
-  if (iptables_version and Puppet::Util::Package.versioncmp(iptables_version, '1.4.1') < 0)
-    mark_flag = '--set-mark'
-  else
-    mark_flag = '--set-xmark'
-  end
+  mark_flag = if iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.4.1') < 0
+                '--set-mark'
+              else
+                '--set-xmark'
+              end
 
-  @protocol = "IPv4"
+  @protocol = 'IPv4'
 
   @resource_map = {
-    :burst                       => "--limit-burst",
-    :checksum_fill               => "--checksum-fill",
-    :clamp_mss_to_pmtu           => "--clamp-mss-to-pmtu",
-    :connlimit_above             => "-m connlimit --connlimit-above",
-    :connlimit_mask              => "--connlimit-mask",
-    :connmark                    => "-m connmark --mark",
-    :ctstate                     => "-m conntrack --ctstate",
-    :destination                 => "-d",
-    :dport                       => ["-m multiport --dports", "--dport"],
-    :dst_range                   => "--dst-range",
-    :dst_type                    => "--dst-type",
-    :gateway                     => "--gateway",
-    :gid                         => "--gid-owner",
-    :icmp                        => "-m icmp --icmp-type",
-    :iniface                     => "-i",
-    :ipsec_dir                   => "-m policy --dir",
-    :ipsec_policy                => "--pol",
-    :ipset                       => "-m set --match-set",
-    :isfragment                  => "-f",
-    :jump                        => "-j",
-    :goto                        => "-g",
-    :length                      => "-m length --length",
-    :limit                       => "-m limit --limit",
-    :log_level                   => "--log-level",
-    :log_prefix                  => "--log-prefix",
-    :log_uid                     => "--log-uid",
-    :mac_source                  => ["-m mac --mac-source", "--mac-source"],
-    :mask                        => '--mask',
-    :match_mark                  => "-m mark --mark",
-    :mss                         => '-m tcpmss --mss',
-    :name                        => "-m comment --comment",
-    :nflog_group                 => "--nflog-group",
-    :nflog_prefix                => "--nflog-prefix",
-    :nflog_range                 => "--nflog-range",
-    :nflog_threshold             => "--nflog-threshold",
-    :outiface                    => "-o",
-    :pkttype                     => "-m pkttype --pkt-type",
-    :port                        => '-m multiport --ports',
-    :proto                       => "-p",
-    :queue_num                   => "--queue-num",
-    :queue_bypass                => "--queue-bypass",
-    :random                      => "--random",
-    :rdest                       => "--rdest",
-    :reap                        => "--reap",
-    :recent                      => "-m recent",
-    :reject                      => "--reject-with",
-    :rhitcount                   => "--hitcount",
-    :rname                       => "--name",
-    :rseconds                    => "--seconds",
-    :rsource                     => "--rsource",
-    :rttl                        => "--rttl",
-    :set_dscp                    => '--set-dscp',
-    :set_dscp_class              => '--set-dscp-class',
-    :set_mark                    => mark_flag,
-    :set_mss                     => '--set-mss',
-    :socket                      => "-m socket",
-    :source                      => "-s",
-    :sport                       => ["-m multiport --sports", "--sport"],
-    :src_range                   => "--src-range",
-    :src_type                    => "--src-type",
-    :stat_every                  => '--every',
-    :stat_mode                   => "-m statistic --mode",
-    :stat_packet                 => '--packet',
-    :stat_probability            => '--probability',
-    :state                       => "-m state --state",
-    :string                      => "-m string --string",
-    :string_algo                 => "--algo",
-    :string_from                 => "--from",
-    :string_to                   => "--to",
-    :table                       => "-t",
-    :tcp_flags                   => "-m tcp --tcp-flags",
-    :todest                      => "--to-destination",
-    :toports                     => "--to-ports",
-    :tosource                    => "--to-source",
-    :to                          => "--to",
-    :uid                         => "--uid-owner",
-    :physdev_in                  => "--physdev-in",
-    :physdev_out                 => "--physdev-out",
-    :physdev_is_bridged          => "--physdev-is-bridged",
-    :physdev_is_in               => "--physdev-is-in",
-    :physdev_is_out              => "--physdev-is-out",
-    :date_start                  => "--datestart",
-    :date_stop                   => "--datestop",
-    :time_start                  => "--timestart",
-    :time_stop                   => "--timestop",
-    :month_days                  => "--monthdays",
-    :week_days                   => "--weekdays",
-    :time_contiguous             => "--contiguous",
-    :kernel_timezone             => "--kerneltz",
-    :clusterip_new               => "--new",
-    :clusterip_hashmode          => "--hashmode",
-    :clusterip_clustermac        => "--clustermac",
-    :clusterip_total_nodes       => "--total-nodes",
-    :clusterip_local_node        => "--local-node",
-    :clusterip_hash_init         => "--hash-init",
-    :src_cc                      => "--source-country",
-    :dst_cc                      => "--destination-country",
-    :hashlimit_name              => "--hashlimit-name",
-    :hashlimit_upto              => "--hashlimit-upto",
-    :hashlimit_above             => "--hashlimit-above",
-    :hashlimit_burst             => "--hashlimit-burst",
-    :hashlimit_mode              => "--hashlimit-mode",
-    :hashlimit_srcmask           => "--hashlimit-srcmask",
-    :hashlimit_dstmask           => "--hashlimit-dstmask",
-    :hashlimit_htable_size       => "--hashlimit-htable-size",
-    :hashlimit_htable_max        => "--hashlimit-htable-max",
-    :hashlimit_htable_expire     => "--hashlimit-htable-expire",
-    :hashlimit_htable_gcinterval => "--hashlimit-htable-gcinterval",
+    burst: '--limit-burst',
+    checksum_fill: '--checksum-fill',
+    clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
+    connlimit_above: '-m connlimit --connlimit-above',
+    connlimit_mask: '--connlimit-mask',
+    connmark: '-m connmark --mark',
+    ctstate: '-m conntrack --ctstate',
+    destination: '-d',
+    dport: ['-m multiport --dports', '--dport'],
+    dst_range: '--dst-range',
+    dst_type: '--dst-type',
+    gateway: '--gateway',
+    gid: '--gid-owner',
+    icmp: '-m icmp --icmp-type',
+    iniface: '-i',
+    ipsec_dir: '-m policy --dir',
+    ipsec_policy: '--pol',
+    ipset: '-m set --match-set',
+    isfragment: '-f',
+    jump: '-j',
+    goto: '-g',
+    length: '-m length --length',
+    limit: '-m limit --limit',
+    log_level: '--log-level',
+    log_prefix: '--log-prefix',
+    log_uid: '--log-uid',
+    mac_source: ['-m mac --mac-source', '--mac-source'],
+    mask: '--mask',
+    match_mark: '-m mark --mark',
+    mss: '-m tcpmss --mss',
+    name: '-m comment --comment',
+    nflog_group: '--nflog-group',
+    nflog_prefix: '--nflog-prefix',
+    nflog_range: '--nflog-range',
+    nflog_threshold: '--nflog-threshold',
+    outiface: '-o',
+    pkttype: '-m pkttype --pkt-type',
+    port: '-m multiport --ports',
+    proto: '-p',
+    queue_num: '--queue-num',
+    queue_bypass: '--queue-bypass',
+    random: '--random',
+    rdest: '--rdest',
+    reap: '--reap',
+    recent: '-m recent',
+    reject: '--reject-with',
+    rhitcount: '--hitcount',
+    rname: '--name',
+    rseconds: '--seconds',
+    rsource: '--rsource',
+    rttl: '--rttl',
+    set_dscp: '--set-dscp',
+    set_dscp_class: '--set-dscp-class',
+    set_mark: mark_flag,
+    set_mss: '--set-mss',
+    socket: '-m socket',
+    source: '-s',
+    sport: ['-m multiport --sports', '--sport'],
+    src_range: '--src-range',
+    src_type: '--src-type',
+    stat_every: '--every',
+    stat_mode: '-m statistic --mode',
+    stat_packet: '--packet',
+    stat_probability: '--probability',
+    state: '-m state --state',
+    string: '-m string --string',
+    string_algo: '--algo',
+    string_from: '--from',
+    string_to: '--to',
+    table: '-t',
+    tcp_flags: '-m tcp --tcp-flags',
+    todest: '--to-destination',
+    toports: '--to-ports',
+    tosource: '--to-source',
+    to: '--to',
+    uid: '--uid-owner',
+    physdev_in: '--physdev-in',
+    physdev_out: '--physdev-out',
+    physdev_is_bridged: '--physdev-is-bridged',
+    physdev_is_in: '--physdev-is-in',
+    physdev_is_out: '--physdev-is-out',
+    date_start: '--datestart',
+    date_stop: '--datestop',
+    time_start: '--timestart',
+    time_stop: '--timestop',
+    month_days: '--monthdays',
+    week_days: '--weekdays',
+    time_contiguous: '--contiguous',
+    kernel_timezone: '--kerneltz',
+    clusterip_new: '--new',
+    clusterip_hashmode: '--hashmode',
+    clusterip_clustermac: '--clustermac',
+    clusterip_total_nodes: '--total-nodes',
+    clusterip_local_node: '--local-node',
+    clusterip_hash_init: '--hash-init',
+    src_cc: '--source-country',
+    dst_cc: '--destination-country',
+    hashlimit_name: '--hashlimit-name',
+    hashlimit_upto: '--hashlimit-upto',
+    hashlimit_above: '--hashlimit-above',
+    hashlimit_burst: '--hashlimit-burst',
+    hashlimit_mode: '--hashlimit-mode',
+    hashlimit_srcmask: '--hashlimit-srcmask',
+    hashlimit_dstmask: '--hashlimit-dstmask',
+    hashlimit_htable_size: '--hashlimit-htable-size',
+    hashlimit_htable_max: '--hashlimit-htable-max',
+    hashlimit_htable_expire: '--hashlimit-htable-expire',
+    hashlimit_htable_gcinterval: '--hashlimit-htable-gcinterval',
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -206,14 +204,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   #                ones.
   #
   @module_to_argument_mapping = {
-    :physdev   => [:physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out],
-    :addrtype  => [:src_type, :dst_type],
-    :iprange   => [:src_range, :dst_range],
-    :owner     => [:uid, :gid],
-    :time      => [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
-    :geoip     => [:src_cc, :dst_cc],
-    :hashlimit => [:hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst, :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask,
-                    :hashlimit_htable_size, :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval],
+    physdev: [:physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out],
+    addrtype: [:src_type, :dst_type],
+    iprange: [:src_range, :dst_range],
+    owner: [:uid, :gid],
+    time: [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
+    geoip: [:src_cc, :dst_cc],
+    hashlimit: [:hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst, :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask,
+                :hashlimit_htable_size, :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval],
   }
 
   def self.munge_resource_map_from_existing_values(resource_map_original, compare)
@@ -224,14 +222,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         if resource_map_original[argument].is_a?(Array)
           if compare.include?(resource_map_original[argument].first)
             resource_map_new[argument] = resource_map_original[argument].clone
-            resource_map_new[argument][0] = "-m #{ipt_module.to_s} #{resource_map_original[argument].first}"
+            resource_map_new[argument][0] = "-m #{ipt_module} #{resource_map_original[argument].first}"
             break
           end
-        else
-          if compare.include?(resource_map_original[argument])
-            resource_map_new[argument] = "-m #{ipt_module.to_s} #{resource_map_original[argument]}"
-            break
-          end
+        elsif compare.include?(resource_map_original[argument])
+          resource_map_new[argument] = "-m #{ipt_module} #{resource_map_original[argument]}"
+          break
         end
       end
     end
@@ -244,31 +240,29 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
     module_to_argument_mapping.each do |ipt_module, arg_array|
       arg_array.each do |argument|
-        if compare[argument]
-          if resource_map_original[argument].is_a?(Array)
-            resource_map_new[argument] = resource_map_original[argument].clone
-            resource_map_new[argument][0] = "-m #{ipt_module.to_s} #{resource_map_original[argument].first}"
-          else
-            resource_map_new[argument] = "-m #{ipt_module.to_s} #{resource_map_original[argument]}"
-          end
-          break
+        next unless compare[argument]
+        if resource_map_original[argument].is_a?(Array)
+          resource_map_new[argument] = resource_map_original[argument].clone
+          resource_map_new[argument][0] = "-m #{ipt_module} #{resource_map_original[argument].first}"
+        else
+          resource_map_new[argument] = "-m #{ipt_module} #{resource_map_original[argument]}"
         end
+        break
       end
     end
     resource_map_new
   end
 
-
   # Create property methods dynamically
   (@resource_map.keys << :chain << :table << :action).each do |property|
-    if @known_booleans.include?(property) then
+    if @known_booleans.include?(property)
       # The boolean properties default to '' which should be read as false
-      define_method "#{property}" do
-        @property_hash[property] = :false if @property_hash[property] == nil
+      define_method property.to_s do
+        @property_hash[property] = :false if @property_hash[property].nil?
         @property_hash[property.to_sym]
       end
     else
-      define_method "#{property}" do
+      define_method property.to_s do
         @property_hash[property.to_sym]
       end
     end
@@ -276,11 +270,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     if property == :chain
       define_method "#{property}=" do |value|
         if @property_hash[:chain] != value
-          raise ArgumentError, "Modifying the chain for existing rules is not supported."
+          raise ArgumentError, 'Modifying the chain for existing rules is not supported.'
         end
       end
     else
-      define_method "#{property}=" do |value|
+      define_method "#{property}=" do |_value|
         @property_hash[:needs_change] = true
       end
     end
@@ -306,7 +300,8 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :name]
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :name
+  ]
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
@@ -326,14 +321,14 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       # Check to see if the iptables rule is already gone. This can sometimes
       # happen as a side effect of other resource changes. If it's not gone,
       # raise the error as per usual.
-      raise e unless self.resource.property(:ensure).insync?(:absent)
+      raise e unless resource.property(:ensure).insync?(:absent)
 
       # If it's already gone, there is no error. Still record a change, but
       # adjust the change message to indicate ambiguity over what work Puppet
       # actually did to remove the resource, vs. what could have been a side
       # effect of something else puppet did.
-      resource.property(:ensure).singleton_class.send(:define_method, :change_to_s) do |a,b|
-        "ensured absent"
+      resource.property(:ensure).singleton_class.send(:define_method, :change_to_s) do |_a, _b|
+        'ensured absent'
       end
     end
   end
@@ -344,9 +339,9 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   # Flush the property hash once done.
   def flush
-    debug("[flush]")
+    debug('[flush]')
     if @property_hash.delete(:needs_change)
-      notice("Properties changed - updating rule")
+      notice('Properties changed - updating rule')
       update
     end
     persist_iptables(self.class.instance_variable_get(:@protocol))
@@ -354,18 +349,19 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   end
 
   def self.instances
-    debug "[instances]"
+    debug '[instances]'
     table = nil
     rules = []
     counter = 1
 
     # String#lines would be nice, but we need to support Ruby 1.8.5
     iptables_save.split("\n").each do |line|
-      unless line =~ /^\#\s+|^\:\S+|^COMMIT|^FATAL/
-        if line =~ /^\*/
-          table = line.sub(/\*/, "")
+      unless line =~ %r{^\#\s+|^\:\S+|^COMMIT|^FATAL}
+        if line =~ %r{^\*}
+          table = line.sub(%r{\*}, '')
         else
-          if hash = rule_to_hash(line, table, counter)
+          hash = rule_to_hash(line, table, counter)
+          if hash
             rules << new(hash)
             counter += 1
           end
@@ -385,30 +381,30 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     ####################
 
     # The match for ttl
-    values = values.gsub(/(!\s+)?-m ttl (!\s+)?--ttl-(eq|lt|gt) [0-9]+/, '')
+    values = values.gsub(%r{(!\s+)?-m ttl (!\s+)?--ttl-(eq|lt|gt) [0-9]+}, '')
     # --tcp-flags takes two values; we cheat by adding " around it
     # so it behaves like --comment
-    values = values.gsub(/(!\s+)?--tcp-flags (\S*) (\S*)/, '--tcp-flags "\1\2 \3"')
+    values = values.gsub(%r{(!\s+)?--tcp-flags (\S*) (\S*)}, '--tcp-flags "\1\2 \3"')
     # --match-set can have multiple values with weird iptables format
-    if values =~ /-m set (!\s+)?--match-set/
-      values = values.gsub(/(!\s+)?--match-set (\S*) (\S*)/, '--match-set \1\2 \3')
+    if values =~ %r{-m set (!\s+)?--match-set}
+      values = values.gsub(%r{(!\s+)?--match-set (\S*) (\S*)}, '--match-set \1\2 \3')
       ind  = values.index('-m set --match-set')
-      sets = values.scan(/-m set --match-set ((?:!\s+)?\S* \S*)/)
-      values = values.gsub(/-m set --match-set (!\s+)?\S* \S* /, '')
+      sets = values.scan(%r{-m set --match-set ((?:!\s+)?\S* \S*)})
+      values = values.gsub(%r{-m set --match-set (!\s+)?\S* \S* }, '')
       values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
     end
     # we do a similar thing for negated address masks (source and destination).
-    values = values.gsub(/(-\S+) (!)\s?(\S*)/,'\1 "\2 \3"')
+    values = values.gsub(%r{(-\S+) (!)\s?(\S*)}, '\1 "\2 \3"')
     # fix negated physdev rules
-    values = values.gsub(/-m physdev ! (--physdev-is-\S+)/, '-m physdev \1 "!"')
+    values = values.gsub(%r{-m physdev ! (--physdev-is-\S+)}, '-m physdev \1 "!"')
     # the actual rule will have the ! mark before the option.
-    values = values.gsub(/(!)\s*(-\S+)\s*(\S*)/, '\2 "\1 \3"')
+    values = values.gsub(%r{(!)\s*(-\S+)\s*(\S*)}, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
-    values = values.gsub(/(?!-m tcp --tcp-flags)-m (tcp|udp) /, '')
+    values = values.gsub(%r{(?!-m tcp --tcp-flags)-m (tcp|udp) }, '')
     # There is a bug in EL5 which puts 2 spaces before physdev, so we fix it
-    values = values.gsub(/\s{2}--physdev/, ' --physdev')
+    values = values.gsub(%r{\s{2}--physdev}, ' --physdev')
     # '--pol ipsec' takes many optional arguments; we cheat again by adding " around them
-    values = values.sub(/
+    values = values.sub(%r{
         --pol\sipsec
         (\s--strict)?
         (\s--reqid\s\S+)?
@@ -417,42 +413,41 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
         (\s--mode\s\S+)?
         (\s--tunnel-dst\s\S+)?
         (\s--tunnel-src\s\S+)?
-        (\s--next)?/x,
-        '--pol "ipsec\1\2\3\4\5\6\7\8" '
-    )
+        (\s--next)?}x,
+                        '--pol "ipsec\1\2\3\4\5\6\7\8" ')
     # on some iptables versions, --connlimit-saddr switch is added after the rule is applied
-    values = values.gsub(/--connlimit-saddr/, '')
+    values = values.gsub(%r{--connlimit-saddr}, '')
 
     resource_map = munge_resource_map_from_existing_values(@resource_map, values)
 
     # Trick the system for booleans
     @known_booleans.each do |bool|
       # append "true" because all params are expected to have values
-      if bool == :isfragment then
-        # -f requires special matching:
-        # only replace those -f that are not followed by an l to
-        # distinguish between -f and the '-f' inside of --tcp-flags.
-        values = values.sub(/\s-f(?!l)(?=.*--comment)/, ' -f true')
-      else
-        # append `true` to booleans that are not already negated (followed by "!")
-        values = values.sub(/#{resource_map[bool]}(?! "!")/, "#{resource_map[bool]} true")
-      end
+      values = if bool == :isfragment
+                 # -f requires special matching:
+                 # only replace those -f that are not followed by an l to
+                 # distinguish between -f and the '-f' inside of --tcp-flags.
+                 values.sub(%r{\s-f(?!l)(?=.*--comment)}, ' -f true')
+               else
+                 # append `true` to booleans that are not already negated (followed by "!")
+                 values.sub(%r{#{resource_map[bool]}(?! "!")}, "#{resource_map[bool]} true")
+               end
     end
 
     ############
     # Populate parser_list with used value, in the correct order
     ############
-    map_index={}
-    resource_map.each_pair do |map_k,map_v|
+    map_index = {}
+    resource_map.each_pair do |map_k, map_v|
       [map_v].flatten.each do |v|
-        ind=values.index(/\s#{v}\s/)
+        ind = values.index(%r{\s#{v}\s})
         next unless ind
-        map_index[map_k]=ind
-     end
+        map_index[map_k] = ind
+      end
     end
     # Generate parser_list based on the index of the found option
-    parser_list=[]
-    map_index.sort_by{|k,v| v}.each{|mapi| parser_list << mapi.first }
+    parser_list = []
+    map_index.sort_by { |_k, v| v }.each { |mapi| parser_list << mapi.first }
 
     ############
     # MAIN PARSE
@@ -462,7 +457,7 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     parser_list.reverse.each do |k|
       resource_map_key = resource_map[k]
       [resource_map_key].flatten.each do |opt|
-        if values.slice!(/\s#{opt}/)
+        if values.slice!(%r{\s#{opt}})
           keys << k
           break
         end
@@ -470,20 +465,20 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
 
     # Manually remove chain
-    if values =~ /(\s|^)-A\s/
-      values = values.sub(/(\s|^)-A\s/, '\1')
+    if values =~ %r{(\s|^)-A\s}
+      values = values.sub(%r{(\s|^)-A\s}, '\1')
       keys << :chain
     end
 
     # Manually remove table (used in some tests)
-    if values =~ /^-t\s/
-      values = values.sub(/^-t\s/, '')
+    if values =~ %r{^-t\s}
+      values = values.sub(%r{^-t\s}, '')
       keys << :table
     end
 
-    valrev = values.scan(/("([^"\\]|\\.)*"|\S+)/).transpose[0].reverse
+    valrev = values.scan(%r{("([^"\\]|\\.)*"|\S+)}).transpose[0].reverse
 
-    if keys.length != valrev.length then
+    if keys.length != valrev.length
       warning "Skipping unparsable iptables rule: keys (#{keys.length}) and values (#{valrev.length}) count mismatch on line: #{line}"
       return
     end
@@ -492,11 +487,11 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # string, handling any quoted characters present in the value, and then
     # zipping the values with the array of keys.
     keys.zip(valrev) do |f, v|
-      if v =~ /^".*"$/ then
-        hash[f] = v.sub(/^"(.*)"$/, '\1').gsub(/\\(\\|'|")/, '\1')
-      else
-        hash[f] = v.dup
-      end
+      hash[f] = if v =~ %r{^".*"$}
+                  v.sub(%r{^"(.*)"$}, '\1').gsub(%r{\\(\\|'|")}, '\1')
+                else
+                  v.dup
+                end
     end
 
     #####################
@@ -504,10 +499,10 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     #####################
 
     [:dport, :sport, :port, :state, :ctstate].each do |prop|
-      hash[prop] = hash[prop].split(',') if ! hash[prop].nil?
+      hash[prop] = hash[prop].split(',') unless hash[prop].nil?
     end
 
-    hash[:ipset] = hash[:ipset].split(';') if ! hash[:ipset].nil?
+    hash[:ipset] = hash[:ipset].split(';') unless hash[:ipset].nil?
 
     ## clean up DSCP class to HEX mappings
     valid_dscp_classes = {
@@ -530,13 +525,13 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       '0x28' => 'cs5',
       '0x30' => 'cs6',
       '0x38' => 'cs7',
-      '0x2e' => 'ef'
+      '0x2e' => 'ef',
     }
     [:set_dscp_class].each do |prop|
       [:set_dscp].each do |dmark|
         next unless hash[dmark]
         hash[prop] = valid_dscp_classes[hash[dmark]]
-     end
+      end
     end
 
     # Convert booleans removing the previous cludge we did
@@ -551,12 +546,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # the types expectations.
     [:dport, :sport, :port].each do |prop|
       next unless hash[prop]
-      hash[prop] = hash[prop].collect do |elem|
-        elem.gsub(/:/,'-')
+      hash[prop] = hash[prop].map do |elem|
+        elem.tr(':', '-')
       end
     end
     if hash[:length]
-      hash[:length].gsub!(/:/,'-')
+      hash[:length].tr!(':', '-')
     end
 
     # Invert any rules that are prefixed with a '!'
@@ -578,23 +573,25 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       :src_type,
       :state,
     ].each do |prop|
-      if hash[prop] and hash[prop].is_a?(Array)
+      if hash[prop] && hash[prop].is_a?(Array)
         # find if any are negated, then negate all if so
         should_negate = hash[prop].index do |value|
-          value.match(/^(!)\s+/)
+          value.match(%r{^(!)\s+})
         end
-        hash[prop] = hash[prop].collect { |v|
-          "! #{v.sub(/^!\s+/,'')}"
-        } if should_negate
+        if should_negate
+          hash[prop] = hash[prop].map do |v|
+            "! #{v.sub(%r{^!\s+}, '')}"
+          end
+        end
       elsif hash[prop]
-        m = hash[prop].match(/^(!?)\s?(.*)/)
-        neg = "! " if m[1] == "!"
-        if [:source,:destination].include?(prop)
-          # Normalise all rules to CIDR notation.
-          hash[prop] = "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
-        else
-          hash[prop] = "#{neg}#{m[2]}"
-        end
+        m = hash[prop].match(%r{^(!?)\s?(.*)})
+        neg = '! ' if m[1] == '!'
+        hash[prop] = if [:source, :destination].include?(prop)
+                       # Normalise all rules to CIDR notation.
+                       "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
+                     else
+                       "#{neg}#{m[2]}"
+                     end
       end
     end
 
@@ -608,39 +605,39 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # Puppet-firewall requires that all rules have comments (resource names) and match this
     # regex and will fail if a rule in iptables does not have a comment. We get around this
     # by appending a high level
-    if ! hash[:name]
+    if !hash[:name]
       num = 9000 + counter
       hash[:name] = "#{num} #{Digest::MD5.hexdigest(line)}"
-    elsif not /^\d+[[:graph:][:space:]]+$/ =~ hash[:name]
+    elsif not %r{^\d+[[:graph:][:space:]]+$} =~ hash[:name] # rubocop:disable Style/Not : Making this change breaks the code
       num = 9000 + counter
-      hash[:name] = "#{num} #{/([[:graph:][:space:]]+)/.match(hash[:name])[1]}"
+      hash[:name] = "#{num} #{%r{([[:graph:][:space:]]+)}.match(hash[:name])[1]}"
     end
 
     # Iptables defaults to log_level '4', so it is omitted from the output of iptables-save.
     # If the :jump value is LOG and you don't have a log-level set, we assume it to be '4'.
-    if hash[:jump] == 'LOG' && ! hash[:log_level]
+    if hash[:jump] == 'LOG' && !hash[:log_level]
       hash[:log_level] = '4'
     end
 
     # Iptables defaults to burst '5', so it is ommitted from the output of iptables-save.
     # If the :limit value is set and you don't have a burst set, we assume it to be '5'.
-    if hash[:limit] && ! hash[:burst]
+    if hash[:limit] && !hash[:burst]
       hash[:burst] = '5'
     end
 
     hash[:line] = line
-    hash[:provider] = self.name.to_s
+    hash[:provider] = name.to_s
     hash[:table] = table
     hash[:ensure] = :present
 
     # Munge some vars here ...
 
     # Proto should equal 'all' if undefined
-    hash[:proto] = "all" if !hash.include?(:proto)
+    hash[:proto] = 'all' unless hash.include?(:proto)
 
     # If the jump parameter is set to one of: ACCEPT, REJECT or DROP then
     # we should set the action parameter instead.
-    if ['ACCEPT','REJECT','DROP'].include?(hash[:jump]) then
+    if %w[ACCEPT REJECT DROP].include?(hash[:jump])
       hash[:action] = hash[:jump].downcase
       hash.delete(:jump)
     end
@@ -649,28 +646,28 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
 
   def insert_args
     args = []
-    args << ["-I", resource[:chain], insert_order]
+    args << ['-I', resource[:chain], insert_order]
     args << general_args
     args
   end
 
   def update_args
     args = []
-    args << ["-R", resource[:chain], insert_order]
+    args << ['-R', resource[:chain], insert_order]
     args << general_args
     args
   end
 
   def delete_args
     # Split into arguments
-    line = properties[:line].gsub(/^\-A /, '-D ').split(/\s+(?=(?:[^"]|"[^"]*")*$)/).map{|v| v.gsub(/^"/, '').gsub(/"$/, '')}
-    line.unshift("-t", properties[:table])
+    line = properties[:line].gsub(%r{^\-A }, '-D ').split(%r{\s+(?=(?:[^"]|"[^"]*")*$)}).map { |v| v.gsub(%r{^"}, '').gsub(%r{"$}, '') }
+    line.unshift('-t', properties[:table])
   end
 
   # This method takes the resource, and attempts to generate the command line
   # arguments for iptables.
   def general_args
-    debug "Current resource: %s" % resource.class
+    debug 'Current resource: %s' % resource.class
 
     args = []
     resource_list = self.class.instance_variable_get('@resource_list')
@@ -682,30 +679,25 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     # puppet is running at the same time something else is managing the rules
     # note: --wait wasn't added untip iptables version 1.4.20
     iptables_version = Facter.value('iptables_version')
-    if (iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.4.20') >= 0)
+    if iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.4.20') >= 0
       args << ['--wait']
     end
 
-    #nflog options are not available on older OSes
-    [:nflog_group,:nflog_prefix,:nflog_threshold,:nflog_range].each do |nflog_feature|
-      fail "#{nflog_feature} is not available on iptables version #{iptables_version}" if resource[nflog_feature] && (iptables_version && iptables_version < '1.3.7')
+    # nflog options are not available on older OSes
+    [:nflog_group, :nflog_prefix, :nflog_threshold, :nflog_range].each do |nflog_feature|
+      raise "#{nflog_feature} is not available on iptables version #{iptables_version}" if resource[nflog_feature] && (iptables_version && iptables_version < '1.3.7')
     end
 
     resource_list.each do |res|
       resource_value = nil
-      if (resource[res]) then
+      if resource[res]
         resource_value = resource[res]
         # If socket is true then do not add the value as -m socket is standalone
-        if known_booleans.include?(res) then
-          if resource[res] == :true then
-            resource_value = nil
-          else
-            # If the property is not :true then we don't want to add the value
-            # to the args list
-            next
-          end
+        if known_booleans.include?(res)
+          next unless resource[res] == :true && known_booleans.include?(res)
+          resource_value = nil
         end
-      elsif res == :jump and resource[:action] then
+      elsif res == :jump && resource[:action]
         # In this case, we are substituting jump for action
         resource_value = resource[:action].to_s.upcase
       else
@@ -716,54 +708,55 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
       args = args.flatten
 
       # On negations, the '!' has to be before the option (eg: "! -d 1.2.3.4")
-      if resource_value.is_a?(String) and resource_value.sub!(/^!\s*/, '') then
+      if resource_value.is_a?(String) && resource_value.sub!(%r{^!\s*}, '')
         # we do this after adding the 'dash' argument because of ones like "-m multiport --dports", where we want it before the "--dports" but after "-m multiport".
         # so we insert before whatever the last argument is
         args.insert(-2, '!')
-      elsif resource_value.is_a?(Symbol) and resource_value.to_s.match(/^!/) then
-        #ruby 1.8.7 can't .match Symbols ------------------ ^
-        resource_value = resource_value.to_s.sub!(/^!\s*/, '').to_sym
+      elsif resource_value.is_a?(Symbol) && resource_value.to_s.match(%r{^!})
+        # ruby 1.8.7 can't .match Symbols ------------------ ^
+        resource_value = resource_value.to_s.sub!(%r{^!\s*}, '').to_sym
         args.insert(-2, '!')
-      elsif resource_value.is_a?(Array) and res != :ipset
+      elsif resource_value.is_a?(Array) && res != :ipset
         should_negate = resource_value.index do |value|
-          #ruby 1.8.7 can't .match symbols
-          value.to_s.match(/^(!)\s+/)
+          # ruby 1.8.7 can't .match symbols
+          value.to_s.match(%r{^(!)\s+})
         end
         if should_negate
-          resource_value, wrong_values = resource_value.collect do |value|
+          resource_value, wrong_values = resource_value.map { |value|
+            # rubocop:disable Metrics/BlockNesting
             if value.is_a?(String)
-              wrong = value if ! value.match(/^!\s+/)
-              [value.sub(/^!\s*/, ''),wrong]
+              wrong = value unless value =~ %r{^!\s+}
+              [value.sub(%r{^!\s*}, ''), wrong]
             else
-              [value,nil]
+              [value, nil]
             end
-          end.transpose
+          }.transpose
           wrong_values = wrong_values.compact
-          if ! wrong_values.empty?
-            fail "All values of the '#{res}' property must be prefixed with a '!' when inverting, but '#{wrong_values.join("', '")}' #{wrong_values.length>1?"are":"is"} not prefixed; aborting"
+          unless wrong_values.empty?
+            raise "All values of the '#{res}' property must be prefixed with a '!' when inverting, but '#{wrong_values.join("', '")}' #{(wrong_values.length > 1) ? 'are' : 'is'} not prefixed; aborting" # rubocop:disable Metrics/LineLength : Line length cannot be reduced
           end
           args.insert(-2, '!')
+          # rubocop:enable Metrics/BlockNesting
         end
       end
 
-
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
-      if [:sport, :dport, :port].include?(res) then
-        resource_value = resource_value.collect do |elem|
-          elem.gsub(/-/, ':')
+      if [:sport, :dport, :port].include?(res)
+        resource_value = resource_value.map do |elem|
+          elem.tr('-', ':')
         end
       end
 
       # ipset can accept multiple values with weird iptables arguments
       if res == :ipset
         resource_value.join(" #{[resource_map[res]].flatten.first} ").split(' ').each do |a|
-          if a.sub!(/^!\s*/, '')
+          if a.sub!(%r{^!\s*}, '')
             # Negate ipset options
             args.insert(-2, '!')
           end
 
-          args << a if a.length > 0
+          args << a unless a.empty?
         end
       # our tcp_flags takes a single string with comma lists separated
       # by space
@@ -783,12 +776,12 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
   end
 
   def insert_order
-    debug("[insert_order]")
+    debug('[insert_order]')
     rules = []
 
     # Find list of current rules based on chain and table
     self.class.instances.each do |rule|
-      if rule.chain == resource[:chain].to_s and rule.table == resource[:table].to_s
+      if rule.chain == resource[:chain].to_s && rule.table == resource[:table].to_s
         rules << rule.name
       end
     end
@@ -800,21 +793,21 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     my_rule = resource[:name].to_s
     rules << my_rule
 
-    unmanaged_rule_regex = /^9[0-9]{3}\s.*$/
+    unmanaged_rule_regex = %r{^9[0-9]{3}\s.*$}
     # Find if this is a new rule or an existing rule, then find how many
     # unmanaged rules preceed it.
     if rules.length == rules.uniq.length
       # This is a new rule so find its ordered location.
       new_rule_location = rules.sort.uniq.index(my_rule)
-      if new_rule_location == 0
-        # The rule will be the first rule in the chain because nothing came
-        # before it.
-        offset_rule = rules[0]
-      else
-        # This rule will come after other managed rules, so find the rule
-        # immediately preceeding it.
-        offset_rule = rules.sort.uniq[new_rule_location - 1]
-      end
+      offset_rule = if new_rule_location.zero?
+                      # The rule will be the first rule in the chain because nothing came
+                      # before it.
+                      rules[0]
+                    else
+                      # This rule will come after other managed rules, so find the rule
+                      # immediately preceeding it.
+                      rules.sort.uniq[new_rule_location - 1]
+                    end
     else
       # This is a pre-existing rule, so find the offset from the original
       # ordering.
@@ -822,19 +815,19 @@ Puppet::Type.type(:firewall).provide :iptables, :parent => Puppet::Provider::Fir
     end
     # Count how many unmanaged rules are ahead of the target rule so we know
     # how much to add to the insert order
-    unnamed_offset = rules[0..rules.index(offset_rule)].inject(0) do |sum,rule|
+    unnamed_offset = rules[0..rules.index(offset_rule)].reduce(0) do |sum, rule|
       # This regex matches the names given to unmanaged rules (a number
       # 9000-9999 followed by an MD5 hash).
       sum + (rule.match(unmanaged_rule_regex) ? 1 : 0)
     end
 
     # We want our rule to come before unmanaged rules if it's not a 9-rule
-    if offset_rule.match(unmanaged_rule_regex) and ! my_rule.match(/^9/)
+    if offset_rule.match(unmanaged_rule_regex) && !my_rule.match(%r{^9})
       unnamed_offset -= 1
     end
 
     # Insert our new or updated rule in the correct order of named rules, but
     # offset for unnamed rules.
-    rules.reject{|r|r.match(unmanaged_rule_regex)}.sort.index(my_rule) + 1 + unnamed_offset
+    rules.reject { |r| r.match(unmanaged_rule_regex) }.sort.index(my_rule) + 1 + unnamed_offset
   end
 end

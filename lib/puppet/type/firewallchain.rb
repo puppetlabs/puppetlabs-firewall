@@ -4,7 +4,7 @@
 # In this case I'm trying the relative path first, then falling back to normal
 # mechanisms. This should be fixed in future versions of puppet but it looks
 # like we'll need to maintain this for some time perhaps.
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__),"..",".."))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..'))
 require 'puppet/util/firewall'
 
 Puppet::Type.newtype(:firewallchain) do
@@ -23,8 +23,8 @@ Puppet::Type.newtype(:firewallchain) do
     those packages to ensure that any required binaries are installed.
   EOS
 
-  feature :iptables_chain, "The provider provides iptables chain features."
-  feature :policy, "Default policy (inbuilt chains only)"
+  feature :iptables_chain, 'The provider provides iptables chain features.'
+  feature :policy, 'Default policy (inbuilt chains only)'
 
   ensurable do
     defaultvalues
@@ -40,46 +40,49 @@ Puppet::Type.newtype(:firewallchain) do
     isnamevar
 
     validate do |value|
-      if value !~ Nameformat then
-        raise ArgumentError, "Inbuilt chains must be in the form {chain}:{table}:{protocol} where {table} is one of FILTER, NAT, MANGLE, RAW, RAWPOST, BROUTE, SECURITY or empty (alias for filter), chain can be anything without colons or one of PREROUTING, POSTROUTING, BROUTING, INPUT, FORWARD, OUTPUT for the inbuilt chains, and {protocol} being IPv4, IPv6, ethernet (ethernet bridging) got '#{value}' table:'#{$1}' chain:'#{$2}' protocol:'#{$3}'"
+      if value !~ NAME_FORMAT
+        raise ArgumentError, 'Inbuilt chains must be in the form {chain}:{table}:{protocol} where {table} is one of FILTER,' \
+            ' NAT, MANGLE, RAW, RAWPOST, BROUTE, SECURITY or empty (alias for filter), chain can be anything without colons' \
+            ' or one of PREROUTING, POSTROUTING, BROUTING, INPUT, FORWARD, OUTPUT for the inbuilt chains, and {protocol} being' \
+            " IPv4, IPv6, ethernet (ethernet bridging) got '#{value}' table:'#{Regexp.last_match(1)}' chain:'#{Regexp.last_match(2)}' protocol:'#{Regexp.last_match(3)}'"
       else
-        chain = $1
-        table = $2
-        protocol = $3
+        chain = Regexp.last_match(1)
+        table = Regexp.last_match(2)
+        protocol = Regexp.last_match(3)
         case table
         when 'filter'
-          if chain =~ /^(PREROUTING|POSTROUTING|BROUTING)$/
+          if chain =~ %r{^(PREROUTING|POSTROUTING|BROUTING)$}
             raise ArgumentError, "INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table 'filter'"
           end
         when 'mangle'
-          if chain =~ InternalChains && chain == 'BROUTING'
+          if chain =~ INTERNAL_CHAINS && chain == 'BROUTING'
             raise ArgumentError, "PREROUTING, POSTROUTING, INPUT, FORWARD and OUTPUT are the only inbuilt chains that can be used in table 'mangle'"
           end
         when 'nat'
-          if chain =~ /^(BROUTING|FORWARD)$/
+          if chain =~ %r{^(BROUTING|FORWARD)$}
             raise ArgumentError, "PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table 'nat'"
           end
-          if Gem::Version.new(Facter['kernelmajversion'].value.dup) < Gem::Version.new('3.7') and protocol =~/^(IP(v6)?)?$/
+          if Gem::Version.new(Facter['kernelmajversion'].value.dup) < Gem::Version.new('3.7') && protocol =~ %r{^(IP(v6)?)?$}
             raise ArgumentError, "table nat isn't valid in IPv6. You must specify ':IPv4' as the name suffix"
           end
         when 'raw'
-          if chain =~ /^(POSTROUTING|BROUTING|INPUT|FORWARD)$/
-            raise ArgumentError,'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\''
+          if chain =~ %r{^(POSTROUTING|BROUTING|INPUT|FORWARD)$}
+            raise ArgumentError, 'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\''
           end
         when 'broute'
           if protocol != 'ethernet'
-            raise ArgumentError,'BROUTE is only valid with protocol \'ethernet\''
+            raise ArgumentError, 'BROUTE is only valid with protocol \'ethernet\''
           end
-          if chain =~ /^PREROUTING|POSTROUTING|INPUT|FORWARD|OUTPUT$/
-            raise ArgumentError,'BROUTING is the only inbuilt chain allowed on on table \'broute\''
+          if chain =~ %r{^PREROUTING|POSTROUTING|INPUT|FORWARD|OUTPUT$}
+            raise ArgumentError, 'BROUTING is the only inbuilt chain allowed on on table \'broute\''
           end
         when 'security'
-          if chain =~ /^(PREROUTING|POSTROUTING|BROUTING)$/
+          if chain =~ %r{^(PREROUTING|POSTROUTING|BROUTING)$}
             raise ArgumentError, "INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table 'security'"
           end
         end
-        if chain == 'BROUTING' && ( protocol != 'ethernet' || table!='broute')
-          raise ArgumentError,'BROUTING is the only inbuilt chain allowed on on table \'BROUTE\' with protocol \'ethernet\' i.e. \'broute:BROUTING:enternet\''
+        if chain == 'BROUTING' && (protocol != 'ethernet' || table != 'broute')
+          raise ArgumentError, 'BROUTING is the only inbuilt chain allowed on on table \'BROUTE\' with protocol \'ethernet\' i.e. \'broute:BROUTING:enternet\''
         end
       end
     end
@@ -101,7 +104,7 @@ Puppet::Type.newtype(:firewallchain) do
     defaultto do
       # ethernet chain have an ACCEPT default while other haven't got an
       # allowed value
-      if @resource[:name] =~ /:ethernet$/
+      if @resource[:name] =~ %r{:ethernet$}
         :accept
       else
         nil
@@ -109,7 +112,7 @@ Puppet::Type.newtype(:firewallchain) do
     end
   end
 
-  newparam(:purge, :boolean => true) do
+  newparam(:purge, boolean: true) do
     desc <<-EOS
       Purge unmanaged firewall rules in this chain
     EOS
@@ -140,13 +143,13 @@ Puppet::Type.newtype(:firewallchain) do
     EOS
 
     validate do |value|
-      unless value.is_a?(Array) or value.is_a?(String) or value == false
-        self.devfail "Ignore must be a string or an Array"
+      unless value.is_a?(Array) || value.is_a?(String) || value == false
+        devfail 'Ignore must be a string or an Array'
       end
     end
     munge do |patterns| # convert into an array of {Regex}es
       patterns = [patterns] if patterns.is_a?(String)
-      patterns.map{|p| Regexp.new(p)}
+      patterns.map { |p| Regexp.new(p) }
     end
   end
 
@@ -155,7 +158,7 @@ Puppet::Type.newtype(:firewallchain) do
   autorequire(:package) do
     case value(:provider)
     when :iptables_chain
-      %w{iptables iptables-persistent iptables-services}
+      %w[iptables iptables-persistent iptables-services]
     else
       []
     end
@@ -164,52 +167,52 @@ Puppet::Type.newtype(:firewallchain) do
   autorequire(:service) do
     case value(:provider)
     when :iptables, :ip6tables
-      %w{firewalld iptables ip6tables iptables-persistent netfilter-persistent}
+      %w[firewalld iptables ip6tables iptables-persistent netfilter-persistent]
     else
       []
     end
   end
 
   validate do
-    debug("[validate]")
+    debug('[validate]')
 
-    value(:name).match(Nameformat)
-    chain = $1
-    table = $2
-    protocol = $3
+    value(:name).match(NAME_FORMAT)
+    chain = Regexp.last_match(1)
+    table = Regexp.last_match(2)
+    protocol = Regexp.last_match(3)
 
     # Check that we're not removing an internal chain
-    if chain =~ InternalChains && value(:ensure) == :absent
-      self.fail "Cannot remove in-built chains"
+    if chain =~ INTERNAL_CHAINS && value(:ensure) == :absent
+      raise 'Cannot remove in-built chains'
     end
 
     if value(:policy).nil? && protocol == 'ethernet'
-      self.fail "you must set a non-empty policy on all ethernet table chains"
+      raise 'you must set a non-empty policy on all ethernet table chains'
     end
 
     # Check that we're not setting a policy on a user chain
-    if chain !~ InternalChains &&
-      !value(:policy).nil? &&
-      protocol != 'ethernet'
+    if chain !~ INTERNAL_CHAINS &&
+       !value(:policy).nil? &&
+       protocol != 'ethernet'
 
-      self.fail "policy can only be set on in-built chains (with the exception of ethernet chains) (table:#{table} chain:#{chain} protocol:#{protocol})"
+      raise "policy can only be set on in-built chains (with the exception of ethernet chains) (table:#{table} chain:#{chain} protocol:#{protocol})"
     end
 
     # no DROP policy on nat table
     if table == 'nat' &&
-      value(:policy) == :drop
+       value(:policy) == :drop
 
-      self.fail 'The "nat" table is not intended for filtering, the use of DROP is therefore inhibited'
+      raise 'The "nat" table is not intended for filtering, the use of DROP is therefore inhibited'
     end
   end
 
   def generate
-    return [] unless self.purge?
+    return [] unless purge?
 
-    value(:name).match(Nameformat)
-    chain = $1
-    table = $2
-    protocol = $3
+    value(:name).match(NAME_FORMAT)
+    chain = Regexp.last_match(1)
+    table = Regexp.last_match(2)
+    protocol = Regexp.last_match(3)
 
     provider = case protocol
                when 'IPv4'
@@ -222,13 +225,13 @@ Puppet::Type.newtype(:firewallchain) do
     rules_resources = Puppet::Type.type(:firewall).instances
 
     # Keep only rules in this chain
-    rules_resources.delete_if { |res| (res[:provider] != provider or res.provider.properties[:table].to_s != table or res.provider.properties[:chain] != chain) }
+    rules_resources.delete_if { |res| (res[:provider] != provider || res.provider.properties[:table].to_s != table || res.provider.properties[:chain] != chain) }
 
     # Remove rules which match our ignore filter
-    rules_resources.delete_if {|res| value(:ignore).find_index{|f| res.provider.properties[:line].match(f)}} if value(:ignore)
+    rules_resources.delete_if { |res| value(:ignore).find_index { |f| res.provider.properties[:line].match(f) } } if value(:ignore)
 
     # We mark all remaining rules for deletion, and then let the catalog override us on rules which should be present
-    rules_resources.each {|res| res[:ensure] = :absent}
+    rules_resources.each { |res| res[:ensure] = :absent }
 
     rules_resources
   end

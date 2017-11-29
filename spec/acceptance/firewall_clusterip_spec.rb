@@ -1,7 +1,6 @@
 
 # These tests have been commented out, as there are suspicions that the clusterIP ipt module is causing system reboots.
 
-
 # require 'spec_helper_acceptance'
 
 # describe 'firewall type', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
@@ -40,7 +39,7 @@
 #         it 'should contain the rule' do
 #           pending("MODULES-2124 should be resolved for clusterip RHEL7 support") if default['platform'] =~ /el-7/
 #           shell('iptables-save') do |r|
-#             expect(r.stdout).to match(/-A FORWARD -d (1.1.1.1\/32|1.1.1.1) -i eth0 -p tcp -m comment --comment "830 - clusterip test" -j CLUSTERIP --new --hashmode sourceip --clustermac 01:00:5E:00:00:00 --total-nodes 2 --local-node 1 --hash-init 1337/)
+#             expect(r.stdout).to match(/-A FORWARD -d (1.1.1.1\/32|1.1.1.1) -i eth0 -p tcp -m comment --comment "830 - clusterip test" -j CLUSTERIP --new --hashmode sourceip --clustermac 01:00:5E:00:00:00 --total-nodes 2 --local-node 1 --hash-init 1337/) # rubocop:disable Metrics/LineLength : Cannot reduce length to required size
 #           end
 #         end
 #       end

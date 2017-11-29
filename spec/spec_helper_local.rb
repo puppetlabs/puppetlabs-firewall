@@ -5,10 +5,10 @@ end
 def with_debian_facts
   let :facts do
     {
-      :kernel          => 'Linux',
-      :operatingsystem => 'Debian',
-      :operatingsystemrelease => '8.0',
-      :osfamily        => 'Debian',
+      kernel: 'Linux',
+      operatingsystem: 'Debian',
+      operatingsystemrelease: '8.0',
+      osfamily: 'Debian',
     }
   end
 end

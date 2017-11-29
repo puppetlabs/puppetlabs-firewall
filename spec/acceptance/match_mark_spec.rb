@@ -6,25 +6,24 @@ describe 'firewall match marks' do
     ip6tables_flush_all_tables
   end
 
-  if default['platform'] !~ /el-5/ and default['platform'] !~ /sles-10/
+  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'match_mark' do
       context '0x1' do
-        it 'applies' do
-          pp = <<-EOS
+        pp1 = <<-EOS
             class { '::firewall': }
             firewall { '503 match_mark - test':
               proto      => 'all',
               match_mark => '0x1',
               action     => reject,
             }
-          EOS
-
-          apply_manifest(pp, :catch_failures => true)
+        EOS
+        it 'applies' do
+          apply_manifest(pp1, catch_failures: true)
         end
 
-        it 'should contain the rule' do
+        it 'contains the rule' do
           shell('iptables-save') do |r|
-            expect(r.stdout).to match(/-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable/)
+            expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
           end
         end
       end
@@ -32,8 +31,7 @@ describe 'firewall match marks' do
 
     describe 'match_mark_ip6' do
       context '0x1' do
-        it 'applies' do
-          pp = <<-EOS
+        pp2 = <<-EOS
             class { '::firewall': }
             firewall { '503 match_mark ip6tables - test':
               proto      => 'all',
@@ -41,14 +39,14 @@ describe 'firewall match marks' do
               action     => reject,
               provider => 'ip6tables',
             }
-          EOS
-
-          apply_manifest(pp, :catch_failures => true)
+        EOS
+        it 'applies' do
+          apply_manifest(pp2, catch_failures: true)
         end
 
-        it 'should contain the rule' do
+        it 'contains the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(/-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark ip6tables - test" -j REJECT --reject-with icmp6-port-unreachable/)
+            expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark ip6tables - test" -j REJECT --reject-with icmp6-port-unreachable})
           end
         end
       end

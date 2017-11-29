@@ -1,41 +1,58 @@
 require 'spec_helper'
 
-describe 'firewall::linux::gentoo', :type => :class do
+describe 'firewall::linux::gentoo', type: :class do
   let(:facts) do
     {
-      :osfamily        => 'Gentoo',
-      :operatingsystem => 'Gentoo'
+      osfamily: 'Gentoo',
+      operatingsystem: 'Gentoo',
     }
   end
-  it { should contain_service('iptables').with(
-    :ensure   => 'running',
-    :enable   => 'true'
-  )}
-  it { should contain_service('ip6tables').with(
-    :ensure   => 'running',
-    :enable   => 'true'
-  )}
-  it { should contain_package('net-firewall/iptables').with(
-    :ensure => 'present'
-  )}
+
+  it {
+    is_expected.to contain_service('iptables').with(
+      ensure: 'running',
+      enable: 'true',
+    )
+  }
+  it {
+    is_expected.to contain_service('ip6tables').with(
+      ensure: 'running',
+      enable: 'true',
+    )
+  }
+  it {
+    is_expected.to contain_package('net-firewall/iptables').with(
+      ensure: 'present',
+    )
+  }
 
   context 'ensure => stopped' do
-    let(:params) {{ :ensure => 'stopped' }}
-    it { should contain_service('iptables').with(
-      :ensure   => 'stopped'
-    )}
-    it { should contain_service('ip6tables').with(
-      :ensure   => 'stopped'
-    )}
+    let(:params) { { ensure: 'stopped' } }
+
+    it {
+      is_expected.to contain_service('iptables').with(
+        ensure: 'stopped',
+      )
+    }
+    it {
+      is_expected.to contain_service('ip6tables').with(
+        ensure: 'stopped',
+      )
+    }
   end
 
   context 'enable => false' do
-    let(:params) {{ :enable => 'false' }}
-    it { should contain_service('iptables').with(
-      :enable   => 'false'
-    )}
-    it { should contain_service('ip6tables').with(
-      :enable   => 'false'
-    )}
+    let(:params) { { enable: 'false' } }
+
+    it {
+      is_expected.to contain_service('iptables').with(
+        enable: 'false',
+      )
+    }
+    it {
+      is_expected.to contain_service('ip6tables').with(
+        enable: 'false',
+      )
+    }
   end
 end
