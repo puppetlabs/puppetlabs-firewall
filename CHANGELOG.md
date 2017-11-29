@@ -1,3 +1,14 @@
+## Supported Release 1.11.0
+### Summary
+This release is to implement Rubocop changes within the module.
+
+#### Added
+- Rubocop has been implemented in the module.
+
+### Changed
+- Module sync was updated.
+- Unparsable rules are now skipped with a warning.
+
 ## Supported Release 1.10.0
 ### Summary
 This is a clean release prior to the module being run through rubocop.
