@@ -7,14 +7,14 @@ if default['platform'] =~ %r{el-5} || default['platform'] =~ %r{sles-10}
       ip6tables_flush_all_tables
     end
 
-    pp1 = <<-EOS
+    pp1 = <<-PUPPETCODE
         class { '::firewall': }
         firewall { '599 - test':
           ensure   => present,
           proto    => 'tcp',
           provider => 'ip6tables',
         }
-    EOS
+    PUPPETCODE
     it "can't use ip6tables" do
       expect(apply_manifest(pp1, expect_failures: true).stderr).to match(%r{ip6tables provider is not supported})
     end
@@ -27,7 +27,7 @@ else
     end
 
     shared_examples 'is idempotent' do |values, line_match|
-      pp2 = <<-EOS
+      pp2 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '599 - test':
               ensure   => present,
@@ -35,7 +35,7 @@ else
               provider => 'ip6tables',
               #{values}
             }
-      EOS
+      PUPPETCODE
       it "changes the values to #{values}" do
         apply_manifest(pp2, catch_failures: true)
         apply_manifest(pp2, catch_changes: do_catch_changes)
@@ -46,7 +46,7 @@ else
       end
     end
     shared_examples "doesn't change" do |values, line_match|
-      pp3 = <<-EOS
+      pp3 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '599 - test':
               ensure   => present,
@@ -54,7 +54,7 @@ else
               provider => 'ip6tables',
               #{values}
             }
-      EOS
+      PUPPETCODE
       it "doesn't change the values to #{values}" do
         apply_manifest(pp3, catch_changes: do_catch_changes)
 
@@ -91,10 +91,10 @@ else
           ip6tables_flush_all_tables
           shell('ip6tables -A INPUT -p tcp -m comment --comment "599 - test"')
         end
-        context 'and current value is false' do
+        context 'when current value is false' do
           it_behaves_like "doesn't change", 'ishasmorefrags => false, islastfrag => false, isfirstfrag => false', %r{-A INPUT -p tcp -m comment --comment "599 - test"}
         end
-        context 'and current value is true' do
+        context 'when current value is true' do
           it_behaves_like 'is idempotent', 'ishasmorefrags => true, islastfrag => true, isfirstfrag => true',
                           %r{-A INPUT -p tcp -m frag --fragid 0 --fragmore -m frag --fragid 0 --fraglast -m frag --fragid 0 --fragfirst -m comment --comment "599 - test"}
         end
@@ -104,10 +104,10 @@ else
           ip6tables_flush_all_tables
           shell('ip6tables -A INPUT -p tcp -m frag --fragid 0 --fragmore -m frag --fragid 0 --fraglast -m frag --fragid 0 --fragfirst -m comment --comment "599 - test"')
         end
-        context 'and current value is false' do
+        context 'when current value is false' do
           it_behaves_like 'is idempotent', 'ishasmorefrags => false, islastfrag => false, isfirstfrag => false', %r{-A INPUT -p tcp -m comment --comment "599 - test"}
         end
-        context 'and current value is true' do
+        context 'when current value is true' do
           it_behaves_like "doesn't change", 'ishasmorefrags => true, islastfrag => true, isfirstfrag => true',
                           %r{-A INPUT -p tcp -m frag --fragid 0 --fragmore -m frag --fragid 0 --fraglast -m frag --fragid 0 --fragfirst -m comment --comment "599 - test"}
         end

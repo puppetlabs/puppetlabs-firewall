@@ -10,7 +10,7 @@ require 'puppet/util/firewall'
 Puppet::Type.newtype(:firewallchain) do
   include Puppet::Util::Firewall
 
-  @doc = <<-EOS
+  @doc = <<-PUPPETCODE
     This type provides the capability to manage rule chains for firewalls.
 
     Currently this supports only iptables, ip6tables and ebtables on Linux. And
@@ -21,7 +21,7 @@ Puppet::Type.newtype(:firewallchain) do
     If Puppet is managing the iptables, iptables-persistent, or iptables-services packages,
     and the provider is iptables_chain, the firewall resource will autorequire
     those packages to ensure that any required binaries are installed.
-  EOS
+  PUPPETCODE
 
   feature :iptables_chain, 'The provider provides iptables chain features.'
   feature :policy, 'Default policy (inbuilt chains only)'
@@ -32,11 +32,11 @@ Puppet::Type.newtype(:firewallchain) do
   end
 
   newparam(:name) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The canonical name of the chain.
 
       For iptables the format must be {chain}:{table}:{protocol}.
-    EOS
+    PUPPETCODE
     isnamevar
 
     validate do |value|
@@ -89,7 +89,7 @@ Puppet::Type.newtype(:firewallchain) do
   end
 
   newproperty(:policy) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       This is the action to when the end of the chain is reached.
       It can only be set on inbuilt chains (INPUT, FORWARD, OUTPUT,
       PREROUTING, POSTROUTING) and can be one of:
@@ -99,7 +99,7 @@ Puppet::Type.newtype(:firewallchain) do
       * queue - the packet is passed userspace
       * return - the packet is returned to calling (jump) queue
                  or the default of inbuilt chains
-    EOS
+    PUPPETCODE
     newvalues(:accept, :drop, :queue, :return)
     defaultto do
       # ethernet chain have an ACCEPT default while other haven't got an
@@ -113,15 +113,15 @@ Puppet::Type.newtype(:firewallchain) do
   end
 
   newparam(:purge, boolean: true) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Purge unmanaged firewall rules in this chain
-    EOS
-    newvalues(:false, :true)
-    defaultto :false
+    PUPPETCODE
+    newvalues(false, true)
+    defaultto false
   end
 
   newparam(:ignore) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Regex to perform on firewall rules to exempt unmanaged rules from purging (when enabled).
       This is matched against the output of `iptables-save`.
 
@@ -140,7 +140,7 @@ Puppet::Type.newtype(:firewallchain) do
           '--comment "[^"]*(?i:ignore)[^"]*"', # ignore any rules with "ignore" (case insensitive) in the comment in the rule
         ],
       }
-    EOS
+    PUPPETCODE
 
     validate do |value|
       unless value.is_a?(Array) || value.is_a?(String) || value == false

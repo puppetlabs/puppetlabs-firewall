@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.shared_examples 'ensures iptables service' do
-  context 'default' do
+  context 'with default' do
     it {
       is_expected.to contain_service('iptables').with(
         ensure: 'running',
@@ -10,7 +10,7 @@ RSpec.shared_examples 'ensures iptables service' do
     }
   end
 
-  context 'ensure => stopped' do
+  context 'with ensure => stopped' do
     let(:params) { { ensure: 'stopped' } }
 
     it {
@@ -20,7 +20,7 @@ RSpec.shared_examples 'ensures iptables service' do
     }
   end
 
-  context 'enable => false' do
+  context 'with enable => false' do
     let(:params) { { enable: 'false' } }
 
     it {
@@ -80,7 +80,7 @@ describe 'firewall::linux::redhat', type: :class do
           )
         }
 
-        context 'ensure => stopped' do
+        context 'with ensure => stopped' do
           let(:params) { { ensure: 'stopped' } }
 
           it {
@@ -90,7 +90,7 @@ describe 'firewall::linux::redhat', type: :class do
           }
         end
 
-        context 'ensure_v6 => stopped' do
+        context 'with ensure_v6 => stopped' do
           let(:params) { { ensure_v6: 'stopped' } }
 
           it {
@@ -100,7 +100,7 @@ describe 'firewall::linux::redhat', type: :class do
           }
         end
 
-        context 'enable => false' do
+        context 'with enable => false' do
           let(:params) { { enable: 'false' } }
 
           it {
@@ -110,7 +110,7 @@ describe 'firewall::linux::redhat', type: :class do
           }
         end
 
-        context 'enable_v6 => false' do
+        context 'with enable_v6 => false' do
           let(:params) { { enable_v6: 'false' } }
 
           it {

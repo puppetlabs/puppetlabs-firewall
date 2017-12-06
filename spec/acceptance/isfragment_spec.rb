@@ -7,14 +7,14 @@ describe 'firewall isfragment property' do
   end
 
   shared_examples 'is idempotent' do |value, line_match|
-    pp1 = <<-EOS
+    pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '597 - test':
             ensure => present,
             proto  => 'tcp',
             #{value}
           }
-    EOS
+    PUPPETCODE
     it "changes the value to #{value}" do
       apply_manifest(pp1, catch_failures: true)
       apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -26,14 +26,14 @@ describe 'firewall isfragment property' do
   end
 
   shared_examples "doesn't change" do |value, line_match|
-    pp2 = <<-EOS
+    pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '597 - test':
             ensure => present,
             proto  => 'tcp',
             #{value}
           }
-    EOS
+    PUPPETCODE
     it "doesn't change the value to #{value}" do
       apply_manifest(pp2, catch_changes: do_catch_changes)
 

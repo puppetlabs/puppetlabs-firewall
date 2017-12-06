@@ -8,8 +8,8 @@ describe 'firewall tee' do
 
   if default['platform'] =~ %r{ubuntu-1404} || default['platform'] =~ %r{ubuntu-1204} || default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{debian-8} || default['platform'] =~ %r{el-7}
     describe 'tee_gateway' do
-      context '10.0.0.2' do
-        pp1 = <<-EOS
+      context 'when 10.0.0.2' do
+        pp1 = <<-PUPPETCODE
             class { '::firewall': }
             firewall {
               '810 - tee_gateway':
@@ -19,7 +19,7 @@ describe 'firewall tee' do
                 gateway => '10.0.0.2',
                 proto   => all,
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp1, catch_failures: true)
         end
@@ -33,8 +33,8 @@ describe 'firewall tee' do
     end
 
     describe 'tee_gateway6' do
-      context '2001:db8::1' do
-        pp2 = <<-EOS
+      context 'when 2001:db8::1' do
+        pp2 = <<-PUPPETCODE
             class { '::firewall': }
             firewall {
               '811 - tee_gateway6':
@@ -45,7 +45,7 @@ describe 'firewall tee' do
                 proto   => all,
                 provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp2, catch_failures: true)
         end

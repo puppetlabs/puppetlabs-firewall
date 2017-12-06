@@ -7,12 +7,12 @@ describe 'puppet resource firewallchain command' do
   end
 
   describe 'ensure' do
-    context 'present' do
-      pp1 = <<-EOS
+    context 'when present' do
+      pp1 = <<-PUPPETCODE
           firewallchain { 'MY_CHAIN:filter:IPv4':
             ensure  => present,
           }
-      EOS
+      PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
         apply_manifest(pp1, catch_failures: true)
@@ -26,12 +26,12 @@ describe 'puppet resource firewallchain command' do
       end
     end
 
-    context 'absent' do
-      pp2 = <<-EOS
+    context 'when absent' do
+      pp2 = <<-PUPPETCODE
           firewallchain { 'MY_CHAIN:filter:IPv4':
             ensure  => absent,
           }
-      EOS
+      PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
         apply_manifest(pp2, catch_failures: true)
@@ -47,8 +47,8 @@ describe 'puppet resource firewallchain command' do
   end
 
   # XXX purge => false is not yet implemented
-  # context 'adding a firewall rule to a chain:' do
-  #    pp3 = <<-EOS
+  # context 'when adding a firewall rule to a chain:' do
+  #    pp3 = <<-PUPPETCODE
   #      firewallchain { 'MY_CHAIN:filter:IPv4':
   #        ensure  => present,
   #      }
@@ -58,7 +58,7 @@ describe 'puppet resource firewallchain command' do
   #        proto   => 'tcp',
   #        dport   => 5000,
   #      }
-  #    EOS
+  #    PUPPETCODE
   #  it 'applies cleanly' do
   #    # Run it twice and test for idempotency
   #    apply_manifest(pp3, :catch_failures => true)
@@ -66,8 +66,8 @@ describe 'puppet resource firewallchain command' do
   #  end
   # end
 
-  # context 'not purge firewallchain chains:' do
-  #    pp4 = <<-EOS
+  # context 'when not purge firewallchain chains:' do
+  #    pp4 = <<-PUPPETCODE
   #      firewallchain { 'MY_CHAIN:filter:IPv4':
   #        ensure  => present,
   #        purge   => false,
@@ -76,7 +76,7 @@ describe 'puppet resource firewallchain command' do
   #      resources { 'firewall':
   #        purge => true,
   #      }
-  #    EOS
+  #    PUPPETCODE
   #  it 'does not purge the rule' do
   #    # Run it twice and test for idempotency
   #    apply_manifest(pp4, :catch_failures => true) do |r|
@@ -86,14 +86,14 @@ describe 'puppet resource firewallchain command' do
   #    apply_manifest(pp4, :catch_changes => do_catch_changes)
   #  end
 
-  #    pp5 = <<-EOS
+  #    pp5 = <<-PUPPETCODE
   #      firewall { '100 my rule':
   #        chain   => 'MY_CHAIN',
   #        action  => 'accept',
   #        proto   => 'tcp',
   #        dport   => 5000,
   #      }
-  #    EOS
+  #    PUPPETCODE
   #  it 'still has the rule' do
   #    # Run it twice and test for idempotency
   #    apply_manifest(pp5, :catch_changes => do_catch_changes)
@@ -105,12 +105,12 @@ describe 'puppet resource firewallchain command' do
       shell('iptables -t filter -P FORWARD ACCEPT')
     end
 
-    context 'DROP' do
-      pp6 = <<-EOS
+    context 'when DROP' do
+      pp6 = <<-PUPPETCODE
           firewallchain { 'FORWARD:filter:IPv4':
             policy  => 'drop',
           }
-      EOS
+      PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
         apply_manifest(pp6, catch_failures: true)

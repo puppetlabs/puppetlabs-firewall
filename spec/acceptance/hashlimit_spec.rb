@@ -8,8 +8,8 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
   end
 
   describe 'hashlimit_tests' do
-    context 'hashlimit_above' do
-      pp1 = <<-EOS
+    context 'when hashlimit_above' do
+      pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '800 - hashlimit_above test':
             chain                       => 'INPUT',
@@ -20,7 +20,7 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_mode              => 'srcip,dstip',
             action                      => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp1, catch_failures: true)
         apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -37,8 +37,8 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
       end
     end
 
-    context 'hashlimit_above_ip6' do
-      pp2 = <<-EOS
+    context 'when hashlimit_above_ip6' do
+      pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '801 - hashlimit_above test ipv6':
             chain                       => 'INPUT',
@@ -50,7 +50,7 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_mode              => 'srcip,dstip',
             action                      => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp2, catch_failures: true)
         apply_manifest(pp2, catch_changes: do_catch_changes)
@@ -67,8 +67,8 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
       end
     end
 
-    context 'hashlimit_upto' do
-      pp3 = <<-EOS
+    context 'when hashlimit_upto' do
+      pp3 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '802 - hashlimit_upto test':
             chain                   => 'INPUT',
@@ -80,7 +80,7 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_htable_expire => '36000000',
             action                  => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp3, catch_failures: true)
         apply_manifest(pp3, catch_changes: do_catch_changes)
@@ -93,8 +93,8 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
       end
     end
 
-    context 'hashlimit_upto_ip6' do
-      pp4 = <<-EOS
+    context 'when hashlimit_upto_ip6' do
+      pp4 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '803 - hashlimit_upto test ip6':
             chain                   => 'INPUT',
@@ -107,7 +107,7 @@ describe 'hashlimit property', if: fact('operatingsystemmajrelease') != '5' && (
             hashlimit_htable_expire => '36000000',
             action                  => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp4, catch_failures: true)
         apply_manifest(pp4, catch_changes: do_catch_changes)

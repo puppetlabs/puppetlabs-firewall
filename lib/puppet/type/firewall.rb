@@ -12,7 +12,7 @@ require 'puppet/util/firewall'
 Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
 
-  @doc = <<-EOS
+  @doc = <<-PUPPETCODE
     This type provides the capability to manage firewall rules within
     puppet.
 
@@ -26,7 +26,7 @@ Puppet::Type.newtype(:firewall) do
     and the provider is iptables or ip6tables, the firewall resource will
     autorequire those packages to ensure that any required binaries are
     installed.
-  EOS
+  PUPPETCODE
 
   feature :connection_limiting, 'Connection limiting features.'
   feature :hop_limiting, 'Hop limiting features.'
@@ -73,9 +73,9 @@ Puppet::Type.newtype(:firewall) do
   feature :iptables, 'The provider provides iptables features.'
 
   ensurable do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Manage the state of this rule. The default action is *present*.
-    EOS
+    PUPPETCODE
 
     newvalue(:present) do
       provider.insert
@@ -89,7 +89,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newparam(:name) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The canonical name of the rule. This name is also used for ordering
       so make sure you prefix the rule with a number:
 
@@ -98,7 +98,7 @@ Puppet::Type.newtype(:firewall) do
 
       Depending on the provider, the name of the rule can be stored using
       the comment feature of the underlying firewall subsystem.
-    EOS
+    PUPPETCODE
     isnamevar
 
     # Keep rule names simple - they must start with a number
@@ -106,7 +106,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:action) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       This is the action to perform on a match. Can be one of:
 
       * accept - the packet is accepted
@@ -115,13 +115,13 @@ Puppet::Type.newtype(:firewall) do
 
       If you specify no value it will simply match the rule but perform no
       action unless you provide a provider specific parameter (such as *jump*).
-    EOS
+    PUPPETCODE
     newvalues(:accept, :reject, :drop)
   end
 
   # Generic matching properties
   newproperty(:source) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The source address. For example:
 
           source => '192.168.2.0/24'
@@ -131,7 +131,7 @@ Puppet::Type.newtype(:firewall) do
           source => '! 192.168.2.0/24'
 
       The source can also be an IPv6 address if your provider supports it.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       case @resource[:provider]
@@ -153,13 +153,13 @@ Puppet::Type.newtype(:firewall) do
 
   # Source IP range
   newproperty(:src_range, required_features: :iprange) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The source IP range. For example:
 
           src_range => '192.168.1.1-192.168.1.10'
 
       The source IP range must be in 'IP1-IP2' format.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       matches = %r{^([^\-\/]+)-([^\-\/]+)$}.match(value)
@@ -178,7 +178,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:destination) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The destination address to match. For example:
 
           destination => '192.168.1.0/24'
@@ -188,7 +188,7 @@ Puppet::Type.newtype(:firewall) do
           destination  => '! 192.168.2.0/24'
 
       The destination can also be an IPv6 address if your provider supports it.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       case @resource[:provider]
@@ -210,13 +210,13 @@ Puppet::Type.newtype(:firewall) do
 
   # Destination IP range
   newproperty(:dst_range, required_features: :iprange) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The destination IP range. For example:
 
           dst_range => '192.168.1.1-192.168.1.10'
 
       The destination IP range must be in 'IP1-IP2' format.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       matches = %r{^([^\-\/]+)-([^\-\/]+)$}.match(value)
@@ -235,7 +235,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:sport, array_matching: :all) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The source port to match for this filter (if the protocol supports
       ports). Will accept a single element or an array.
 
@@ -248,7 +248,7 @@ Puppet::Type.newtype(:firewall) do
           1-1024
 
       This would cover ports 1 to 1024.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       @resource.string_to_port(value, :proto)
@@ -265,7 +265,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:dport, array_matching: :all) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The destination port to match for this filter (if the protocol supports
       ports). Will accept a single element or an array.
 
@@ -278,7 +278,7 @@ Puppet::Type.newtype(:firewall) do
           1-1024
 
       This would cover ports 1 to 1024.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       @resource.string_to_port(value, :proto)
@@ -295,7 +295,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:port, array_matching: :all) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       DEPRECATED
 
       The destination or source port to match for this filter (if the protocol
@@ -310,7 +310,7 @@ Puppet::Type.newtype(:firewall) do
           1-1024
 
       This would cover ports 1 to 1024.
-    EOS
+    PUPPETCODE
 
     validate do |_value|
       Puppet.warning('Passing port to firewall is deprecated and will be removed. Use dport and/or sport instead.')
@@ -331,7 +331,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:dst_type, required_features: :address_type) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The destination address type. For example:
 
           dst_type => 'LOCAL'
@@ -350,7 +350,7 @@ Puppet::Type.newtype(:firewall) do
       * THROW - undocumented
       * NAT - undocumented
       * XRESOLVE - undocumented
-    EOS
+    PUPPETCODE
 
     newvalues(*[:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
                 :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].map { |address_type|
@@ -359,7 +359,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:src_type, required_features: :address_type) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The source address type. For example:
 
           src_type => 'LOCAL'
@@ -378,7 +378,7 @@ Puppet::Type.newtype(:firewall) do
       * THROW - undocumented
       * NAT - undocumented
       * XRESOLVE - undocumented
-    EOS
+    PUPPETCODE
 
     newvalues(*[:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST,
                 :BLACKHOLE, :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].map { |address_type|
@@ -387,10 +387,10 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:proto) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The specific protocol to match for this rule. By default this is
       *tcp*.
-    EOS
+    PUPPETCODE
 
     newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
       [proto, "! #{proto}".to_sym]
@@ -400,14 +400,14 @@ Puppet::Type.newtype(:firewall) do
 
   # tcp-specific
   newproperty(:mss) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match a given TCP MSS value or range.
-    EOS
+    PUPPETCODE
   end
 
   # tcp-specific
   newproperty(:tcp_flags, required_features: :tcp_flags) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match when the TCP flags are as specified.
       Is a string with a list of comma-separated flag names for the mask,
       then a space, then a comma-separated list of flags that should be set.
@@ -417,12 +417,12 @@ Puppet::Type.newtype(:firewall) do
       Example: FIN,SYN,RST,ACK SYN matches packets with the SYN bit set and the
 	       ACK,RST and FIN bits cleared.  Such packets are used to request
                TCP  connection initiation.
-    EOS
+    PUPPETCODE
   end
 
   # Iptables specific
   newproperty(:chain, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Name of the chain to use. Can be one of the built-ins:
 
       * INPUT
@@ -434,14 +434,14 @@ Puppet::Type.newtype(:firewall) do
       Or you can provide a user-based chain.
 
       The default value is 'INPUT'.
-    EOS
+    PUPPETCODE
 
     defaultto 'INPUT'
     newvalue(%r{^[a-zA-Z0-9\-_]+$})
   end
 
   newproperty(:table, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Table to use. Can be one of:
 
       * nat
@@ -451,14 +451,14 @@ Puppet::Type.newtype(:firewall) do
       * rawpost
 
       By default the setting is 'filter'.
-    EOS
+    PUPPETCODE
 
     newvalues(:nat, :mangle, :filter, :raw, :rawpost)
     defaultto 'filter'
   end
 
   newproperty(:jump, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The value for the iptables --jump parameter. Normal values are:
 
       * QUEUE
@@ -479,27 +479,27 @@ Puppet::Type.newtype(:firewall) do
 
       If you set both 'accept' and 'jump' parameters, you will get an error as
       only one of the options should be set.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       unless value =~ %r{^[a-zA-Z0-9\-_]+$}
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           Jump destination must consist of alphanumeric characters, an
           underscore or a yphen.
-        EOS
+        PUPPETCODE
       end
 
       if %w[accept reject drop].include?(value.downcase)
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           Jump destination should not be one of ACCEPT, REJECT or DROP. Use
           the action property instead.
-        EOS
+        PUPPETCODE
       end
     end
   end
 
   newproperty(:goto, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The value for the iptables --goto parameter. Normal values are:
 
       * QUEUE
@@ -512,98 +512,98 @@ Puppet::Type.newtype(:firewall) do
       * MARK
 
       But any valid chain name is allowed.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       unless value =~ %r{^[a-zA-Z0-9\-_]+$}
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           Goto destination must consist of alphanumeric characters, an
           underscore or a yphen.
-        EOS
+        PUPPETCODE
       end
 
       if %w[accept reject drop].include?(value.downcase)
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           Goto destination should not be one of ACCEPT, REJECT or DROP. Use
           the action property instead.
-        EOS
+        PUPPETCODE
       end
     end
   end
 
   # Interface specific matching properties
   newproperty(:iniface, required_features: :interface_match) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Input interface to filter on.  Supports interface alias like eth0:0.
       To negate the match try this:
 
             iniface => '! lo',
 
-    EOS
+    PUPPETCODE
     newvalues(%r{^!?\s?[a-zA-Z0-9\-\._\+\:]+$})
   end
 
   newproperty(:outiface, required_features: :interface_match) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Output interface to filter on.  Supports interface alias like eth0:0.
      To negate the match try this:
 
            outiface => '! lo',
 
-    EOS
+    PUPPETCODE
     newvalues(%r{^!?\s?[a-zA-Z0-9\-\._\+\:]+$})
   end
 
   # NAT specific properties
   newproperty(:tosource, required_features: :snat) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When using jump => "SNAT" you can specify the new source address using
       this parameter.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:todest, required_features: :dnat) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When using jump => "DNAT" you can specify the new destination address
       using this paramter.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:toports, required_features: :dnat) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       For DNAT this is the port that will replace the destination port.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:to, required_features: :netmap) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       For NETMAP this will replace the destination IP
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:random, required_features: :dnat) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT"
       this boolean will enable randomized port mapping.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   # Reject ICMP type
   newproperty(:reject, required_features: :reject_type) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When combined with jump => "REJECT" you can specify a different icmp
       response to be sent back to the packet sender.
-    EOS
+    PUPPETCODE
   end
 
   # Logging properties
   newproperty(:log_level, required_features: :log_level) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When combined with jump => "LOG" specifies the system log level to log
       to.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       if value.is_a?(String)
@@ -620,27 +620,27 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:log_prefix, required_features: :log_prefix) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When combined with jump => "LOG" specifies the log prefix to use when
       logging.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:log_uid, required_features: :log_uid) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When combined with jump => "LOG" specifies the uid of the process making
       the connection.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:nflog_group, required_features: :nflog_group) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the jump target NFLOG.
       The netlink group (0 - 2^16-1) to which packets are (only applicable
       for nfnetlink_log). Defaults to 0.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       if value.to_i > (2**16) - 1 || value.to_i < 0
@@ -658,11 +658,11 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:nflog_prefix, required_features: :nflog_prefix) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the jump target NFLOG.
       A prefix string to include in the log message, up to 64 characters long,
       useful for distinguishing messages in the logs.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       if value.length > 64
@@ -672,20 +672,20 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:nflog_range, required_features: :nflog_range) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the jump target NFLOG.
       The number of bytes to be copied to userspace (only applicable for nfnetlink_log).
       nfnetlink_log instances may specify their own range, this option overrides it.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:nflog_threshold, required_features: :nflog_threshold) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the jump target NFLOG.
       Number of packets to queue inside the kernel before sending them to userspace
       (only applicable for nfnetlink_log). Higher values result in less overhead
       per packet, but increase delay until the packets reach userspace. Defaults to 1.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       if value.is_a?(String) && value =~ %r{^[-0-9]+$}
@@ -698,14 +698,14 @@ Puppet::Type.newtype(:firewall) do
 
   # ICMP matching property
   newproperty(:icmp, required_features: :icmp_match) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When matching ICMP packets, this is the type of ICMP packet to match.
 
       A value of "any" is not supported. To achieve this behaviour the
       parameter should simply be omitted or undefined.
       An array of values is also not supported. To match against multiple ICMP
       types, please use separate rules for each ICMP type.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       if value == 'any'
@@ -745,7 +745,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:state, array_matching: :all, required_features: :state_match) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Matches a packet based on its state in the firewall stateful inspection
       table. Values can be:
 
@@ -754,7 +754,7 @@ Puppet::Type.newtype(:firewall) do
       * NEW
       * RELATED
       * UNTRACKED
-    EOS
+    PUPPETCODE
 
     newvalues(:INVALID, :ESTABLISHED, :NEW, :RELATED, :UNTRACKED)
 
@@ -775,7 +775,7 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:ctstate, array_matching: :all, required_features: :state_match) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Matches a packet based on its state in the firewall stateful inspection
       table, using the conntrack module. Values can be:
 
@@ -784,7 +784,7 @@ Puppet::Type.newtype(:firewall) do
       * NEW
       * RELATED
       * UNTRACKED
-    EOS
+    PUPPETCODE
 
     newvalues(:INVALID, :ESTABLISHED, :NEW, :RELATED, :UNTRACKED)
 
@@ -806,10 +806,10 @@ Puppet::Type.newtype(:firewall) do
 
   # Connection mark
   newproperty(:connmark, required_features: :mark) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match the Netfilter mark value associated with the packet.  Accepts either of:
       mark/mask or mark.  These will be converted to hex if they are not already.
-    EOS
+    PUPPETCODE
     munge do |value|
       int_or_hex = '[a-fA-F0-9x]'
       match = value.to_s.match("(#{int_or_hex}+)(/)?(#{int_or_hex}+)?")
@@ -833,52 +833,52 @@ Puppet::Type.newtype(:firewall) do
 
   # Connection limiting properties
   newproperty(:connlimit_above, required_features: :connection_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Connection limiting value for matched connections above n.
-    EOS
+    PUPPETCODE
     newvalue(%r{^\d+$})
   end
 
   newproperty(:connlimit_mask, required_features: :connection_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Connection limiting by subnet mask for matched connections.
       IPv4: 0-32
       IPv6: 0-128
-    EOS
+    PUPPETCODE
     newvalue(%r{^\d+$})
   end
 
   # Hop limiting properties
   newproperty(:hop_limit, required_features: :hop_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Hop limiting value for matched packets.
-    EOS
+    PUPPETCODE
     newvalue(%r{^\d+$})
   end
 
   # Rate limiting properties
   newproperty(:limit, required_features: :rate_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Rate limiting value for matched packets. The format is:
       rate/[/second/|/minute|/hour|/day].
 
       Example values are: '50/sec', '40/min', '30/hour', '10/day'."
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:burst, required_features: :rate_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Rate limiting burst value (per second) before limit checks apply.
-    EOS
+    PUPPETCODE
     newvalue(%r{^\d+$})
   end
 
   newproperty(:uid, required_features: :owner) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       UID or Username owner matching rule.  Accepts a string argument
       only, as iptables does not accept multiple uid in a single
       statement.
-    EOS
+    PUPPETCODE
     def insync?(is)
       require 'etc'
 
@@ -921,11 +921,11 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:gid, required_features: :owner) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       GID or Group owner matching rule.  Accepts a string argument
       only, as iptables does not accept multiple gid in a single
       statement.
-    EOS
+    PUPPETCODE
     def insync?(is)
       require 'etc'
 
@@ -969,10 +969,10 @@ Puppet::Type.newtype(:firewall) do
 
   # match mark
   newproperty(:match_mark, required_features: :mark) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match the Netfilter mark value associated with the packet.  Accepts either of:
       mark/mask or mark.  These will be converted to hex if they are not already.
-    EOS
+    PUPPETCODE
     munge do |value|
       mark_regex = %r{\A((?:0x)?[0-9A-F]+)(/)?((?:0x)?[0-9A-F]+)?\z}i
       match = value.to_s.match(mark_regex)
@@ -998,10 +998,10 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:set_mark, required_features: :mark) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Set the Netfilter mark value associated with the packet.  Accepts either of:
       mark/mask or mark.  These will be converted to hex if they are not already.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       int_or_hex = '[a-fA-F0-9x]'
@@ -1040,23 +1040,23 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:clamp_mss_to_pmtu, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Sets the clamp mss to pmtu flag.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:set_dscp, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Set DSCP Markings.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:set_dscp_class, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       This sets the DSCP field according to a predefined DiffServ class.
-    EOS
+    PUPPETCODE
     #  iptables uses the cisco DSCP classes as the basis for this flag. Values may be found here:
     #  'http://www.cisco.com/c/en/us/support/docs/quality-of-service-qos/qos-packet-marking/10103-dscpvalues.html'
     valid_codes = %w[
@@ -1072,29 +1072,29 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:set_mss, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Sets the TCP MSS value for packets.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:pkttype, required_features: :pkttype) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Sets the packet type to match.
-    EOS
+    PUPPETCODE
 
     newvalues(:unicast, :broadcast, :multicast)
   end
 
   newproperty(:isfragment, required_features: :isfragment) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Set to true to match tcp fragments (requires type to be set to tcp)
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:recent, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Enable the recent module. Takes as an argument one of set, update,
       rcheck or remove. For example:
 
@@ -1119,7 +1119,7 @@ Puppet::Type.newtype(:firewall) do
           action      => 'DROP',
           chain       => 'FORWARD',
         }
-    EOS
+    PUPPETCODE
 
     newvalues(:set, :update, :rcheck, :remove)
     munge do |value|
@@ -1128,59 +1128,59 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:rdest, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Recent module; add the destination IP address to the list.
       Must be boolean true.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:rsource, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Recent module; add the source IP address to the list.
       Must be boolean true.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:rname, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Recent module; The name of the list. Takes a string argument.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:rseconds, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Recent module; used in conjunction with one of `recent => 'rcheck'` or
       `recent => 'update'`. When used, this will narrow the match to only
       happen when the address is in the list and was seen within the last given
       number of seconds.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:reap, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Recent module; can only be used in conjunction with the `rseconds`
       attribute. When used, this will cause entries older than 'seconds' to be
       purged.  Must be boolean true.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:rhitcount, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Recent module; used in conjunction with `recent => 'update'` or `recent
       => 'rcheck'. When used, this will narrow the match to only happen when
       the address is in the list and packets had been received greater than or
       equal to the given value.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:rttl, required_features: :recent_limiting) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Recent module; may only be used in conjunction with one of `recent =>
       'rcheck'` or `recent => 'update'`. When used, this will narrow the match
       to only happen when the address is in the list and the TTL of the current
@@ -1188,138 +1188,138 @@ Puppet::Type.newtype(:firewall) do
       This may be useful if you have problems with people faking their source
       address in order to DoS you via this module by disallowing others access
       to your site by sending bogus packets to you.  Must be boolean true.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:socket, required_features: :socket) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       If true, matches if an open socket can be found by doing a coket lookup
       on the packet.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:ishasmorefrags, required_features: :ishasmorefrags) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       If true, matches if the packet has it's 'more fragments' bit set. ipv6.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:islastfrag, required_features: :islastfrag) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       If true, matches if the packet is the last fragment. ipv6.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:isfirstfrag, required_features: :isfirstfrag) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       If true, matches if the packet is the first fragment.
       Sadly cannot be negated. ipv6.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:ipsec_policy, required_features: :ipsec_policy) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
        Sets the ipsec policy type. May take a combination of arguments for any flags that can be passed to `--pol ipsec` such as: `--strict`, `--reqid 100`, `--next`, `--proto esp`, etc.
-    EOS
+    PUPPETCODE
 
     newvalues(:none, :ipsec)
   end
 
   newproperty(:ipsec_dir, required_features: :ipsec_dir) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
        Sets the ipsec policy direction
-    EOS
+    PUPPETCODE
 
     newvalues(:in, :out)
   end
 
   newproperty(:stat_mode) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Set the matching mode for statistic matching. Supported modes are `random` and `nth`.
-    EOS
+    PUPPETCODE
 
     newvalues(:nth, :random)
   end
 
   newproperty(:stat_every) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match one packet every nth packet. Requires `stat_mode => 'nth'`
-    EOS
+    PUPPETCODE
 
     validate do |value|
       unless value =~ %r{^\d+$}
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           stat_every value must be a digit
-        EOS
+        PUPPETCODE
       end
 
       unless value.to_i > 0
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           stat_every value must be larger than 0
-        EOS
+        PUPPETCODE
       end
     end
   end
 
   newproperty(:stat_packet) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Set the initial counter value for the nth mode. Must be between 0 and the value of `stat_every`. Defaults to 0. Requires `stat_mode => 'nth'`
-    EOS
+    PUPPETCODE
 
     newvalues(%r{^\d+$})
   end
 
   newproperty(:stat_probability) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       unless value =~ %r{^([01])\.(\d+)$}
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           stat_probability must be between 0.0 and 1.0
-        EOS
+        PUPPETCODE
       end
 
       if Regexp.last_match(1).to_i == 1 && Regexp.last_match(2).to_i != 0
-        raise ArgumentError, <<-EOS
+        raise ArgumentError, <<-PUPPETCODE
           start_probability must be between 0.0 and 1.0
-        EOS
+        PUPPETCODE
       end
     end
   end
 
   newproperty(:mask, required_features: :mask) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Sets the mask to use when `recent` is enabled.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:gateway, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The TEE target will clone a packet and redirect this clone to another
       machine on the local network segment. gateway is the target host's IP.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:ipset, required_features: :ipset, array_matching: :all) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Matches against the specified ipset list.
       Requires ipset kernel module. Will accept a single element or an array.
       The value is the name of the blacklist, followed by a space, and then
       'src' and/or 'dst' separated by a comma.
       For example: 'blacklist src,dst'
-    EOS
+    PUPPETCODE
 
     def to_s?(value)
       should_to_s(value)
@@ -1332,80 +1332,80 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:checksum_fill, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Compute and fill missing packet checksums.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newparam(:line) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Read-only property for caching the rule line.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:mac_source) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       MAC Source
-    EOS
+    PUPPETCODE
     newvalues(%r{^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$}i)
   end
 
   newproperty(:physdev_in, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match if the packet is entering a bridge from the given interface.
-    EOS
+    PUPPETCODE
     newvalues(%r{^[a-zA-Z0-9\-\._\+]+$})
   end
 
   newproperty(:physdev_out, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match if the packet is leaving a bridge via the given interface.
-    EOS
+    PUPPETCODE
     newvalues(%r{^[a-zA-Z0-9\-\._\+]+$})
   end
 
   newproperty(:physdev_is_bridged, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match if the packet is transversing a bridge.
-    EOS
+    PUPPETCODE
     newvalues(:true, :false)
   end
 
   newproperty(:physdev_is_in, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Matches if the packet has entered through a bridge interface.
-    EOS
+    PUPPETCODE
     newvalues(:true, :false)
   end
 
   newproperty(:physdev_is_out, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Matches if the packet will leave through a bridge interface.
-    EOS
+    PUPPETCODE
     newvalues(:true, :false)
   end
 
   newproperty(:date_start, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Only match during the given time, which must be in ISO 8601 "T" notation.
       The possible time range is 1970-01-01T00:00:00 to 2038-01-19T04:17:07
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:date_stop, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Only match during the given time, which must be in ISO 8601 "T" notation.
       The possible time range is 1970-01-01T00:00:00 to 2038-01-19T04:17:07
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:time_start, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Only match during the given daytime. The possible time range is 00:00:00 to 23:59:59.
       Leading zeroes are allowed (e.g. "06:03") and correctly interpreted as base-10.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       if value =~ %r{^([0-9]):}
@@ -1421,10 +1421,10 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:time_stop, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Only match during the given daytime. The possible time range is 00:00:00 to 23:59:59.
       Leading zeroes are allowed (e.g. "06:03") and correctly interpreted as base-10.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       if value =~ %r{^([0-9]):}
@@ -1440,11 +1440,11 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:month_days, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Only match on the given days of the month. Possible values are 1 to 31.
       Note that specifying 31 will of course not match on months which do not have a 31st day;
       the same goes for 28- or 29-day February.
-    EOS
+    PUPPETCODE
 
     validate do |value|
       month = value.to_i
@@ -1458,85 +1458,85 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:week_days, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Only match on the given weekdays. Possible values are Mon, Tue, Wed, Thu, Fri, Sat, Sun.
-    EOS
+    PUPPETCODE
 
     newvalues(:Mon, :Tue, :Wed, :Thu, :Fri, :Sat, :Sun)
   end
 
   newproperty(:time_contiguous, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When time_stop is smaller than time_start value, match this as a single time period instead distinct intervals.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:kernel_timezone, required_features: :iptables) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Use the kernel timezone instead of UTC to determine whether a packet meets the time regulations.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:clusterip_new, required_features: :clusterip) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the CLUSTERIP jump target.
       Create a new ClusterIP. You always have to set this on the first rule for a given ClusterIP.
-    EOS
+    PUPPETCODE
 
     newvalues(:true, :false)
   end
 
   newproperty(:clusterip_hashmode, required_features: :clusterip) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the CLUSTERIP jump target.
       Specify the hashing mode. Valid values: sourceip, sourceip-sourceport, sourceip-sourceport-destport.
-    EOS
+    PUPPETCODE
 
     newvalues(:sourceip, :'sourceip-sourceport', :'sourceip-sourceport-destport')
   end
 
   newproperty(:clusterip_clustermac, required_features: :clusterip) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the CLUSTERIP jump target.
       Specify the ClusterIP MAC address. Has to be a link-layer multicast address.
-    EOS
+    PUPPETCODE
 
     newvalues(%r{^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$}i)
   end
 
   newproperty(:clusterip_total_nodes, required_features: :clusterip) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the CLUSTERIP jump target.
       Number of total nodes within this cluster.
-    EOS
+    PUPPETCODE
 
     newvalues(%r{\d+})
   end
 
   newproperty(:clusterip_local_node, required_features: :clusterip) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the CLUSTERIP jump target.
       Specify the random seed used for hash initialization.
-    EOS
+    PUPPETCODE
 
     newvalues(%r{\d+})
   end
 
   newproperty(:clusterip_hash_init, required_features: :clusterip) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with the CLUSTERIP jump target.
       Specify the random seed used for hash initialization.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:length, required_features: :length) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Sets the length of layer-3 payload to match.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       match = value.to_s.match('^([0-9]+)(-)?([0-9]+)?$')
@@ -1563,10 +1563,10 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:string, required_features: :string_matching) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       String matching feature. Matches the packet against the pattern
       given as an argument.
-    EOS
+    PUPPETCODE
 
     munge do |value|
       _value = "'" + value + "'"
@@ -1574,30 +1574,30 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:string_algo, required_features: :string_matching) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       String matching feature, pattern matching strategy.
-    EOS
+    PUPPETCODE
 
     newvalues(:bm, :kmp)
   end
 
   newproperty(:string_from, required_features: :string_matching) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       String matching feature, offset from which we start looking for any matching.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:string_to, required_features: :string_matching) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       String matching feature, offset up to which we should scan.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:queue_num, required_features: :queue_num) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with NFQUEUE jump target.
       What queue number to send packets to
-    EOS
+    PUPPETCODE
     munge do |value|
       match = value.to_s.match('^([0-9])*$')
       if match.nil?
@@ -1612,98 +1612,98 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:queue_bypass, required_features: :queue_bypass) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Used with NFQUEUE jump target
       Allow packets to bypass :queue_num if userspace process is not listening
-    EOS
+    PUPPETCODE
     newvalues(:true, :false)
   end
 
   newproperty(:src_cc) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       src attribute for the module geoip
-    EOS
+    PUPPETCODE
     newvalues(%r{^[A-Z]{2}(,[A-Z]{2})*$})
   end
 
   newproperty(:dst_cc) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       dst attribute for the module geoip
-    EOS
+    PUPPETCODE
     newvalues(%r{^[A-Z]{2}(,[A-Z]{2})*$})
   end
 
   newproperty(:hashlimit_name) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The name for the /proc/net/ipt_hashlimit/foo entry.
       This parameter is required.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_upto) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match if the rate is below or equal to amount/quantum. It is specified either as a number, with an optional time quantum suffix (the default is 3/hour), or as amountb/second (number of bytes per second).
       This parameter or hashlimit_above is required.
       Allowed forms are '40','40/second','40/minute','40/hour','40/day'.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_above) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Match if the rate is above amount/quantum.
       This parameter or hashlimit_upto is required.
       Allowed forms are '40','40/second','40/minute','40/hour','40/day'.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_burst) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Maximum initial number of packets to match: this number gets recharged by one every time the limit specified above is not reached, up to this number; the default is 5. When byte-based rate matching is requested, this option specifies the amount of bytes that can exceed the given rate. This option should be used with caution -- if the entry expires, the burst value is reset too.
-    EOS
+    PUPPETCODE
     newvalue(%r{^\d+$})
   end
 
   newproperty(:hashlimit_mode) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       A comma-separated list of objects to take into consideration. If no --hashlimit-mode option is given, hashlimit acts like limit, but at the expensive of doing the hash housekeeping.
       Allowed values are: srcip, srcport, dstip, dstport
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_srcmask) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       When --hashlimit-mode srcip is used, all source addresses encountered will be grouped according to the given prefix length and the so-created subnet will be subject to hashlimit. prefix must be between (inclusive) 0 and 32. Note that --hashlimit-srcmask 0 is basically doing the same thing as not specifying srcip for --hashlimit-mode, but is technically more expensive.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_dstmask) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Like --hashlimit-srcmask, but for destination addresses.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_htable_size) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       The number of buckets of the hash table
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_htable_max) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       Maximum entries in the hash.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_htable_expire) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       After how many milliseconds do hash entries expire.
-    EOS
+    PUPPETCODE
   end
 
   newproperty(:hashlimit_htable_gcinterval) do
-    desc <<-EOS
+    desc <<-PUPPETCODE
       How many milliseconds between garbage collection intervals.
-    EOS
+    PUPPETCODE
   end
 
   autorequire(:firewallchain) do

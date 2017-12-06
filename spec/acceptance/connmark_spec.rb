@@ -2,15 +2,15 @@ require 'spec_helper_acceptance'
 
 describe 'connmark property' do
   describe 'connmark' do
-    context '50' do
-      pp = <<-EOS
+    context 'when 50' do
+      pp = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '502 - test':
             proto    => 'all',
             connmark => '0x1',
             action   => reject,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp, catch_failures: true)
       end
