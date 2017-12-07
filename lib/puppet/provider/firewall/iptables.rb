@@ -394,7 +394,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
     end
     # we do a similar thing for negated address masks (source and destination).
-    values = values.gsub(%r{(-\S+) (!)\s?(\S*)}, '\1 "\2 \3"')
+    values = values.gsub(%r{(?<=\s)(-\S+) (!)\s?(\S*)}, '\1 "\2 \3"')
     # fix negated physdev rules
     values = values.gsub(%r{-m physdev ! (--physdev-is-\S+)}, '-m physdev \1 "!"')
     # the actual rule will have the ! mark before the option.
