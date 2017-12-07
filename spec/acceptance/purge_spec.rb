@@ -6,7 +6,7 @@ describe 'purge tests' do
     ip6tables_flush_all_tables
   end
 
-  context('resources purge') do
+  context('when resources purge') do
     before(:all) do
       iptables_flush_all_tables
 
@@ -14,12 +14,12 @@ describe 'purge tests' do
       shell('iptables -A INPUT -s 1.2.1.2')
     end
 
-    pp1 = <<-EOS
+    pp1 = <<-PUPPETCODE
         class { 'firewall': }
         resources { 'firewall':
           purge => true,
         }
-    EOS
+    PUPPETCODE
     it 'make sure duplicate existing rules get purged' do
       apply_manifest(pp1, expect_changes: true)
     end
@@ -32,7 +32,7 @@ describe 'purge tests' do
     end
   end
 
-  context('ipv4 chain purge') do
+  context('when ipv4 chain purge') do
     after(:all) do
       iptables_flush_all_tables
     end
@@ -44,12 +44,12 @@ describe 'purge tests' do
       shell('iptables -A OUTPUT -s 1.2.1.2 -m comment --comment "010 output-1.2.1.2"')
     end
 
-    pp2 = <<-EOS
+    pp2 = <<-PUPPETCODE
         class { 'firewall': }
         firewallchain { 'INPUT:filter:IPv4':
           purge => true,
         }
-    EOS
+    PUPPETCODE
     # rubocop:disable RSpec/ExampleLength
     it 'purges only the specified chain' do # rubocop:disable RSpec/MultipleExpectations
       apply_manifest(pp2, expect_changes: true)
@@ -62,7 +62,7 @@ describe 'purge tests' do
     end
     # rubocop:enable RSpec/ExampleLength
 
-    pp3 = <<-EOS
+    pp3 = <<-PUPPETCODE
         class { 'firewall': }
         firewallchain { 'OUTPUT:filter:IPv4':
           purge => true,
@@ -72,12 +72,12 @@ describe 'purge tests' do
           proto  => 'all',
           source => '1.2.1.2',
         }
-    EOS
+    PUPPETCODE
     it 'ignores managed rules' do
       apply_manifest(pp3, catch_changes: do_catch_changes)
     end
 
-    pp4 = <<-EOS
+    pp4 = <<-PUPPETCODE
         class { 'firewall': }
         firewallchain { 'INPUT:filter:IPv4':
           purge => true,
@@ -85,12 +85,12 @@ describe 'purge tests' do
             '-s 1\.2\.1\.1',
           ],
         }
-    EOS
+    PUPPETCODE
     it 'ignores specified rules' do
       apply_manifest(pp4, catch_changes: do_catch_changes)
     end
 
-    pp5 = <<-EOS
+    pp5 = <<-PUPPETCODE
         class { 'firewall': }
         firewallchain { 'INPUT:filter:IPv4':
           purge => true,
@@ -118,7 +118,7 @@ describe 'purge tests' do
           proto  => 'all',
           source => '1.2.1.3',
         }
-    EOS
+    PUPPETCODE
     it 'adds managed rules with ignored rules' do
       apply_manifest(pp5, catch_failures: true)
 
@@ -127,7 +127,7 @@ describe 'purge tests' do
   end
 
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
-    context 'ipv6 chain purge' do
+    context 'when ipv6 chain purge' do
       after(:all) do
         ip6tables_flush_all_tables
       end
@@ -139,12 +139,12 @@ describe 'purge tests' do
         shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
       end
 
-      pp6 = <<-EOS
+      pp6 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv6':
             purge => true,
           }
-      EOS
+      PUPPETCODE
       # rubocop:disable RSpec/ExampleLength
       it 'purges only the specified chain' do # rubocop:disable RSpec/MultipleExpectations
         apply_manifest(pp6, expect_changes: true)
@@ -157,7 +157,7 @@ describe 'purge tests' do
       end
       # rubocop:enable RSpec/ExampleLength
 
-      pp7 = <<-EOS
+      pp7 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'OUTPUT:filter:IPv6':
             purge => true,
@@ -168,12 +168,12 @@ describe 'purge tests' do
             source   => '1::50',
             provider => 'ip6tables',
           }
-      EOS
+      PUPPETCODE
       it 'ignores managed rules' do
         apply_manifest(pp7, catch_changes: do_catch_changes)
       end
 
-      pp8 = <<-EOS
+      pp8 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv6':
             purge => true,
@@ -181,12 +181,12 @@ describe 'purge tests' do
               '-s 1::42',
             ],
           }
-      EOS
+      PUPPETCODE
       it 'ignores specified rules' do
         apply_manifest(pp8, catch_changes: do_catch_changes)
       end
 
-      pp9 = <<-EOS
+      pp9 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv6':
             purge => true,
@@ -218,7 +218,7 @@ describe 'purge tests' do
             source   => '1::43',
             provider => 'ip6tables',
           }
-      EOS
+      PUPPETCODE
       it 'adds managed rules with ignored rules' do
         apply_manifest(pp9, catch_failures: true)
 

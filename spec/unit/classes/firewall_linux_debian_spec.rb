@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'firewall::linux::debian', type: :class do
-  context 'Debian 7' do
+  context 'with Debian 7' do
     let(:facts) do
       {
         osfamily: 'Debian',
@@ -24,7 +24,7 @@ describe 'firewall::linux::debian', type: :class do
     }
   end
 
-  context 'deb7 enable => false' do
+  context 'with deb7 enable => false' do
     let(:facts) do
       {
         osfamily: 'Debian',
@@ -41,7 +41,7 @@ describe 'firewall::linux::debian', type: :class do
     }
   end
 
-  context 'Debian 8' do
+  context 'with Debian 8' do
     let(:facts) do
       {
         osfamily: 'Debian',
@@ -64,7 +64,7 @@ describe 'firewall::linux::debian', type: :class do
     }
   end
 
-  context 'deb8 enable => false' do
+  context 'with deb8 enable => false' do
     let(:facts) do
       {
         osfamily: 'Debian',
@@ -81,7 +81,7 @@ describe 'firewall::linux::debian', type: :class do
     }
   end
 
-  context 'Debian 8, alt operatingsystem' do
+  context 'with Debian 8, alt operatingsystem' do
     let(:facts) do
       {
         osfamily: 'Debian',
@@ -104,7 +104,7 @@ describe 'firewall::linux::debian', type: :class do
     }
   end
 
-  context 'deb8, alt operatingsystem, enable => false' do
+  context 'with deb8, alt operatingsystem, enable => false' do
     let(:facts) do
       {
         osfamily: 'Debian',

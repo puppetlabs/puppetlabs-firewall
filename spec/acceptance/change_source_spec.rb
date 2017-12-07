@@ -7,7 +7,7 @@ describe 'changing the source' do
   end
 
   describe 'when unmanaged rules exist' do
-    pp1 = <<-EOS
+    pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '101 test source changes':
             proto  => tcp,
@@ -21,7 +21,7 @@ describe 'changing the source' do
             action => accept,
             source => '8.0.0.2',
           }
-    EOS
+    PUPPETCODE
     it 'applies with 8.0.0.1 first' do
       apply_manifest(pp1, catch_failures: true)
     end
@@ -42,7 +42,7 @@ describe 'changing the source' do
       end
     end
 
-    pp2 = <<-EOS
+    pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '101 test source changes':
             proto  => tcp,
@@ -50,7 +50,7 @@ describe 'changing the source' do
             action => accept,
             source => '8.0.0.4',
           }
-    EOS
+    PUPPETCODE
     it 'changes to 8.0.0.4 second' do
       expect(apply_manifest(pp2, catch_failures: true).stdout)
         .to match(%r{Notice: \/Stage\[main\]\/Main\/Firewall\[101 test source changes\]\/source: source changed '8\.0\.0\.1\/32' to '8\.0\.0\.4\/32'})

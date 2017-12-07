@@ -7,21 +7,21 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'name' do
-    context 'valid' do
-      pp1 = <<-EOS
+    context 'when valid' do
+      pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '001 - test': ensure => present }
-      EOS
+      PUPPETCODE
       it 'applies cleanly' do
         apply_manifest(pp1, catch_failures: true)
       end
     end
 
-    context 'invalid' do
-      pp2 = <<-EOS
+    context 'when invalid' do
+      pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { 'test': ensure => present }
-      EOS
+      PUPPETCODE
       it 'fails' do
         apply_manifest(pp2, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{Invalid value "test".})
@@ -31,15 +31,15 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'ensure' do
-    context 'default' do
-      pp3 = <<-EOS
+    context 'when default' do
+      pp3 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '555 - test':
             proto  => tcp,
             port   => '555',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp3, catch_failures: true)
       end
@@ -51,8 +51,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'present' do
-      pp4 = <<-EOS
+    context 'when present' do
+      pp4 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '555 - test':
             ensure => present,
@@ -60,7 +60,7 @@ describe 'firewall basics', docker: true do
             port   => '555',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp4, catch_failures: true)
       end
@@ -72,8 +72,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'absent' do
-      pp5 = <<-EOS
+    context 'when absent' do
+      pp5 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '555 - test':
             ensure => absent,
@@ -81,7 +81,7 @@ describe 'firewall basics', docker: true do
             port   => '555',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp5, catch_failures: true)
       end
@@ -95,8 +95,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'source' do
-    context '192.168.2.0/24' do
-      pp7 = <<-EOS
+    context 'when 192.168.2.0/24' do
+      pp7 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '556 - test':
             proto  => tcp,
@@ -104,7 +104,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             source => '192.168.2.0/24',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp7, catch_failures: true)
         apply_manifest(pp7, catch_changes: do_catch_changes)
@@ -117,8 +117,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context '! 192.168.2.0/24' do
-      pp8 = <<-EOS
+    context 'when ! 192.168.2.0/24' do
+      pp8 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '556 - test':
             proto  => tcp,
@@ -126,7 +126,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             source => '! 192.168.2.0/24',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp8, catch_failures: true)
         apply_manifest(pp8, catch_changes: do_catch_changes)
@@ -140,8 +140,8 @@ describe 'firewall basics', docker: true do
     end
 
     # Invalid address
-    context '256.168.2.0/24' do
-      pp9 = <<-EOS
+    context 'when 256.168.2.0/24' do
+      pp9 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '556 - test':
             proto  => tcp,
@@ -149,7 +149,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             source => '256.168.2.0/24',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp9, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{host_to_ip failed for 256.168.2.0\/(24|255\.255\.255\.0)})
@@ -165,8 +165,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'src_range' do
-    context '192.168.1.1-192.168.1.10' do
-      pp10 = <<-EOS
+    context 'when 192.168.1.1-192.168.1.10' do
+      pp10 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '557 - test':
             proto  => tcp,
@@ -174,7 +174,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             src_range => '192.168.1.1-192.168.1.10',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp10, catch_failures: true)
         apply_manifest(pp10, catch_changes: do_catch_changes)
@@ -188,8 +188,8 @@ describe 'firewall basics', docker: true do
     end
 
     # Invalid IP
-    context '392.168.1.1-192.168.1.10' do
-      pp11 = <<-EOS
+    context 'when 392.168.1.1-192.168.1.10' do
+      pp11 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '557 - test':
             proto  => tcp,
@@ -197,7 +197,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             src_range => '392.168.1.1-192.168.1.10',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp11, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{Invalid IP address "392.168.1.1" in range "392.168.1.1-192.168.1.10"})
@@ -213,8 +213,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'destination' do
-    context '192.168.2.0/24' do
-      pp12 = <<-EOS
+    context 'when 192.168.2.0/24' do
+      pp12 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '558 - test':
             proto  => tcp,
@@ -222,7 +222,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             destination => '192.168.2.0/24',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp12, catch_failures: true)
         apply_manifest(pp12, catch_changes: do_catch_changes)
@@ -235,8 +235,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context '! 192.168.2.0/24' do
-      pp13 = <<-EOS
+    context 'when ! 192.168.2.0/24' do
+      pp13 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '558 - test':
             proto  => tcp,
@@ -244,7 +244,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             destination => '! 192.168.2.0/24',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp13, catch_failures: true)
         apply_manifest(pp13, catch_changes: do_catch_changes)
@@ -258,8 +258,8 @@ describe 'firewall basics', docker: true do
     end
 
     # Invalid address
-    context '256.168.2.0/24' do
-      pp14 = <<-EOS
+    context 'when 256.168.2.0/24' do
+      pp14 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '558 - test':
             proto  => tcp,
@@ -267,7 +267,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             destination => '256.168.2.0/24',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp14, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{host_to_ip failed for 256.168.2.0\/(24|255\.255\.255\.0)})
@@ -283,8 +283,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'dst_range' do
-    context '192.168.1.1-192.168.1.10' do
-      pp15 = <<-EOS
+    context 'when 192.168.1.1-192.168.1.10' do
+      pp15 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '559 - test':
             proto  => tcp,
@@ -292,7 +292,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             dst_range => '192.168.1.1-192.168.1.10',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp15, catch_failures: true)
         apply_manifest(pp15, catch_changes: do_catch_changes)
@@ -306,8 +306,8 @@ describe 'firewall basics', docker: true do
     end
 
     # Invalid IP
-    context '392.168.1.1-192.168.1.10' do
-      pp16 = <<-EOS
+    context 'when 392.168.1.1-192.168.1.10' do
+      pp16 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '559 - test':
             proto  => tcp,
@@ -315,7 +315,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             dst_range => '392.168.1.1-192.168.1.10',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp16, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{Invalid IP address "392.168.1.1" in range "392.168.1.1-192.168.1.10"})
@@ -331,15 +331,15 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'sport' do
-    context 'single port' do
-      pp17 = <<-EOS
+    context 'when single port' do
+      pp17 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '560 - test':
             proto  => tcp,
             sport  => '560',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp17, catch_failures: true)
       end
@@ -351,15 +351,15 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'multiple ports' do
-      pp18 = <<-EOS
+    context 'when multiple ports' do
+      pp18 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '560 - test':
             proto  => tcp,
             sport  => '560-561',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp18, catch_failures: true)
       end
@@ -371,15 +371,15 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'invalid ports' do
-      pp19 = <<-EOS
+    context 'when invalid ports' do
+      pp19 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '560 - test':
             proto  => tcp,
             sport  => '9999560-561',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp19, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{invalid port\/service `9999560' specified})
@@ -395,15 +395,15 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'dport' do
-    context 'single port' do
-      pp20 = <<-EOS
+    context 'when single port' do
+      pp20 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '561 - test':
             proto  => tcp,
             dport  => '561',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp20, catch_failures: true)
       end
@@ -415,15 +415,15 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'multiple ports' do
-      pp21 = <<-EOS
+    context 'when multiple ports' do
+      pp21 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '561 - test':
             proto  => tcp,
             dport  => '561-562',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp21, catch_failures: true)
       end
@@ -435,15 +435,15 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'invalid ports' do
-      pp22 = <<-EOS
+    context 'when invalid ports' do
+      pp22 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '561 - test':
             proto  => tcp,
             dport  => '9999561-562',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp22, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{invalid port\/service `9999561' specified})
@@ -459,15 +459,15 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'port' do
-    context 'single port' do
-      pp23 = <<-EOS
+    context 'when single port' do
+      pp23 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '562 - test':
             proto  => tcp,
             port  => '562',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp23, catch_failures: true)
       end
@@ -479,15 +479,15 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'multiple ports' do
-      pp24 = <<-EOS
+    context 'when multiple ports' do
+      pp24 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '562 - test':
             proto  => tcp,
             port  => '562-563',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp24, catch_failures: true)
       end
@@ -499,15 +499,15 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'invalid ports' do
-      pp25 = <<-EOS
+    context 'when invalid ports' do
+      pp25 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '562 - test':
             proto  => tcp,
             port  => '9999562-563',
             action => accept,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp25, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{invalid port\/service `9999562' specified})
@@ -524,15 +524,15 @@ describe 'firewall basics', docker: true do
 
   %w[dst_type src_type].each do |type|
     describe type.to_s do
-      context 'MULTICAST' do
-        pp26 = <<-EOS
+      context 'when MULTICAST' do
+        pp26 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '563 - test':
               proto  => tcp,
               action => accept,
               #{type} => 'MULTICAST',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp26, catch_failures: true)
         end
@@ -544,15 +544,15 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context '! MULTICAST' do
-        pp27 = <<-EOS
+      context 'when ! MULTICAST' do
+        pp27 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '563 - test inversion':
               proto  => tcp,
               action => accept,
               #{type} => '! MULTICAST',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp27, catch_failures: true)
           apply_manifest(pp27, catch_changes: do_catch_changes)
@@ -565,15 +565,15 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'BROKEN' do
-        pp28 = <<-EOS
+      context 'when BROKEN' do
+        pp28 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '563 - test':
               proto  => tcp,
               action => accept,
               #{type} => 'BROKEN',
             }
-        EOS
+        PUPPETCODE
         it 'fails' do
           apply_manifest(pp28, expect_failures: true) do |r|
             expect(r.stderr).to match(%r{Invalid value "BROKEN".})
@@ -590,15 +590,15 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'tcp_flags' do
-    context 'FIN,SYN ACK' do
-      pp29 = <<-EOS
+    context 'when FIN,SYN ACK' do
+      pp29 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '564 - test':
             proto  => tcp,
             action => accept,
             tcp_flags => 'FIN,SYN ACK',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp29, catch_failures: true)
       end
@@ -612,15 +612,15 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'chain' do
-    context 'INPUT' do
-      pp30 = <<-EOS
+    context 'when INPUT' do
+      pp30 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '565 - test':
             proto  => tcp,
             action => accept,
             chain  => 'FORWARD',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp30, catch_failures: true)
       end
@@ -634,15 +634,15 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'table' do
-    context 'mangle' do
-      pp31 = <<-EOS
+    context 'when mangle' do
+      pp31 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '566 - test':
             proto  => tcp,
             action => accept,
             table  => 'mangle',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp31, catch_failures: true)
       end
@@ -653,8 +653,8 @@ describe 'firewall basics', docker: true do
         end
       end
     end
-    context 'nat' do
-      pp32 = <<-EOS
+    context 'when nat' do
+      pp32 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '566 - test2':
             proto  => tcp,
@@ -662,7 +662,7 @@ describe 'firewall basics', docker: true do
             table  => 'nat',
             chain  => 'OUTPUT',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp32, catch_failures: true)
       end
@@ -680,8 +680,8 @@ describe 'firewall basics', docker: true do
       iptables_flush_all_tables
     end
 
-    context 'MARK' do
-      pp33 = <<-EOS
+    context 'when MARK' do
+      pp33 = <<-PUPPETCODE
           class { '::firewall': }
           firewallchain { 'TEST:filter:IPv4':
             ensure => present,
@@ -691,7 +691,7 @@ describe 'firewall basics', docker: true do
             chain  => 'INPUT',
             jump  => 'TEST',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp33, catch_failures: true)
       end
@@ -703,8 +703,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'jump and apply' do
-      pp34 = <<-EOS
+    context 'when jump and apply' do
+      pp34 = <<-PUPPETCODE
           class { '::firewall': }
           firewallchain { 'TEST:filter:IPv4':
             ensure => present,
@@ -715,7 +715,7 @@ describe 'firewall basics', docker: true do
             action => 'accept',
             jump  => 'TEST',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp34, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{Only one of the parameters 'action' and 'jump' can be set})
@@ -731,8 +731,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'tosource' do
-    context '192.168.1.1' do
-      pp35 = <<-EOS
+    context 'when 192.168.1.1' do
+      pp35 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '568 - test':
             proto  => tcp,
@@ -741,7 +741,7 @@ describe 'firewall basics', docker: true do
             jump  => 'SNAT',
             tosource => '192.168.1.1',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp35, catch_failures: true)
       end
@@ -755,8 +755,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'todest' do
-    context '192.168.1.1' do
-      pp36 = <<-EOS
+    context 'when 192.168.1.1' do
+      pp36 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '569 - test':
             proto  => tcp,
@@ -766,7 +766,7 @@ describe 'firewall basics', docker: true do
             source => '200.200.200.200',
             todest => '192.168.1.1',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp36, catch_failures: true)
       end
@@ -780,8 +780,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'toports' do
-    context '192.168.1.1' do
-      pp37 = <<-EOS
+    context 'when 192.168.1.1' do
+      pp37 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '570 - test':
             proto  => icmp,
@@ -790,7 +790,7 @@ describe 'firewall basics', docker: true do
             jump  => 'REDIRECT',
             toports => '2222',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp37, catch_failures: true)
       end
@@ -805,8 +805,8 @@ describe 'firewall basics', docker: true do
 
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{ubuntu-10\.04} && default['platform'] !~ %r{debian-6} && default['platform'] !~ %r{sles}
     describe 'checksum_fill' do
-      context 'virbr' do
-        pp38 = <<-EOS
+      context 'when virbr' do
+        pp38 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '576 - test':
               proto  => udp,
@@ -818,7 +818,7 @@ describe 'firewall basics', docker: true do
               checksum_fill => true,
               provider => iptables,
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp38, catch_failures: true)
         end
@@ -832,8 +832,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'checksum_fill6' do
-      context 'virbr' do
-        pp39 = <<-EOS
+      context 'when virbr' do
+        pp39 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '576 - test':
               proto  => udp,
@@ -845,7 +845,7 @@ describe 'firewall basics', docker: true do
               checksum_fill => true,
               provider => ip6tables,
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp39, catch_failures: true)
         end
@@ -862,8 +862,8 @@ describe 'firewall basics', docker: true do
   # RHEL5 does not support --random
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'random' do
-      context '192.168.1.1' do
-        pp40 = <<-EOS
+      context 'when 192.168.1.1' do
+        pp40 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '570 - test 2':
               proto  => all,
@@ -873,7 +873,7 @@ describe 'firewall basics', docker: true do
               source => '172.30.0.0/16',
               random => true
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp40, catch_failures: true)
           apply_manifest(pp40, catch_changes: do_catch_changes)
@@ -889,14 +889,14 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'icmp' do
-    context 'any' do
-      pp41 = <<-EOS
+    context 'when any' do
+      pp41 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '571 - test':
             proto  => icmp,
             icmp   => 'any',
           }
-      EOS
+      PUPPETCODE
       it 'fails' do
         apply_manifest(pp41, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{This behaviour should be achieved by omitting or undefining the ICMP parameter})
@@ -915,8 +915,8 @@ describe 'firewall basics', docker: true do
   # iptables version 1.4.7 fails for multiple hl entries
   if default['platform'] !~ %r{(el-5|el-6|sles-10|sles-11)}
     describe 'hop_limit' do
-      context '5' do
-        pp42 = <<-EOS
+      context 'when 5' do
+        pp42 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '571 - test':
               ensure => present,
@@ -926,7 +926,7 @@ describe 'firewall basics', docker: true do
               hop_limit => '5',
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp42, catch_failures: true)
         end
@@ -938,8 +938,8 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'invalid' do
-        pp43 = <<-EOS
+      context 'when invalid' do
+        pp43 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '571 - test':
               ensure => present,
@@ -949,7 +949,7 @@ describe 'firewall basics', docker: true do
               hop_limit => 'invalid',
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp43, expect_failures: true) do |r|
             expect(r.stderr).to match(%r{Invalid value "invalid".})
@@ -965,8 +965,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'ishasmorefrags' do
-      context 'true' do
-        pp44 = <<-EOS
+      context 'when true' do
+        pp44 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '587 - test':
               ensure => present,
@@ -976,7 +976,7 @@ describe 'firewall basics', docker: true do
               ishasmorefrags => true,
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp44, catch_failures: true)
         end
@@ -988,8 +988,8 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'false' do
-        pp45 = <<-EOS
+      context 'when false' do
+        pp45 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '588 - test':
               ensure => present,
@@ -999,7 +999,7 @@ describe 'firewall basics', docker: true do
               ishasmorefrags => false,
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp45, catch_failures: true)
         end
@@ -1013,8 +1013,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'islastfrag' do
-      context 'true' do
-        pp46 = <<-EOS
+      context 'when true' do
+        pp46 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '589 - test':
               ensure => present,
@@ -1024,7 +1024,7 @@ describe 'firewall basics', docker: true do
               islastfrag => true,
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp46, catch_failures: true)
         end
@@ -1036,8 +1036,8 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'false' do
-        pp47 = <<-EOS
+      context 'when false' do
+        pp47 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '590 - test':
               ensure => present,
@@ -1047,7 +1047,7 @@ describe 'firewall basics', docker: true do
               islastfrag => false,
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp47, catch_failures: true)
         end
@@ -1061,8 +1061,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'isfirstfrag' do
-      context 'true' do
-        pp48 = <<-EOS
+      context 'when true' do
+        pp48 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '591 - test':
               ensure => present,
@@ -1072,7 +1072,7 @@ describe 'firewall basics', docker: true do
               isfirstfrag => true,
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp48, catch_failures: true)
         end
@@ -1084,8 +1084,8 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'false' do
-        pp49 = <<-EOS
+      context 'when false' do
+        pp49 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '592 - test':
               ensure => present,
@@ -1095,7 +1095,7 @@ describe 'firewall basics', docker: true do
               isfirstfrag => false,
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp49, catch_failures: true)
         end
@@ -1109,8 +1109,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'tcp_flags' do
-      context 'FIN,SYN ACK' do
-        pp50 = <<-EOS
+      context 'when FIN,SYN ACK' do
+        pp50 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '593 - test':
             proto  => tcp,
@@ -1118,7 +1118,7 @@ describe 'firewall basics', docker: true do
             tcp_flags => 'FIN,SYN ACK',
             provider => 'ip6tables',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp50, catch_failures: true)
         end
@@ -1132,8 +1132,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'src_range' do
-      context '2001:db8::1-2001:db8::ff' do
-        pp51 = <<-EOS
+      context 'when 2001:db8::1-2001:db8::ff' do
+        pp51 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '601 - test':
             proto     => tcp,
@@ -1142,7 +1142,7 @@ describe 'firewall basics', docker: true do
             src_range => '2001:db8::1-2001:db8::ff',
             provider  => 'ip6tables',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp51, catch_failures: true)
           apply_manifest(pp51, catch_changes: do_catch_changes)
@@ -1156,8 +1156,8 @@ describe 'firewall basics', docker: true do
       end
 
       # Invalid IP
-      context '2001::db8::1-2001:db8::ff' do
-        pp52 = <<-EOS
+      context 'when 2001::db8::1-2001:db8::ff' do
+        pp52 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '601 - test':
             proto     => tcp,
@@ -1166,7 +1166,7 @@ describe 'firewall basics', docker: true do
             provider  => 'ip6tables',
             src_range => '2001::db8::1-2001:db8::ff',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp52, expect_failures: true) do |r|
             expect(r.stderr).to match(%r{Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"})
@@ -1182,8 +1182,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'dst_range' do
-      context '2001:db8::1-2001:db8::ff' do
-        pp53 = <<-EOS
+      context 'when 2001:db8::1-2001:db8::ff' do
+        pp53 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '602 - test':
             proto     => tcp,
@@ -1192,7 +1192,7 @@ describe 'firewall basics', docker: true do
             dst_range => '2001:db8::1-2001:db8::ff',
             provider  => 'ip6tables',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp53, catch_failures: true)
           apply_manifest(pp53, catch_changes: do_catch_changes)
@@ -1206,8 +1206,8 @@ describe 'firewall basics', docker: true do
       end
 
       # Invalid IP
-      context '2001::db8::1-2001:db8::ff' do
-        pp54 = <<-EOS
+      context 'when 2001::db8::1-2001:db8::ff' do
+        pp54 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '602 - test':
             proto     => tcp,
@@ -1216,7 +1216,7 @@ describe 'firewall basics', docker: true do
             provider  => 'ip6tables',
             dst_range => '2001::db8::1-2001:db8::ff',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp54, expect_failures: true) do |r|
             expect(r.stderr).to match(%r{Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"})
@@ -1232,8 +1232,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'mac_source' do
-      context '0A:1B:3C:4D:5E:6F' do
-        pp55 = <<-EOS
+      context 'when 0A:1B:3C:4D:5E:6F' do
+        pp55 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '604 - test':
             ensure      => present,
@@ -1242,7 +1242,7 @@ describe 'firewall basics', docker: true do
             chain       => 'INPUT',
             provider    => 'ip6tables',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp55, catch_failures: true)
         end
@@ -1258,8 +1258,8 @@ describe 'firewall basics', docker: true do
     # ip6tables has limited `-m socket` support
     if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{ubuntu-10\.04} && default['platform'] !~ %r{debian-6} && default['platform'] !~ %r{sles}
       describe 'socket' do
-        context 'true' do
-          pp56 = <<-EOS
+        context 'when true' do
+          pp56 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '605 - test':
                 ensure   => present,
@@ -1270,7 +1270,7 @@ describe 'firewall basics', docker: true do
                 socket   => true,
                 provider => 'ip6tables',
               }
-          EOS
+          PUPPETCODE
           it 'applies' do
             apply_manifest(pp56, catch_failures: true)
           end
@@ -1282,8 +1282,8 @@ describe 'firewall basics', docker: true do
           end
         end
 
-        context 'false' do
-          pp57 = <<-EOS
+        context 'when false' do
+          pp57 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '606 - test':
                 ensure   => present,
@@ -1294,7 +1294,7 @@ describe 'firewall basics', docker: true do
                 socket   => false,
                 provider => 'ip6tables',
               }
-          EOS
+          PUPPETCODE
           it 'applies' do
             apply_manifest(pp57, catch_failures: true)
           end
@@ -1309,8 +1309,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'ipsec_policy' do
-      context 'ipsec' do
-        pp58 = <<-EOS
+      context 'when ipsec' do
+        pp58 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '607 - test':
               ensure       => 'present',
@@ -1324,7 +1324,7 @@ describe 'firewall basics', docker: true do
               table        => 'filter',
               provider     => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp58, catch_failures: true)
         end
@@ -1336,8 +1336,8 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'none' do
-        pp59 = <<-EOS
+      context 'when none' do
+        pp59 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '608 - test':
             ensure       => 'present',
@@ -1351,7 +1351,7 @@ describe 'firewall basics', docker: true do
             table        => 'filter',
             provider     => 'ip6tables',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp59, catch_failures: true)
         end
@@ -1365,8 +1365,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'ipsec_dir' do
-      context 'out' do
-        pp60 = <<-EOS
+      context 'when out' do
+        pp60 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '609 - test':
             ensure       => 'present',
@@ -1380,7 +1380,7 @@ describe 'firewall basics', docker: true do
             table        => 'filter',
             provider     => 'ip6tables',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp60, catch_failures: true)
         end
@@ -1392,8 +1392,8 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'in' do
-        pp61 = <<-EOS
+      context 'when in' do
+        pp61 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '610 - test':
             ensure       => 'present',
@@ -1407,7 +1407,7 @@ describe 'firewall basics', docker: true do
             table        => 'filter',
             provider     => 'ip6tables',
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp61, catch_failures: true)
         end
@@ -1421,8 +1421,8 @@ describe 'firewall basics', docker: true do
     end
 
     describe 'set_mark' do
-      context '0x3e8/0xffffffff' do
-        pp62 = <<-EOS
+      context 'when 0x3e8/0xffffffff' do
+        pp62 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '611 - test':
               ensure => present,
@@ -1434,7 +1434,7 @@ describe 'firewall basics', docker: true do
               set_mark => '0x3e8/0xffffffff',
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp62, catch_failures: true)
         end
@@ -1452,7 +1452,7 @@ describe 'firewall basics', docker: true do
       # ipset is really difficult to test, just testing on one platform
       if default['platform'] =~ %r{ubuntu-14\.04}
         describe 'ipset' do
-          pp63 = <<-EOS
+          pp63 = <<-PUPPETCODE
             exec { 'hackery pt 1':
               command => 'service iptables-persistent flush',
               path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
@@ -1493,7 +1493,7 @@ describe 'firewall basics', docker: true do
               provider => 'ip6tables',
               require  => Exec['add honeypot'],
             }
-          EOS
+          PUPPETCODE
           it 'applies' do
             apply_manifest(pp63, catch_failures: true)
           end
@@ -1509,7 +1509,7 @@ describe 'firewall basics', docker: true do
       # mask isn't supported on deb7
       if default['platform'] !~ %r{debian-7}
         describe 'mask' do
-          pp64 = <<-EOS
+          pp64 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '613 - test':
               recent => 'update',
@@ -1521,7 +1521,7 @@ describe 'firewall basics', docker: true do
               mask => 'ffff::',
               provider => 'ip6tables',
             }
-          EOS
+          PUPPETCODE
           it 'applies' do
             apply_manifest(pp64, catch_failures: true)
           end
@@ -1536,8 +1536,8 @@ describe 'firewall basics', docker: true do
 
       %w[dst_type src_type].each do |type|
         describe type.to_s do
-          context 'MULTICAST' do
-            pp65 = <<-EOS
+          context 'when MULTICAST' do
+            pp65 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '603 - test':
                 proto    => tcp,
@@ -1545,7 +1545,7 @@ describe 'firewall basics', docker: true do
                 #{type}  => 'MULTICAST',
                 provider => 'ip6tables',
               }
-            EOS
+            PUPPETCODE
             it 'applies' do
               apply_manifest(pp65, catch_failures: true)
               apply_manifest(pp65, catch_changes: do_catch_changes)
@@ -1558,8 +1558,8 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context '! MULTICAST' do
-            pp66 = <<-EOS
+          context 'when ! MULTICAST' do
+            pp66 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '603 - test inversion':
                 proto    => tcp,
@@ -1567,7 +1567,7 @@ describe 'firewall basics', docker: true do
                 #{type}  => '! MULTICAST',
                 provider => 'ip6tables',
               }
-            EOS
+            PUPPETCODE
             it 'applies' do
               apply_manifest(pp66, catch_failures: true)
               apply_manifest(pp66, catch_changes: do_catch_changes)
@@ -1580,8 +1580,8 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'BROKEN' do
-            pp67 = <<-EOS
+          context 'when BROKEN' do
+            pp67 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '603 - test':
                 proto    => tcp,
@@ -1589,7 +1589,7 @@ describe 'firewall basics', docker: true do
                 #{type}  => 'BROKEN',
                 provider => 'ip6tables',
               }
-            EOS
+            PUPPETCODE
             it 'fails' do
               apply_manifest(pp67, expect_failures: true) do |r|
                 expect(r.stderr).to match(%r{Invalid value "BROKEN".})
@@ -1609,8 +1609,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'limit' do
-    context '500/sec' do
-      pp68 = <<-EOS
+    context 'when 500/sec' do
+      pp68 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '572 - test':
             ensure => present,
@@ -1619,7 +1619,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             limit => '500/sec',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp68, catch_failures: true)
       end
@@ -1633,8 +1633,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'burst' do
-    context '500' do
-      pp69 = <<-EOS
+    context 'when 500' do
+      pp69 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '573 - test':
             ensure => present,
@@ -1644,7 +1644,7 @@ describe 'firewall basics', docker: true do
             limit => '500/sec',
             burst => '1500',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp69, catch_failures: true)
       end
@@ -1656,8 +1656,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'invalid' do
-      pp70 = <<-EOS
+    context 'when invalid' do
+      pp70 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '571 - test':
             ensure => present,
@@ -1667,7 +1667,7 @@ describe 'firewall basics', docker: true do
             limit => '500/sec',
             burst => '1500/sec',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp70, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{Invalid value "1500\/sec".})
@@ -1683,8 +1683,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'uid' do
-    context 'nobody' do
-      pp71 = <<-EOS
+    context 'when nobody' do
+      pp71 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '574 - test':
             ensure => present,
@@ -1694,7 +1694,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             uid => 'nobody',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp71, catch_failures: true)
       end
@@ -1708,8 +1708,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'gid' do
-    context 'root' do
-      pp72 = <<-EOS
+    context 'when root' do
+      pp72 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '575 - test':
             ensure => present,
@@ -1719,7 +1719,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             gid => 'root',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp72, catch_failures: true)
       end
@@ -1735,8 +1735,8 @@ describe 'firewall basics', docker: true do
   # iptables version 1.3.5 does not support masks on MARK rules
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'set_mark' do
-      context '0x3e8/0xffffffff' do
-        pp73 = <<-EOS
+      context 'when 0x3e8/0xffffffff' do
+        pp73 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '580 - test':
               ensure => present,
@@ -1747,7 +1747,7 @@ describe 'firewall basics', docker: true do
               table => 'mangle',
               set_mark => '0x3e8/0xffffffff',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp73, catch_failures: true)
         end
@@ -1762,8 +1762,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'pkttype' do
-    context 'multicast' do
-      pp74 = <<-EOS
+    context 'when multicast' do
+      pp74 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '581 - test':
             ensure => present,
@@ -1772,7 +1772,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             pkttype => 'multicast',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp74, catch_failures: true)
       end
@@ -1784,8 +1784,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'test' do
-      pp75 = <<-EOS
+    context 'when test' do
+      pp75 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '582 - test':
             ensure => present,
@@ -1794,7 +1794,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             pkttype => 'test',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp75, expect_failures: true) do |r|
           expect(r.stderr).to match(%r{Invalid value "test".})
@@ -1810,8 +1810,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'isfragment' do
-    context 'true' do
-      pp76 = <<-EOS
+    context 'when true' do
+      pp76 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '583 - test':
             ensure => present,
@@ -1820,7 +1820,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             isfragment => true,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp76, catch_failures: true)
       end
@@ -1832,8 +1832,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'false' do
-      pp77 = <<-EOS
+    context 'when false' do
+      pp77 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '584 - test':
             ensure => present,
@@ -1842,7 +1842,7 @@ describe 'firewall basics', docker: true do
             action => accept,
             isfragment => false,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp77, catch_failures: true)
       end
@@ -1857,8 +1857,8 @@ describe 'firewall basics', docker: true do
 
   # RHEL5/SLES does not support -m socket
   describe 'socket', unless: (default['platform'] =~ %r{el-5} || fact('operatingsystem') == 'SLES') do
-    context 'true' do
-      pp78 = <<-EOS
+    context 'when true' do
+      pp78 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '585 - test':
             ensure => present,
@@ -1869,7 +1869,7 @@ describe 'firewall basics', docker: true do
             table  => 'nat',
             socket => true,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp78, catch_failures: true)
       end
@@ -1881,8 +1881,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'false' do
-      pp79 = <<-EOS
+    context 'when false' do
+      pp79 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '586 - test':
             ensure => present,
@@ -1893,7 +1893,7 @@ describe 'firewall basics', docker: true do
             table  => 'nat',
             socket => false,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp79, catch_failures: true)
       end
@@ -1907,8 +1907,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'ipsec_policy' do
-    context 'ipsec' do
-      pp80 = <<-EOS
+    context 'when ipsec' do
+      pp80 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '593 - test':
             ensure       => 'present',
@@ -1921,7 +1921,7 @@ describe 'firewall basics', docker: true do
             reject       => 'icmp-net-unreachable',
             table        => 'filter',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp80, catch_failures: true)
       end
@@ -1933,8 +1933,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'none' do
-      pp81 = <<-EOS
+    context 'when none' do
+      pp81 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '594 - test':
             ensure       => 'present',
@@ -1947,7 +1947,7 @@ describe 'firewall basics', docker: true do
             reject       => 'icmp-net-unreachable',
             table        => 'filter',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp81, catch_failures: true)
       end
@@ -1961,8 +1961,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'ipsec_dir' do
-    context 'out' do
-      pp82 = <<-EOS
+    context 'when out' do
+      pp82 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '595 - test':
             ensure       => 'present',
@@ -1975,7 +1975,7 @@ describe 'firewall basics', docker: true do
             reject       => 'icmp-net-unreachable',
             table        => 'filter',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp82, catch_failures: true)
       end
@@ -1987,8 +1987,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'in' do
-      pp83 = <<-EOS
+    context 'when in' do
+      pp83 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '596 - test':
             ensure       => 'present',
@@ -2001,7 +2001,7 @@ describe 'firewall basics', docker: true do
             reject       => 'icmp-net-unreachable',
             table        => 'filter',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp83, catch_failures: true)
       end
@@ -2015,8 +2015,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'recent' do
-    context 'set' do
-      pp84 = <<-EOS
+    context 'when set' do
+      pp84 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '597 - test':
             ensure       => 'present',
@@ -2028,7 +2028,7 @@ describe 'firewall basics', docker: true do
             rdest        => true,
             rname        => 'list1',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp84, catch_failures: true)
       end
@@ -2041,8 +2041,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'rcheck' do
-      pp85 = <<-EOS
+    context 'when rcheck' do
+      pp85 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '598 - test':
             ensure       => 'present',
@@ -2057,7 +2057,7 @@ describe 'firewall basics', docker: true do
             rhitcount    => 5,
             rttl         => true,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp85, catch_failures: true)
       end
@@ -2069,8 +2069,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'update' do
-      pp86 = <<-EOS
+    context 'when update' do
+      pp86 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '599 - test':
             ensure       => 'present',
@@ -2080,7 +2080,7 @@ describe 'firewall basics', docker: true do
             table        => 'filter',
             recent       => 'update',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp86, catch_failures: true)
       end
@@ -2092,8 +2092,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'remove' do
-      pp87 = <<-EOS
+    context 'when remove' do
+      pp87 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '600 - test':
             ensure       => 'present',
@@ -2103,7 +2103,7 @@ describe 'firewall basics', docker: true do
             table        => 'filter',
             recent       => 'remove',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp87, catch_failures: true)
       end
@@ -2117,8 +2117,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'mac_source' do
-    context '0A:1B:3C:4D:5E:6F' do
-      pp88 = <<-EOS
+    context 'when 0A:1B:3C:4D:5E:6F' do
+      pp88 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '610 - test':
             ensure      => present,
@@ -2126,7 +2126,7 @@ describe 'firewall basics', docker: true do
             mac_source  => '0A:1B:3C:4D:5E:6F',
             chain       => 'INPUT',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp88, catch_failures: true)
       end
@@ -2152,8 +2152,8 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'to' do
-    context 'Destination netmap 192.168.1.1' do
-      pp89 = <<-EOS
+    context 'when Destination netmap 192.168.1.1' do
+      pp89 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '569 - test':
             proto  => tcp,
@@ -2163,7 +2163,7 @@ describe 'firewall basics', docker: true do
             source => '200.200.200.200',
             to => '192.168.1.1',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp89, catch_failures: true)
       end
@@ -2182,8 +2182,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    context 'Source netmap 192.168.1.1' do
-      pp90 = <<-EOS
+    context 'when Source netmap 192.168.1.1' do
+      pp90 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '569 - test':
             proto  => tcp,
@@ -2193,7 +2193,7 @@ describe 'firewall basics', docker: true do
             destination => '200.200.200.200',
             to => '192.168.1.1',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp90, catch_failures: true)
       end
@@ -2206,14 +2206,14 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  context 'log_prefix containing -A' do
-    pp91 = <<-EOS
+  context 'when log_prefix containing -A' do
+    pp91 = <<-PUPPETCODE
       class { '::firewall': }
       firewall { '700 - test':
         jump       => 'LOG',
         log_prefix => 'FW-A-INPUT: ',
       }
-    EOS
+    PUPPETCODE
     it 'adds the rule' do
       apply_manifest(pp91, catch_failures: true)
     end
@@ -2224,14 +2224,14 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    pp92 = <<-EOS
+    pp92 = <<-PUPPETCODE
       class { '::firewall': }
       firewall { '700 - test':
         ensure     => absent,
         jump       => 'LOG',
         log_prefix => 'FW-A-INPUT: ',
       }
-    EOS
+    PUPPETCODE
     it 'removes the rule' do
       apply_manifest(pp92, catch_failures: true)
     end
@@ -2243,15 +2243,15 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  context 'log_uid is true' do
-    pp93 = <<-EOS
+  context 'when log_uid is true' do
+    pp93 = <<-PUPPETCODE
       class { '::firewall': }
       firewall { '700 - test log_uid':
         chain   => 'OUTPUT',
         jump    => 'LOG',
         log_uid => true,
       }
-    EOS
+    PUPPETCODE
     it 'adds the rule' do
       apply_manifest(pp93, catch_failures: true)
     end
@@ -2262,7 +2262,7 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    pp94 = <<-EOS
+    pp94 = <<-PUPPETCODE
       class  { '::firewall': }
       firewall { '700 - test log_uid':
         chain   => 'OUTPUT',
@@ -2270,7 +2270,7 @@ describe 'firewall basics', docker: true do
         log_uid => false,
         ensure  => absent,
       }
-    EOS
+    PUPPETCODE
     it 'removes the rule' do
       apply_manifest(pp94, catch_failures: true)
     end
@@ -2282,14 +2282,14 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  context 'comment containing "-A "' do
-    pp95 = <<-EOS
+  context 'when comment containing "-A "' do
+    pp95 = <<-PUPPETCODE
       class { '::firewall': }
       firewall { '700 - blah-A Test Rule':
         jump       => 'LOG',
         log_prefix => 'FW-A-INPUT: ',
       }
-    EOS
+    PUPPETCODE
     it 'adds the rule' do
       apply_manifest(pp95, catch_failures: true)
     end
@@ -2300,14 +2300,14 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    pp96 = <<-EOS
+    pp96 = <<-PUPPETCODE
       class { '::firewall': }
       firewall { '700 - blah-A Test Rule':
         ensure     => absent,
         jump       => 'LOG',
         log_prefix => 'FW-A-INPUT: ',
       }
-    EOS
+    PUPPETCODE
     it 'removes the rule' do
       apply_manifest(pp96, catch_failures: true)
     end

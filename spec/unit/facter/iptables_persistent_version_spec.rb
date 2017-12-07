@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'Facter::Util::Fact iptables_persistent_version' do
-  context 'iptables-persistent applicable' do
+  context 'when iptables-persistent applicable' do
     before(:each) { Facter.clear }
 
     let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' iptables-persistent 2>/dev/null" }
@@ -47,7 +47,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
     end
   end
 
-  context 'netfilter-persistent applicable' do
+  context 'when netfilter-persistent applicable' do
     before(:each) { Facter.clear }
 
     let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' netfilter-persistent 2>/dev/null" }

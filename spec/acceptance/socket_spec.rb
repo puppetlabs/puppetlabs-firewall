@@ -8,7 +8,7 @@ describe 'firewall socket property', unless: default['platform'] =~ %r{el-5} || 
   end
 
   shared_examples 'is idempotent' do |value, line_match|
-    pp1 = <<-EOS
+    pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '598 - test':
             ensure => present,
@@ -17,7 +17,7 @@ describe 'firewall socket property', unless: default['platform'] =~ %r{el-5} || 
             table  => 'raw',
             #{value}
           }
-    EOS
+    PUPPETCODE
     it "changes the value to #{value}" do
       apply_manifest(pp1, catch_failures: true)
       apply_manifest(pp1, catch_changes: true)
@@ -29,7 +29,7 @@ describe 'firewall socket property', unless: default['platform'] =~ %r{el-5} || 
   end
 
   shared_examples "doesn't change" do |value, line_match|
-    pp2 = <<-EOS
+    pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '598 - test':
             ensure => present,
@@ -38,7 +38,7 @@ describe 'firewall socket property', unless: default['platform'] =~ %r{el-5} || 
             table  => 'raw',
             #{value}
           }
-    EOS
+    PUPPETCODE
     it "doesn't change the value to #{value}" do
       apply_manifest(pp2, catch_changes: true)
 

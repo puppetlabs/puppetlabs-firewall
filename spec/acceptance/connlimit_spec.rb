@@ -8,8 +8,8 @@ describe 'connlimit property' do
 
   if default['platform'] !~ %r{sles-10}
     describe 'connlimit_above' do
-      context '10' do
-        pp1 = <<-EOS
+      context 'when 10' do
+        pp1 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '500 - test':
               proto           => tcp,
@@ -17,7 +17,7 @@ describe 'connlimit property' do
               connlimit_above => '10',
               action          => reject,
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp1, catch_failures: true)
           apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -33,8 +33,8 @@ describe 'connlimit property' do
     end
 
     describe 'connlimit_mask' do
-      context '24' do
-        pp2 = <<-EOS
+      context 'when 24' do
+        pp2 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '501 - test':
               proto           => tcp,
@@ -43,7 +43,7 @@ describe 'connlimit property' do
               connlimit_mask  => '24',
               action          => reject,
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp2, catch_failures: true)
           apply_manifest(pp2, catch_changes: do_catch_changes)

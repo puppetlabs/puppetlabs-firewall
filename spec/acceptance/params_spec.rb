@@ -6,7 +6,7 @@ describe 'param based tests' do
     ip6tables_flush_all_tables
   end
 
-  ppm1 = <<-EOS
+  ppm1 = <<-PUPPETCODE
     firewall { '100 test':
       table     => 'raw',
       socket    => 'true',
@@ -14,7 +14,7 @@ describe 'param based tests' do
       jump      => 'LOG',
       log_level => 'debug',
     }
-  EOS
+  PUPPETCODE
   values = [2, 0]
   it 'test various params', unless: (default['platform'].match(%r{el-5}) || fact('operatingsystem') == 'SLES') do
     iptables_flush_all_tables
@@ -24,13 +24,13 @@ describe 'param based tests' do
     end
   end
 
-  ppm2 = <<-EOS
+  ppm2 = <<-PUPPETCODE
     firewall { '998 log all':
       proto     => 'all',
       jump      => 'LOG',
       log_level => 'debug',
     }
-  EOS
+  PUPPETCODE
   values = [2, 0]
   it 'test log rule' do
     iptables_flush_all_tables
@@ -40,7 +40,7 @@ describe 'param based tests' do
     end
   end
 
-  ppm3 = <<-EOS
+  ppm3 = <<-PUPPETCODE
     firewall { '004 log all INVALID packets':
       chain      => 'INPUT',
       proto      => 'all',
@@ -49,8 +49,8 @@ describe 'param based tests' do
       log_level  => '3',
       log_prefix => 'IPTABLES dropped invalid: ',
     }
-  EOS
-  ppm4 = <<-EOS
+  PUPPETCODE
+  ppm4 = <<-PUPPETCODE
     firewall { '003 log all INVALID packets':
       chain      => 'INPUT',
       proto      => 'all',
@@ -59,12 +59,12 @@ describe 'param based tests' do
       log_level  => '3',
       log_prefix => 'IPTABLES dropped invalid: ',
     }
-  EOS
-  ppm5 = <<-EOS + "\n" + ppm4
+  PUPPETCODE
+  ppm5 = <<-PUPPETCODE + "\n" + ppm4
       resources { 'firewall':
         purge => true,
       }
-  EOS
+  PUPPETCODE
   it 'test log rule - changing names' do # rubocop:disable RSpec/MultipleExpectations
     iptables_flush_all_tables
 
@@ -72,23 +72,23 @@ describe 'param based tests' do
     expect(apply_manifest(ppm5, catch_failures: true).exit_code).to eq(2)
   end
 
-  ppm6 = <<-EOS
+  ppm6 = <<-PUPPETCODE
     firewall { '004 with a chain':
       chain => 'INPUT',
       proto => 'all',
     }
-  EOS
-  ppm7 = <<-EOS
+  PUPPETCODE
+  ppm7 = <<-PUPPETCODE
     firewall { '004 with a chain':
       chain => 'OUTPUT',
       proto => 'all',
     }
-  EOS
-  _ppm8 = <<-EOS + "\n" + ppm7
+  PUPPETCODE
+  _ppm8 = <<-PUPPETCODE + "\n" + ppm7
       resources { 'firewall':
         purge => true,
       }
-  EOS
+  PUPPETCODE
   it 'test chain - changing names' do
     iptables_flush_all_tables
 
@@ -96,7 +96,7 @@ describe 'param based tests' do
     expect(apply_manifest(ppm7, expect_failures: true).stderr).to match(%r{is not supported})
   end
 
-  ppm9 = <<-EOS
+  ppm9 = <<-PUPPETCODE
     firewall { '004 log all INVALID packets':
       chain      => 'INPUT',
       proto      => 'all',
@@ -105,7 +105,7 @@ describe 'param based tests' do
       log_level  => '3',
       log_prefix => 'IPTABLES dropped invalid: ',
     }
-  EOS
+  PUPPETCODE
   values = [2, 0]
   it 'test log rule - idempotent' do
     iptables_flush_all_tables
@@ -115,14 +115,14 @@ describe 'param based tests' do
     end
   end
 
-  ppm10 = <<-EOS
+  ppm10 = <<-PUPPETCODE
     firewall { '997 block src ip range':
       chain     => 'INPUT',
       proto     => 'all',
       action    => 'drop',
       src_range => '10.0.0.1-10.0.0.10',
     }
-  EOS
+  PUPPETCODE
   values = [2, 0]
   it 'test src_range rule' do
     iptables_flush_all_tables
@@ -132,14 +132,14 @@ describe 'param based tests' do
     end
   end
 
-  ppm11 = <<-EOS
+  ppm11 = <<-PUPPETCODE
     firewall { '998 block dst ip range':
       chain     => 'INPUT',
       proto     => 'all',
       action    => 'drop',
       dst_range => '10.0.0.2-10.0.0.20',
     }
-  EOS
+  PUPPETCODE
   values = [2, 0]
   it 'test dst_range rule' do
     iptables_flush_all_tables

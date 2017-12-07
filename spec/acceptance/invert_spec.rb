@@ -6,8 +6,8 @@ describe 'firewall inverting' do
     ip6tables_flush_all_tables
   end
 
-  context 'inverting rules' do
-    pp1 = <<-EOS
+  context 'when inverting rules' do
+    pp1 = <<-PUPPETCODE
         class { '::firewall': }
         firewall { '601 disallow esp protocol':
           action => 'accept',
@@ -22,7 +22,7 @@ describe 'firewall inverting' do
           source    => '! 10.0.0.0/8',
           tcp_flags => '! FIN,SYN,RST,ACK SYN',
         }
-    EOS
+    PUPPETCODE
     it 'applies' do
       apply_manifest(pp1, catch_failures: true)
       apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -39,8 +39,8 @@ describe 'firewall inverting' do
       end
     end
   end
-  context 'inverting partial array rules' do
-    pp2 = <<-EOS
+  context 'when inverting partial array rules' do
+    pp2 = <<-PUPPETCODE
         class { '::firewall': }
         firewall { '603 drop 80,443 traffic':
           chain     => 'INPUT',
@@ -48,7 +48,7 @@ describe 'firewall inverting' do
           proto     => 'tcp',
           sport     => ['! http', '443'],
         }
-    EOS
+    PUPPETCODE
     it 'raises a failure' do
       apply_manifest(pp2, expect_failures: true) do |r|
         expect(r.stderr).to match(%r{is not prefixed})

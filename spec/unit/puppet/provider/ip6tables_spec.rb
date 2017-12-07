@@ -43,14 +43,14 @@ describe 'ip6tables' do
       provider.new(resource.new(params))
     }
   end
-  context 'iptables 1.3' do
+  context 'when iptables 1.3' do
     let(:params) { { name: '000 test foo', action: 'accept' } }
     let(:error_message) { %r{The ip6tables provider is not supported on version 1\.3 of iptables} }
     let(:ip6tables_version) { '1.3.10' }
 
     it_behaves_like 'raise error'
   end
-  context 'ip6tables nil' do
+  context 'when ip6tables nil' do
     let(:params) { { name: '000 test foo', action: 'accept' } }
     let(:error_message) { %r{The ip6tables provider is not supported on version 1\.3 of iptables} }
     let(:ip6tables_version) { nil }

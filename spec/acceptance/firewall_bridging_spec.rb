@@ -7,8 +7,8 @@ describe 'firewall bridging' do
   end
 
   describe 'iptables physdev tests' do
-    context 'physdev_in eth0' do
-      pp1 = <<-EOS
+    context 'when physdev_in eth0' do
+      pp1 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '701 - test':
               chain => 'FORWARD',
@@ -17,7 +17,7 @@ describe 'firewall bridging' do
               action => accept,
               physdev_in => 'eth0',
             }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp1, catch_failures: true)
         apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -30,8 +30,8 @@ describe 'firewall bridging' do
       end
     end
 
-    context 'physdev_out eth1' do
-      pp2 = <<-EOS
+    context 'when physdev_out eth1' do
+      pp2 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '702 - test':
               chain => 'FORWARD',
@@ -40,7 +40,7 @@ describe 'firewall bridging' do
               action => accept,
               physdev_out => 'eth1',
             }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp2, catch_failures: true)
         apply_manifest(pp2, catch_changes: do_catch_changes)
@@ -53,8 +53,8 @@ describe 'firewall bridging' do
       end
     end
 
-    context 'physdev_in eth0 and physdev_out eth1' do
-      pp3 = <<-EOS
+    context 'when physdev_in eth0 and physdev_out eth1' do
+      pp3 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '703 - test':
               chain => 'FORWARD',
@@ -64,7 +64,7 @@ describe 'firewall bridging' do
               physdev_in => 'eth0',
               physdev_out => 'eth1',
             }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp3, catch_failures: true)
         apply_manifest(pp3, catch_changes: do_catch_changes)
@@ -77,8 +77,8 @@ describe 'firewall bridging' do
       end
     end
 
-    context 'physdev_is_bridged' do
-      pp4 = <<-EOS
+    context 'when physdev_is_bridged' do
+      pp4 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '704 - test':
               chain => 'FORWARD',
@@ -87,7 +87,7 @@ describe 'firewall bridging' do
               action => accept,
               physdev_is_bridged => true,
             }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp4, catch_failures: true)
         apply_manifest(pp4, catch_changes: do_catch_changes)
@@ -100,8 +100,8 @@ describe 'firewall bridging' do
       end
     end
 
-    context 'physdev_in eth0 and physdev_is_bridged' do
-      pp5 = <<-EOS
+    context 'when physdev_in eth0 and physdev_is_bridged' do
+      pp5 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '705 - test':
               chain => 'FORWARD',
@@ -111,7 +111,7 @@ describe 'firewall bridging' do
               physdev_in => 'eth0',
               physdev_is_bridged => true,
             }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp5, catch_failures: true)
         apply_manifest(pp5, catch_changes: do_catch_changes)
@@ -124,8 +124,8 @@ describe 'firewall bridging' do
       end
     end
 
-    context 'physdev_out eth1 and physdev_is_bridged' do
-      pp6 = <<-EOS
+    context 'when physdev_out eth1 and physdev_is_bridged' do
+      pp6 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '706 - test':
               chain => 'FORWARD',
@@ -135,7 +135,7 @@ describe 'firewall bridging' do
               physdev_out => 'eth1',
               physdev_is_bridged => true,
             }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp6, catch_failures: true)
         apply_manifest(pp6, catch_changes: do_catch_changes)
@@ -148,8 +148,8 @@ describe 'firewall bridging' do
       end
     end
 
-    context 'physdev_in eth0 and physdev_out eth1 and physdev_is_bridged' do
-      pp7 = <<-EOS
+    context 'when physdev_in eth0 and physdev_out eth1 and physdev_is_bridged' do
+      pp7 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '707 - test':
               chain => 'FORWARD',
@@ -160,7 +160,7 @@ describe 'firewall bridging' do
               physdev_out => 'eth1',
               physdev_is_bridged => true,
             }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp7, catch_failures: true)
         apply_manifest(pp7, catch_changes: do_catch_changes)
@@ -177,8 +177,8 @@ describe 'firewall bridging' do
   # iptables version 1.3.5 is not suppored by the ip6tables provider
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'ip6tables physdev tests' do
-      context 'physdev_in eth0' do
-        pp8 = <<-EOS
+      context 'when physdev_in eth0' do
+        pp8 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '701 - test':
                 provider => 'ip6tables',
@@ -188,7 +188,7 @@ describe 'firewall bridging' do
                 action => accept,
                 physdev_in => 'eth0',
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp8, catch_failures: true)
           apply_manifest(pp8, catch_changes: do_catch_changes)
@@ -201,8 +201,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_out eth1' do
-        pp9 = <<-EOS
+      context 'when physdev_out eth1' do
+        pp9 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '702 - test':
                 provider => 'ip6tables',
@@ -212,7 +212,7 @@ describe 'firewall bridging' do
                 action => accept,
                 physdev_out => 'eth1',
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp9, catch_failures: true)
           apply_manifest(pp9, catch_changes: do_catch_changes)
@@ -225,8 +225,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_in eth0 and physdev_out eth1' do
-        pp10 = <<-EOS
+      context 'when physdev_in eth0 and physdev_out eth1' do
+        pp10 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '703 - test':
                 provider => 'ip6tables',
@@ -237,7 +237,7 @@ describe 'firewall bridging' do
                 physdev_in => 'eth0',
                 physdev_out => 'eth1',
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp10, catch_failures: true)
           apply_manifest(pp10, catch_changes: do_catch_changes)
@@ -250,8 +250,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_is_bridged' do
-        pp11 = <<-EOS
+      context 'when physdev_is_bridged' do
+        pp11 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '704 - test':
                 provider => 'ip6tables',
@@ -261,7 +261,7 @@ describe 'firewall bridging' do
                 action => accept,
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp11, catch_failures: true)
           apply_manifest(pp11, catch_changes: do_catch_changes)
@@ -274,8 +274,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_in eth0 and physdev_is_bridged' do
-        pp12 = <<-EOS
+      context 'when physdev_in eth0 and physdev_is_bridged' do
+        pp12 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '705 - test':
                 provider => 'ip6tables',
@@ -286,7 +286,7 @@ describe 'firewall bridging' do
                 physdev_in => 'eth0',
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp12, catch_failures: true)
           apply_manifest(pp12, catch_changes: do_catch_changes)
@@ -299,8 +299,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_out eth1 and physdev_is_bridged' do
-        pp13 = <<-EOS
+      context 'when physdev_out eth1 and physdev_is_bridged' do
+        pp13 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '706 - test':
                 provider => 'ip6tables',
@@ -311,7 +311,7 @@ describe 'firewall bridging' do
                 physdev_out => 'eth1',
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp13, catch_failures: true)
           apply_manifest(pp13, catch_changes: do_catch_changes)
@@ -324,8 +324,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_in eth0 and physdev_out eth1 and physdev_is_bridged' do
-        pp14 = <<-EOS
+      context 'when physdev_in eth0 and physdev_out eth1 and physdev_is_bridged' do
+        pp14 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '707 - test':
                 provider => 'ip6tables',
@@ -337,7 +337,7 @@ describe 'firewall bridging' do
                 physdev_out => 'eth1',
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp14, catch_failures: true)
           apply_manifest(pp14, catch_changes: do_catch_changes)
@@ -350,8 +350,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_is_in' do
-        pp15 = <<-EOS
+      context 'when physdev_is_in' do
+        pp15 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '708 - test':
             provider => 'ip6tables',
@@ -361,7 +361,7 @@ describe 'firewall bridging' do
             action => accept,
             physdev_is_in => true,
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp15, catch_failures: true)
           apply_manifest(pp15, catch_changes: do_catch_changes)
@@ -374,8 +374,8 @@ describe 'firewall bridging' do
         end
       end
 
-      context 'physdev_is_out' do
-        pp16 = <<-EOS
+      context 'when physdev_is_out' do
+        pp16 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '709 - test':
             provider => 'ip6tables',
@@ -385,7 +385,7 @@ describe 'firewall bridging' do
             action => accept,
             physdev_is_out => true,
           }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp16, catch_failures: true)
           apply_manifest(pp16, catch_changes: do_catch_changes)

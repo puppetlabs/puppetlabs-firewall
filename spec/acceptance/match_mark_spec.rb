@@ -8,15 +8,15 @@ describe 'firewall match marks' do
 
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'match_mark' do
-      context '0x1' do
-        pp1 = <<-EOS
+      context 'when 0x1' do
+        pp1 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '503 match_mark - test':
               proto      => 'all',
               match_mark => '0x1',
               action     => reject,
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp1, catch_failures: true)
         end
@@ -30,8 +30,8 @@ describe 'firewall match marks' do
     end
 
     describe 'match_mark_ip6' do
-      context '0x1' do
-        pp2 = <<-EOS
+      context 'when 0x1' do
+        pp2 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '503 match_mark ip6tables - test':
               proto      => 'all',
@@ -39,7 +39,7 @@ describe 'firewall match marks' do
               action     => reject,
               provider => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp2, catch_failures: true)
         end

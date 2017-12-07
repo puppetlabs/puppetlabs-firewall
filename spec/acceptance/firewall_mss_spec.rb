@@ -7,8 +7,8 @@ describe 'firewall MSS' do
   end
 
   describe 'mss ipv4 tests' do
-    context '1360' do
-      pp1 = <<-EOS
+    context 'when 1360' do
+      pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall {
             '502 - set_mss':
@@ -20,7 +20,7 @@ describe 'firewall MSS' do
               chain     => 'FORWARD',
               table     => 'mangle',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp1, catch_failures: true)
       end
@@ -32,8 +32,8 @@ describe 'firewall MSS' do
       end
     end
 
-    context 'clamp_mss_to_pmtu' do
-      pp2 = <<-EOS
+    context 'when clamp_mss_to_pmtu' do
+      pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall {
             '503 - clamp_mss_to_pmtu':
@@ -43,7 +43,7 @@ describe 'firewall MSS' do
               jump              => 'TCPMSS',
               clamp_mss_to_pmtu => true,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp2, catch_failures: true)
       end
@@ -58,8 +58,8 @@ describe 'firewall MSS' do
 
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'mss ipv6 tests' do
-      context '1360' do
-        pp3 = <<-EOS
+      context 'when 1360' do
+        pp3 = <<-PUPPETCODE
             class { '::firewall': }
             firewall {
               '502 - set_mss':
@@ -72,7 +72,7 @@ describe 'firewall MSS' do
                 table     => 'mangle',
                 provider  => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp3, catch_failures: true)
         end
@@ -84,8 +84,8 @@ describe 'firewall MSS' do
         end
       end
 
-      context 'clamp_mss_to_pmtu' do
-        pp4 = <<-EOS
+      context 'when clamp_mss_to_pmtu' do
+        pp4 = <<-PUPPETCODE
             class { '::firewall': }
             firewall {
               '503 - clamp_mss_to_pmtu':
@@ -96,7 +96,7 @@ describe 'firewall MSS' do
                 clamp_mss_to_pmtu => true,
                 provider          => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp4, catch_failures: true)
         end

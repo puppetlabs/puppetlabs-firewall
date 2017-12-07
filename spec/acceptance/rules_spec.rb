@@ -14,7 +14,7 @@ describe 'rules spec' do
       shell('iptables -t filter --flush')
     end
 
-    pp1 = <<-EOS
+    pp1 = <<-PUPPETCODE
         firewall { '090 forward allow local':
           chain       => 'FORWARD',
           proto       => 'all',
@@ -91,7 +91,7 @@ describe 'rules spec' do
           toports => '22',
           jump    => 'REDIRECT',
         }
-    EOS
+    PUPPETCODE
     it 'applies cleanly' do
       # Run it twice and test for idempotency
       apply_manifest(pp1, catch_failures: true)
@@ -121,7 +121,7 @@ describe 'rules spec' do
       shell('iptables -t filter --flush')
     end
 
-    pp2 = <<-EOS
+    pp2 = <<-PUPPETCODE
         class { '::firewall': }
 
         Firewall {
@@ -237,7 +237,7 @@ describe 'rules spec' do
 
         # and the nat table
         firewallchain { ['PREROUTING:nat:IPv4', 'INPUT:nat:IPv4', 'OUTPUT:nat:IPv4', 'POSTROUTING:nat:IPv4']: }
-    EOS
+    PUPPETCODE
     it 'applies cleanly' do
       # Run it twice and test for idempotency
       apply_manifest(pp2, catch_failures: true)

@@ -8,8 +8,8 @@ describe 'firewall time' do
 
   if default['platform'] =~ %r{ubuntu-1404} || default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{debian-8} || default['platform'] =~ %r{el-7}
     describe 'time tests ipv4' do
-      context 'set all time parameters' do
-        pp1 = <<-EOS
+      context 'when set all time parameters' do
+        pp1 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '805 - test':
               proto              => tcp,
@@ -24,7 +24,7 @@ describe 'firewall time' do
               week_days          => 'Tue',
               kernel_timezone    => true,
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp1, catch_failures: true)
           apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -39,8 +39,8 @@ describe 'firewall time' do
     end
 
     describe 'time tests ipv6' do
-      context 'set all time parameters' do
-        pp2 = <<-EOS
+      context 'when when set all time parameters' do
+        pp2 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '805 - test':
               proto              => tcp,
@@ -56,7 +56,7 @@ describe 'firewall time' do
               kernel_timezone    => true,
               provider           => 'ip6tables',
             }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp2, catch_failures: true)
           apply_manifest(pp2, catch_changes: do_catch_changes)

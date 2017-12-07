@@ -21,7 +21,7 @@ describe 'firewall::linux::archlinux', type: :class do
     )
   }
 
-  context 'ensure => stopped' do
+  context 'with ensure => stopped' do
     let(:params) { { ensure: 'stopped' } }
 
     it {
@@ -36,7 +36,7 @@ describe 'firewall::linux::archlinux', type: :class do
     }
   end
 
-  context 'enable => false' do
+  context 'with enable => false' do
     let(:params) { { enable: 'false' } }
 
     it {

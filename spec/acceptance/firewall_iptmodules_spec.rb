@@ -7,8 +7,8 @@ describe 'firewall iptmodules' do
   end
 
   describe 'iptables ipt_modules tests' do
-    context 'all the modules with multiple args' do
-      pp1 = <<-EOS
+    context 'when all the modules with multiple args' do
+      pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '801 - ipt_modules tests':
             proto              => tcp,
@@ -25,7 +25,7 @@ describe 'firewall iptmodules' do
             physdev_out        => "eth1",
             physdev_is_bridged => true,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp1, catch_failures: true)
         apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -38,8 +38,8 @@ describe 'firewall iptmodules' do
       end
     end
 
-    context 'all the modules with single args' do
-      pp2 = <<-EOS
+    context 'when all the modules with single args' do
+      pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '802 - ipt_modules tests':
             proto              => tcp,
@@ -52,7 +52,7 @@ describe 'firewall iptmodules' do
             physdev_out        => "eth1",
             physdev_is_bridged => true,
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp2, catch_failures: true)
         apply_manifest(pp2, catch_changes: do_catch_changes)
@@ -69,8 +69,8 @@ describe 'firewall iptmodules' do
   # iptables version 1.3.5 is not suppored by the ip6tables provider
   if default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{ubuntu-14\.04}
     describe 'ip6tables ipt_modules tests' do
-      context 'all the modules with multiple args' do
-        pp3 = <<-EOS
+      context 'when all the modules with multiple args' do
+        pp3 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '801 - ipt_modules tests':
                 proto              => tcp,
@@ -88,7 +88,7 @@ describe 'firewall iptmodules' do
                 physdev_out        => "eth1",
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp3, catch_failures: true)
           apply_manifest(pp3, catch_changes: do_catch_changes)
@@ -101,8 +101,8 @@ describe 'firewall iptmodules' do
         end
       end
 
-      context 'all the modules with single args' do
-        pp4 = <<-EOS
+      context 'when all the modules with single args' do
+        pp4 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '802 - ipt_modules tests':
                 proto              => tcp,
@@ -116,7 +116,7 @@ describe 'firewall iptmodules' do
                 physdev_out        => "eth1",
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp4, catch_failures: true)
           apply_manifest(pp4, catch_changes: do_catch_changes)
@@ -133,8 +133,8 @@ describe 'firewall iptmodules' do
   # el-5 doesn't support ipv6 by default
   elsif default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'ip6tables ipt_modules tests' do
-      context 'all the modules with multiple args' do
-        pp5 = <<-EOS
+      context 'when all the modules with multiple args' do
+        pp5 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '801 - ipt_modules tests':
                 proto              => tcp,
@@ -150,7 +150,7 @@ describe 'firewall iptmodules' do
                 physdev_out        => "eth1",
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp5, catch_failures: true)
           apply_manifest(pp5, catch_changes: do_catch_changes)
@@ -163,8 +163,8 @@ describe 'firewall iptmodules' do
         end
       end
 
-      context 'all the modules with single args' do
-        pp6 = <<-EOS
+      context 'when all the modules with single args' do
+        pp6 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '802 - ipt_modules tests':
                 proto              => tcp,
@@ -177,7 +177,7 @@ describe 'firewall iptmodules' do
                 physdev_out        => "eth1",
                 physdev_is_bridged => true,
               }
-        EOS
+        PUPPETCODE
         it 'applies' do
           apply_manifest(pp6, catch_failures: true)
           apply_manifest(pp6, catch_changes: do_catch_changes)

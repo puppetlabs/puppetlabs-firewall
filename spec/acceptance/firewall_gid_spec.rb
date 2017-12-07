@@ -7,8 +7,8 @@ describe 'firewall gid' do
   end
 
   describe 'gid tests' do
-    context 'gid set to root' do
-      pp1 = <<-EOS
+    context 'when gid set to root' do
+      pp1 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '801 - test':
             chain => 'OUTPUT',
@@ -16,7 +16,7 @@ describe 'firewall gid' do
             gid => 'root',
             proto => 'all',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp1, catch_failures: true)
         apply_manifest(pp1, catch_changes: do_catch_changes)
@@ -29,8 +29,8 @@ describe 'firewall gid' do
       end
     end
 
-    context 'gid set to !root' do
-      pp2 = <<-EOS
+    context 'when gid set to !root' do
+      pp2 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '802 - test':
             chain => 'OUTPUT',
@@ -38,7 +38,7 @@ describe 'firewall gid' do
             gid => '!root',
             proto => 'all',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp2, catch_failures: true)
         apply_manifest(pp2, catch_changes: do_catch_changes)
@@ -51,8 +51,8 @@ describe 'firewall gid' do
       end
     end
 
-    context 'gid set to 0' do
-      pp3 = <<-EOS
+    context 'when gid set to 0' do
+      pp3 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '803 - test':
             chain => 'OUTPUT',
@@ -60,7 +60,7 @@ describe 'firewall gid' do
             gid => '0',
             proto => 'all',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp3, catch_failures: true)
         apply_manifest(pp3, catch_changes: do_catch_changes)
@@ -73,8 +73,8 @@ describe 'firewall gid' do
       end
     end
 
-    context 'gid set to !0' do
-      pp4 = <<-EOS
+    context 'when gid set to !0' do
+      pp4 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '804 - test':
             chain => 'OUTPUT',
@@ -82,7 +82,7 @@ describe 'firewall gid' do
             gid => '!0',
             proto => 'all',
           }
-      EOS
+      PUPPETCODE
       it 'applies' do
         apply_manifest(pp4, catch_failures: true)
         apply_manifest(pp4, catch_changes: do_catch_changes)
