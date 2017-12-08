@@ -365,6 +365,15 @@ ARGS_TO_HASH = {
       :iniface => '! eth0',
     },
   },
+  'iniface_2_negated' => {
+    :line => '-A CHAIN-WITH-DASH ! -i eth0 -p tcp -m comment --comment "005 iniface 2" -j DROP',
+    :table => 'filter',
+    :params => {
+      :action => 'drop',
+      :chain => 'CHAIN-WITH-DASH',
+      :iniface => '! eth0',
+    },
+  },
   'iniface_1_aliased' => {
     :line => '-A INPUT -i eth0:1 -j DROP -m comment --comment "060 iniface"',
     :table => 'filter',
