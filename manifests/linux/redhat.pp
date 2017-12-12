@@ -106,6 +106,11 @@ class firewall::linux::redhat (
       case $::operatingsystem {
         'CentOS': {
           case $::operatingsystemrelease {
+            /^5\..*/: {
+              File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'etc_t' }
+              File["/etc/sysconfig/${service_name_v6}"] { seluser => 'system_u', seltype => 'etc_t' }
+            }
+
             /^6\..*/: {
               File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
               File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
