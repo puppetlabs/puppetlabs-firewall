@@ -661,6 +661,17 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   def delete_args
     # Split into arguments
     line = properties[:line].gsub(%r{^\-A }, '-D ').split(%r{\s+(?=(?:[^"]|"[^"]*")*$)}).map { |v| v.gsub(%r{^"}, '').gsub(%r{"$}, '') }
+    if self.class.instance_variable_get(:@protocol) == 'IPv6' && properties[:proto] == 'all'
+      #
+      # There is currently a bug in ip6tables where delete rules do not match rules using any protocol
+      # if '-p' all is missing.
+      #
+      # https://bugzilla.netfilter.org/show_bug.cgi?id=1015
+      #
+      # This check looks for this case, and adds '-p all' to the rule for ipv6.
+      #
+      line = line.concat ['-p', 'all']
+    end
     line.unshift('-t', properties[:table])
   end
 
