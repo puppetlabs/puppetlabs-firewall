@@ -26,7 +26,8 @@ class firewall::linux::archlinux (
     }
   }
 
-  service { $service_name:
+  service { 'firewall':
+    name      => $service_name,
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,

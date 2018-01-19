@@ -67,12 +67,14 @@ class firewall::linux::redhat (
     }
   }
 
-  service { $service_name:
+  service { 'firewall':
+    name      => $service_name,
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
   }
-  service { $service_name_v6:
+  service { 'firewall6':
+    name      => $service_name_v6,
     ensure    => $_ensure_v6,
     enable    => $_enable_v6,
     hasstatus => true,
