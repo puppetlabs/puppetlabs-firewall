@@ -1,3 +1,22 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org).
+
+## Supported Release 1.12.0
+### Summary
+This release uses the PDK convert functionality which in return makes the module PDK compliant. It also includes a roll up of maintenance changes.
+
+#### Added
+- PDK convert firewall ([MODULES-6455](https://tickets.puppet.com/browse/MODULES-6455)).
+- Modulesync updates.
+
+### Fixed
+- Set correct `seluser` for CentOS/RHEL 5.x ([MODULES-6092](https://tickets.puppet.com/browse/MODULES-6092)).
+- Fix error parsing rules with dashes in the chain name ([MODULES-6261](https://tickets.puppet.com/browse/MODULES-6261)).
+- Changes to address additional Rubocop failures.
+- (maint) Addressing puppet-lint doc warnings.
+
 ## Supported Release 1.11.0
 ### Summary
 This release is to implement Rubocop changes within the module.
@@ -260,7 +279,7 @@ working on those platforms.
 
 #### Features
 
-- Apply firewall resources alphabetically. 
+- Apply firewall resources alphabetically.
 - Add support for connlimit and connmark.
 - Add `mask` as a parameter. (Used exclusively with the recent parameter).
 
