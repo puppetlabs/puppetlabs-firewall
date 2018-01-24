@@ -2130,8 +2130,7 @@ describe 'firewall basics', docker: true do
       it 'applies' do
         apply_manifest(pp88, catch_failures: true)
       end
-      # rubocop:disable RSpec/ExampleLength : Cannot reduce lines to required size
-      it 'contains the rule' do # rubocop:disable RSpec/MultipleExpectations : Second expectation required
+      it 'contains the rule' do
         shell('iptables-save') do |r|
           if (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') == '5') || (default['platform'] =~ %r{sles-10})
             expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})

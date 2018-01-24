@@ -112,8 +112,6 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
   end
 
   describe 'autorequire packages' do
-    # rubocop:disable RSpec/ExampleLength
-    # rubocop:disable RSpec/MultipleExpectations
     it 'provider iptables_chain should autorequire package iptables' do
       expect(resource[:provider]).to be :iptables_chain
       package = Puppet::Type.type(:package).new(name: 'iptables')
@@ -200,7 +198,7 @@ PUPPETCODE
 end
 
 describe 'firewall on unsupported platforms' do
-  it 'is not suitable' do # rubocop:disable RSpec/ExampleLength
+  it 'is not suitable' do
     # Stub iptables version
     allow(Facter.fact(:iptables_version)).to receive(:value).and_return(nil)
     allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return(nil)

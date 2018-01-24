@@ -61,7 +61,7 @@ describe 'iptables provider' do
                                           .and_return '/sbin/iptables-save'
   end
 
-  it 'is expected to be able to get a list of existing rules' do # rubocop:disable RSpec/MultipleExpectations
+  it 'is expected to be able to get a list of existing rules' do
     provider.instances.each do |rule|
       expect(rule).to be_instance_of(provider)
       expect(rule.properties[:provider].to_s).to eq(provider.name.to_s)
@@ -234,7 +234,7 @@ describe 'iptables provider' do
 
         # Iterate across each parameter, creating an example for comparison
         data[:params].each do |param_name, param_value|
-          it "the parameter '#{param_name}' should match #{param_value.inspect}" do # rubocop:disable RSpec/MultipleExpectations
+          it "the parameter '#{param_name}' should match #{param_value.inspect}" do
             # booleans get cludged to string "true"
             if param_value == true
               expect(resource[param_name]).to be_truthy
@@ -383,7 +383,7 @@ describe 'ip6tables provider' do
                                           .and_return '/sbin/ip6tables-save'
   end
 
-  it 'is expected to be able to get a list of existing rules' do # rubocop:disable RSpec/MultipleExpectations
+  it 'is expected to be able to get a list of existing rules' do
     provider6.instances.each do |rule|
       expect(rule).to be_instance_of(provider6)
       expect(rule.properties[:provider6].to_s).to eql provider6.name.to_s

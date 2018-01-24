@@ -65,7 +65,7 @@ describe 'param based tests' do
         purge => true,
       }
   PUPPETCODE
-  it 'test log rule - changing names' do # rubocop:disable RSpec/MultipleExpectations
+  it 'test log rule - changing names' do
     iptables_flush_all_tables
 
     expect(apply_manifest(ppm3, catch_failures: true).exit_code).to eq(2)

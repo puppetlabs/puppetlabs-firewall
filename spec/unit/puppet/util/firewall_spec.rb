@@ -14,7 +14,7 @@ describe 'Puppet::Util::Firewall' do
   describe '#host_to_ip' do
     subject(:host) { resource }
 
-    it { # rubocop:disable RSpec/MultipleExpectations
+    it {
       allow(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
       expect(host.host_to_ip('puppetlabs.com', :IPv4)).to eql '96.126.112.51/32'
       expect(host.host_to_ip('puppetlabs.com', :IPv6)).to eql '2001:db8:4650::13:8a/128'
@@ -30,7 +30,7 @@ describe 'Puppet::Util::Firewall' do
   describe '#host_to_mask' do
     subject(:host) { resource }
 
-    it { # rubocop:disable RSpec/MultipleExpectations
+    it {
       allow(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
       expect(host.host_to_mask('puppetlabs.com', :IPv4)).to eql '96.126.112.51/32'
       expect(host.host_to_mask('!puppetlabs.com', :IPv4)).to eql '! 96.126.112.51/32'
@@ -177,7 +177,7 @@ describe 'Puppet::Util::Firewall' do
         host.persist_iptables(proto)
       end
 
-      it 'is expected to raise a warning when exec fails' do # rubocop:disable RSpec/ExampleLength
+      it 'is expected to raise a warning when exec fails' do
         allow(Facter.fact(:osfamily)).to receive(:value).and_return('RedHat')
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('RedHat')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('6')
