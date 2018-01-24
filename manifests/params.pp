@@ -1,4 +1,4 @@
-# Documents the module parameters
+# Manifest containing module parameters
 class firewall::params {
   $package_ensure = 'present'
   case $::osfamily {

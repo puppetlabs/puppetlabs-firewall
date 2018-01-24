@@ -27,6 +27,7 @@ class firewall::linux::debian (
         command     => "/bin/echo \"${package_name} ${package_name}/autosave_v4 boolean false\" |
                       /usr/bin/debconf-set-selections && /bin/echo \"${package_name} ${package_name}/autosave_v6 boolean false\" |
                       /usr/bin/debconf-set-selections",
+
         refreshonly => true,
     }
     package { $package_name:
