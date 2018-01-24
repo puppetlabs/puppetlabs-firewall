@@ -24,7 +24,7 @@ describe 'purge tests' do
       apply_manifest(pp1, expect_changes: true)
     end
 
-    it 'saves' do # rubocop:disable RSpec/MultipleExpectations
+    it 'saves' do
       shell('iptables-save') do |r|
         expect(r.stdout).not_to match(%r{1\.2\.1\.2})
         expect(r.stderr).to eq('')
@@ -50,8 +50,7 @@ describe 'purge tests' do
           purge => true,
         }
     PUPPETCODE
-    # rubocop:disable RSpec/ExampleLength
-    it 'purges only the specified chain' do # rubocop:disable RSpec/MultipleExpectations
+    it 'purges only the specified chain' do
       apply_manifest(pp2, expect_changes: true)
 
       shell('iptables-save') do |r|
@@ -145,8 +144,7 @@ describe 'purge tests' do
             purge => true,
           }
       PUPPETCODE
-      # rubocop:disable RSpec/ExampleLength
-      it 'purges only the specified chain' do # rubocop:disable RSpec/MultipleExpectations
+      it 'purges only the specified chain' do
         apply_manifest(pp6, expect_changes: true)
 
         shell('ip6tables-save') do |r|

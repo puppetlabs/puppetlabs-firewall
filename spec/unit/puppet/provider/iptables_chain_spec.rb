@@ -75,7 +75,7 @@ describe 'iptables chain' do
       allow(provider).to receive(:execute).with(['/sbin/iptables-save']).and_return('')
     end
 
-    it 'is able to get a list of existing rules' do # rubocop:disable RSpec/MultipleExpectations
+    it 'is able to get a list of existing rules' do
       provider.instances.each do |chain|
         expect(chain).to be_instance_of(provider)
         expect(chain.properties[:provider].to_s).to eq(provider.name.to_s)

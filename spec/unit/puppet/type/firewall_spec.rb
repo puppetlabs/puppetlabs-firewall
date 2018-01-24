@@ -520,8 +520,6 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   [:chain, :jump].each do |param|
     describe param do
-      # rubocop:disable RSpec/ExampleLength
-      # rubocop:disable RSpec/MultipleExpectations
       it 'autorequires fwchain when table and provider are undefined' do
         resource[param] = 'FOO'
         expect(resource[:table]).to be :filter
@@ -677,8 +675,6 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
   end
 
   describe 'autorequire packages' do
-    # rubocop:disable RSpec/ExampleLength
-    # rubocop:disable RSpec/MultipleExpectations
     [:iptables, :ip6tables].each do |provider|
       it "provider #{provider} should autorequire package iptables" do
         resource[:provider] = provider
@@ -720,7 +716,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 end
 
 describe 'firewall on unsupported platforms' do
-  it 'is not suitable' do # rubocop:disable RSpec/ExampleLength
+  it 'is not suitable' do
     # Stub iptables version
     allow(Facter.fact(:iptables_version)).to receive(:value).and_return(nil)
     allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return(nil)

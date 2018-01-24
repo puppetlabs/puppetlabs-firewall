@@ -5,8 +5,6 @@ describe 'firewall', type: :class do
     with_debian_facts
     it { is_expected.to contain_class('firewall::linux').with_ensure('running') }
   end
-
-  # rubocop:disable RSpec/MultipleExpectations
   context 'with kernel => Windows' do
     let(:facts) { { kernel: 'Windows' } }
 
