@@ -393,12 +393,12 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values = values.gsub(%r{-m set --match-set (!\s+)?\S* \S* }, '')
       values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
     end
+    # the actual rule will have the ! mark before the option.
+    values = values.gsub(%r{(!)\s*(-\S+)\s*(\S*)}, '\2 "\1 \3"')
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(%r{(?<=\s)(-\S+) (!)\s?(\S*)}, '\1 "\2 \3"')
     # fix negated physdev rules
     values = values.gsub(%r{-m physdev ! (--physdev-is-\S+)}, '-m physdev \1 "!"')
-    # the actual rule will have the ! mark before the option.
-    values = values.gsub(%r{(!)\s*(-\S+)\s*(\S*)}, '\2 "\1 \3"')
     # The match extension for tcp & udp are optional and throws off the @resource_map.
     values = values.gsub(%r{(?!-m tcp --tcp-flags)-m (tcp|udp) }, '')
     # There is a bug in EL5 which puts 2 spaces before physdev, so we fix it
