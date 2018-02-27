@@ -11,7 +11,7 @@ describe 'firewall::linux::debian', type: :class do
     end
 
     it {
-      is_expected.to contain_package('firewall').with(
+      is_expected.to contain_package('iptables-persistent').with(
         ensure: 'present',
       )
     }
