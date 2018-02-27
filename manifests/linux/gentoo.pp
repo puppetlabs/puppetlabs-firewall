@@ -35,11 +35,11 @@ class firewall::linux::gentoo (
 
   file { '/var/lib/iptables/rules-save':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 
   file { '/var/lib/iptables/rules-save6':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 }

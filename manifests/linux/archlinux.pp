@@ -35,11 +35,11 @@ class firewall::linux::archlinux (
 
   file { '/etc/iptables/iptables.rules':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 
   file { '/etc/iptables/ip6tables.rules':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 }

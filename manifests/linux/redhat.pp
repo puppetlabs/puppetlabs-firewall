@@ -43,7 +43,7 @@ class firewall::linux::redhat (
     service { 'firewalld':
       ensure => stopped,
       enable => false,
-      before => [Package[$package_name], Service[$service_name]],
+      before => [Package[$package_name], Service['firewall']],
     }
   }
 
@@ -60,7 +60,7 @@ class firewall::linux::redhat (
     if $ensure == 'running' {
       exec { '/usr/bin/systemctl daemon-reload':
         require     => Package[$package_name],
-        before      => Service[$service_name, $service_name_v6],
+        before      => Service['firewall', 'firewall6'],
         subscribe   => Package[$package_name],
         refreshonly => true,
       }
@@ -96,8 +96,8 @@ class firewall::linux::redhat (
   # Before puppet 4, the autobefore on the firewall type does not work - therefore
   # we need to keep this workaround here
   if versioncmp($::puppetversion, '4.0') <= 0 {
-    File["/etc/sysconfig/${service_name}"]    -> Service[$service_name]
-    File["/etc/sysconfig/${service_name_v6}"] -> Service[$service_name_v6]
+    File["/etc/sysconfig/${service_name}"]    -> Service['firewall']
+    File["/etc/sysconfig/${service_name_v6}"] -> Service['firewall6']
   }
 
   # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to system_u
