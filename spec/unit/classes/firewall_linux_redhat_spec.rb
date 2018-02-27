@@ -121,7 +121,7 @@ describe 'firewall::linux::redhat', type: :class do
         end
 
         it {
-          is_expected.to contain_service('firewall').with(
+          is_expected.to contain_service('firewalld').with(
             ensure: 'stopped',
             enable: false,
             before: ['Package[iptables-services]', 'Service[firewall]'],
