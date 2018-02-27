@@ -27,10 +27,10 @@ class firewall::linux::archlinux (
   }
 
   service { 'firewall':
-    name      => $service_name,
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
+    name      => $service_name,
   }
 
   file { '/etc/iptables/iptables.rules':

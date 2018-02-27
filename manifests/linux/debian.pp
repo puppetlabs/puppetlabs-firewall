@@ -47,10 +47,10 @@ class firewall::linux::debian (
     # This isn't a real service/daemon. The start action loads rules, so just
     # needs to be called on system boot.
     service { 'firewall':
-      name      => $service_name,
       ensure    => undef,
       enable    => $enable,
       hasstatus => true,
+      name      => $service_name,
       require   => Package[$package_name],
     }
   }

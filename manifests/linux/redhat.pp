@@ -68,16 +68,16 @@ class firewall::linux::redhat (
   }
 
   service { 'firewall':
-    name      => $service_name,
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
+    name      => $service_name,
   }
   service { 'firewall6':
-    name      => $service_name_v6,
     ensure    => $_ensure_v6,
     enable    => $_enable_v6,
     hasstatus => true,
+    name      => $service_name_v6,
   }
 
   file { "/etc/sysconfig/${service_name}":

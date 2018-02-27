@@ -27,10 +27,10 @@ class firewall::linux::gentoo (
   }
 
   service { 'firewall':
-    name      => $service_name,
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
+    name      => $service_name,
   }
 
   file { '/var/lib/iptables/rules-save':
