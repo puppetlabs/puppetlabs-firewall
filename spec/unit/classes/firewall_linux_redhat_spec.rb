@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.shared_examples 'ensures iptables service' do
   context 'with default' do
     it {
-      is_expected.to contain_service('iptables').with(
+      is_expected.to contain_service('firewall').with(
         ensure: 'running',
         enable: 'true',
       )
@@ -14,7 +14,7 @@ RSpec.shared_examples 'ensures iptables service' do
     let(:params) { { ensure: 'stopped' } }
 
     it {
-      is_expected.to contain_service('iptables').with(
+      is_expected.to contain_service('firewall').with(
         ensure: 'stopped',
       )
     }
@@ -24,7 +24,7 @@ RSpec.shared_examples 'ensures iptables service' do
     let(:params) { { enable: 'false' } }
 
     it {
-      is_expected.to contain_service('iptables').with(
+      is_expected.to contain_service('firewall').with(
         enable: 'false',
       )
     }
@@ -68,13 +68,13 @@ describe 'firewall::linux::redhat', type: :class do
         end
 
         it {
-          is_expected.to contain_service('iptables').with(
+          is_expected.to contain_service('firewall').with(
             ensure: 'running',
             enable: 'true',
           )
         }
         it {
-          is_expected.to contain_service('ip6tables').with(
+          is_expected.to contain_service('firewall6').with(
             ensure: 'running',
             enable: 'true',
           )
@@ -84,7 +84,7 @@ describe 'firewall::linux::redhat', type: :class do
           let(:params) { { ensure: 'stopped' } }
 
           it {
-            is_expected.to contain_service('iptables').with(
+            is_expected.to contain_service('firewall').with(
               ensure: 'stopped',
             )
           }
@@ -94,7 +94,7 @@ describe 'firewall::linux::redhat', type: :class do
           let(:params) { { ensure_v6: 'stopped' } }
 
           it {
-            is_expected.to contain_service('ip6tables').with(
+            is_expected.to contain_service('firewall6').with(
               ensure: 'stopped',
             )
           }
@@ -104,7 +104,7 @@ describe 'firewall::linux::redhat', type: :class do
           let(:params) { { enable: 'false' } }
 
           it {
-            is_expected.to contain_service('iptables').with(
+            is_expected.to contain_service('firewall').with(
               enable: 'false',
             )
           }
@@ -114,7 +114,7 @@ describe 'firewall::linux::redhat', type: :class do
           let(:params) { { enable_v6: 'false' } }
 
           it {
-            is_expected.to contain_service('ip6tables').with(
+            is_expected.to contain_service('firewall6').with(
               enable: 'false',
             )
           }
@@ -124,14 +124,14 @@ describe 'firewall::linux::redhat', type: :class do
           is_expected.to contain_service('firewalld').with(
             ensure: 'stopped',
             enable: false,
-            before: ['Package[iptables-services]', 'Service[iptables]'],
+            before: ['Package[iptables-services]', 'Service[firewall]'],
           )
         }
 
         it {
           is_expected.to contain_package('iptables-services').with(
             ensure: 'present',
-            before: 'Service[iptables]',
+            before: 'Service[firewall]',
           )
         }
 

@@ -9,13 +9,13 @@ describe 'firewall::linux::archlinux', type: :class do
   end
 
   it {
-    is_expected.to contain_service('iptables').with(
+    is_expected.to contain_service('firewall').with(
       ensure: 'running',
       enable: 'true',
     )
   }
   it {
-    is_expected.to contain_service('ip6tables').with(
+    is_expected.to contain_service('firewall6').with(
       ensure: 'running',
       enable: 'true',
     )
@@ -25,12 +25,12 @@ describe 'firewall::linux::archlinux', type: :class do
     let(:params) { { ensure: 'stopped' } }
 
     it {
-      is_expected.to contain_service('iptables').with(
+      is_expected.to contain_service('firewall').with(
         ensure: 'stopped',
       )
     }
     it {
-      is_expected.to contain_service('ip6tables').with(
+      is_expected.to contain_service('firewall6').with(
         ensure: 'stopped',
       )
     }
@@ -40,12 +40,12 @@ describe 'firewall::linux::archlinux', type: :class do
     let(:params) { { enable: 'false' } }
 
     it {
-      is_expected.to contain_service('iptables').with(
+      is_expected.to contain_service('firewall').with(
         enable: 'false',
       )
     }
     it {
-      is_expected.to contain_service('ip6tables').with(
+      is_expected.to contain_service('firewall6').with(
         enable: 'false',
       )
     }
