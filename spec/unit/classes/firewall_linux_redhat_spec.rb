@@ -48,7 +48,7 @@ describe 'firewall::linux::redhat', type: :class do
           }
         end
 
-        it { is_expected.not_to contain_service('firewall') }
+        it { is_expected.not_to contain_service('firewalld') }
         it { is_expected.not_to contain_package('iptables-services') }
 
         it_behaves_like 'ensures iptables service'
