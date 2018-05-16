@@ -8,11 +8,14 @@ AllCops:
   Exclude:
   - bin/*
   - ".vendor/**/*"
-  - Gemfile
-  - Rakefile
+  - "**/Gemfile"
+  - "**/Rakefile"
   - pkg/**/*
   - spec/fixtures/**/*
   - vendor/**/*
+  - "**/Puppetfile"
+  - "**/Vagrantfile"
+  - "**/Guardfile"
 Metrics/LineLength:
   Description: People have wide screens, use them.
   Max: 200
@@ -63,6 +66,8 @@ Style/TrailingCommaInLiteral:
 Style/SymbolArray:
   Description: Using percent style obscures symbolic intent of array's contents.
   EnforcedStyle: brackets
+RSpec/MessageSpies:
+  EnforcedStyle: receive
 Style/CollectionMethods:
   Enabled: true
 Style/MethodCalledOnDoEndBlock:
