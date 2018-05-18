@@ -3,13 +3,13 @@ require 'beaker/puppet_install_helper'
 require 'beaker/module_install_helper'
 
 def iptables_flush_all_tables
-  %w[filter nat mangle raw].each do |t|
+  ['filter', 'nat', 'mangle', 'raw'].each do |t|
     expect(shell("iptables -t #{t} -F").stderr).to eq('')
   end
 end
 
 def ip6tables_flush_all_tables
-  %w[filter mangle].each do |t|
+  ['filter', 'mangle'].each do |t|
     expect(shell("ip6tables -t #{t} -F").stderr).to eq('')
   end
 end

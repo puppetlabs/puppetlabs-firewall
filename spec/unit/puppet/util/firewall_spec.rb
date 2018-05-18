@@ -55,7 +55,7 @@ describe 'Puppet::Util::Firewall' do
     describe 'proto unsupported' do
       subject(:host) { resource }
 
-      %w[inet5 inet8 foo].each do |proto|
+      ['inet5', 'inet8', 'foo'].each do |proto|
         it "should reject invalid proto #{proto}" do
           expect { host.icmp_name_to_number('echo-reply', proto) }
             .to raise_error(ArgumentError, "unsupported protocol family '#{proto}'")
@@ -133,7 +133,7 @@ describe 'Puppet::Util::Firewall' do
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('RedHat')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('6')
 
-        allow(host).to receive(:execute).with(%w[/sbin/service iptables save])
+        allow(host).to receive(:execute).with(['/sbin/service', 'iptables', 'save'])
         host.persist_iptables(proto)
       end
 
@@ -142,7 +142,7 @@ describe 'Puppet::Util::Firewall' do
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('RedHat')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('7')
 
-        allow(host).to receive(:execute).with(%w[/usr/libexec/iptables/iptables.init save])
+        allow(host).to receive(:execute).with(['/usr/libexec/iptables/iptables.init', 'save'])
         host.persist_iptables(proto)
       end
 
@@ -151,7 +151,7 @@ describe 'Puppet::Util::Firewall' do
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Fedora')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('15')
 
-        allow(host).to receive(:execute).with(%w[/usr/libexec/iptables/iptables.init save])
+        allow(host).to receive(:execute).with(['/usr/libexec/iptables/iptables.init', 'save'])
         host.persist_iptables(proto)
       end
 
@@ -159,7 +159,7 @@ describe 'Puppet::Util::Firewall' do
         allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('CentOS')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('6.5')
-        allow(host).to receive(:execute).with(%w[/sbin/service iptables save])
+        allow(host).to receive(:execute).with(['/sbin/service', 'iptables', 'save'])
         host.persist_iptables(proto)
       end
 
@@ -167,7 +167,7 @@ describe 'Puppet::Util::Firewall' do
         allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('CentOS')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('7.0.1406')
-        allow(host).to receive(:execute).with(%w[/usr/libexec/iptables/iptables.init save])
+        allow(host).to receive(:execute).with(['/usr/libexec/iptables/iptables.init', 'save'])
         host.persist_iptables(proto)
       end
 
@@ -182,7 +182,7 @@ describe 'Puppet::Util::Firewall' do
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('RedHat')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('6')
 
-        allow(host).to receive(:execute).with(%w[/sbin/service iptables save]).and_raise(Puppet::ExecutionFailure, 'some error')
+        allow(host).to receive(:execute).with(['/sbin/service', 'iptables', 'save']).and_raise(Puppet::ExecutionFailure, 'some error')
         allow(host).to receive(:warning).with('Unable to persist firewall rules: some error')
         host.persist_iptables(proto)
       end
@@ -195,7 +195,7 @@ describe 'Puppet::Util::Firewall' do
         allow(Facter.fact(:osfamily)).to receive(:value).and_return(nil)
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
         allow(Facter.fact(:iptables_persistent_version)).to receive(:value).and_return('0.5.3ubuntu2')
-        allow(host).to receive(:execute).with(%w[/usr/sbin/service iptables-persistent save])
+        allow(host).to receive(:execute).with(['/usr/sbin/service', 'iptables-persistent', 'save'])
         host.persist_iptables(proto)
       end
 

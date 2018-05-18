@@ -100,14 +100,14 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       expect(res.parameters[:jump]).to be nil
     end
 
-    %w[QUEUE RETURN DNAT SNAT LOG NFLOG MASQUERADE REDIRECT MARK].each do |jump|
+    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'NFLOG', 'MASQUERADE', 'REDIRECT', 'MARK'].each do |jump|
       it "should accept jump value #{jump}" do
         resource[:jump] = jump
         expect(resource[:jump]).to eql jump
       end
     end
 
-    %w[ACCEPT DROP REJECT].each do |jump|
+    ['ACCEPT', 'DROP', 'REJECT'].each do |jump|
       it "should now fail when value #{jump}" do
         expect(-> { resource[:jump] = jump }).to raise_error(Puppet::Error)
       end
@@ -145,8 +145,8 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       end
 
       it "should accept a #{port} as an array" do
-        resource[port] = %w[22 23]
-        expect(resource[port]).to eql %w[22 23]
+        resource[port] = ['22', '23']
+        expect(resource[port]).to eql ['22', '23']
       end
 
       it "should accept a #{port} as a number" do
@@ -412,7 +412,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
   end
 
   describe ':recent' do
-    %w[set update rcheck remove].each do |recent|
+    ['set', 'update', 'rcheck', 'remove'].each do |recent|
       it "should accept recent value #{recent}" do
         resource[:recent] = recent
         expect(resource[:recent]).to eql "--#{recent}"
@@ -433,7 +433,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       expect(resource[:uid]).to eql 'root'
     end
     it 'allows me to set uid as an array, and silently hide my error' do
-      resource[:uid] = %w[root bobby]
+      resource[:uid] = ['root', 'bobby']
       expect(resource[:uid]).to eql 'root'
     end
     it 'allows me to set gid' do
@@ -441,7 +441,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       expect(resource[:gid]).to eql 'root'
     end
     it 'allows me to set gid as an array, and silently hide my error' do
-      resource[:gid] = %w[root bobby]
+      resource[:gid] = ['root', 'bobby']
       expect(resource[:gid]).to eql 'root'
     end
   end
@@ -577,7 +577,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       end
 
       # test where autorequire is still needed (table != filter)
-      %w[INPUT OUTPUT FORWARD].each do |test_chain|
+      ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
         it "should autorequire fwchain #{test_chain} when table is mangle and provider is undefined" do
           resource[param] = test_chain
           resource[:table] = :mangle
@@ -608,7 +608,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       end
 
       # test of case where autorequire should not happen
-      %w[INPUT OUTPUT FORWARD].each do |test_chain|
+      ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
         it "should not autorequire fwchain #{test_chain} when table and provider are undefined" do
           resource[param] = test_chain
           expect(resource[:table]).to be :filter

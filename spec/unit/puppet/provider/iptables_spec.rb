@@ -273,7 +273,7 @@ describe 'iptables provider' do
     end
 
     resource_types = [:chain, :source, :destination, :proto, :dport, :sport, :action]
-    rule_values = ['INPUT', '1.1.1.1/32', '1.1.1.1/32', 'tcp', %w[7061 7062], %w[7061 7062], 'accept']
+    rule_values = ['INPUT', '1.1.1.1/32', '1.1.1.1/32', 'tcp', ['7061', '7062'], ['7061', '7062'], 'accept']
     it 'parsed the rule arguments correctly' do
       resource_types.each_with_index do |type, index|
         expect(resource[type]).to eq(rule_values[index])
