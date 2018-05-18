@@ -32,9 +32,9 @@ RSpec.shared_examples 'ensures iptables service' do
 end
 
 describe 'firewall::linux::redhat', type: :class do
-  %w[RedHat CentOS Fedora].each do |os|
+  ['RedHat', 'CentOS', 'Fedora'].each do |os|
     oldreleases = ((os == 'Fedora') ? ['14'] : ['6.5'])
-    newreleases = ((os == 'Fedora') ? %w[15 Rawhide] : ['7.0.1406'])
+    newreleases = ((os == 'Fedora') ? ['15', 'Rawhide'] : ['7.0.1406'])
 
     oldreleases.each do |osrel|
       context "os #{os} and osrel #{osrel}" do

@@ -522,7 +522,7 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  %w[dst_type src_type].each do |type|
+  ['dst_type', 'src_type'].each do |type|
     describe type.to_s do
       context 'when MULTICAST' do
         pp26 = <<-PUPPETCODE
@@ -1534,7 +1534,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      %w[dst_type src_type].each do |type|
+      ['dst_type', 'src_type'].each do |type|
         describe type.to_s do
           context 'when MULTICAST' do
             pp65 = <<-PUPPETCODE

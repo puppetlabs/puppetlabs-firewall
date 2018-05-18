@@ -158,7 +158,7 @@ Puppet::Type.newtype(:firewallchain) do
   autorequire(:package) do
     case value(:provider)
     when :iptables_chain
-      %w[iptables iptables-persistent iptables-services]
+      ['iptables', 'iptables-persistent', 'iptables-services']
     else
       []
     end
@@ -167,7 +167,7 @@ Puppet::Type.newtype(:firewallchain) do
   autorequire(:service) do
     case value(:provider)
     when :iptables, :ip6tables
-      %w[firewalld iptables ip6tables iptables-persistent netfilter-persistent]
+      ['firewalld', 'iptables', 'ip6tables', 'iptables-persistent', 'netfilter-persistent']
     else
       []
     end

@@ -489,7 +489,7 @@ Puppet::Type.newtype(:firewall) do
         PUPPETCODE
       end
 
-      if %w[accept reject drop].include?(value.downcase)
+      if ['accept', 'reject', 'drop'].include?(value.downcase)
         raise ArgumentError, <<-PUPPETCODE
           Jump destination should not be one of ACCEPT, REJECT or DROP. Use
           the action property instead.
@@ -522,7 +522,7 @@ Puppet::Type.newtype(:firewall) do
         PUPPETCODE
       end
 
-      if %w[accept reject drop].include?(value.downcase)
+      if ['accept', 'reject', 'drop'].include?(value.downcase)
         raise ArgumentError, <<-PUPPETCODE
           Goto destination should not be one of ACCEPT, REJECT or DROP. Use
           the action property instead.
@@ -1059,10 +1059,7 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
     #  iptables uses the cisco DSCP classes as the basis for this flag. Values may be found here:
     #  'http://www.cisco.com/c/en/us/support/docs/quality-of-service-qos/qos-packet-marking/10103-dscpvalues.html'
-    valid_codes = %w[
-      af11 af12 af13 af21 af22 af23 af31 af32 af33 af41
-      af42 af43 cs1 cs2 cs3 cs4 cs5 cs6 cs7 ef
-    ]
+    valid_codes = ['af11', 'af12', 'af13', 'af21', 'af22', 'af23', 'af31', 'af32', 'af33', 'af41', 'af42', 'af43', 'cs1', 'cs2', 'cs3', 'cs4', 'cs5', 'cs6', 'cs7', 'ef']
     munge do |value|
       unless valid_codes.include? value.downcase
         raise ArgumentError, "#{value} is not a valid DSCP Class"
@@ -1720,7 +1717,7 @@ Puppet::Type.newtype(:firewall) do
     unless protocol.nil?
       table = value(:table)
       [value(:chain), value(:jump)].each do |chain|
-        reqs << "#{chain}:#{table}:#{protocol}" unless chain.nil? || (%w[INPUT OUTPUT FORWARD].include?(chain) && table == :filter)
+        reqs << "#{chain}:#{table}:#{protocol}" unless chain.nil? || (['INPUT', 'OUTPUT', 'FORWARD'].include?(chain) && table == :filter)
       end
     end
 
@@ -1732,7 +1729,7 @@ Puppet::Type.newtype(:firewall) do
   autorequire(:package) do
     case value(:provider)
     when :iptables, :ip6tables
-      %w[iptables iptables-persistent iptables-services]
+      ['iptables', 'iptables-persistent', 'iptables-services']
     else
       []
     end
@@ -1741,7 +1738,7 @@ Puppet::Type.newtype(:firewall) do
   autorequire(:service) do
     case value(:provider)
     when :iptables, :ip6tables
-      %w[firewalld iptables ip6tables iptables-persistent netfilter-persistent]
+      ['firewalld', 'iptables', 'ip6tables', 'iptables-persistent', 'netfilter-persistent']
     else
       []
     end

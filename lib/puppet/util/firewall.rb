@@ -196,7 +196,7 @@ module Puppet::Util::Firewall
     end
 
     # RHEL 7 and newer also use systemd to persist iptable rules
-    if os_key == 'RedHat' && %w[RedHat CentOS Scientific SL SLC Ascendos CloudLinux PSBM OracleLinux OVS OEL XenServer VirtuozzoLinux]
+    if os_key == 'RedHat' && ['RedHat', 'CentOS', 'Scientific', 'SL', 'SLC', 'Ascendos', 'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'XenServer', 'VirtuozzoLinux']
        .include?(Facter.value(:operatingsystem)) && Facter.value(:operatingsystemrelease).to_i >= 7
       os_key = 'Fedora'
     end
@@ -205,24 +205,24 @@ module Puppet::Util::Firewall
           when :RedHat
             case proto.to_sym
             when :IPv4
-              %w[/sbin/service iptables save]
+              ['/sbin/service', 'iptables', 'save']
             when :IPv6
-              %w[/sbin/service ip6tables save]
+              ['/sbin/service', 'ip6tables', 'save']
             end
           when :Fedora
             case proto.to_sym
             when :IPv4
-              %w[/usr/libexec/iptables/iptables.init save]
+              ['/usr/libexec/iptables/iptables.init', 'save']
             when :IPv6
-              %w[/usr/libexec/iptables/ip6tables.init save]
+              ['/usr/libexec/iptables/ip6tables.init', 'save']
             end
           when :Debian
             case proto.to_sym
             when :IPv4, :IPv6
               if persist_ver && Puppet::Util::Package.versioncmp(persist_ver, '1.0') > 0
-                %w[/usr/sbin/service netfilter-persistent save]
+                ['/usr/sbin/service', 'netfilter-persistent', 'save']
               else
-                %w[/usr/sbin/service iptables-persistent save]
+                ['/usr/sbin/service', 'iptables-persistent', 'save']
               end
             end
           when :Debian_manual

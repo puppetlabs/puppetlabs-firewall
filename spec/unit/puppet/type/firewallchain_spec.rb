@@ -26,13 +26,13 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
   end
 
   describe ':name' do
-    { 'nat' => %w[PREROUTING POSTROUTING INPUT OUTPUT],
-      'mangle' => %w[PREROUTING POSTROUTING INPUT FORWARD OUTPUT],
-      'filter' => %w[INPUT OUTPUT FORWARD],
-      'raw' => %w[PREROUTING OUTPUT],
+    { 'nat' => ['PREROUTING', 'POSTROUTING', 'INPUT', 'OUTPUT'],
+      'mangle' => ['PREROUTING', 'POSTROUTING', 'INPUT', 'FORWARD', 'OUTPUT'],
+      'filter' => ['INPUT', 'OUTPUT', 'FORWARD'],
+      'raw' => ['PREROUTING', 'OUTPUT'],
       'broute' => ['BROUTING'],
-      'security' => %w[INPUT OUTPUT FORWARD] }.each_pair do |table, allowedinternalchains|
-      %w[IPv4 IPv6 ethernet].each do |protocol|
+      'security' => ['INPUT', 'OUTPUT', 'FORWARD'] }.each_pair do |table, allowedinternalchains|
+      ['IPv4', 'IPv6', 'ethernet'].each do |protocol|
         ['test', '$5()*&%\'"^$09):'].each do |chainname|
           name = "#{chainname}:#{table}:#{protocol}"
           if table == 'nat' && protocol == 'IPv6'
@@ -58,7 +58,7 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
         end
       end
 
-      %w[PREROUTING POSTROUTING BROUTING INPUT FORWARD OUTPUT].each do |internalchain|
+      ['PREROUTING', 'POSTROUTING', 'BROUTING', 'INPUT', 'FORWARD', 'OUTPUT'].each do |internalchain|
         name = internalchain + ':' + table + ':'
         name += if internalchain == 'BROUTING'
                   'ethernet'

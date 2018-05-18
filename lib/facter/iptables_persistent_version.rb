@@ -1,5 +1,5 @@
 Facter.add(:iptables_persistent_version) do
-  confine operatingsystem: %w[Debian Ubuntu]
+  confine operatingsystem: ['Debian', 'Ubuntu']
   setcode do
     # Throw away STDERR because dpkg >= 1.16.7 will make some noise if the
     # package isn't currently installed.
