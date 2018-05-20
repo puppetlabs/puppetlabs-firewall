@@ -26,19 +26,20 @@ class firewall::linux::gentoo (
     }
   }
 
-  service { $service_name:
+  service { 'firewall':
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
+    name      => $service_name,
   }
 
   file { '/var/lib/iptables/rules-save':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 
   file { '/var/lib/iptables/rules-save6':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 }

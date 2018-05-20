@@ -16,7 +16,7 @@ describe 'firewall::linux::debian', type: :class do
       )
     }
     it {
-      is_expected.to contain_service('iptables-persistent').with(
+      is_expected.to contain_service('firewall').with(
         ensure: nil,
         enable: 'true',
         require: 'Package[iptables-persistent]',
@@ -35,7 +35,7 @@ describe 'firewall::linux::debian', type: :class do
     let(:params) { { enable: 'false' } }
 
     it {
-      is_expected.to contain_service('iptables-persistent').with(
+      is_expected.to contain_service('firewall').with(
         enable: 'false',
       )
     }
@@ -56,7 +56,7 @@ describe 'firewall::linux::debian', type: :class do
       )
     }
     it {
-      is_expected.to contain_service('netfilter-persistent').with(
+      is_expected.to contain_service('firewall').with(
         ensure: nil,
         enable: 'true',
         require: 'Package[iptables-persistent]',
@@ -75,7 +75,7 @@ describe 'firewall::linux::debian', type: :class do
     let(:params) { { enable: 'false' } }
 
     it {
-      is_expected.to contain_service('netfilter-persistent').with(
+      is_expected.to contain_service('firewall').with(
         enable: 'false',
       )
     }
@@ -96,7 +96,7 @@ describe 'firewall::linux::debian', type: :class do
       )
     }
     it {
-      is_expected.to contain_service('netfilter-persistent').with(
+      is_expected.to contain_service('firewall').with(
         ensure: nil,
         enable: 'true',
         require: 'Package[iptables-persistent]',
@@ -115,7 +115,7 @@ describe 'firewall::linux::debian', type: :class do
     let(:params) { { enable: 'false' } }
 
     it {
-      is_expected.to contain_service('netfilter-persistent').with(
+      is_expected.to contain_service('firewall').with(
         enable: 'false',
       )
     }

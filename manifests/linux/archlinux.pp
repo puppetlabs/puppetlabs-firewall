@@ -26,19 +26,20 @@ class firewall::linux::archlinux (
     }
   }
 
-  service { $service_name:
+  service { 'firewall':
     ensure    => $ensure,
     enable    => $enable,
     hasstatus => true,
+    name      => $service_name,
   }
 
   file { '/etc/iptables/iptables.rules':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 
   file { '/etc/iptables/ip6tables.rules':
     ensure => present,
-    before => Service[$service_name],
+    before => Service['firewall'],
   }
 }
