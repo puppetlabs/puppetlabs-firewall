@@ -6,7 +6,7 @@ describe 'firewall time' do
     ip6tables_flush_all_tables
   end
 
-  if default['platform'] =~ %r{ubuntu-1404} || default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{debian-8} || default['platform'] =~ %r{el-7}
+  if default['platform'] =~ %r{ubuntu-1404} || default['platform'] =~ %r{debian-8} || default['platform'] =~ %r{el-7}
     describe 'time tests ipv4' do
       context 'when set all time parameters' do
         pp1 = <<-PUPPETCODE

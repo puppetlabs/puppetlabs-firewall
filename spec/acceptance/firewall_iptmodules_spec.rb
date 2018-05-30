@@ -67,7 +67,7 @@ describe 'firewall iptmodules' do
   end
 
   # iptables version 1.3.5 is not suppored by the ip6tables provider
-  if default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{ubuntu-14\.04}
+  if default['platform'] =~ %r{ubuntu-14\.04}
     describe 'ip6tables ipt_modules tests' do
       context 'when all the modules with multiple args' do
         pp3 = <<-PUPPETCODE

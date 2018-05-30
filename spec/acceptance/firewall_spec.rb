@@ -803,7 +803,7 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{ubuntu-10\.04} && default['platform'] !~ %r{debian-6} && default['platform'] !~ %r{sles}
+  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles}
     describe 'checksum_fill' do
       context 'when virbr' do
         pp38 = <<-PUPPETCODE
@@ -1256,7 +1256,7 @@ describe 'firewall basics', docker: true do
     end
 
     # ip6tables has limited `-m socket` support
-    if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{ubuntu-10\.04} && default['platform'] !~ %r{debian-6} && default['platform'] !~ %r{sles}
+    if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles}
       describe 'socket' do
         context 'when true' do
           pp56 = <<-PUPPETCODE
@@ -1448,7 +1448,7 @@ describe 'firewall basics', docker: true do
     end
 
     # ip6tables only supports ipset, addrtype, and mask on a limited set of platforms
-    if default['platform'] =~ %r{el-7} || default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{ubuntu-14\.04}
+    if default['platform'] =~ %r{el-7} || default['platform'] =~ %r{ubuntu-14\.04}
       # ipset is really difficult to test, just testing on one platform
       if default['platform'] =~ %r{ubuntu-14\.04}
         describe 'ipset' do
@@ -1501,34 +1501,6 @@ describe 'firewall basics', docker: true do
           it 'contains the rule' do
             shell('ip6tables-save') do |r|
               expect(r.stdout).to match(%r{-A INPUT -p tcp -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP})
-            end
-          end
-        end
-      end
-
-      # mask isn't supported on deb7
-      if default['platform'] !~ %r{debian-7}
-        describe 'mask' do
-          pp64 = <<-PUPPETCODE
-            class { '::firewall': }
-            firewall { '613 - test':
-              recent => 'update',
-              rseconds => 60,
-              rsource => true,
-              rname => 'test',
-              action => 'drop',
-              chain => 'FORWARD',
-              mask => 'ffff::',
-              provider => 'ip6tables',
-            }
-          PUPPETCODE
-          it 'applies' do
-            apply_manifest(pp64, catch_failures: true)
-          end
-
-          it 'contains the rule' do
-            shell('ip6tables-save') do |r|
-              expect(r.stdout).to match(%r{-A FORWARD -p tcp -m recent --update --seconds 60 --name test --mask ffff:: --rsource -m comment --comment "613 - test" -j DROP})
             end
           end
         end
