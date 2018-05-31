@@ -6,7 +6,7 @@ describe 'firewall tee' do
     ip6tables_flush_all_tables
   end
 
-  if default['platform'] =~ %r{ubuntu-1404} || default['platform'] =~ %r{ubuntu-1204} || default['platform'] =~ %r{debian-7} || default['platform'] =~ %r{debian-8} || default['platform'] =~ %r{el-7}
+  if default['platform'] =~ %r{ubuntu-1404} || default['platform'] =~ %r{debian-8} || default['platform'] =~ %r{el-7}
     describe 'tee_gateway' do
       context 'when 10.0.0.2' do
         pp1 = <<-PUPPETCODE

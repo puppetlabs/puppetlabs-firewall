@@ -7,15 +7,9 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
     let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' iptables-persistent 2>/dev/null" }
 
     {
-      'Debian' => '0.0.20090701',
       'Ubuntu' => '0.5.3ubuntu2',
     }.each do |os, ver|
-
-      if os == 'Debian'
-        os_release = '7.0'
-      elsif os == 'Ubuntu'
-        os_release = '14.04'
-      end
+      os_release = '14.04'
 
       describe "#{os} package installed" do
         before(:each) do
