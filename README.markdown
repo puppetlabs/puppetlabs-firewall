@@ -70,8 +70,9 @@ Therefore, the run order is:
 
 The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity and that you drop unmatched packets appropriately. The rules you define in your manifests are likely specific to the applications you run.
 
-1.) Add the `pre` class to my_fw/manifests/pre.pp. Your pre.pp file should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.2.
-  ~~~puppet
+1. Add the `pre` class to my_fw/manifests/pre.pp. Your pre.pp file should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.2.
+
+  ~~~ puppet
   class my_fw::pre {
     Firewall {
       require => undef,
@@ -103,9 +104,9 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
 
   The rules in `pre` should allow basic networking (such as ICMP and TCP) and ensure that existing connections are not closed.
 
-2.) Add the `post` class to my_fw/manifests/post.pp and include any default rules to be applied last.
+2. Add the `post` class to my_fw/manifests/post.pp and include any default rules to be applied last.
 
-  ~~~puppet
+  ~~~ puppet
   class my_fw::post {
     firewall { '999 drop all':
       proto  => 'all',
@@ -117,7 +118,7 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
 
 Alternatively, the [firewallchain](#type-firewallchain) type can be used to set the default policy:
 
-  ~~~puppet
+  ~~~ puppet
   firewallchain { 'INPUT:filter:IPv4':
     ensure => present,
     policy => drop,
@@ -131,9 +132,9 @@ The rules you create here are helpful if you don’t have any existing rules; th
 
 Rules are persisted automatically between reboots, although there are known issues with ip6tables on older Debian/Ubuntu distributions. There are also known issues with ebtables.
 
-1.) In site.pp or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
+1. In site.pp or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
 
-  ~~~puppet
+  ~~~ puppet
   resources { 'firewall':
     purge => true,
   }
@@ -141,7 +142,7 @@ Rules are persisted automatically between reboots, although there are known issu
 
   To purge unmanaged firewall chains, also add:
 
-  ~~~puppet
+  ~~~ puppet
   resources { 'firewallchain':
     purge => true,
   }
@@ -149,24 +150,24 @@ Rules are persisted automatically between reboots, although there are known issu
 
   **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs before the firewall chain is purged. This is different than the `purge` parameter available in `firewallchain`.
 
-2.)  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
+2.  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
 
-  ~~~puppet
+  ~~~ puppet
   Firewall {
     before  => Class['my_fw::post'],
     require => Class['my_fw::pre'],
   }
   ~~~
 
-3.) Then, declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an External Node Classifier or the following code:
+3. Then, declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an External Node Classifier or the following code:
 
-  ~~~puppet
+  ~~~ puppet
   class { ['my_fw::pre', 'my_fw::post']: }
   ~~~
 
-4.) Include the `firewall` class to ensure the correct packages are installed.
+4. Include the `firewall` class to ensure the correct packages are installed.
 
-  ~~~puppet
+  ~~~ puppet
   class { 'firewall': }
   ~~~
 
@@ -196,7 +197,7 @@ In iptables, the title of the rule is stored using the comment feature of the un
 
 Basic accept ICMP request example:
 
-~~~puppet
+~~~ puppet
 firewall { '000 accept all icmp requests':
   proto  => 'icmp',
   action => 'accept',
@@ -205,7 +206,7 @@ firewall { '000 accept all icmp requests':
 
 Drop all:
 
-~~~puppet
+~~~ puppet
 firewall { '999 drop all other requests':
   action => 'drop',
 }
@@ -215,7 +216,7 @@ firewall { '999 drop all other requests':
 
 IPv6 rules can be specified using the _ip6tables_ provider:
 
-~~~puppet
+~~~ puppet
 firewall { '006 Allow inbound SSH (v6)':
   dport    => 22,
   proto    => tcp,
@@ -235,7 +236,7 @@ remain close to the services managed by the profile.
 
 This is an example of firewall rules in a profile:
 
-~~~puppet
+~~~ puppet
 class profile::apache {
   include apache
   apache::vhost { 'mysite': ensure => present }
@@ -256,7 +257,7 @@ Parameters that understand inversion are: connmark, ctstate, destination, dport,
 
 Examples:
 
-~~~puppet
+~~~ puppet
 firewall { '001 disallow esp protocol':
   action => 'accept',
   proto  => '! esp',
@@ -276,7 +277,7 @@ firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN u
 
 You can apply firewall rules to specific nodes. Usually, you should put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows:
 
-~~~puppet
+~~~ puppet
 node 'some.node.com' {
   firewall { '111 open port 111':
     dport => 111,
@@ -286,7 +287,7 @@ node 'some.node.com' {
 
 You can also do more complex things with the `firewall` resource. This example sets up static NAT for the source network 10.1.2.0/24:
 
-~~~puppet
+~~~ puppet
 firewall { '100 snat for network foo2':
   chain    => 'POSTROUTING',
   jump     => 'MASQUERADE',
@@ -300,7 +301,7 @@ firewall { '100 snat for network foo2':
 
 You can also change the TCP MSS value for VPN client traffic:
 
-~~~puppet
+~~~ puppet
 firewall { '110 TCPMSS for VPN clients':
   chain     => 'FORWARD',
   table     => 'mangle',
@@ -315,7 +316,7 @@ firewall { '110 TCPMSS for VPN clients':
 
 The following will mirror all traffic sent to the server to a secondary host on the LAN with the TEE target:
 
-~~~puppet
+~~~ puppet
 firewall { '503 Mirror traffic to IDS':
   proto   => all,
   jump    => 'TEE',
@@ -327,7 +328,7 @@ firewall { '503 Mirror traffic to IDS':
 
 The following example creates a new chain and forwards any port 5000 access to it.
 
-~~~puppet
+~~~ puppet
 firewall { '100 forward to MY_CHAIN':
   chain   => 'INPUT',
   jump    => 'MY_CHAIN',
@@ -346,7 +347,7 @@ firewall { '100 my rule':
 
 Setup NFLOG for a rule.
 
-~~~puppet
+~~~ puppet
 firewall {'666 for NFLOG':
   proto => 'all',
   jump  => 'NFLOG',
@@ -680,7 +681,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `name`: The canonical name of the rule. This name is also used for ordering, so make sure you prefix the rule with a number. For example:
 
-  ~~~puppet
+  ~~~ puppet
   firewall { '000 this runs first':
     # this rule will run first
   }
@@ -739,7 +740,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `recent`: Enable the recent module. Valid values are: 'set', 'update', 'rcheck', or 'remove'. For example:
 
-  ~~~puppet
+  ~~~ puppet
   # If anyone's appeared on the 'badguy' blacklist within
   # the last 60 seconds, drop their traffic, and update the timestamp.
   firewall { '100 Drop badguy traffic':
@@ -847,7 +848,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `tosource`: When using `jump => 'SNAT'`, you can specify the new source address using this parameter. Requires the `snat` feature.
 
-* `to`: When using `jump => 'NETMAP'`, you can specify a source or destination subnet to nat to. Requires the `netmap` feature`.
+* `to`: When using `jump => 'NETMAP'`, you can specify a source or destination subnet to nat to. Requires the `netmap` feature.
 
 * `uid`: UID or Username owner matching rule. Accepts a string argument only, as iptables does not accept multiple uid in a single statement. Requires the `owner` feature.
 
@@ -877,7 +878,7 @@ Currently this type supports only iptables, ip6tables, and ebtables on Linux. It
 * `ignore`: Regex to perform on firewall rules to exempt unmanaged rules from purging (when enabled). This is matched against the output of iptables-save. This can be a single regex or an array of them. To support flags, use the ruby inline flag mechanism: a regex such as '/foo/i' can be written as '(?i)foo' or '(?i:foo)'. Only when purge is 'true'.
 
   Full example:
-  ~~~puppet
+  ~~~ puppet
   firewallchain { 'INPUT:filter:IPv4':
     purge  => true,
     ignore => [
@@ -910,7 +911,7 @@ Currently this type supports only iptables, ip6tables, and ebtables on Linux. It
 
   **Note** This `purge` is purging unmanaged rules in a firewall chain, not unmanaged firewall chains. To purge unmanaged firewall chains, use the following instead.
 
-  ~~~puppet
+  ~~~ puppet
   resources { 'firewallchain':
     purge => true,
   }
@@ -1016,13 +1017,14 @@ Make sure you have:
 
 Install the necessary gems:
 
-    bundle install
+~~~ text
+bundle install
+~~~
 
 And run the tests from the root of the source code:
 
-    rake test
+~~~ text
+bundle exec rake parallel_spec
+~~~
 
-If you have a copy of Vagrant 1.1.0 you can also run the system tests:
-
-    RS_SET=ubuntu-1404-x64 rspec spec/acceptance
-    RS_SET=centos-64-x64 rspec spec/acceptance
+See also `.travis.yml` for information on running the acceptance and other tests.
