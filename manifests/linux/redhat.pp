@@ -67,15 +67,30 @@ class firewall::linux::redhat (
     }
   }
 
-  service { $service_name:
-    ensure    => $ensure,
-    enable    => $enable,
-    hasstatus => true,
-  }
-  service { $service_name_v6:
-    ensure    => $_ensure_v6,
-    enable    => $_enable_v6,
-    hasstatus => true,
+  if ($::operatingsystem == 'Amazon') and (versioncmp($::operatingsystemmajrelease, '4') >= 0) {
+    service { $service_name:
+      ensure    => $ensure,
+      enable    => $enable,
+      hasstatus => true,
+      provider  => systemd,
+    }
+    service { $service_name_v6:
+      ensure    => $_ensure_v6,
+      enable    => $_enable_v6,
+      hasstatus => true,
+      provider  => systemd,
+    }
+  } else {
+    service { $service_name:
+      ensure    => $ensure,
+      enable    => $enable,
+      hasstatus => true,
+    }
+    service { $service_name_v6:
+      ensure    => $_ensure_v6,
+      enable    => $_enable_v6,
+      hasstatus => true,
+    }
   }
 
   file { "/etc/sysconfig/${service_name}":
