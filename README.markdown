@@ -931,6 +931,8 @@ Retrieves the version of iptables-persistent from your OS. This is a Debian/Ubun
 
 ## Limitations
 
+For an extensive list of supported operating systems, see [metadata.json](https://github.com/puppetlabs/puppetlabs-firewall/blob/master/metadata.json)
+
 ### SLES
 
 The `socket` parameter is not supported on SLES.  In this release it will cause
@@ -943,11 +945,6 @@ The `socket` and `owner` parameters are unsupported on Oracle Enterprise Linux
 when the "Unbreakable" kernel is used. These may function correctly when using
 the stock RedHat kernel instead. Declaring either of these parameters on an
 unsupported system will result in iptable rules failing to apply.
-
-### Debian 8 Support
-
-As Puppet Enterprise itself does not yet support Debian 8, use of this module with Puppet Enterprise under a Debian 8
-system should be regarded as experimental.
 
 ## Passing firewall parameter values as arrays with `firewall_multi` module
 
