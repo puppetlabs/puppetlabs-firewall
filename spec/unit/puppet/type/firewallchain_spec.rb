@@ -145,7 +145,6 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
   end
 
   describe 'purge iptables rules' do
-    # rubocop:disable Layout/IndentHeredoc
     before(:each) do
       stub_return = <<PUPPETCODE
 # Completed on Sun Jan  5 19:30:21 2014
