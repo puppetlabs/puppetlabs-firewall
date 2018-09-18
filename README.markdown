@@ -68,9 +68,9 @@ Therefore, the run order is:
 * Your rules (defined in code)
 * The rules in `my_fw::post`
 
-The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity and that you drop unmatched packets appropriately. The rules you define in your manifests are likely specific to the applications you run.
+The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity and that you drop unmatched packets appropriately. The rules you define in your manifests are likely to be specific to the applications you run.
 
-1. Add the `pre` class to my_fw/manifests/pre.pp. Your pre.pp file should contain any default rules to be applied first. The rules in this class should be added in the order you want them to run.2.
+1. Add the `pre` class to `my_fw/manifests/pre.pp`, and any default rules to your pre.pp file first — in the order you want them to run.
 
   ~~~ puppet
   class my_fw::pre {
@@ -102,9 +102,9 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
   }
   ~~~
 
-  The rules in `pre` should allow basic networking (such as ICMP and TCP) and ensure that existing connections are not closed.
+ The rules in `pre` allow basic networking (such as ICMP and TCP) and ensure that existing connections are not closed.
 
-2. Add the `post` class to my_fw/manifests/post.pp and include any default rules to be applied last.
+2. Add the `post` class to `my_fw/manifests/post.pp` and include any default rules — apply these last.
 
   ~~~ puppet
   class my_fw::post {
@@ -140,7 +140,7 @@ Rules are persisted automatically between reboots, although there are known issu
   }
   ~~~
 
-  To purge unmanaged firewall chains, also add:
+  To purge unmanaged firewall chains, add:
 
   ~~~ puppet
   resources { 'firewallchain':
@@ -148,9 +148,9 @@ Rules are persisted automatically between reboots, although there are known issu
   }
   ~~~
 
-  **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs before the firewall chain is purged. This is different than the `purge` parameter available in `firewallchain`.
+  **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs for the firewall chain to be purged. This is different than the `purge` parameter available in `firewallchain`.
 
-2.  Use the following code to set up the default parameters for all of the firewall rules you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order to avoid locking you out of your box during the first Puppet run.
+2.  Use the following code to set up the default parameters for all of the firewall rules that you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order and avoid locking you out of your box during the first Puppet run.
 
   ~~~ puppet
   Firewall {
@@ -159,13 +159,13 @@ Rules are persisted automatically between reboots, although there are known issu
   }
   ~~~
 
-3. Then, declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an External Node Classifier or the following code:
+3. Declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an external node classifier or the following code:
 
   ~~~ puppet
   class { ['my_fw::pre', 'my_fw::post']: }
   ~~~
 
-4. Include the `firewall` class to ensure the correct packages are installed.
+4. Include the `firewall` class to ensure the correct packages are installed:
 
   ~~~ puppet
   class { 'firewall': }
