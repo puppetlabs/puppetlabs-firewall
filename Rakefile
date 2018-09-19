@@ -5,7 +5,7 @@ require 'github_changelog_generator/task' if Bundler.rubygems.find_name('github_
 
 def changelog_user
   return unless Rake.application.top_level_tasks.include? "changelog"
-  returnVal = nil || JSON.load(File.read('metadata.json'))['author']
+  returnVal = "puppetlabs" || JSON.load(File.read('metadata.json'))['author']
   raise "unable to find the changelog_user in .sync.yml, or the author in metadata.json" if returnVal.nil?
   puts "GitHubChangelogGenerator user:#{returnVal}"
   returnVal
