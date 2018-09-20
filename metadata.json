@@ -1,7 +1,7 @@
 {
   "name": "puppetlabs-firewall",
   "version": "1.13.0",
-  "author": "Puppet Labs",
+  "author": "puppetlabs",
   "summary": "Manages Firewalls such as iptables",
   "license": "Apache-2.0",
   "source": "https://github.com/puppetlabs/puppetlabs-firewall",
