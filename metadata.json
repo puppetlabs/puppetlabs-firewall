@@ -65,12 +65,6 @@
         "16.04",
         "18.04"
       ]
-    },
-    {
-      "operatingsystem": "Gentoo",
-      "operatingsystemrelease": [
-        "1.0"
-      ]
     }
   ],
   "requirements": [
