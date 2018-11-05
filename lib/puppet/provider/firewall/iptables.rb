@@ -393,6 +393,15 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values = values.gsub(%r{-m set --match-set (!\s+)?\S* \S* }, '')
       values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
     end
+    # --comment can have multiple values, the same as --match-set
+    if values =~ %r{-m comment --comment}
+      ind = values.index('-m comment --comment')
+      comments = values.scan(%r{-m comment --comment "(.*?[^\\"])"})
+      comments += values.scan(%r{-m comment --comment ([^"]+?)\b})
+      values = values.gsub(%r{-m comment --comment (".*?[^\\"]"|[^ ].*)( |$)}, '')
+      values = values.gsub(%r{-m comment --comment ([^"].*?)[ $]}, '')
+      values.insert(ind, "-m comment --comment \"#{comments.join(';')}\" ")
+    end
     # the actual rule will have the ! mark before the option.
     values = values.gsub(%r{(!)\s*(-\S+)\s*(\S*)}, '\2 "\1 \3"')
     # we do a similar thing for negated address masks (source and destination).
