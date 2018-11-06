@@ -586,6 +586,117 @@ describe 'firewall basics', docker: true do
           end
         end
       end
+
+      context 'when LOCAL --limit-iface-in', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                     (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+        pp97 = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '613 - test':
+              proto   => tcp,
+              action  => accept,
+              #{type} => 'LOCAL --limit-iface-in',
+            }
+        PUPPETCODE
+        it 'applies' do
+          apply_manifest(pp97, catch_failures: true)
+        end
+
+        it 'contains the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "613 - test" -j ACCEPT})
+          end
+        end
+      end
+
+      context 'when LOCAL --limit-iface-in fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                      (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+        pp98 = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '614 - test':
+              proto   => tcp,
+              action  => accept,
+              #{type} => 'LOCAL --limit-iface-in',
+            }
+        PUPPETCODE
+        it 'fails' do
+          apply_manifest(pp98, expect_failures: true) do |r|
+            expect(r.stderr).to match(%r{--limit-iface-in and --limit-iface-out are available from iptables version})
+          end
+        end
+
+        it 'does not contain the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "614 - test" -j ACCEPT})
+          end
+        end
+      end
+
+      context 'when duplicated LOCAL', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                               (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+        pp99 = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '615 - test':
+              proto   => tcp,
+              action  => accept,
+              #{type} => ['LOCAL', 'LOCAL'],
+            }
+        PUPPETCODE
+        it 'fails' do
+          apply_manifest(pp99, expect_failures: true) do |r|
+            expect(r.stderr).to match(%r{#{type} elements must be unique})
+          end
+        end
+
+        it 'does not contain the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype --#{type.tr('_', '-')} LOCAL -m comment --comment "615 - test" -j ACCEPT})
+          end
+        end
+      end
+
+      context 'when multiple addrtype', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+        pp100 = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '616 - test':
+              proto   => tcp,
+              action  => accept,
+              #{type} => ['LOCAL', '! LOCAL'],
+            }
+        PUPPETCODE
+        it 'applies' do
+          apply_manifest(pp100, catch_failures: true)
+        end
+
+        it 'contains the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
+          end
+        end
+      end
+
+      context 'when multiple addrtype fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                 (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+        pp101 = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '616 - test':
+              proto   => tcp,
+              action  => accept,
+              #{type} => ['LOCAL', '! LOCAL'],
+            }
+        PUPPETCODE
+        it 'fails' do
+          apply_manifest(pp101, expect_failures: true) do |r|
+            expect(r.stderr).to match(%r{Multiple #{type} elements are available from iptables version})
+          end
+        end
+
+        it 'does not contain the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
+          end
+        end
+      end
     end
   end
 
@@ -1571,6 +1682,120 @@ describe 'firewall basics', docker: true do
             it 'does not contain the rule' do
               shell('ip6tables-save') do |r|
                 expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sBROKEN -m comment --comment "603 - test" -j ACCEPT})
+              end
+            end
+          end
+
+          context 'when LOCAL --limit-iface-in', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                         (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+            pp102 = <<-PUPPETCODE
+                class { '::firewall': }
+                firewall { '617 - test':
+                  proto   => tcp,
+                  action  => accept,
+                  #{type} => 'LOCAL --limit-iface-in',
+                }
+            PUPPETCODE
+            it 'applies' do
+              apply_manifest(pp102, catch_failures: true)
+            end
+
+            it 'contains the rule' do
+              shell('iptables-save') do |r|
+                expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "617 - test" -j ACCEPT})
+              end
+            end
+          end
+
+          context 'when LOCAL --limit-iface-in fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                          (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+            pp103 = <<-PUPPETCODE
+                class { '::firewall': }
+                firewall { '618 - test':
+                  proto   => tcp,
+                  action  => accept,
+                  #{type} => 'LOCAL --limit-iface-in',
+                }
+            PUPPETCODE
+            it 'fails' do
+              apply_manifest(pp103, expect_failures: true) do |r|
+                expect(r.stderr).to match(%r{--limit-iface-in and --limit-iface-out are available from iptables version})
+              end
+            end
+
+            it 'does not contain the rule' do
+              shell('iptables-save') do |r|
+                expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "618 - test" -j ACCEPT})
+              end
+            end
+          end
+
+          context 'when duplicated LOCAL', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                   (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+            pp104 = <<-PUPPETCODE
+                class { '::firewall': }
+                firewall { '619 - test':
+                  proto    => tcp,
+                  action   => accept,
+                  #{type}  => ['LOCAL', 'LOCAL'],
+                  provider => 'ip6tables',
+                }
+            PUPPETCODE
+            it 'fails' do
+              apply_manifest(pp104, expect_failures: true) do |r|
+                expect(r.stderr).to match(%r{#{type} elements must be unique})
+              end
+            end
+
+            it 'does not contain the rule' do
+              shell('ip6tables-save') do |r|
+                expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL -m addrtype\s.*\sLOCAL -m comment --comment "619 - test" -j ACCEPT})
+              end
+            end
+          end
+
+          context 'when multiple addrtype', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                    (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+            pp105 = <<-PUPPETCODE
+                class { '::firewall': }
+                firewall { '620 - test':
+                  proto    => tcp,
+                  action   => accept,
+                  #{type}  => ['LOCAL', '! LOCAL'],
+                  provider => 'ip6tables',
+                }
+            PUPPETCODE
+            it 'applies' do
+              apply_manifest(pp105, catch_failures: true)
+            end
+
+            it 'contains the rule' do
+              shell('ip6tables-save') do |r|
+                expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "620 - test" -j ACCEPT})
+              end
+            end
+          end
+
+          context 'when multiple addrtype fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                     (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+            pp106 = <<-PUPPETCODE
+                class { '::firewall': }
+                firewall { '616 - test':
+                  proto    => tcp,
+                  action   => accept,
+                  #{type}  => ['LOCAL', '! LOCAL'],
+                  provider => 'ip6tables',
+                }
+            PUPPETCODE
+            it 'fails' do
+              apply_manifest(pp106, expect_failures: true) do |r|
+                expect(r.stderr).to match(%r{Multiple #{type} elements are available from iptables version})
+              end
+            end
+
+            it 'does not contain the rule' do
+              shell('ip6tables-save') do |r|
+                expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
               end
             end
           end

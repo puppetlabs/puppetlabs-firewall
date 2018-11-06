@@ -581,7 +581,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
   The destination IP range is must in 'IP1-IP2' format. Values in the range must be valid IPv4 or IPv6 addresses. Requires the `iprange` feature.
 
-* `dst_type`: The destination address type. For example: `dst_type => 'LOCAL'`.
+* `dst_type`: The destination address type. Will accept a single element or an array. For example: `dst_type => ['LOCAL']`.
 
   Valid values are:
 
@@ -596,6 +596,10 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
   * 'PROHIBIT': a prohibited address
   * 'THROW': an unroutable address
   * 'XRESOLVE: an unresolvable address
+
+  In addition, it accepts '--limit-iface-in' and '--limit-iface-out' flags. For example: `dst_type => ['LOCAL --limit-iface-in']`.
+
+  It can also be negated using '!'. For example: `dst_type => ['! LOCAL']`.
 
   Requires the `address_type` feature.
 
@@ -798,7 +802,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `src_range`: The source IP range. For example: `src_range => '192.168.1.1-192.168.1.10'`. The source IP range must be in 'IP1-IP2' format. Values in the range must be valid IPv4 or IPv6 addresses. Requires the `iprange` feature.
 
-* `src_type`: Specify the source address type. For example: `src_type => 'LOCAL'`.
+* `src_type`: Specify the source address type. Will accept a single element or an array. For example: `src_type => ['LOCAL']`.
 
   Valid values are:
 
@@ -813,6 +817,10 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
   * 'PROHIBIT': a prohibited address.
   * 'THROW': an unroutable address.
   * 'XRESOLVE': an unresolvable address.
+
+  In addition, it accepts '--limit-iface-in' and '--limit-iface-out' flags. For example: `dst_type => ['LOCAL --limit-iface-in']`.
+
+  It can also be negated using '!'. For example: `dst_type => ['! LOCAL']`.
 
   Requires the `address_type` feature.
 
