@@ -540,7 +540,7 @@ Puppet::Type.newtype(:firewall) do
             iniface => '! lo',
 
     PUPPETCODE
-    newvalues(%r{^!?\s?[a-zA-Z0-9\-\._\+\:]+$})
+    newvalues(%r{^!?\s?[a-zA-Z0-9\-\._\+\:@]+$})
   end
 
   newproperty(:outiface, required_features: :interface_match) do
@@ -551,7 +551,7 @@ Puppet::Type.newtype(:firewall) do
            outiface => '! lo',
 
     PUPPETCODE
-    newvalues(%r{^!?\s?[a-zA-Z0-9\-\._\+\:]+$})
+    newvalues(%r{^!?\s?[a-zA-Z0-9\-\._\+\:@]+$})
   end
 
   # NAT specific properties
