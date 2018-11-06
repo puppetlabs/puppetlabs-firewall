@@ -627,7 +627,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `icmp`: When matching ICMP packets, this indicates the type of ICMP packet to match. A value of 'any' is not supported. To match any type of ICMP packet, the parameter should be omitted or undefined. Requires the `icmp_match` feature. This parameter is supported by firewall_multi (see below).
 
-* `iniface`: Input interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.
+* `iniface`: Input interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:@]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.
 
 * `ipsec_dir`: Sets the ipsec policy direction. Valid values are 'in', 'out'. Requires the `ipsec_dir` feature.
 
@@ -692,7 +692,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
   Depending on the provider, the name of the rule can be stored using the comment feature of the underlying firewall subsystem. Values must match '/^\d+[[:graph:][:space:]]+$/'.
 
-* `outiface`: Output interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.
+* `outiface`: Output interface to filter on. Values must match '/^!?\s?[a-zA-Z0-9\-\._\+\:@]+$/'.  Requires the `interface_match` feature.  Supports interface alias (eth0:0) and negation.
 
 * `physdev_in`: Match if the packet is entering a bridge from the given interface. Values must match '/^[a-zA-Z0-9\-\._\+]+$/'.
 
