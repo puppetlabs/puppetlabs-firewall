@@ -64,6 +64,22 @@ describe 'puppet resource firewall command' do
     end
   end
 
+  context 'when accepts rules with multiple comments', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
+                                                               (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+    before(:all) do
+      iptables_flush_all_tables
+      shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http" -m comment --comment "http"')
+    end
+
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
+      end
+    end
+  end
+
   context 'when accepts rules with negation' do
     before :all do
       iptables_flush_all_tables
