@@ -67,7 +67,8 @@ class firewall::linux::redhat (
     }
   }
 
-  if ($::operatingsystem == 'Amazon') and (versioncmp($::operatingsystemmajrelease, '4') >= 0) {
+  if ($::operatingsystem == 'Amazon') and (versioncmp($::operatingsystemmajrelease, '4') >= 0)
+    or ($::operatingsystem == 'Amazon') and (versioncmp($::operatingsystemmajrelease, '2') >= 0) {
     service { $service_name:
       ensure    => $ensure,
       enable    => $enable,
