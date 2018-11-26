@@ -176,14 +176,14 @@ ARGS_TO_HASH = {
     line: '-A INPUT -m addrtype --dst-type LOCAL',
     table: 'filter',
     params: {
-      dst_type: 'LOCAL',
+      dst_type: ['LOCAL'],
     },
   },
   'src_type_1' => {
     line: '-A INPUT -m addrtype --src-type LOCAL',
     table: 'filter',
     params: {
-      src_type: 'LOCAL',
+      src_type: ['LOCAL'],
     },
   },
   'dst_range_1' => {
@@ -368,6 +368,39 @@ ARGS_TO_HASH = {
       state: ['NEW'],
       ipset: ['! setname1 src'],
       action: 'drop',
+    },
+  },
+  'addrtype_limit_iface_out' => {
+    line: '-A cali-POSTROUTING -o tunl0 -m comment --comment "000 cali:JHlpT-eSqR1TvyYm" -m addrtype --src-type LOCAL --limit-iface-out -j MASQUERADE',
+    table: 'filter',
+    params: {
+      chain: 'cali-POSTROUTING',
+      outiface: 'tunl0',
+      name: '000 cali:JHlpT-eSqR1TvyYm',
+      jump: 'MASQUERADE',
+      src_type: ['LOCAL --limit-iface-out'],
+    },
+  },
+  'addrtype_negated' => {
+    line: '-A cali-POSTROUTING -o tunl0 -m comment --comment "000 cali:JHlpT-eSqR1TvyYm" -m addrtype ! --src-type LOCAL -j MASQUERADE',
+    table: 'filter',
+    params: {
+      chain: 'cali-POSTROUTING',
+      outiface: 'tunl0',
+      name: '000 cali:JHlpT-eSqR1TvyYm',
+      jump: 'MASQUERADE',
+      src_type: ['! LOCAL'],
+    },
+  },
+  'addrtype_multiple' => {
+    line: '-A cali-POSTROUTING -o tunl0 -m comment --comment "000 cali:JHlpT-eSqR1TvyYm" -m addrtype ! --src-type LOCAL --limit-iface-out -m addrtype --src-type LOCAL -j MASQUERADE',
+    table: 'filter',
+    params: {
+      chain: 'cali-POSTROUTING',
+      outiface: 'tunl0',
+      name: '000 cali:JHlpT-eSqR1TvyYm',
+      jump: 'MASQUERADE',
+      src_type: ['! LOCAL --limit-iface-out', 'LOCAL'],
     },
   },
   'iniface_1_negated' => {
@@ -838,7 +871,31 @@ HASH_TO_ARGS = {
       table: 'filter',
       dst_type: 'LOCAL',
     },
-    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', :LOCAL, '-m', 'comment', '--comment', '000 dst_type'],
+    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', 'LOCAL', '-m', 'comment', '--comment', '000 dst_type'],
+  },
+  'dst_type_as_array' => {
+    params: {
+      name: '000 dst_type',
+      table: 'filter',
+      dst_type: ['LOCAL'],
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', 'LOCAL', '-m', 'comment', '--comment', '000 dst_type'],
+  },
+  'dst_type_multiple' => {
+    params: {
+      name: '000 dst_type',
+      table: 'filter',
+      dst_type: ['LOCAL', '! LOCAL'],
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', 'LOCAL', '-m', 'addrtype', '!', '--dst-type', 'LOCAL', '-m', 'comment', '--comment', '000 dst_type'],
+  },
+  'dst_type_limit' => {
+    params: {
+      name: '000 dst_type',
+      table: 'filter',
+      dst_type: ['LOCAL --limit-iface-in'],
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--dst-type', 'LOCAL', '--limit-iface-in', '-m', 'comment', '--comment', '000 dst_type'],
   },
   'src_type_1' => {
     params: {
@@ -846,7 +903,23 @@ HASH_TO_ARGS = {
       table: 'filter',
       src_type: 'LOCAL',
     },
-    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', :LOCAL, '-m', 'comment', '--comment', '000 src_type'],
+    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', 'LOCAL', '-m', 'comment', '--comment', '000 src_type'],
+  },
+  'src_type_as_array' => {
+    params: {
+      name: '000 src_type',
+      table: 'filter',
+      src_type: ['LOCAL'],
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', 'LOCAL', '-m', 'comment', '--comment', '000 src_type'],
+  },
+  'src_type_multiple' => {
+    params: {
+      name: '000 src_type',
+      table: 'filter',
+      src_type: ['LOCAL', '! LOCAL'],
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'addrtype', '--src-type', 'LOCAL', '-m', 'addrtype', '!', '--src-type', 'LOCAL', '-m', 'comment', '--comment', '000 src_type'],
   },
   'dst_range_1' => {
     params: {

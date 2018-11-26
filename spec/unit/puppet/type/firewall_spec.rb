@@ -198,9 +198,13 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
     [:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST, :BLACKHOLE,
      :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].each do |type|
-      it "should accept #{addrtype} value #{type}" do
-        resource[addrtype] = type
-        expect(resource[addrtype]).to eql type
+      ['! ', ''].each do |negation|
+        ['', ' --limit-iface-in', ' --limit-iface-out'].each do |limit|
+          it "should accept #{addrtype} value #{negation}#{type}#{limit}" do
+            resource[addrtype] = type
+            expect(resource[addrtype]).to eql [type]
+          end
+        end
       end
     end
 
