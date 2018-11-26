@@ -3,24 +3,39 @@ class firewall::params {
   $package_ensure = 'present'
   case $::osfamily {
     'RedHat': {
-      $service_name = 'iptables'
-      $service_name_v6 = 'ip6tables'
       case $::operatingsystem {
         'Amazon': {
+          $service_name = 'iptables'
+          $service_name_v6 = 'ip6tables'
           $package_name = undef
+          $sysconfig_manage = true
         }
         'Fedora': {
+          $service_name = 'iptables'
+          $service_name_v6 = 'ip6tables'
           if versioncmp($::operatingsystemrelease, '15') >= 0 {
             $package_name = 'iptables-services'
           } else {
             $package_name = undef
           }
+          $sysconfig_manage = true
         }
         default: {
-          if versioncmp($::operatingsystemrelease, '7.0') >= 0 {
+          if versioncmp($::operatingsystemrelease, '8.0') >= 0 {
+            $service_name = 'nftables'
+            $service_name_v6 = undef
+            $package_name = 'nftables'
+            $sysconfig_manage = false
+          } elsif versioncmp($::operatingsystemrelease, '7.0') >= 0 {
+            $service_name = 'iptables'
+            $service_name_v6 = 'ip6tables'
             $package_name = 'iptables-services'
+            $sysconfig_manage = true
           } else {
+            $service_name = 'iptables'
+            $service_name_v6 = 'ip6tables'
             $package_name = 'iptables-ipv6'
+            $sysconfig_manage = true
           }
         }
       }

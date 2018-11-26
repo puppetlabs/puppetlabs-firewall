@@ -10,7 +10,7 @@
 #
 # [*ensure_v6*]
 #   Ensure parameter passed onto Service[] resources.
-#   Default: running
+#   Default: undef
 #
 # [*enable*]
 #   Enable parameter passed onto Service[] resources.
@@ -18,18 +18,23 @@
 #
 # [*enable_v6*]
 #   Enable parameter passed onto Service[] resources.
+#   Default: undef
+#
+# [*sysconfig_manage*]
+#   Enable sysconfig configuration for iptables/ip6tables files. This is
+#   disabled for RedHat 8+ or CentOS 8+
 #   Default: true
 #
-#
 class firewall::linux::redhat (
-  $ensure          = running,
-  $ensure_v6       = undef,
-  $enable          = true,
-  $enable_v6       = undef,
-  $service_name    = $::firewall::params::service_name,
-  $service_name_v6 = $::firewall::params::service_name_v6,
-  $package_name    = $::firewall::params::package_name,
-  $package_ensure  = $::firewall::params::package_ensure,
+  $ensure           = running,
+  $ensure_v6        = undef,
+  $enable           = true,
+  $enable_v6        = undef,
+  $service_name     = $::firewall::params::service_name,
+  $service_name_v6  = $::firewall::params::service_name_v6,
+  $package_name     = $::firewall::params::package_name,
+  $package_ensure   = $::firewall::params::package_ensure,
+  $sysconfig_manage = $::firewall::params::sysconfig_manage,
 ) inherits ::firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
   $_enable_v6 = pick($enable_v6, $enable)
@@ -45,6 +50,12 @@ class firewall::linux::redhat (
       enable => false,
       before => [Package[$package_name], Service[$service_name]],
     }
+  }
+
+  # in RHEL 8 / CentOS 8 nftables provides a replacement iptables cli
+  # but there is no nftables specific for ipv6 so throw a warning
+  if !$service_name_v6 and ($ensure_v6 or $enable_v6) {
+    warning('No v6 service available, $ensure_v6 and $enable_v6 are ignored')
   }
 
   if $package_name {
@@ -75,11 +86,13 @@ class firewall::linux::redhat (
       hasstatus => true,
       provider  => systemd,
     }
-    service { $service_name_v6:
-      ensure    => $_ensure_v6,
-      enable    => $_enable_v6,
-      hasstatus => true,
-      provider  => systemd,
+    if $service_name_v6 {
+      service { $service_name_v6:
+        ensure    => $_ensure_v6,
+        enable    => $_enable_v6,
+        hasstatus => true,
+        provider  => systemd,
+      }
     }
   } else {
     service { $service_name:
@@ -87,69 +100,79 @@ class firewall::linux::redhat (
       enable    => $enable,
       hasstatus => true,
     }
-    service { $service_name_v6:
-      ensure    => $_ensure_v6,
-      enable    => $_enable_v6,
-      hasstatus => true,
-    }
-  }
-
-  file { "/etc/sysconfig/${service_name}":
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0600',
-  }
-  file { "/etc/sysconfig/${service_name_v6}":
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0600',
-  }
-
-  # Before puppet 4, the autobefore on the firewall type does not work - therefore
-  # we need to keep this workaround here
-  if versioncmp($::puppetversion, '4.0') <= 0 {
-    File["/etc/sysconfig/${service_name}"]    -> Service[$service_name]
-    File["/etc/sysconfig/${service_name_v6}"] -> Service[$service_name_v6]
-  }
-
-  # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to system_u
-  # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to system_conf_t
-  case $::selinux {
-    #lint:ignore:quoted_booleans
-    'true',true: {
-      case $::operatingsystem {
-        'CentOS': {
-          case $::operatingsystemrelease {
-            /^6\..*/: {
-              File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-              File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'system_conf_t' }
-            }
-
-            /^7\..*/: {
-              File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' }
-              File["/etc/sysconfig/${service_name_v6}"] { seluser => 'system_u', seltype => 'system_conf_t' }
-            }
-
-            default : {
-              File["/etc/sysconfig/${service_name}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
-              File["/etc/sysconfig/${service_name_v6}"] { seluser => 'unconfined_u', seltype => 'etc_t' }
-            }
-          }
-        }
-
-        # Fedora uses the same SELinux context as Redhat
-        'Fedora': {
-          File["/etc/sysconfig/${service_name}"] { seluser => 'system_u', seltype => 'system_conf_t' }
-          File["/etc/sysconfig/${service_name_v6}"] { seluser => 'system_u', seltype => 'system_conf_t' }
-        }
-
-        default: {}
-
+    if $service_name_v6 {
+      service { $service_name_v6:
+        ensure    => $_ensure_v6,
+        enable    => $_enable_v6,
+        hasstatus => true,
       }
     }
-    default: {}
-    #lint:endignore
+  }
+
+  if $sysconfig_manage {
+    file { "/etc/sysconfig/${service_name}":
+      ensure => present,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0600',
+    }
+    if $service_name_v6 {
+      file { "/etc/sysconfig/${service_name_v6}":
+        ensure => present,
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0600',
+      }
+    }
+
+    # Before puppet 4, the autobefore on the firewall type does not work - therefore
+    # we need to keep this workaround here
+    if versioncmp($::puppetversion, '4.0') <= 0 {
+      File<| title == "/etc/sysconfig/${service_name}" |> -> Service<| title == $service_name |>
+      File<| title == "/etc/sysconfig/${service_name_v6}" |> -> Service<| title == $service_name_v6 |>
+    }
+
+    # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to system_u
+    # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to system_conf_t
+    case $::selinux {
+      #lint:ignore:quoted_booleans
+      'true',true: {
+        case $::operatingsystem {
+          'CentOS': {
+            case $::operatingsystemrelease {
+              /^6\..*/: {
+                $seluser = 'unconfined_u'
+                $seltype = 'system_conf_t'
+              }
+
+              /^7\..*/: {
+                $seluser = 'system_u'
+                $seltype = 'system_conf_t'
+              }
+
+              default : {
+                $seluser = 'unconfined_u'
+                $seltype = 'etc_t'
+              }
+            }
+            File<| title == "/etc/sysconfig/${service_name}" |> { seluser => $seluser, seltype => $seltype }
+            File<| title == "/etc/sysconfig/${service_name_v6}" |> { seluser => $seluser, seltype => $seltype }
+          }
+
+          # Fedora uses the same SELinux context as Redhat
+          'Fedora': {
+            $seluser = 'system_u'
+            $seltype = 'system_conf_t'
+            File<| title == "/etc/sysconfig/${service_name}" |> { seluser => $seluser, seltype => $seltype }
+            File<| title == "/etc/sysconfig/${service_name_v6}" |> { seluser => $seluser, seltype => $seltype }
+          }
+
+          default: {}
+
+        }
+      }
+      default: {}
+      #lint:endignore
+    }
   }
 }

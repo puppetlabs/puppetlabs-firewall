@@ -35,6 +35,7 @@ describe 'firewall::linux::redhat', type: :class do
   ['RedHat', 'CentOS', 'Fedora'].each do |os|
     oldreleases = ((os == 'Fedora') ? ['14'] : ['6.5'])
     newreleases = ((os == 'Fedora') ? ['15', 'Rawhide'] : ['7.0.1406'])
+    nftablesreleases = ((os == 'Fedora') ? [] : ['8.0'])
 
     oldreleases.each do |osrel|
       context "os #{os} and osrel #{osrel}" do
@@ -50,6 +51,10 @@ describe 'firewall::linux::redhat', type: :class do
 
         it { is_expected.not_to contain_service('firewalld') }
         it { is_expected.not_to contain_package('iptables-services') }
+        it {
+          is_expected.to contain_file('/etc/sysconfig/iptables')
+          is_expected.to contain_file('/etc/sysconfig/ip6tables')
+        }
 
         it_behaves_like 'ensures iptables service'
       end
@@ -78,6 +83,10 @@ describe 'firewall::linux::redhat', type: :class do
             ensure: 'running',
             enable: 'true',
           )
+        }
+        it {
+          is_expected.to contain_file('/etc/sysconfig/iptables')
+          is_expected.to contain_file('/etc/sysconfig/ip6tables')
         }
 
         context 'with ensure => stopped' do
@@ -136,6 +145,67 @@ describe 'firewall::linux::redhat', type: :class do
         }
 
         it_behaves_like 'ensures iptables service'
+      end
+    end
+
+    nftablesreleases.each do |osrel|
+      context "os #{os} and osrel #{osrel}" do
+        let(:facts) do
+          {
+            operatingsystem: os,
+            operatingsystemrelease: osrel,
+            osfamily: 'RedHat',
+            selinux: false,
+            puppetversion: Puppet.version,
+          }
+        end
+
+        it {
+          is_expected.to contain_service('nftables').with(
+            ensure: 'running',
+            enable: 'true',
+          )
+          is_expected.not_to contain_service('iptables')
+        }
+
+        context 'with ensure => stopped' do
+          let(:params) { { ensure: 'stopped' } }
+
+          it {
+            is_expected.to contain_service('nftables').with(
+              ensure: 'stopped',
+            )
+          }
+        end
+
+        context 'with enable => false' do
+          let(:params) { { enable: 'false' } }
+
+          it {
+            is_expected.to contain_service('nftables').with(
+              enable: 'false',
+            )
+          }
+        end
+
+        it {
+          is_expected.to contain_service('firewalld').with(
+            ensure: 'stopped',
+            enable: false,
+            before: ['Package[nftables]', 'Service[nftables]'],
+          )
+        }
+
+        it {
+          is_expected.to contain_package('nftables').with(
+            ensure: 'present',
+            before: 'Service[nftables]',
+          )
+        }
+
+        it {
+          is_expected.not_to contain_file('/etc/sysconfig/nftables')
+        }
       end
     end
   end
