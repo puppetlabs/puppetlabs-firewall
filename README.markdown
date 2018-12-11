@@ -187,6 +187,8 @@ There are two kinds of firewall rules you can use with firewall: default rules a
 
 All rules employ a numbering system in the resource's title that is used for ordering. When titling your rules, make sure you prefix the rule with a number, for example, '000 accept all icmp requests'. _000_ runs first, _999_ runs last.
 
+**Note:** The ordering range 9000-9999 is reserved for unmanaged rules. Do not specify any firewall rules in this range.
+
 ### Default rules
 
 You can place default rules in either `my_fw::pre` or `my_fw::post`, depending on when you would like them to run. Rules placed in the `pre` class will run first, and rules in the `post` class, last.

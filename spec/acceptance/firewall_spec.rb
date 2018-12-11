@@ -28,6 +28,18 @@ describe 'firewall basics', docker: true do
         end
       end
     end
+
+    context 'when invalid ordering range specified' do
+      pp = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '9946 test': ensure => present }
+      PUPPETCODE
+      it 'fails' do
+        apply_manifest(pp, expect_failures: true) do |r|
+          expect(r.stderr).to match(%r{Invalid ordering value})
+        end
+      end
+    end
   end
 
   describe 'ensure' do
