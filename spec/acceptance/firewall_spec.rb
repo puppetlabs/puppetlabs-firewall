@@ -36,7 +36,7 @@ describe 'firewall basics', docker: true do
       PUPPETCODE
       it 'fails' do
         apply_manifest(pp, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{Invalid ordering value})
+          expect(r.stderr).to match(%r{Ordering error detected})
         end
       end
     end
