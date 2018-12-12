@@ -741,6 +741,12 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         next
       end
 
+      # Skip proto=all as it is default for iptables/ip6tables
+      # There will be problems with externally added rules using '-p all' but this is a lesser evil
+      if res == :proto && resource_value == 'all'
+        next
+      end
+
       args << [resource_map[res]].flatten.first.split(' ')
       args = args.flatten
 
