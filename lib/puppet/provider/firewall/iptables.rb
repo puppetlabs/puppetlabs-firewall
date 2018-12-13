@@ -876,6 +876,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
     # Insert our new or updated rule in the correct order of named rules, but
     # offset for unnamed rules.
-    rules.reject { |r| r.match(unmanaged_rule_regex) }.sort.index(my_rule) + 1 + unnamed_offset
+    sorted_rules = rules.reject { |r| r.match(unmanaged_rule_regex) }.sort
+    raise 'Rule sorting error. Make sure that the title of your rule does not start with 9000-9999, as this range is reserved.' if sorted_rules.index(my_rule).nil?
+    sorted_rules.index(my_rule) + 1 + unnamed_offset
   end
 end
