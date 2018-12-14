@@ -48,7 +48,8 @@
       "operatingsystem": "SLES",
       "operatingsystemrelease": [
         "11 SP1",
-        "12"
+        "12",
+        "15"
       ]
     },
     {
