@@ -1604,7 +1604,7 @@ Puppet::Type.newtype(:firewall) do
       _value = "'" + value + "'"
     end
   end
-  
+
   newproperty(:string_hex, required_features: :string_matching) do
     desc <<-PUPPETCODE
       String matching feature. Matches the packet against the HEX code
