@@ -838,6 +838,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `string`: Set the pattern for string matching. Requires the `string_matching` feature.
 
+* `string_hex`: Set the hex pattern for string matching. Requires the `string_matching` feature. This should be in the format it appears in iptables e.g. `"|0000ff0001|"`
+
 * `string_algo`: Used in conjunction with `string`, select the pattern matching strategy. Valid values are: 'bm', 'kmp' (bm = Boyer-Moore, kmp = Knuth-Pratt-Morris). Requires the `string_matching` feature.
 
 * `string_from`: Used in conjunction with `string`, set the offset from which it starts looking for any matching. Requires the `string_matching` feature.
