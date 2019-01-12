@@ -325,9 +325,15 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       # https://bugzilla.netfilter.org/show_bug.cgi?id=1015
       #
       # This tries deleting again with -p all to see if that helps.
+      #
+      # rubocop:disable Lint/HandleExceptions
       if self.class.instance_variable_get(:@protocol) == 'IPv6' && properties[:proto] == 'all'
-        iptables delete_args.concat('-p', 'all')
+        begin
+          iptables delete_args.concat(['-p', 'all'])
+        rescue Puppet::ExecutionFailure => e
+        end
       end
+      # rubocop:enable Lint/HandleExceptions
 
       # Check to see if the iptables rule is already gone. This can sometimes
       # happen as a side effect of other resource changes. If it's not gone,
