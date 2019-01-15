@@ -44,7 +44,7 @@ class firewall::params {
       $service_name_v6 = undef
       case $::operatingsystem {
         'Debian': {
-          if facts['os']['release']['major'] == 'buster/sid' {
+          if $facts['os']['release']['major'] == 'buster/sid' {
             $service_name = 'netfilter-persistent'
             $package_name = 'netfilter-persistent'
           }
