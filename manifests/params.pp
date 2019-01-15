@@ -44,7 +44,11 @@ class firewall::params {
       $service_name_v6 = undef
       case $::operatingsystem {
         'Debian': {
-          if versioncmp($::operatingsystemrelease, '8.0') >= 0 {
+          if $facts['os']['release']['major'] == 'buster/sid' {
+            $service_name = 'netfilter-persistent'
+            $package_name = 'netfilter-persistent'
+          }
+          elsif versioncmp($::operatingsystemrelease, '8.0') >= 0 {
             $service_name = 'netfilter-persistent'
             $package_name = 'iptables-persistent'
           } else {
