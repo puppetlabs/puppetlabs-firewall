@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.15.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.0) (2019-01-18)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.14.0...1.15.0)
+
+### Added
+
+- \(MODULES-8143\) - Add SLES 15 support [\#798](https://github.com/puppetlabs/puppetlabs-firewall/pull/798) ([eimlav](https://github.com/eimlav))
+- Add nftables wrapper support for RHEL8 [\#794](https://github.com/puppetlabs/puppetlabs-firewall/pull/794) ([mwhahaha](https://github.com/mwhahaha))
+- Changed regex for iniface and outiface to allow '@' in interface names [\#791](https://github.com/puppetlabs/puppetlabs-firewall/pull/791) ([GeorgeCox](https://github.com/GeorgeCox))
+- \(MODULES-8214\) Handle src\_type and dst\_type as array [\#790](https://github.com/puppetlabs/puppetlabs-firewall/pull/790) ([mateusz-gozdek-sociomantic](https://github.com/mateusz-gozdek-sociomantic))
+- \(MODULES-7990\) Merge multiple comments into one while parsing rules [\#789](https://github.com/puppetlabs/puppetlabs-firewall/pull/789) ([mateusz-gozdek-sociomantic](https://github.com/mateusz-gozdek-sociomantic))
+- add -g flag handling in ip6tables.rb provider [\#788](https://github.com/puppetlabs/puppetlabs-firewall/pull/788) ([cestith](https://github.com/cestith))
+- \(MODULES-7681\) Add support for bytecode property [\#771](https://github.com/puppetlabs/puppetlabs-firewall/pull/771) ([baurmatt](https://github.com/baurmatt))
+
+### Fixed
+
+- pdksync - \(FM-7655\) Fix rubygems-update for ruby \< 2.3 [\#801](https://github.com/puppetlabs/puppetlabs-firewall/pull/801) ([tphoney](https://github.com/tphoney))
+- \(MODULES-6340\) - Address failure when name begins with 9XXX [\#796](https://github.com/puppetlabs/puppetlabs-firewall/pull/796) ([eimlav](https://github.com/eimlav))
+- Amazon linux 2 changed its major version to 2 with the last update... [\#793](https://github.com/puppetlabs/puppetlabs-firewall/pull/793) ([erik-frontify](https://github.com/erik-frontify))
+
 ## [1.14.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.14.0) (2018-09-27)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.13.0...1.14.0)
