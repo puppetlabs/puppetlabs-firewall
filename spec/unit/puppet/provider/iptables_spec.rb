@@ -455,14 +455,5 @@ describe 'ip6tables provider' do
     it 'delete_args is an array' do
       expect(instance.delete_args.class).to eq(Array)
     end
-
-    it 'attempts to match ipv6 rule' do
-      expect(instance.delete_args).to eq(['-t', 'filter', '-D', 'INPUT', '-i', 'lo', '-m', 'comment', '--comment', '001 accept all to lo interface v6', '-j', 'ACCEPT', '-p', 'all'])
-    end
-
-    it 'delete_args is the same as the rule string when joined' do
-      expect(instance.delete_args.join(' ')).to eq(bare_sample_rule.gsub(%r{\-A},
-                                                                         '-t filter -D') + ' -p all')
-    end
   end
 end
