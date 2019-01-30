@@ -62,12 +62,6 @@ The code in this section does the following:
 * The 'require' parameter in `firewall {}` ensures `my_fw::pre` is run before any other rules.
 * In the `my_fw::post` class declaration, the 'before' parameter ensures `my_fw::post` is run after any other rules.
 
-Therefore, the run order is:
-
-* The rules in `my_fw::pre`
-* Your rules (defined in code)
-* The rules in `my_fw::post`
-
 The rules in the `pre` and `post` classes are fairly general. These two classes ensure that you retain connectivity and that you drop unmatched packets appropriately. The rules you define in your manifests are likely to be specific to the applications you run.
 
 1. Add the `pre` class to `my_fw/manifests/pre.pp`, and any default rules to your pre.pp file first — in the order you want them to run.
