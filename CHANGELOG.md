@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.15.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.1) (2019-02-01)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.0...1.15.1)
+
+### Fixed
+
+- \(DOC-3056\) Remove mention of rules ordering [\#809](https://github.com/puppetlabs/puppetlabs-firewall/pull/809) ([clairecadman](https://github.com/clairecadman))
+- \(FM-7712\) - Remove Gentoo 1.0 testing/support for Firewall module [\#808](https://github.com/puppetlabs/puppetlabs-firewall/pull/808) ([david22swan](https://github.com/david22swan))
+- \(MODULES-8360\) Fix IPv6 bug relating to Bugzilla 1015 [\#804](https://github.com/puppetlabs/puppetlabs-firewall/pull/804) ([alexharv074](https://github.com/alexharv074))
+
 ## [1.15.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.0) (2019-01-18)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.14.0...1.15.0)
