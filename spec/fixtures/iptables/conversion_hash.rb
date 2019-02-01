@@ -255,10 +255,10 @@ ARGS_TO_HASH = {
     },
   },
   'string_escape_sequences' => {
-    line: '-A INPUT -m comment --comment "000 parse escaped \\"s, \\\'s, and \\\\s"',
+    line: '-A INPUT -m comment --comment "000 parse escaped \\"s, \\"s, \\\'s, \\\'s, \\\\s and \\\\s"',
     table: 'filter',
     params: {
-      name: '000 parse escaped "s, \'s, and \\s',
+      name: '000 parse escaped "s, "s, \'s, \'s, \\s and \\s',
     },
   },
   'log_level_debug' => {

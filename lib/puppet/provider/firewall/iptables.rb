@@ -413,7 +413,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # --comment can have multiple values, the same as --match-set
     if values =~ %r{-m comment --comment}
       ind = values.index('-m comment --comment')
-      comments = values.scan(%r{-m comment --comment "(.*?[^\\"])"})
+      comments = values.scan(%r{-m comment --comment "((?:\\"|[^"])*)"})
       comments += values.scan(%r{-m comment --comment ([^"]+?)\b})
       values = values.gsub(%r{-m comment --comment (".*?[^\\"]"|[^ ].*)( |$)}, '')
       values = values.gsub(%r{-m comment --comment ([^"].*?)[ $]}, '')
