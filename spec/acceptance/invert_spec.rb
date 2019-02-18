@@ -15,7 +15,7 @@ describe 'firewall inverting' do
         }
         firewall { '602 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
           chain     => 'INPUT',
-          state     => 'NEW',
+          ctstate     => 'NEW',
           action    => 'drop',
           proto     => 'tcp',
           sport     => ['! http', '! 443'],

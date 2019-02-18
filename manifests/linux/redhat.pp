@@ -140,6 +140,11 @@ class firewall::linux::redhat (
         case $::operatingsystem {
           'CentOS': {
             case $::operatingsystemrelease {
+              /^5\..*/: {
+                $seluser = 'system_u'
+                $seltype = 'etc_t'
+              }
+
               /^6\..*/: {
                 $seluser = 'unconfined_u'
                 $seltype = 'system_conf_t'

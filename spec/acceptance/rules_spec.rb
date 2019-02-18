@@ -27,7 +27,7 @@ describe 'rules spec' do
           source      => '10.0.0.0/8',
           destination => '!10.0.0.0/8',
           proto       => 'tcp',
-          state       => 'NEW',
+          ctstate       => 'NEW',
           port        => [80,443,21,20,22,53,123,43,873,25,465],
           action      => 'accept',
         }
@@ -93,15 +93,14 @@ describe 'rules spec' do
         }
     PUPPETCODE
     it 'applies cleanly' do
-      # Run it twice and test for idempotency
       apply_manifest(pp1, catch_failures: true)
-      expect(apply_manifest(pp1, catch_failures: true).exit_code).to be_zero
+      apply_manifest(pp1, catch_changes: true)
     end
     regex_values = [
       %r{INPUT ACCEPT}, %r{FORWARD ACCEPT}, %r{OUTPUT ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) -d 10.0.0.0\/(8|255\.0\.0\.0) -m comment --comment \"090 forward allow local\" -j ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT},
-      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m state --state NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Metrics/LineLength
+      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m conntrack --ctstate NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Metrics/LineLength
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --ports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT}
     ]
     it 'contains appropriate rules' do
@@ -143,7 +142,7 @@ describe 'rules spec' do
 
         firewall { '010 INPUT allow established and related':
           proto  => 'all',
-          state  => ['ESTABLISHED', 'RELATED'],
+          ctstate  => ['ESTABLISHED', 'RELATED'],
           action => 'accept',
           before => Firewallchain['INPUT:filter:IPv4'],
         }
@@ -162,7 +161,7 @@ describe 'rules spec' do
         firewall { '020 ssh':
           proto  => 'tcp',
           dport  => '22',
-          state  => 'NEW',
+          ctstate  => 'NEW',
           action => 'accept',
           before => Firewallchain['INPUT:filter:IPv4'],
         }
@@ -172,7 +171,7 @@ describe 'rules spec' do
           chain    => 'OUTPUT',
           proto    => 'tcp',
           dport    => '25',
-          state    => 'NEW',
+          ctstate    => 'NEW',
           action   => 'accept',
         }
         firewall { '013 icmp echo-request':
@@ -194,7 +193,7 @@ describe 'rules spec' do
         firewall { '443 ssl on aliased interface':
           proto   => 'tcp',
           dport   => '443',
-          state   => 'NEW',
+          ctstate   => 'NEW',
           action  => 'accept',
           iniface => 'eth0:3',
         }
@@ -221,7 +220,7 @@ describe 'rules spec' do
         firewall { '010 allow established and related':
           chain  => 'FORWARD',
           proto  => 'all',
-          state  => ['ESTABLISHED','RELATED'],
+          ctstate  => ['ESTABLISHED','RELATED'],
           action => 'accept',
           before => Firewallchain['FORWARD:filter:IPv4'],
         }
@@ -241,7 +240,7 @@ describe 'rules spec' do
     it 'applies cleanly' do
       # Run it twice and test for idempotency
       apply_manifest(pp2, catch_failures: true)
-      apply_manifest(pp2, catch_changes: do_catch_changes)
+      apply_manifest(pp2, catch_changes: true)
     end
 
     regex_values = [
@@ -252,17 +251,17 @@ describe 'rules spec' do
       %r{LOCAL_INPUT_PRE},
       %r{-A INPUT -m comment --comment \"001 LOCAL_INPUT_PRE\" -j LOCAL_INPUT_PRE},
       %r{-A INPUT -p tcp -m multiport --dports 22 -m comment --comment \"001 ssh needed for beaker testing\" -j ACCEPT},
-      %r{-A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment \"010 INPUT allow established and related\" -j ACCEPT},
+      %r{-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -m comment --comment \"010 INPUT allow established and related\" -j ACCEPT},
       %r{-A INPUT -d 127.0.0.0\/(8|255\.0\.0\.0) (! -i|-i !) lo -m comment --comment \"011 reject local traffic not on loopback interface\" -j REJECT --reject-with icmp-port-unreachable},
       %r{-A INPUT -i lo -m comment --comment \"012 accept loopback\" -j ACCEPT},
       %r{-A INPUT -p icmp -m icmp --icmp-type 3 -m comment --comment \"013 icmp destination-unreachable\" -j ACCEPT},
       %r{-A INPUT -s 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m icmp --icmp-type 8 -m comment --comment \"013 icmp echo-request\" -j ACCEPT},
       %r{-A INPUT -p icmp -m icmp --icmp-type 11 -m comment --comment \"013 icmp time-exceeded\" -j ACCEPT},
-      %r{-A INPUT -p tcp -m multiport --dports 22 -m state --state NEW -m comment --comment \"020 ssh\" -j ACCEPT},
-      %r{-A INPUT -i eth0:3 -p tcp -m multiport --dports 443 -m state --state NEW -m comment --comment \"443 ssl on aliased interface\" -j ACCEPT},
+      %r{-A INPUT -p tcp -m multiport --dports 22 -m conntrack --ctstate NEW -m comment --comment \"020 ssh\" -j ACCEPT},
+      %r{-A INPUT -i eth0:3 -p tcp -m multiport --dports 443 -m conntrack --ctstate NEW -m comment --comment \"443 ssl on aliased interface\" -j ACCEPT},
       %r{-A INPUT -m comment --comment \"900 LOCAL_INPUT\" -j LOCAL_INPUT},
-      %r{-A FORWARD -m state --state RELATED,ESTABLISHED -m comment --comment \"010 allow established and related\" -j ACCEPT},
-      %r{-A OUTPUT (! -o|-o !) eth0:2 -p tcp -m multiport --dports 25 -m state --state NEW -m comment --comment \"025 smtp\" -j ACCEPT},
+      %r{-A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -m comment --comment \"010 allow established and related\" -j ACCEPT},
+      %r{-A OUTPUT (! -o|-o !) eth0:2 -p tcp -m multiport --dports 25 -m conntrack --ctstate NEW -m comment --comment \"025 smtp\" -j ACCEPT},
     ]
     it 'contains appropriate rules' do
       shell('iptables-save') do |r|
