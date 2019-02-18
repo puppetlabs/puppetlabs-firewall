@@ -828,7 +828,7 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `stat_probability`: Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
 
-* `state`: Matches a packet based on its state in the firewall stateful inspection table. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED', 'UNTRACKED'. Requires the `state_match` feature.
+* `state`: Matches a packet based on its state in the firewall stateful inspection table. Valid values are: 'INVALID', 'ESTABLISHED', 'NEW', 'RELATED', 'UNTRACKED'. Requires the `state_match` feature. Usage of this is considered to be deprecated and obsolete on SLES 11 SP4, as such it is advisable to use the `ctstate` parameter in it's place.
 
 * `string`: Set the pattern for string matching. Requires the `string_matching` feature.
 
