@@ -1,4 +1,7 @@
 ---
+.gitlab-ci.yml:
+  unmanaged: true
+
 .travis.yml:
   bundle_args: --without system_tests
   docker_sets:
@@ -9,6 +12,9 @@
   secure: ""
   branches:
     - release
+
+appveyor.yml:
+  delete: true
 
 Gemfile:
   optional:
@@ -27,8 +33,6 @@ Gemfile:
           - mingw
           - x64_mingw
 
-appveyor.yml:
-  delete: true
-
-.gitlab-ci.yml:
-  unmanaged: true
+spec/spec_helper.rb:
+  mock_with: ':rspec'
+  coverage_report: true
