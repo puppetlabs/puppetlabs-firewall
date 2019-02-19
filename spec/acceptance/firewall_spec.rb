@@ -825,32 +825,6 @@ describe 'firewall basics', docker: true do
         end
       end
     end
-
-    context 'when jump and apply' do
-      pp34 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewallchain { 'TEST:filter:IPv4':
-            ensure => present,
-          }
-          firewall { '568 - test':
-            proto  => tcp,
-            chain  => 'INPUT',
-            action => 'accept',
-            jump  => 'TEST',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp34, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{Only one of the parameters 'action' and 'jump' can be set})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m comment --comment "568 - test" -j TEST})
-        end
-      end
-    end
   end
 
   describe 'tosource' do

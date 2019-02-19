@@ -431,6 +431,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       }.to raise_error(RuntimeError, %r{Only one of the parameters 'action' and 'jump' can be set$})
     end
   end
+
   describe ':gid and :uid' do
     it 'allows me to set uid' do
       resource[:uid] = 'root'
