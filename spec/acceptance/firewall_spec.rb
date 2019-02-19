@@ -599,8 +599,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when LOCAL --limit-iface-in', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                     (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when LOCAL --limit-iface-in', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
         pp97 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '613 - test':
@@ -620,8 +619,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when LOCAL --limit-iface-in fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                      (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when LOCAL --limit-iface-in fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
         pp98 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '614 - test':
@@ -643,8 +641,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when duplicated LOCAL', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                               (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when duplicated LOCAL', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
         pp99 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '615 - test':
@@ -666,8 +663,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when multiple addrtype', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when multiple addrtype', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
         pp100 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '616 - test':
@@ -687,8 +683,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when multiple addrtype fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                 (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when multiple addrtype fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
         pp101 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '616 - test':
@@ -1672,8 +1667,7 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when LOCAL --limit-iface-in', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                         (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when LOCAL --limit-iface-in', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
             pp102 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '617 - test':
@@ -1693,8 +1687,7 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when LOCAL --limit-iface-in fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                          (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when LOCAL --limit-iface-in fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
             pp103 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '618 - test':
@@ -1716,8 +1709,7 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when duplicated LOCAL', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                   (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when duplicated LOCAL', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
             pp104 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '619 - test':
@@ -1740,8 +1732,7 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when multiple addrtype', unless: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                    (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when multiple addrtype', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
             pp105 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '620 - test':
@@ -1762,8 +1753,7 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when multiple addrtype fail', if: (fact('operatingsystem') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') ||
-                                                     (fact('operatingsystem') == 'CentOS' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when multiple addrtype fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
             pp106 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '616 - test':
