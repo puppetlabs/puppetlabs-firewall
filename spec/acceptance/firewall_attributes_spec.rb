@@ -22,6 +22,30 @@ describe 'connlimit property' do
             connmark => '0x1',
             action   => reject,
           }
+          firewall { '801 - gid root':
+            chain => 'OUTPUT',
+            action => accept,
+            gid => 'root',
+            proto => 'all',
+          }
+          firewall { '802 - gid not root':
+            chain => 'OUTPUT',
+            action => accept,
+            gid => '!root',
+            proto => 'all',
+          }
+          firewall { '803 - uid 0':
+            chain => 'OUTPUT',
+            action => accept,
+            uid => '0',
+            proto => 'all',
+          }
+          firewall { '804 - uid not 0':
+            chain => 'OUTPUT',
+            action => accept,
+            uid => '!0',
+            proto => 'all',
+          }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -35,6 +59,18 @@ describe 'connlimit property' do
     end
     it 'contains the connmark' do
       expect(result.stdout).to match(%r{-A INPUT -m connmark --mark 0x1 -m comment --comment "502 - connmark" -j REJECT --reject-with icmp-port-unreachable})
+    end
+    it 'when gid set to root' do
+      expect(result.stdout).to match(%r{-A OUTPUT -m owner --gid-owner (0|root) -m comment --comment "801 - gid root" -j ACCEPT})
+    end
+    it 'when gid set to not root' do
+      expect(result.stdout).to match(%r{-A OUTPUT -m owner ! --gid-owner (0|root) -m comment --comment "802 - gid not root" -j ACCEPT})
+    end
+    it 'when uid set to 0' do
+      expect(result.stdout).to match(%r{-A OUTPUT -m owner --uid-owner (0|root) -m comment --comment "803 - uid 0" -j ACCEPT})
+    end
+    it 'when uid set to not 0' do
+      expect(result.stdout).to match(%r{-A OUTPUT -m owner ! --uid-owner (0|root) -m comment --comment "804 - uid not 0" -j ACCEPT})
     end
   end
 end

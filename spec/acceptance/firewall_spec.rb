@@ -1880,31 +1880,6 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'gid' do
-    context 'when root' do
-      pp72 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '575 - test':
-            ensure => present,
-            proto => tcp,
-            chain => 'OUTPUT',
-            port   => '575',
-            action => accept,
-            gid => 'root',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp72, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m owner --gid-owner (root|\d+) -m multiport --ports 575 -m comment --comment "575 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
   # iptables version 1.3.5 does not support masks on MARK rules
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'set_mark' do
