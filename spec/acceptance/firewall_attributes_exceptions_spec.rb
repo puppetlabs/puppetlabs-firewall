@@ -92,28 +92,6 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'src_range' do
-    context 'when 192.168.1.1-192.168.1.10' do
-      pp10 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '557 - test':
-            proto  => tcp,
-            port   => '557',
-            action => accept,
-            src_range => '192.168.1.1-192.168.1.10',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp10, catch_failures: true)
-        apply_manifest(pp10, catch_changes: do_catch_changes)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m iprange --src-range 192.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT})
-        end
-      end
-    end
-
     # Invalid IP
     context 'when 392.168.1.1-192.168.1.10' do
       pp11 = <<-PUPPETCODE
@@ -140,50 +118,6 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'destination' do
-    context 'when 192.168.2.0/24' do
-      pp12 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '558 - test':
-            proto  => tcp,
-            port   => '558',
-            action => accept,
-            destination => '192.168.2.0/24',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp12, catch_failures: true)
-        apply_manifest(pp12, catch_changes: do_catch_changes)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -d 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT})
-        end
-      end
-    end
-
-    context 'when ! 192.168.2.0/24' do
-      pp13 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '558 - test':
-            proto  => tcp,
-            port   => '558',
-            action => accept,
-            destination => '! 192.168.2.0/24',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp13, catch_failures: true)
-        apply_manifest(pp13, catch_changes: do_catch_changes)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT (! -d|-d !) 192.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT})
-        end
-      end
-    end
-
     # Invalid address
     context 'when 256.168.2.0/24' do
       pp14 = <<-PUPPETCODE
@@ -210,28 +144,6 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'dst_range' do
-    context 'when 192.168.1.1-192.168.1.10' do
-      pp15 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '559 - test':
-            proto  => tcp,
-            port   => '559',
-            action => accept,
-            dst_range => '192.168.1.1-192.168.1.10',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp15, catch_failures: true)
-        apply_manifest(pp15, catch_changes: do_catch_changes)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m iprange --dst-range 192.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT})
-        end
-      end
-    end
-
     # Invalid IP
     context 'when 392.168.1.1-192.168.1.10' do
       pp16 = <<-PUPPETCODE
@@ -258,46 +170,6 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'sport' do
-    context 'when single port' do
-      pp17 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '560 - test':
-            proto  => tcp,
-            sport  => '560',
-            action => accept,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp17, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --sports 560 -m comment --comment "560 - test" -j ACCEPT})
-        end
-      end
-    end
-
-    context 'when multiple ports' do
-      pp18 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '560 - test':
-            proto  => tcp,
-            sport  => '560-561',
-            action => accept,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp18, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --sports 560:561 -m comment --comment "560 - test" -j ACCEPT})
-        end
-      end
-    end
-
     context 'when invalid ports' do
       pp19 = <<-PUPPETCODE
           class { '::firewall': }
@@ -322,46 +194,6 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'dport' do
-    context 'when single port' do
-      pp20 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '561 - test':
-            proto  => tcp,
-            dport  => '561',
-            action => accept,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp20, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 561 -m comment --comment "561 - test" -j ACCEPT})
-        end
-      end
-    end
-
-    context 'when multiple ports' do
-      pp21 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '561 - test':
-            proto  => tcp,
-            dport  => '561-562',
-            action => accept,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp21, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 561:562 -m comment --comment "561 - test" -j ACCEPT})
-        end
-      end
-    end
-
     context 'when invalid ports' do
       pp22 = <<-PUPPETCODE
           class { '::firewall': }
@@ -386,46 +218,6 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'port' do
-    context 'when single port' do
-      pp23 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '562 - test':
-            proto  => tcp,
-            port  => '562',
-            action => accept,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp23, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 562 -m comment --comment "562 - test" -j ACCEPT})
-        end
-      end
-    end
-
-    context 'when multiple ports' do
-      pp24 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '562 - test':
-            proto  => tcp,
-            port  => '562-563',
-            action => accept,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp24, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 562:563 -m comment --comment "562 - test" -j ACCEPT})
-        end
-      end
-    end
-
     context 'when invalid ports' do
       pp25 = <<-PUPPETCODE
           class { '::firewall': }
