@@ -73,6 +73,33 @@ describe 'firewall attribute testing, happy path' do
             port  => '562-563',
             action => accept,
           }
+          firewall { '563 - dst_type':
+            proto  => tcp,
+            action => accept,
+            dst_type => 'MULTICAST',
+          }
+          firewall { '564 - src_type negated':
+            proto  => tcp,
+            action => accept,
+            src_type => '! MULTICAST',
+          }
+          firewall { '565 - tcp_flags':
+            proto  => tcp,
+            action => accept,
+            tcp_flags => 'FIN,SYN ACK',
+          }
+          firewall { '566 - chain':
+            proto  => tcp,
+            action => accept,
+            chain  => 'FORWARD',
+          }
+          firewall { '568 - tosource':
+            proto  => tcp,
+            table  => 'nat',
+            chain  => 'POSTROUTING',
+            jump  => 'SNAT',
+            tosource => '192.168.1.1',
+          }
           firewall { '801 - gid root':
             chain => 'OUTPUT',
             action => accept,
@@ -137,6 +164,21 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'port range is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 562:563 -m comment --comment "562 - port range" -j ACCEPT})
+    end
+    it 'dst_type is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype --dst-type MULTICAST -m comment --comment "563 - dst_type" -j ACCEPT})
+    end
+    it 'src_type is negated' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype ! --src-type MULTICAST -m comment --comment "564 - src_type negated" -j ACCEPT})
+    end
+    it 'tcp_flags is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN ACK -m comment --comment "565 - tcp_flags" -j ACCEPT})
+    end
+    it 'chain is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m comment --comment "566 - chain" -j ACCEPT})
+    end
+    it 'tosource is set' do
+      expect(result.stdout).to match(%r{A POSTROUTING -p tcp -m comment --comment "568 - tosource" -j SNAT --to-source 192.168.1.1})
     end
     it 'gid set to root' do
       expect(result.stdout).to match(%r{-A OUTPUT -m owner --gid-owner (0|root) -m comment --comment "801 - gid root" -j ACCEPT})
