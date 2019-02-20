@@ -144,6 +144,37 @@ describe 'firewall attribute testing, happy path' do
             action => accept,
             isfragment => true,
           }
+          firewall { '595 - ipsec_policy ipsec and out':
+            ensure       => 'present',
+            action       => 'reject',
+            chain        => 'OUTPUT',
+            destination  => '20.0.0.0/8',
+            ipsec_dir    => 'out',
+            ipsec_policy => 'ipsec',
+            proto        => 'all',
+            reject       => 'icmp-net-unreachable',
+            table        => 'filter',
+          }
+          firewall { '596 - ipsec_policy none and in':
+            ensure       => 'present',
+            action       => 'reject',
+            chain        => 'INPUT',
+            destination  => '20.0.0.0/8',
+            ipsec_dir    => 'in',
+            ipsec_policy => 'none',
+            proto        => 'all',
+            reject       => 'icmp-net-unreachable',
+            table        => 'filter',
+          }
+          firewall { '700 - blah-A Test Rule':
+            jump       => 'LOG',
+            log_prefix => 'FW-A-INPUT: ',
+          }
+          firewall { '701 - log_uid':
+            chain   => 'OUTPUT',
+            jump    => 'LOG',
+            log_uid => true,
+          }
           firewall { '801 - gid root':
             chain => 'OUTPUT',
             action => accept,
@@ -241,6 +272,18 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'isfragment is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -f -m multiport --ports 583 -m comment --comment "583 - isfragment" -j ACCEPT})
+    end
+    it 'ipsec_policy ipsec and dir out' do
+      expect(result.stdout).to match(%r{-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir out --pol ipsec -m comment --comment "595 - ipsec_policy ipsec and out" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Metrics/LineLength
+    end
+    it 'ipsec_policy none and dir in' do
+      expect(result.stdout).to match(%r{-A INPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir in --pol none -m comment --comment "596 - ipsec_policy none and in" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Metrics/LineLength
+    end
+    it 'comment containing "-A "' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "700 - blah-A Test Rule" -j LOG --log-prefix "FW-A-INPUT: "})
+    end
+    it 'set log_uid' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m comment --comment "701 - log_uid" -j LOG --log-uid})
     end
     it 'gid set to root' do
       expect(result.stdout).to match(%r{-A OUTPUT -m owner --gid-owner (0|root) -m comment --comment "801 - gid root" -j ACCEPT})
