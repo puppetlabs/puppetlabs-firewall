@@ -100,6 +100,50 @@ describe 'firewall attribute testing, happy path' do
             jump  => 'SNAT',
             tosource => '192.168.1.1',
           }
+          firewall { '569 - todest':
+            proto  => tcp,
+            table  => 'nat',
+            chain  => 'PREROUTING',
+            jump   => 'DNAT',
+            source => '200.200.200.200',
+            todest => '192.168.1.1',
+          }
+          firewall { '570 - toports':
+            proto  => icmp,
+            table  => 'nat',
+            chain  => 'PREROUTING',
+            jump  => 'REDIRECT',
+            toports => '2222',
+          }
+          firewall { '572 - limit':
+            ensure => present,
+            proto => tcp,
+            port   => '572',
+            action => accept,
+            limit => '500/sec',
+          }
+          firewall { '573 - burst':
+            ensure => present,
+            proto => tcp,
+            port   => '573',
+            action => accept,
+            limit => '500/sec',
+            burst => '1500',
+          }
+          firewall { '581 - pkttype':
+            ensure => present,
+            proto => tcp,
+            port   => '581',
+            action => accept,
+            pkttype => 'multicast',
+          }
+          firewall { '583 - isfragment':
+            ensure => present,
+            proto => tcp,
+            port   => '583',
+            action => accept,
+            isfragment => true,
+          }
           firewall { '801 - gid root':
             chain => 'OUTPUT',
             action => accept,
@@ -179,6 +223,24 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'tosource is set' do
       expect(result.stdout).to match(%r{A POSTROUTING -p tcp -m comment --comment "568 - tosource" -j SNAT --to-source 192.168.1.1})
+    end
+    it 'todest is set' do
+      expect(result.stdout).to match(%r{-A PREROUTING -s 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - todest" -j DNAT --to-destination 192.168.1.1})
+    end
+    it 'toports is set' do
+      expect(result.stdout).to match(%r{-A PREROUTING -p icmp -m comment --comment "570 - toports" -j REDIRECT --to-ports 2222})
+    end
+    it 'limit is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 572 -m limit --limit 500\/sec -m comment --comment "572 - limit" -j ACCEPT})
+    end
+    it 'burst is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 573 -m limit --limit 500\/sec --limit-burst 1500 -m comment --comment "573 - burst" -j ACCEPT})
+    end
+    it 'pkttype is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 581 -m pkttype --pkt-type multicast -m comment --comment "581 - pkttype" -j ACCEPT})
+    end
+    it 'isfragment is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -f -m multiport --ports 583 -m comment --comment "583 - isfragment" -j ACCEPT})
     end
     it 'gid set to root' do
       expect(result.stdout).to match(%r{-A OUTPUT -m owner --gid-owner (0|root) -m comment --comment "801 - gid root" -j ACCEPT})

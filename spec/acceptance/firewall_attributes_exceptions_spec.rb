@@ -444,55 +444,6 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'todest' do
-    context 'when 192.168.1.1' do
-      pp36 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '569 - test':
-            proto  => tcp,
-            table  => 'nat',
-            chain  => 'PREROUTING',
-            jump   => 'DNAT',
-            source => '200.200.200.200',
-            todest => '192.168.1.1',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp36, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save -t nat') do |r|
-          expect(r.stdout).to match(%r{-A PREROUTING -s 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - test" -j DNAT --to-destination 192.168.1.1})
-        end
-      end
-    end
-  end
-
-  describe 'toports' do
-    context 'when 192.168.1.1' do
-      pp37 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '570 - test':
-            proto  => icmp,
-            table  => 'nat',
-            chain  => 'PREROUTING',
-            jump  => 'REDIRECT',
-            toports => '2222',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp37, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save -t nat') do |r|
-          expect(r.stdout).to match(%r{-A PREROUTING -p icmp -m comment --comment "570 - test" -j REDIRECT --to-ports 2222})
-        end
-      end
-    end
-  end
-
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles}
     describe 'checksum_fill' do
       context 'when virbr' do
@@ -1379,54 +1330,7 @@ describe 'firewall basics', docker: true do
 
   end
 
-  describe 'limit' do
-    context 'when 500/sec' do
-      pp68 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '572 - test':
-            ensure => present,
-            proto => tcp,
-            port   => '572',
-            action => accept,
-            limit => '500/sec',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp68, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 572 -m limit --limit 500\/sec -m comment --comment "572 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
   describe 'burst' do
-    context 'when 500' do
-      pp69 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '573 - test':
-            ensure => present,
-            proto => tcp,
-            port   => '573',
-            action => accept,
-            limit => '500/sec',
-            burst => '1500',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp69, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 573 -m limit --limit 500\/sec --limit-burst 1500 -m comment --comment "573 - test" -j ACCEPT})
-        end
-      end
-    end
-
     context 'when invalid' do
       pp70 = <<-PUPPETCODE
           class { '::firewall': }
@@ -1508,28 +1412,6 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'pkttype' do
-    context 'when multicast' do
-      pp74 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '581 - test':
-            ensure => present,
-            proto => tcp,
-            port   => '581',
-            action => accept,
-            pkttype => 'multicast',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp74, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 581 -m pkttype --pkt-type multicast -m comment --comment "581 - test" -j ACCEPT})
-        end
-      end
-    end
-
     context 'when test' do
       pp75 = <<-PUPPETCODE
           class { '::firewall': }
@@ -1550,52 +1432,6 @@ describe 'firewall basics', docker: true do
       it 'does not contain the rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 582 -m pkttype --pkt-type multicast -m comment --comment "582 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
-  describe 'isfragment' do
-    context 'when true' do
-      pp76 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '583 - test':
-            ensure => present,
-            proto => tcp,
-            port   => '583',
-            action => accept,
-            isfragment => true,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp76, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -f -m multiport --ports 583 -m comment --comment "583 - test" -j ACCEPT})
-        end
-      end
-    end
-
-    context 'when false' do
-      pp77 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '584 - test':
-            ensure => present,
-            proto => tcp,
-            port   => '584',
-            action => accept,
-            isfragment => false,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp77, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 584 -m comment --comment "584 - test" -j ACCEPT})
         end
       end
     end
