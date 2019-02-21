@@ -175,6 +175,29 @@ describe 'firewall attribute testing, happy path' do
             jump    => 'LOG',
             log_uid => true,
           }
+          firewall { '711 - physdev_in':
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '711',
+            action => accept,
+            physdev_in => 'eth0',
+          }
+          firewall { '712 - physdev_out':
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '712',
+            action => accept,
+            physdev_out => 'eth1',
+          }
+          firewall { '713 - physdev_in physdev_out physdev_is_bridged':
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '713',
+            action => accept,
+            physdev_in => 'eth0',
+            physdev_out => 'eth1',
+            physdev_is_bridged => true,
+          }
           firewall { '801 - gid root':
             chain => 'OUTPUT',
             action => accept,
@@ -284,6 +307,15 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'set log_uid' do
       expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m comment --comment "701 - log_uid" -j LOG --log-uid})
+    end
+    it 'set physdev_in' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 711 -m comment --comment "711 - physdev_in" -j ACCEPT})
+    end
+    it 'set physdev_out' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 712 -m comment --comment "712 - physdev_out" -j ACCEPT})
+    end
+    it 'physdev_in eth0 and physdev_out eth1 and physdev_is_bridged' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 713 -m comment --comment "713 - physdev_in physdev_out physdev_is_bridged" -j ACCEPT}) # rubocop:disable Metrics/LineLength
     end
     it 'gid set to root' do
       expect(result.stdout).to match(%r{-A OUTPUT -m owner --gid-owner (0|root) -m comment --comment "801 - gid root" -j ACCEPT})
