@@ -137,6 +137,38 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
   end
 
+  describe 'source error checking' do
+    it 'Invalid address when 256.168.2.0/24' do
+      expect(-> { resource[:source] = '256.168.2.0/24' }).to raise_error(
+        Puppet::Error, %r{host_to_ip failed}
+      )
+    end
+  end
+
+  describe 'destination error checking' do
+    it 'Invalid address when 256.168.2.0/24' do
+      expect(-> { resource[:destination] = '256.168.2.0/24' }).to raise_error(
+        Puppet::Error, %r{host_to_ip failed}
+      )
+    end
+  end
+
+  describe 'src_range error checking' do
+    it 'Invalid IP when 392.168.1.1-192.168.1.10' do
+      expect(-> { resource[:src_range] = '392.168.1.1-192.168.1.10' }).to raise_error(
+        Puppet::Error, %r{Invalid IP address}
+      )
+    end
+  end
+
+  describe 'dst_range error checking' do
+    it 'Invalid IP when 392.168.1.1-192.168.1.10' do
+      expect(-> { resource[:dst_range] = '392.168.1.1-192.168.1.10' }).to raise_error(
+        Puppet::Error, %r{Invalid IP address}
+      )
+    end
+  end
+
   [:dport, :sport].each do |port|
     describe port do
       it "should accept a #{port} as string" do
@@ -412,6 +444,9 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
     it 'fails if value is not numeric' do
       expect(-> { resource[:burst] = 'foo' }).to raise_error(Puppet::Error)
+    end
+    it 'fails if value contains /sec' do
+      expect(-> { resource[:burst] = '1500/sec' }).to raise_error(Puppet::Error)
     end
   end
 

@@ -65,110 +65,6 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'source' do
-    # Invalid address
-    context 'when 256.168.2.0/24' do
-      pp9 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '556 - test':
-            proto  => tcp,
-            port   => '556',
-            action => accept,
-            source => '256.168.2.0/24',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp9, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{host_to_ip failed for 256.168.2.0\/(24|255\.255\.255\.0)})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -s 256.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 556 -m comment --comment "556 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
-  describe 'src_range' do
-    # Invalid IP
-    context 'when 392.168.1.1-192.168.1.10' do
-      pp11 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '557 - test':
-            proto  => tcp,
-            port   => '557',
-            action => accept,
-            src_range => '392.168.1.1-192.168.1.10',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp11, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{Invalid IP address "392.168.1.1" in range "392.168.1.1-192.168.1.10"})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --src-range 392.168.1.1-192.168.1.10 -m multiport --ports 557 -m comment --comment "557 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
-  describe 'destination' do
-    # Invalid address
-    context 'when 256.168.2.0/24' do
-      pp14 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '558 - test':
-            proto  => tcp,
-            port   => '558',
-            action => accept,
-            destination => '256.168.2.0/24',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp14, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{host_to_ip failed for 256.168.2.0\/(24|255\.255\.255\.0)})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -d 256.168.2.0\/(24|255\.255\.255\.0) -p tcp -m multiport --ports 558 -m comment --comment "558 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
-  describe 'dst_range' do
-    # Invalid IP
-    context 'when 392.168.1.1-192.168.1.10' do
-      pp16 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '559 - test':
-            proto  => tcp,
-            port   => '559',
-            action => accept,
-            dst_range => '392.168.1.1-192.168.1.10',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp16, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{Invalid IP address "392.168.1.1" in range "392.168.1.1-192.168.1.10"})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --dst-range 392.168.1.1-192.168.1.10 -m multiport --ports 559 -m comment --comment "559 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
   describe 'sport' do
     context 'when invalid ports' do
       pp19 = <<-PUPPETCODE
@@ -243,28 +139,6 @@ describe 'firewall basics', docker: true do
 
   ['dst_type', 'src_type'].each do |type|
     describe type.to_s do
-      context 'when BROKEN' do
-        pp28 = <<-PUPPETCODE
-            class { '::firewall': }
-            firewall { '563 - test':
-              proto  => tcp,
-              action => accept,
-              #{type} => 'BROKEN',
-            }
-        PUPPETCODE
-        it 'fails' do
-          apply_manifest(pp28, expect_failures: true) do |r|
-            expect(r.stderr).to match(%r{Invalid value "BROKEN".})
-          end
-        end
-
-        it 'does not contain the rule' do
-          shell('iptables-save') do |r|
-            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sBROKEN -m comment --comment "563 - test" -j ACCEPT})
-          end
-        end
-      end
-
       context 'when LOCAL --limit-iface-in', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
         pp97 = <<-PUPPETCODE
             class { '::firewall': }
@@ -524,29 +398,6 @@ describe 'firewall basics', docker: true do
           shell('iptables-save -t nat') do |r|
             expect(r.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - test 2" -j MASQUERADE --random})
           end
-        end
-      end
-    end
-  end
-
-  describe 'icmp' do
-    context 'when any' do
-      pp41 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '571 - test':
-            proto  => icmp,
-            icmp   => 'any',
-          }
-      PUPPETCODE
-      it 'fails' do
-        apply_manifest(pp41, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{This behaviour should be achieved by omitting or undefining the ICMP parameter})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p icmp -m comment --comment "570 - test" -m icmp --icmp-type 11})
         end
       end
     end
@@ -1330,58 +1181,6 @@ describe 'firewall basics', docker: true do
 
   end
 
-  describe 'burst' do
-    context 'when invalid' do
-      pp70 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '571 - test':
-            ensure => present,
-            proto => tcp,
-            port   => '571',
-            action => accept,
-            limit => '500/sec',
-            burst => '1500/sec',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp70, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{Invalid value "1500\/sec".})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 573 -m comment --comment "573 - test" -m limit --limit 500\/sec --limit-burst 1500\/sec -j ACCEPT})
-        end
-      end
-    end
-  end
-
-  describe 'uid' do
-    context 'when nobody' do
-      pp71 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '574 - test':
-            ensure => present,
-            proto => tcp,
-            chain => 'OUTPUT',
-            port   => '574',
-            action => accept,
-            uid => 'nobody',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp71, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m owner --uid-owner (nobody|\d+) -m multiport --ports 574 -m comment --comment "574 - test" -j ACCEPT})
-        end
-      end
-    end
-  end
-
   # iptables version 1.3.5 does not support masks on MARK rules
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     describe 'set_mark' do
@@ -1406,32 +1205,6 @@ describe 'firewall basics', docker: true do
           shell('iptables-save -t mangle') do |r|
             expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 580 -m comment --comment "580 - test" -j MARK --set-xmark 0x3e8\/0xffffffff})
           end
-        end
-      end
-    end
-  end
-
-  describe 'pkttype' do
-    context 'when test' do
-      pp75 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '582 - test':
-            ensure => present,
-            proto => tcp,
-            port   => '582',
-            action => accept,
-            pkttype => 'test',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp75, expect_failures: true) do |r|
-          expect(r.stderr).to match(%r{Invalid value "test".})
-        end
-      end
-
-      it 'does not contain the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 582 -m pkttype --pkt-type multicast -m comment --comment "582 - test" -j ACCEPT})
         end
       end
     end
