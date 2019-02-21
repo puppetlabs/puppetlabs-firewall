@@ -244,7 +244,7 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype --dst-type MULTICAST -m comment --comment "563 - dst_type" -j ACCEPT})
     end
     it 'src_type is negated' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype ! --src-type MULTICAST -m comment --comment "564 - src_type negated" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype (! --src-type|--src-type !) MULTICAST -m comment --comment "564 - src_type negated" -j ACCEPT})
     end
     it 'tcp_flags is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN ACK -m comment --comment "565 - tcp_flags" -j ACCEPT})
