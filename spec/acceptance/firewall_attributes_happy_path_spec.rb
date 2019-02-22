@@ -10,6 +10,15 @@ describe 'firewall attribute testing, happy path' do
     before(:all) do
       pp = <<-PUPPETCODE
           class { '::firewall': }
+          firewall { '004 - log_level and log_prefix':
+            chain      => 'INPUT',
+            proto      => 'all',
+            ctstate    => 'INVALID',
+            jump       => 'LOG',
+            log_level  => '3',
+            log_prefix => 'IPTABLES dropped invalid: ',
+          }
+
           firewall { '501 - connlimit':
             proto           => tcp,
             dport           => '2222',
@@ -166,6 +175,24 @@ describe 'firewall attribute testing, happy path' do
             reject       => 'icmp-net-unreachable',
             table        => 'filter',
           }
+          firewall {
+            '600 - set_mss':
+              proto     => 'tcp',
+              tcp_flags => 'SYN,RST SYN',
+              jump      => 'TCPMSS',
+              set_mss   => '1360',
+              mss       => '1361:1541',
+              chain     => 'FORWARD',
+              table     => 'mangle',
+          }
+          firewall {
+            '601 - clamp_mss_to_pmtu':
+              proto             => 'tcp',
+              chain             => 'FORWARD',
+              tcp_flags         => 'SYN,RST SYN',
+              jump              => 'TCPMSS',
+              clamp_mss_to_pmtu => true,
+          }
           firewall { '700 - blah-A Test Rule':
             jump       => 'LOG',
             log_prefix => 'FW-A-INPUT: ',
@@ -174,6 +201,29 @@ describe 'firewall attribute testing, happy path' do
             chain   => 'OUTPUT',
             jump    => 'LOG',
             log_uid => true,
+          }
+          firewall { '711 - physdev_in':
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '711',
+            action => accept,
+            physdev_in => 'eth0',
+          }
+          firewall { '712 - physdev_out':
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '712',
+            action => accept,
+            physdev_out => 'eth1',
+          }
+          firewall { '713 - physdev_in physdev_out physdev_is_bridged':
+            chain => 'FORWARD',
+            proto  => tcp,
+            port   => '713',
+            action => accept,
+            physdev_in => 'eth0',
+            physdev_out => 'eth1',
+            physdev_is_bridged => true,
           }
           firewall { '801 - gid root':
             chain => 'OUTPUT',
@@ -205,6 +255,9 @@ describe 'firewall attribute testing, happy path' do
     end
     let(:result) { shell('iptables-save') }
 
+    it 'log_level and log_prefix' do
+      expect(result.stdout).to match(%r{A INPUT -m conntrack --ctstate INVALID -m comment --comment "004 - log_level and log_prefix" -j LOG --log-prefix "IPTABLES dropped invalid: " --log-level 3})
+    end
     it 'contains the connlimit and connlimit_mask rule' do
       expect(result.stdout).to match(
         %r{-A INPUT -p tcp -m multiport --dports 2222 -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-m comment --comment "501 - connlimit" -j REJECT --reject-with icmp-port-unreachable}, # rubocop:disable Metrics/LineLength
@@ -279,11 +332,26 @@ describe 'firewall attribute testing, happy path' do
     it 'ipsec_policy none and dir in' do
       expect(result.stdout).to match(%r{-A INPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir in --pol none -m comment --comment "596 - ipsec_policy none and in" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Metrics/LineLength
     end
+    it 'set_mss is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "600 - set_mss" -j TCPMSS --set-mss 1360})
+    end
+    it 'clamp_mss_to_pmtu is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "601 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu})
+    end
     it 'comment containing "-A "' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "700 - blah-A Test Rule" -j LOG --log-prefix "FW-A-INPUT: "})
     end
     it 'set log_uid' do
       expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m comment --comment "701 - log_uid" -j LOG --log-uid})
+    end
+    it 'set physdev_in' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 711 -m comment --comment "711 - physdev_in" -j ACCEPT})
+    end
+    it 'set physdev_out' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 712 -m comment --comment "712 - physdev_out" -j ACCEPT})
+    end
+    it 'physdev_in eth0 and physdev_out eth1 and physdev_is_bridged' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 713 -m comment --comment "713 - physdev_in physdev_out physdev_is_bridged" -j ACCEPT}) # rubocop:disable Metrics/LineLength
     end
     it 'gid set to root' do
       expect(result.stdout).to match(%r{-A OUTPUT -m owner --gid-owner (0|root) -m comment --comment "801 - gid root" -j ACCEPT})

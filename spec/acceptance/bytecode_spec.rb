@@ -2,9 +2,9 @@ require 'spec_helper_acceptance'
 
 # --bytecode is only supported by operatingsystems using nftables (in general Linux kernel 3.13, RedHat 7 (and derivates) with 3.10)
 # Skipping those from which we know they would fail.
-describe 'bytecode property', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') < '7') ||
-                                      (fact('operatingsystem') == 'OracleLinux' && fact('operatingsystemmajrelease') <= '7') ||
-                                      (fact('operatingsystem') == 'SLES' && fact('operatingsystemmajrelease') <= '11') do
+describe 'bytecode property', unless: (os[:family] == 'redhat' && os[:release][0] <= '6') ||
+                                      (os[:family] == 'sles' && os[:release][0..1] <= '11') ||
+                                      (host_inventory['facter']['os']['name'].casecmp('oraclelinux').zero? && os[:release][0] <= '7') do
   describe 'bytecode' do
     context '4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0' do
       pp = <<-PUPPETCODE

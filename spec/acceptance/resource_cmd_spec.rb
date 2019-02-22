@@ -64,7 +64,7 @@ describe 'puppet resource firewall command' do
     end
   end
 
-  context 'when accepts rules with multiple comments', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+  context 'when accepts rules with multiple comments', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
     before(:all) do
       iptables_flush_all_tables
       shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http" -m comment --comment "http"')
@@ -186,7 +186,7 @@ describe 'puppet resource firewall command' do
   if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
     context 'when dport/sport with ip6tables' do
       before :all do
-        if fact('osfamily') == 'Debian'
+        if os['family'] == 'debian'
           shell('echo "iptables-persistent iptables-persistent/autosave_v4 boolean false" | debconf-set-selections')
           shell('echo "iptables-persistent iptables-persistent/autosave_v6 boolean false" | debconf-set-selections')
           shell('apt-get install iptables-persistent -y')
