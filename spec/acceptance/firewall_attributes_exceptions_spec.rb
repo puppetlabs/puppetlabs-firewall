@@ -139,7 +139,7 @@ describe 'firewall basics', docker: true do
 
   ['dst_type', 'src_type'].each do |type|
     describe type.to_s do
-      context 'when LOCAL --limit-iface-in', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when LOCAL --limit-iface-in', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
         pp97 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '613 - test':
@@ -159,7 +159,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when LOCAL --limit-iface-in fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when LOCAL --limit-iface-in fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
         pp98 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '614 - test':
@@ -181,7 +181,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when duplicated LOCAL', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when duplicated LOCAL', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
         pp99 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '615 - test':
@@ -203,7 +203,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when multiple addrtype', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when multiple addrtype', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
         pp100 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '616 - test':
@@ -223,7 +223,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      context 'when multiple addrtype fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+      context 'when multiple addrtype fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
         pp101 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '616 - test':
@@ -823,7 +823,9 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(%r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "607 - test" -j REJECT --reject-with icmp6-adm-prohibited}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+            expect(r.stdout).to match(
+              %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "607 - test" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Metrics/LineLength
+            )
           end
         end
       end
@@ -850,7 +852,9 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(%r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol none -m comment --comment "608 - test" -j REJECT --reject-with icmp6-adm-prohibited}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+            expect(r.stdout).to match(
+              %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol none -m comment --comment "608 - test" -j REJECT --reject-with icmp6-adm-prohibited},
+            )
           end
         end
       end
@@ -879,7 +883,9 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(%r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "609 - test" -j REJECT --reject-with icmp6-adm-prohibited}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+            expect(r.stdout).to match(
+              %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "609 - test" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Metrics/LineLength
+            )
           end
         end
       end
@@ -906,7 +912,9 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(%r{-A INPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir in --pol none -m comment --comment "610 - test" -j REJECT --reject-with icmp6-adm-prohibited}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+            expect(r.stdout).to match(
+              %r{-A INPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir in --pol none -m comment --comment "610 - test" -j REJECT --reject-with icmp6-adm-prohibited},
+            )
           end
         end
       end
@@ -1067,7 +1075,8 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when LOCAL --limit-iface-in', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when LOCAL --limit-iface-in', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                         ) do
             pp102 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '617 - test':
@@ -1087,7 +1096,8 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when LOCAL --limit-iface-in fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when LOCAL --limit-iface-in fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                          ) do
             pp103 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '618 - test':
@@ -1109,7 +1119,8 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when duplicated LOCAL', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when duplicated LOCAL', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                   ) do
             pp104 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '619 - test':
@@ -1132,7 +1143,8 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when multiple addrtype', unless: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when multiple addrtype', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                    ) do
             pp105 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '620 - test':
@@ -1153,7 +1165,8 @@ describe 'firewall basics', docker: true do
             end
           end
 
-          context 'when multiple addrtype fail', if: (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') <= '5') do
+          context 'when multiple addrtype fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                     ) do
             pp106 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '616 - test':
@@ -1211,7 +1224,7 @@ describe 'firewall basics', docker: true do
   end
 
   # RHEL5/SLES does not support -m socket
-  describe 'socket', unless: (default['platform'] =~ %r{el-5} || fact('operatingsystem') == 'SLES') do
+  describe 'socket', unless: (default['platform'] =~ %r{el-5} || os[:family] == 'sles') do
     context 'when true' do
       pp78 = <<-PUPPETCODE
           class { '::firewall': }
@@ -1311,7 +1324,9 @@ describe 'firewall basics', docker: true do
 
       it 'contains the rule' do
         shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - test"}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+          expect(r.stdout).to match(
+            %r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - test"},
+          )
         end
       end
     end
@@ -1379,7 +1394,7 @@ describe 'firewall basics', docker: true do
       end
       it 'contains the rule' do
         shell('iptables-save') do |r|
-          if (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') == '5') || (default['platform'] =~ %r{sles-10})
+          if os[:family] == 'redhat' && os[:release].start_with?('5') || (default['platform'] =~ %r{sles-10})
             expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})
           else
             expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})
