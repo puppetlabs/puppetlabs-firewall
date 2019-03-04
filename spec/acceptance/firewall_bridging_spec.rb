@@ -7,7 +7,7 @@ describe 'firewall bridging' do
   end
   describe 'iptables physdev tests' do
     # iptables version 1.3.5 is not suppored by the ip6tables provider
-    if default['platform'] !~ %r{el-5}
+    unless os[:family] == 'redhat' && os[:release].start_with?('5')
       describe 'ip6tables physdev tests' do
         context 'when physdev_in eth0' do
           pp8 = <<-PUPPETCODE

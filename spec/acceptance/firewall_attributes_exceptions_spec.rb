@@ -318,7 +318,7 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles}
+  unless (os[:family] == 'redhat' && os[:release].start_with?('5')) || os[:family] == 'sles'
     describe 'checksum_fill' do
       context 'when virbr' do
         pp38 = <<-PUPPETCODE
@@ -375,7 +375,7 @@ describe 'firewall basics', docker: true do
   end
 
   # RHEL5 does not support --random
-  if default['platform'] !~ %r{el-5}
+  unless os[:family] == 'redhat' && os[:release].start_with?('5')
     describe 'random' do
       context 'when 192.168.1.1' do
         pp40 = <<-PUPPETCODE
@@ -748,7 +748,7 @@ describe 'firewall basics', docker: true do
     end
 
     # ip6tables has limited `-m socket` support
-    if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles}
+    unless (os[:family] == 'redhat' && os[:release].start_with?('5')) || os[:family] == 'sles'
       describe 'socket' do
         context 'when true' do
           pp56 = <<-PUPPETCODE
@@ -1195,7 +1195,7 @@ describe 'firewall basics', docker: true do
   end
 
   # iptables version 1.3.5 does not support masks on MARK rules
-  if default['platform'] !~ %r{el-5}
+  unless os[:family] == 'redhat' && os[:release].start_with?('5')
     describe 'set_mark' do
       context 'when 0x3e8/0xffffffff' do
         pp73 = <<-PUPPETCODE
@@ -1224,7 +1224,7 @@ describe 'firewall basics', docker: true do
   end
 
   # RHEL5/SLES does not support -m socket
-  describe 'socket', unless: (default['platform'] =~ %r{el-5} || os[:family] == 'sles') do
+  describe 'socket', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) || (os[:family] == 'sles') do
     context 'when true' do
       pp78 = <<-PUPPETCODE
           class { '::firewall': }

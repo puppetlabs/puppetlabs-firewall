@@ -6,7 +6,7 @@ describe 'firewall MSS' do
     ip6tables_flush_all_tables
   end
 
-  if default['platform'] !~ %r{el-5}
+  unless os[:family] == 'redhat' && os[:release].start_with?('5')
     describe 'mss ipv6 tests' do
       context 'when 1360' do
         pp3 = <<-PUPPETCODE

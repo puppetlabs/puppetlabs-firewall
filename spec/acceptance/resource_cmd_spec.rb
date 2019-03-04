@@ -181,7 +181,7 @@ describe 'puppet resource firewall command' do
   # version of iptables that ships with el5 doesn't work with the
   # ip6tables provider
   # TODO: Test below fails if this file is run seperately. i.e. bundle exec rspec spec/acceptance/resource_cmd_spec.rb
-  if default['platform'] !~ %r{el-5}
+  unless os[:family] == 'redhat' && os[:release].start_with?('5')
     context 'when dport/sport with ip6tables' do
       before :all do
         if os['family'] == 'debian'
