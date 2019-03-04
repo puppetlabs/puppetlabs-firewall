@@ -125,7 +125,7 @@ describe 'purge tests' do
     end
   end
 
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
+  unless os[:family] == 'redhat' && os[:release].start_with?('5')
     context 'when ipv6 chain purge' do
       after(:all) do
         ip6tables_flush_all_tables

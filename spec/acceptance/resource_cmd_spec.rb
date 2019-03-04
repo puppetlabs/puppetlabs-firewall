@@ -111,22 +111,20 @@ describe 'puppet resource firewall command' do
     end
   end
 
-  if default['platform'] !~ %r{sles-10}
-    context 'when accepts rules utilizing the statistic module' do
-      before :all do
-        iptables_flush_all_tables
-        # This command doesn't work with all versions/oses, so let it fail
-        shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode nth --every 2 -j SNAT --to-source 2.3.4.5', acceptable_exit_codes: [0, 1, 2])
-        shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode nth --every 1 --packet 0 -j SNAT --to-source 2.3.4.6')
-        shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode random --probability 0.99 -j SNAT --to-source 2.3.4.7')
-      end
+  context 'when accepts rules utilizing the statistic module' do
+    before :all do
+      iptables_flush_all_tables
+      # This command doesn't work with all versions/oses, so let it fail
+      shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode nth --every 2 -j SNAT --to-source 2.3.4.5', acceptable_exit_codes: [0, 1, 2])
+      shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode nth --every 1 --packet 0 -j SNAT --to-source 2.3.4.6')
+      shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode random --probability 0.99 -j SNAT --to-source 2.3.4.7')
+    end
 
-      it do
-        shell('puppet resource firewall') do |r|
-          r.exit_code.should be_zero
-          # don't check stdout, testing preexisting rules, output is normal
-          r.stderr.should be_empty
-        end
+    it do
+      shell('puppet resource firewall') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
       end
     end
   end
@@ -183,7 +181,7 @@ describe 'puppet resource firewall command' do
   # version of iptables that ships with el5 doesn't work with the
   # ip6tables provider
   # TODO: Test below fails if this file is run seperately. i.e. bundle exec rspec spec/acceptance/resource_cmd_spec.rb
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
+  if default['platform'] !~ %r{el-5}
     context 'when dport/sport with ip6tables' do
       before :all do
         if os['family'] == 'debian'

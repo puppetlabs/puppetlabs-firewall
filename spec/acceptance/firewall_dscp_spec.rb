@@ -56,7 +56,7 @@ describe 'firewall DSCP' do
     end
   end
 
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
+  unless os[:family] == 'redhat' && os[:release].start_with?('5')
     describe 'dscp ipv6 tests' do
       context 'when set_dscp 0x01' do
         pp3 = <<-PUPPETCODE

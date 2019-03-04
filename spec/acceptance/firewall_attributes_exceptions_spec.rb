@@ -375,7 +375,7 @@ describe 'firewall basics', docker: true do
   end
 
   # RHEL5 does not support --random
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
+  if default['platform'] !~ %r{el-5}
     describe 'random' do
       context 'when 192.168.1.1' do
         pp40 = <<-PUPPETCODE
@@ -405,7 +405,7 @@ describe 'firewall basics', docker: true do
 
   # iptables version 1.3.5 is not suppored by the ip6tables provider
   # iptables version 1.4.7 fails for multiple hl entries
-  if default['platform'] !~ %r{(el-5|el-6|sles-10|sles-11)}
+  if default['platform'] !~ %r{(el-5|el-6|sles-11)}
     describe 'hop_limit' do
       context 'when 5' do
         pp42 = <<-PUPPETCODE
@@ -1195,7 +1195,7 @@ describe 'firewall basics', docker: true do
   end
 
   # iptables version 1.3.5 does not support masks on MARK rules
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
+  if default['platform'] !~ %r{el-5}
     describe 'set_mark' do
       context 'when 0x3e8/0xffffffff' do
         pp73 = <<-PUPPETCODE
@@ -1394,7 +1394,7 @@ describe 'firewall basics', docker: true do
       end
       it 'contains the rule' do
         shell('iptables-save') do |r|
-          if os[:family] == 'redhat' && os[:release].start_with?('5') || (default['platform'] =~ %r{sles-10})
+          if os[:family] == 'redhat' && os[:release].start_with?('5')
             expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})
           else
             expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})

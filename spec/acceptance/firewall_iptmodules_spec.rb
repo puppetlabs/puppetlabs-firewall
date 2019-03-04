@@ -131,7 +131,7 @@ describe 'firewall iptmodules' do
     end
   # Older OSes don't have addrtype so we leave those properties out.
   # el-5 doesn't support ipv6 by default
-  elsif default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
+  elsif default['platform'] !~ %r{el-5}
     describe 'ip6tables ipt_modules tests' do
       context 'when all the modules with multiple args' do
         pp5 = <<-PUPPETCODE

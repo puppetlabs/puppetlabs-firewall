@@ -6,7 +6,7 @@ describe 'firewall match marks' do
     ip6tables_flush_all_tables
   end
 
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
+  if default['platform'] !~ %r{el-5}
     describe 'match_mark' do
       context 'when 0x1' do
         pp1 = <<-PUPPETCODE

@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-if default['platform'] =~ %r{el-5} || default['platform'] =~ %r{sles-10}
+if default['platform'] =~ %r{el-5}
   describe "firewall ip6tables doesn't work on 1.3.5 because --comment is missing" do
     before :all do
       iptables_flush_all_tables
