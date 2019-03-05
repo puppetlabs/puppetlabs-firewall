@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall time', unless: (os[:family] == 'redhat' && ['5', '6'].include?(os[:release][0])) || (os[:family] == 'sles') do
+describe 'firewall time', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
   before :all do
     iptables_flush_all_tables
     ip6tables_flush_all_tables

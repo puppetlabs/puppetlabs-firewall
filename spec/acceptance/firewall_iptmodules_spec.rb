@@ -66,7 +66,7 @@ describe 'firewall iptmodules' do
     end
   end
 
-  describe 'ip6tables ipt_modules tests', unless: (os[:family] == 'redhat' && ['5', '6'].include?(os[:release][0])) || (os[:family] == 'sles') do
+  describe 'ip6tables ipt_modules tests', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
     context 'when all the modules with multiple args' do
       pp3 = <<-PUPPETCODE
               class { '::firewall': }

@@ -405,7 +405,7 @@ describe 'firewall basics', docker: true do
 
   # iptables version 1.3.5 is not suppored by the ip6tables provider
   # iptables version 1.4.7 fails for multiple hl entries
-  describe 'testing ipv6', unless: (os[:family] == 'redhat' && ['5', '6'].include?(os[:release][0])) || (os[:family] == 'sles') do
+  describe 'testing ipv6', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
     describe 'hop_limit' do
       context 'when 5' do
         pp42 = <<-PUPPETCODE
@@ -1139,7 +1139,7 @@ describe 'firewall basics', docker: true do
           end
         end
 
-        context 'when multiple addrtype', unless: (os[:family] == 'redhat' && ['5', '6'].include?(os[:release][0])) do
+        context 'when multiple addrtype', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) do
           pp105 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '620 - test':
