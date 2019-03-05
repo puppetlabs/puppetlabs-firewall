@@ -405,7 +405,7 @@ describe 'firewall basics', docker: true do
 
   # iptables version 1.3.5 is not suppored by the ip6tables provider
   # iptables version 1.4.7 fails for multiple hl entries
-  if default['platform'] !~ %r{(el-5|el-6|sles-11)}
+  describe 'testing ipv6', unless: (os[:family] == 'redhat' && ['5', '6'].include?(os[:release][0])) || (os[:family] == 'sles') do
     describe 'hop_limit' do
       context 'when 5' do
         pp42 = <<-PUPPETCODE
@@ -947,69 +947,65 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    # ip6tables only supports ipset, addrtype, and mask on a limited set of platforms
-    if default['platform'] =~ %r{el-7} || default['platform'] =~ %r{ubuntu-14\.04}
-      # ipset is really difficult to test, just testing on one platform
-      if default['platform'] =~ %r{ubuntu-14\.04}
-        describe 'ipset' do
-          pp63 = <<-PUPPETCODE
-            exec { 'hackery pt 1':
-              command => 'service iptables-persistent flush',
-              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-            }
-            package { 'ipset':
-              ensure  => present,
-              require => Exec['hackery pt 1'],
-            }
-            exec { 'hackery pt 2':
-              command => 'service iptables-persistent start',
-              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-              require => Package['ipset'],
-            }
-            class { '::firewall': }
-            exec { 'create ipset blacklist':
-              command => 'ipset create blacklist hash:ip,port family inet6 maxelem 1024 hashsize 65535 timeout 120',
-              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-              require => Package['ipset'],
-            }
-            -> exec { 'create ipset honeypot':
-              command => 'ipset create honeypot hash:ip family inet6 maxelem 1024 hashsize 65535 timeout 120',
-              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-            }
-            -> exec { 'add blacklist':
-              command => 'ipset add blacklist 2001:db8::1,80',
-              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-            }
-            -> exec { 'add honeypot':
-              command => 'ipset add honeypot 2001:db8::5',
-              path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-            }
-            firewall { '612 - test':
-              ensure   => present,
-              chain    => 'INPUT',
-              proto    => tcp,
-              action   => drop,
-              ipset    => ['blacklist src,dst', '! honeypot dst'],
-              provider => 'ip6tables',
-              require  => Exec['add honeypot'],
-            }
-          PUPPETCODE
-          it 'applies' do
-            apply_manifest(pp63, catch_failures: true)
-          end
-
-          it 'contains the rule' do
-            shell('ip6tables-save') do |r|
-              expect(r.stdout).to match(%r{-A INPUT -p tcp -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP})
-            end
-          end
-        end
+    # ipset is hard to test, only testing on ubuntu 14
+    describe 'ipset', if: (host_inventory['facter']['os']['name'] == 'ubuntu' && os[:release].start_with?('14')) do
+      pp63 = <<-PUPPETCODE
+          exec { 'hackery pt 1':
+            command => 'service iptables-persistent flush',
+            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          }
+          package { 'ipset':
+            ensure  => present,
+            require => Exec['hackery pt 1'],
+          }
+          exec { 'hackery pt 2':
+            command => 'service iptables-persistent start',
+            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+            require => Package['ipset'],
+          }
+          class { '::firewall': }
+          exec { 'create ipset blacklist':
+            command => 'ipset create blacklist hash:ip,port family inet6 maxelem 1024 hashsize 65535 timeout 120',
+            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+            require => Package['ipset'],
+          }
+          -> exec { 'create ipset honeypot':
+            command => 'ipset create honeypot hash:ip family inet6 maxelem 1024 hashsize 65535 timeout 120',
+            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          }
+          -> exec { 'add blacklist':
+            command => 'ipset add blacklist 2001:db8::1,80',
+            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          }
+          -> exec { 'add honeypot':
+            command => 'ipset add honeypot 2001:db8::5',
+            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          }
+          firewall { '612 - test':
+            ensure   => present,
+            chain    => 'INPUT',
+            proto    => tcp,
+            action   => drop,
+            ipset    => ['blacklist src,dst', '! honeypot dst'],
+            provider => 'ip6tables',
+            require  => Exec['add honeypot'],
+          }
+        PUPPETCODE
+      it 'applies' do
+        apply_manifest(pp63, catch_failures: true)
       end
 
-      ['dst_type', 'src_type'].each do |type|
-        describe type.to_s do
-          context 'when MULTICAST' do
-            pp65 = <<-PUPPETCODE
+      it 'contains the rule' do
+        shell('ip6tables-save') do |r|
+          expect(r.stdout).to match(%r{-A INPUT -p tcp -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP})
+        end
+      end
+    end
+
+    ['dst_type', 'src_type'].each do |type|
+      describe type.to_s do
+        context 'when MULTICAST' do
+          pp65 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '603 - test':
                 proto    => tcp,
@@ -1018,20 +1014,20 @@ describe 'firewall basics', docker: true do
                 provider => 'ip6tables',
               }
             PUPPETCODE
-            it 'applies' do
-              apply_manifest(pp65, catch_failures: true)
-              apply_manifest(pp65, catch_changes: do_catch_changes)
-            end
-
-            it 'contains the rule' do
-              shell('ip6tables-save') do |r|
-                expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sMULTICAST -m comment --comment "603 - test" -j ACCEPT})
-              end
-            end
+          it 'applies' do
+            apply_manifest(pp65, catch_failures: true)
+            apply_manifest(pp65, catch_changes: do_catch_changes)
           end
 
-          context 'when ! MULTICAST' do
-            pp66 = <<-PUPPETCODE
+          it 'contains the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sMULTICAST -m comment --comment "603 - test" -j ACCEPT})
+            end
+          end
+        end
+
+        context 'when ! MULTICAST' do
+          pp66 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '603 - test inversion':
                 proto    => tcp,
@@ -1040,20 +1036,20 @@ describe 'firewall basics', docker: true do
                 provider => 'ip6tables',
               }
             PUPPETCODE
-            it 'applies' do
-              apply_manifest(pp66, catch_failures: true)
-              apply_manifest(pp66, catch_changes: do_catch_changes)
-            end
-
-            it 'contains the rule' do
-              shell('ip6tables-save') do |r|
-                expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype( !\s.*\sMULTICAST|\s.*\s! MULTICAST) -m comment --comment "603 - test inversion" -j ACCEPT})
-              end
-            end
+          it 'applies' do
+            apply_manifest(pp66, catch_failures: true)
+            apply_manifest(pp66, catch_changes: do_catch_changes)
           end
 
-          context 'when BROKEN' do
-            pp67 = <<-PUPPETCODE
+          it 'contains the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype( !\s.*\sMULTICAST|\s.*\s! MULTICAST) -m comment --comment "603 - test inversion" -j ACCEPT})
+            end
+          end
+        end
+
+        context 'when BROKEN' do
+          pp67 = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '603 - test':
                 proto    => tcp,
@@ -1062,22 +1058,22 @@ describe 'firewall basics', docker: true do
                 provider => 'ip6tables',
               }
             PUPPETCODE
-            it 'fails' do
-              apply_manifest(pp67, expect_failures: true) do |r|
-                expect(r.stderr).to match(%r{Invalid value "BROKEN".})
-              end
-            end
-
-            it 'does not contain the rule' do
-              shell('ip6tables-save') do |r|
-                expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sBROKEN -m comment --comment "603 - test" -j ACCEPT})
-              end
+          it 'fails' do
+            apply_manifest(pp67, expect_failures: true) do |r|
+              expect(r.stderr).to match(%r{Invalid value "BROKEN".})
             end
           end
 
-          context 'when LOCAL --limit-iface-in', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
-                                                         ) do
-            pp102 = <<-PUPPETCODE
+          it 'does not contain the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sBROKEN -m comment --comment "603 - test" -j ACCEPT})
+            end
+          end
+        end
+
+        context 'when LOCAL --limit-iface-in', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                       ) do
+          pp102 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '617 - test':
                   proto   => tcp,
@@ -1085,20 +1081,20 @@ describe 'firewall basics', docker: true do
                   #{type} => 'LOCAL --limit-iface-in',
                 }
             PUPPETCODE
-            it 'applies' do
-              apply_manifest(pp102, catch_failures: true)
-            end
-
-            it 'contains the rule' do
-              shell('iptables-save') do |r|
-                expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "617 - test" -j ACCEPT})
-              end
-            end
+          it 'applies' do
+            apply_manifest(pp102, catch_failures: true)
           end
 
-          context 'when LOCAL --limit-iface-in fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')
-                                                          ) do
-            pp103 = <<-PUPPETCODE
+          it 'contains the rule' do
+            shell('iptables-save') do |r|
+              expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "617 - test" -j ACCEPT})
+            end
+          end
+        end
+
+        context 'when LOCAL --limit-iface-in fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                        ) do
+          pp103 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '618 - test':
                   proto   => tcp,
@@ -1106,22 +1102,22 @@ describe 'firewall basics', docker: true do
                   #{type} => 'LOCAL --limit-iface-in',
                 }
             PUPPETCODE
-            it 'fails' do
-              apply_manifest(pp103, expect_failures: true) do |r|
-                expect(r.stderr).to match(%r{--limit-iface-in and --limit-iface-out are available from iptables version})
-              end
-            end
-
-            it 'does not contain the rule' do
-              shell('iptables-save') do |r|
-                expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "618 - test" -j ACCEPT})
-              end
+          it 'fails' do
+            apply_manifest(pp103, expect_failures: true) do |r|
+              expect(r.stderr).to match(%r{--limit-iface-in and --limit-iface-out are available from iptables version})
             end
           end
 
-          context 'when duplicated LOCAL', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
-                                                   ) do
-            pp104 = <<-PUPPETCODE
+          it 'does not contain the rule' do
+            shell('iptables-save') do |r|
+              expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "618 - test" -j ACCEPT})
+            end
+          end
+        end
+
+        context 'when duplicated LOCAL', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                 ) do
+          pp104 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '619 - test':
                   proto    => tcp,
@@ -1130,22 +1126,21 @@ describe 'firewall basics', docker: true do
                   provider => 'ip6tables',
                 }
             PUPPETCODE
-            it 'fails' do
-              apply_manifest(pp104, expect_failures: true) do |r|
-                expect(r.stderr).to match(%r{#{type} elements must be unique})
-              end
-            end
-
-            it 'does not contain the rule' do
-              shell('ip6tables-save') do |r|
-                expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL -m addrtype\s.*\sLOCAL -m comment --comment "619 - test" -j ACCEPT})
-              end
+          it 'fails' do
+            apply_manifest(pp104, expect_failures: true) do |r|
+              expect(r.stderr).to match(%r{#{type} elements must be unique})
             end
           end
 
-          context 'when multiple addrtype', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')
-                                                    ) do
-            pp105 = <<-PUPPETCODE
+          it 'does not contain the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL -m addrtype\s.*\sLOCAL -m comment --comment "619 - test" -j ACCEPT})
+            end
+          end
+        end
+
+        context 'when multiple addrtype', unless: (os[:family] == 'redhat' && ['5', '6'].include?(os[:release][0])) do
+          pp105 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '620 - test':
                   proto    => tcp,
@@ -1154,20 +1149,20 @@ describe 'firewall basics', docker: true do
                   provider => 'ip6tables',
                 }
             PUPPETCODE
-            it 'applies' do
-              apply_manifest(pp105, catch_failures: true)
-            end
-
-            it 'contains the rule' do
-              shell('ip6tables-save') do |r|
-                expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "620 - test" -j ACCEPT})
-              end
-            end
+          it 'applies' do
+            apply_manifest(pp105, catch_failures: true)
           end
 
-          context 'when multiple addrtype fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')
-                                                     ) do
-            pp106 = <<-PUPPETCODE
+          it 'contains the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "620 - test" -j ACCEPT})
+            end
+          end
+        end
+
+        context 'when multiple addrtype fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')
+                                                   ) do
+          pp106 = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '616 - test':
                   proto    => tcp,
@@ -1176,22 +1171,20 @@ describe 'firewall basics', docker: true do
                   provider => 'ip6tables',
                 }
             PUPPETCODE
-            it 'fails' do
-              apply_manifest(pp106, expect_failures: true) do |r|
-                expect(r.stderr).to match(%r{Multiple #{type} elements are available from iptables version})
-              end
+          it 'fails' do
+            apply_manifest(pp106, expect_failures: true) do |r|
+              expect(r.stderr).to match(%r{Multiple #{type} elements are available from iptables version})
             end
+          end
 
-            it 'does not contain the rule' do
-              shell('ip6tables-save') do |r|
-                expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
-              end
+          it 'does not contain the rule' do
+            shell('ip6tables-save') do |r|
+              expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
             end
           end
         end
       end
     end
-
   end
 
   # iptables version 1.3.5 does not support masks on MARK rules

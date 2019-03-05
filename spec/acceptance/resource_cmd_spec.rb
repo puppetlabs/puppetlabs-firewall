@@ -181,23 +181,21 @@ describe 'puppet resource firewall command' do
   # version of iptables that ships with el5 doesn't work with the
   # ip6tables provider
   # TODO: Test below fails if this file is run seperately. i.e. bundle exec rspec spec/acceptance/resource_cmd_spec.rb
-  unless os[:family] == 'redhat' && os[:release].start_with?('5')
-    context 'when dport/sport with ip6tables' do
-      before :all do
-        if os['family'] == 'debian'
-          shell('echo "iptables-persistent iptables-persistent/autosave_v4 boolean false" | debconf-set-selections')
-          shell('echo "iptables-persistent iptables-persistent/autosave_v6 boolean false" | debconf-set-selections')
-          shell('apt-get install iptables-persistent -y')
-        end
-        ip6tables_flush_all_tables
-        shell('ip6tables -A INPUT -d fe80::/64 -p tcp -m tcp --dport 546 --sport 547 -j ACCEPT -m comment --comment 000-foobar')
+  context 'when dport/sport with ip6tables', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
+    before :all do
+      if os['family'] == 'debian'
+        shell('echo "iptables-persistent iptables-persistent/autosave_v4 boolean false" | debconf-set-selections')
+        shell('echo "iptables-persistent iptables-persistent/autosave_v6 boolean false" | debconf-set-selections')
+        shell('apt-get install iptables-persistent -y')
       end
-      it do
-        shell('puppet resource firewall \'000-foobar\' provider=ip6tables') do |r|
-          r.exit_code.should be_zero
-          # don't check stdout, testing preexisting rules, output is normal
-          r.stderr.should be_empty
-        end
+      ip6tables_flush_all_tables
+      shell('ip6tables -A INPUT -d fe80::/64 -p tcp -m tcp --dport 546 --sport 547 -j ACCEPT -m comment --comment 000-foobar')
+    end
+    it do
+      shell('puppet resource firewall \'000-foobar\' provider=ip6tables') do |r|
+        r.exit_code.should be_zero
+        # don't check stdout, testing preexisting rules, output is normal
+        r.stderr.should be_empty
       end
     end
   end

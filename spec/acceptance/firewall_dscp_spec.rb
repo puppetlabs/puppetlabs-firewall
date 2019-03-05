@@ -56,10 +56,9 @@ describe 'firewall DSCP' do
     end
   end
 
-  unless os[:family] == 'redhat' && os[:release].start_with?('5')
-    describe 'dscp ipv6 tests' do
-      context 'when set_dscp 0x01' do
-        pp3 = <<-PUPPETCODE
+  describe 'dscp ipv6 tests', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
+    context 'when set_dscp 0x01' do
+      pp3 = <<-PUPPETCODE
             class { '::firewall': }
             firewall {
               '1002 - set_dscp':
@@ -72,19 +71,19 @@ describe 'firewall DSCP' do
                 provider  => 'ip6tables',
             }
         PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp3, catch_failures: true)
-        end
-
-        it 'contains the rule' do
-          shell('ip6tables-save -t mangle') do |r|
-            expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1002 - set_dscp" -j DSCP --set-dscp 0x01})
-          end
-        end
+      it 'applies' do
+        apply_manifest(pp3, catch_failures: true)
       end
 
-      context 'when set_dscp_class EF' do
-        pp4 = <<-PUPPETCODE
+      it 'contains the rule' do
+        shell('ip6tables-save -t mangle') do |r|
+          expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1002 - set_dscp" -j DSCP --set-dscp 0x01})
+        end
+      end
+    end
+
+    context 'when set_dscp_class EF' do
+      pp4 = <<-PUPPETCODE
             class { '::firewall': }
             firewall {
               '1003 EF - set_dscp_class':
@@ -97,14 +96,13 @@ describe 'firewall DSCP' do
                 provider       => 'ip6tables',
             }
         PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp4, catch_failures: true)
-        end
+      it 'applies' do
+        apply_manifest(pp4, catch_failures: true)
+      end
 
-        it 'contains the rule' do
-          shell('ip6tables-save') do |r|
-            expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1003 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
-          end
+      it 'contains the rule' do
+        shell('ip6tables-save') do |r|
+          expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1003 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
         end
       end
     end
