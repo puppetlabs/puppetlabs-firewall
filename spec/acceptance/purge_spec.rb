@@ -125,37 +125,36 @@ describe 'purge tests' do
     end
   end
 
-  if default['platform'] !~ %r{el-5} && default['platform'] !~ %r{sles-10}
-    context 'when ipv6 chain purge' do
-      after(:all) do
-        ip6tables_flush_all_tables
-      end
-      before(:each) do
-        ip6tables_flush_all_tables
+  context 'when ipv6 chain purge', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
+    after(:all) do
+      ip6tables_flush_all_tables
+    end
+    before(:each) do
+      ip6tables_flush_all_tables
 
-        shell('ip6tables -A INPUT -p tcp -s 1::42')
-        shell('ip6tables -A INPUT -p udp -s 1::42')
-        shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
-      end
+      shell('ip6tables -A INPUT -p tcp -s 1::42')
+      shell('ip6tables -A INPUT -p udp -s 1::42')
+      shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
+    end
 
-      pp6 = <<-PUPPETCODE
+    pp6 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv6':
             purge => true,
           }
       PUPPETCODE
-      it 'purges only the specified chain' do
-        apply_manifest(pp6, expect_changes: true)
+    it 'purges only the specified chain' do
+      apply_manifest(pp6, expect_changes: true)
 
-        shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(%r{010 output-1::50})
-          expect(r.stdout).not_to match(%r{1::42})
-          expect(r.stderr).to eq('')
-        end
+      shell('ip6tables-save') do |r|
+        expect(r.stdout).to match(%r{010 output-1::50})
+        expect(r.stdout).not_to match(%r{1::42})
+        expect(r.stderr).to eq('')
       end
-      # rubocop:enable RSpec/ExampleLength
+    end
+    # rubocop:enable RSpec/ExampleLength
 
-      pp7 = <<-PUPPETCODE
+    pp7 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'OUTPUT:filter:IPv6':
             purge => true,
@@ -167,11 +166,11 @@ describe 'purge tests' do
             provider => 'ip6tables',
           }
       PUPPETCODE
-      it 'ignores managed rules' do
-        apply_manifest(pp7, catch_changes: do_catch_changes)
-      end
+    it 'ignores managed rules' do
+      apply_manifest(pp7, catch_changes: do_catch_changes)
+    end
 
-      pp8 = <<-PUPPETCODE
+    pp8 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv6':
             purge => true,
@@ -180,11 +179,11 @@ describe 'purge tests' do
             ],
           }
       PUPPETCODE
-      it 'ignores specified rules' do
-        apply_manifest(pp8, catch_changes: do_catch_changes)
-      end
+    it 'ignores specified rules' do
+      apply_manifest(pp8, catch_changes: do_catch_changes)
+    end
 
-      pp9 = <<-PUPPETCODE
+    pp9 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv6':
             purge => true,
@@ -217,11 +216,10 @@ describe 'purge tests' do
             provider => 'ip6tables',
           }
       PUPPETCODE
-      it 'adds managed rules with ignored rules' do
-        apply_manifest(pp9, catch_failures: true)
+    it 'adds managed rules with ignored rules' do
+      apply_manifest(pp9, catch_failures: true)
 
-        expect(shell('ip6tables-save').stdout).to match(%r{-A INPUT -s 1::42(\/128)? -p tcp\s?\n-A INPUT -s 1::42(\/128)? -p udp})
-      end
+      expect(shell('ip6tables-save').stdout).to match(%r{-A INPUT -s 1::42(\/128)? -p tcp\s?\n-A INPUT -s 1::42(\/128)? -p udp})
     end
   end
 end
