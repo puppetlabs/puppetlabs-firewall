@@ -42,6 +42,15 @@ class firewall::linux::redhat (
   # RHEL 7 / CentOS 7 and later and Fedora 15 and later require the iptables-services
   # package, which provides the /usr/libexec/iptables/iptables.init used by
   # lib/puppet/util/firewall.rb.
+  # The package_name variable is defined by the firewall::params class
+
+  if $package_name {
+    package { $package_name:
+      ensure => $package_ensure,
+      before => Service[$service_name],
+    }
+  }
+
   if ($::operatingsystem != 'Amazon')
     and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
     or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
@@ -58,12 +67,6 @@ class firewall::linux::redhat (
     warning('No v6 service available, $ensure_v6 and $enable_v6 are ignored')
   }
 
-  if $package_name {
-    package { $package_name:
-      ensure => $package_ensure,
-      before => Service[$service_name],
-    }
-  }
 
   if ($::operatingsystem != 'Amazon')
     and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
