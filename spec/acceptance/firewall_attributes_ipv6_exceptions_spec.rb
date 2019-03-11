@@ -1,12 +1,12 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall attribute testing, exceptions', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
+describe 'firewall attribute testing, exceptions' do
   before(:all) do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
   end
 
-  describe 'attributes test' do
+  describe 'attributes test', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
     describe 'hop_limit' do
       context 'when invalid' do
         pp43 = <<-PUPPETCODE
@@ -208,9 +208,129 @@ describe 'firewall attribute testing, exceptions', unless: (os[:family] == 'redh
       end
 
       it 'contains the rule' do
-        expect(result.stdout).to match(%r{-A INPUT -p tcp -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP})
+        shell('ip6tables-save') do |r|
+          expect(r.stdout).to match(%r{-A INPUT -p tcp -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP})
+        end
       end
     end
-
   end
+
+  describe 'attributes test (unless redhat 5)', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
+    before(:all) do
+      pp = <<-PUPPETCODE
+        firewall { '701 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '701',
+          action => accept,
+          physdev_in => 'eth0',
+        }
+        firewall { '702 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '702',
+          action => accept,
+          physdev_out => 'eth1',
+        }
+        firewall { '703 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '703',
+          action => accept,
+          physdev_in => 'eth0',
+          physdev_out => 'eth1',
+        }
+        firewall { '704 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '704',
+          action => accept,
+          physdev_is_bridged => true,
+        }
+        firewall { '705 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '705',
+          action => accept,
+          physdev_in => 'eth0',
+          physdev_is_bridged => true,
+        }
+        firewall { '706 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '706',
+          action => accept,
+          physdev_out => 'eth1',
+          physdev_is_bridged => true,
+        }
+        firewall { '707 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '707',
+          action => accept,
+          physdev_in => 'eth0',
+          physdev_out => 'eth1',
+          physdev_is_bridged => true,
+        }
+        firewall { '708 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '708',
+          action => accept,
+          physdev_is_in => true,
+        }
+        firewall { '709 - test':
+          provider => 'ip6tables',
+          chain => 'FORWARD',
+          proto  => tcp,
+          port   => '709',
+          action => accept,
+          physdev_is_out => true,
+        }
+
+      PUPPETCODE
+      apply_manifest(pp, catch_failures: true)
+      apply_manifest(pp, catch_changes: do_catch_changes)
+    end
+
+    let(:result) { shell('ip6tables-save') }
+
+    it 'physdev_in is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 701 -m comment --comment "701 - test" -j ACCEPT})
+    end
+    it 'physdev_out is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 702 -m comment --comment "702 - test" -j ACCEPT})
+    end
+    it 'physdev_in and physdev_out is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 -m multiport --ports 703 -m comment --comment "703 - test" -j ACCEPT})
+    end
+    it 'physdev_is_bridged is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-bridged -m multiport --ports 704 -m comment --comment "704 - test" -j ACCEPT})
+    end
+    it 'physdev_in and physdev_is_bridged is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-is-bridged -m multiport --ports 705 -m comment --comment "705 - test" -j ACCEPT})
+    end
+    it 'physdev_out and physdev_is_bridged is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m multiport --ports 706 -m comment --comment "706 - test" -j ACCEPT})
+    end
+    it 'physdev_in and physdev_out and physdev_is_bridged is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 707 -m comment --comment "707 - test" -j ACCEPT})
+    end
+    it 'physdev_is_in is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-in -m multiport --ports 708 -m comment --comment "708 - test" -j ACCEPT})
+    end
+    it 'physdev_is_out is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-out -m multiport --ports 709 -m comment --comment "709 - test" -j ACCEPT})
+    end
+    
+  end
+  
 end
