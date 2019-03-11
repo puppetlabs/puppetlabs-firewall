@@ -126,14 +126,14 @@ describe 'firewall basics', docker: true do
           apply_manifest(pp1, catch_failures: true)
           apply_manifest(pp1, catch_changes: do_catch_changes)
         end
-  
+
         it 'finds the chain' do
           shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{MY_CHAIN})
           end
         end
       end
-  
+
       context 'when absent' do
         pp2 = <<-PUPPETCODE
             firewallchain { 'MY_CHAIN:filter:IPv4':
@@ -145,7 +145,7 @@ describe 'firewall basics', docker: true do
           apply_manifest(pp2, catch_failures: true)
           apply_manifest(pp2, catch_changes: do_catch_changes)
         end
-  
+
         it 'fails to find the chain' do
           shell('iptables-save') do |r|
             expect(r.stdout).not_to match(%r{MY_CHAIN})
@@ -153,7 +153,7 @@ describe 'firewall basics', docker: true do
         end
       end
     end
-  
+
     # XXX purge => false is not yet implemented
     # context 'when adding a firewall rule to a chain:' do
     #    pp3 = <<-PUPPETCODE
@@ -173,7 +173,7 @@ describe 'firewall basics', docker: true do
     #    apply_manifest(pp3, :catch_changes => do_catch_changes)
     #  end
     # end
-  
+
     # context 'when not purge firewallchain chains:' do
     #    pp4 = <<-PUPPETCODE
     #      firewallchain { 'MY_CHAIN:filter:IPv4':
@@ -193,7 +193,7 @@ describe 'firewall basics', docker: true do
     #    end
     #    apply_manifest(pp4, :catch_changes => do_catch_changes)
     #  end
-  
+
     #    pp5 = <<-PUPPETCODE
     #      firewall { '100 my rule':
     #        chain   => 'MY_CHAIN',
@@ -207,12 +207,12 @@ describe 'firewall basics', docker: true do
     #    apply_manifest(pp5, :catch_changes => do_catch_changes)
     #  end
     # end
-  
+
     describe 'policy' do
       after :all do
         shell('iptables -t filter -P FORWARD ACCEPT')
       end
-  
+
       context 'when DROP' do
         pp6 = <<-PUPPETCODE
             firewallchain { 'FORWARD:filter:IPv4':
@@ -224,7 +224,7 @@ describe 'firewall basics', docker: true do
           apply_manifest(pp6, catch_failures: true)
           apply_manifest(pp6, catch_changes: do_catch_changes)
         end
-  
+
         it 'finds the chain' do
           shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{FORWARD DROP})
@@ -233,7 +233,6 @@ describe 'firewall basics', docker: true do
       end
     end
   end
-  
 
   describe 'hashlimit' do
     context 'when hashlimit_above' do
@@ -355,7 +354,7 @@ describe 'firewall basics', docker: true do
         it 'applies' do
           apply_manifest(pp1, catch_failures: true)
         end
-  
+
         it 'contains the rule' do
           shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
@@ -365,7 +364,7 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'nflog on older OSes', if: fact('iptables_version') < '1.3.7' do # rubocop:disable RSpec/MultipleDescribes : Describes are clearly seperate
+  describe 'nflog on older OSes', if: fact('iptables_version') < '1.3.7' do
     pp1 = <<-PUPPETCODE
         class {'::firewall': }
         firewall { '503 - test':
@@ -378,7 +377,7 @@ describe 'firewall basics', docker: true do
       apply_manifest(pp1, acceptable_error_codes: [0])
     end
   end
-  
+
   describe 'nflog', unless: fact('iptables_version') < '1.3.7' do
     describe 'nflog_group' do
       it 'applies' do
@@ -388,14 +387,14 @@ describe 'firewall basics', docker: true do
         PUPPETCODE
         apply_manifest(pp2, catch_failures: true)
       end
-  
+
       it 'contains the rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-group 3})
         end
       end
     end
-  
+
     describe 'nflog_prefix' do
       it 'applies' do
         pp3 = <<-PUPPETCODE
@@ -404,14 +403,14 @@ describe 'firewall basics', docker: true do
         PUPPETCODE
         apply_manifest(pp3, catch_failures: true)
       end
-  
+
       it 'contains the rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-prefix +"TEST PREFIX"})
         end
       end
     end
-  
+
     describe 'nflog_range' do
       it 'applies' do
         pp4 = <<-PUPPETCODE
@@ -420,14 +419,14 @@ describe 'firewall basics', docker: true do
         PUPPETCODE
         apply_manifest(pp4, catch_failures: true)
       end
-  
+
       it 'contains the rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-range 16})
         end
       end
     end
-  
+
     describe 'nflog_threshold' do
       it 'applies' do
         pp5 = <<-PUPPETCODE
@@ -436,14 +435,14 @@ describe 'firewall basics', docker: true do
         PUPPETCODE
         apply_manifest(pp5, catch_failures: true)
       end
-  
+
       it 'contains the rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-threshold 2})
         end
       end
     end
-  
+
     describe 'multiple rules' do
       it 'applies' do
         pp6 = <<-PUPPETCODE
@@ -452,15 +451,15 @@ describe 'firewall basics', docker: true do
         PUPPETCODE
         apply_manifest(pp6, catch_failures: true)
       end
-  
+
       it 'contains the rules' do
         shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-group 2 --nflog-threshold 3})
         end
       end
     end
-  end  
-  
+  end
+
   describe 'port' do
     context 'when invalid ports' do
       pp25 = <<-PUPPETCODE
@@ -490,15 +489,15 @@ describe 'firewall basics', docker: true do
       iptables_flush_all_tables
       ip6tables_flush_all_tables
     end
-  
+
     context 'when resources purge' do
       before(:all) do
         iptables_flush_all_tables
-  
+
         shell('iptables -A INPUT -s 1.2.1.2')
         shell('iptables -A INPUT -s 1.2.1.2')
       end
-  
+
       pp1 = <<-PUPPETCODE
           class { 'firewall': }
           resources { 'firewall':
@@ -508,7 +507,7 @@ describe 'firewall basics', docker: true do
       it 'make sure duplicate existing rules get purged' do
         apply_manifest(pp1, expect_changes: true)
       end
-  
+
       it 'saves' do
         shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{1\.2\.1\.2})
@@ -516,19 +515,19 @@ describe 'firewall basics', docker: true do
         end
       end
     end
-  
+
     context 'when ipv4 chain purge' do
       after(:all) do
         iptables_flush_all_tables
       end
       before(:each) do
         iptables_flush_all_tables
-  
+
         shell('iptables -A INPUT -p tcp -s 1.2.1.1')
         shell('iptables -A INPUT -p udp -s 1.2.1.1')
         shell('iptables -A OUTPUT -s 1.2.1.2 -m comment --comment "010 output-1.2.1.2"')
       end
-  
+
       pp2 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv4':
@@ -537,7 +536,7 @@ describe 'firewall basics', docker: true do
       PUPPETCODE
       it 'purges only the specified chain' do
         apply_manifest(pp2, expect_changes: true)
-  
+
         shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{010 output-1\.2\.1\.2})
           expect(r.stdout).not_to match(%r{1\.2\.1\.1})
@@ -545,7 +544,7 @@ describe 'firewall basics', docker: true do
         end
       end
       # rubocop:enable RSpec/ExampleLength
-  
+
       pp3 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'OUTPUT:filter:IPv4':
@@ -560,7 +559,7 @@ describe 'firewall basics', docker: true do
       it 'ignores managed rules' do
         apply_manifest(pp3, catch_changes: do_catch_changes)
       end
-  
+
       pp4 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv4':
@@ -573,7 +572,7 @@ describe 'firewall basics', docker: true do
       it 'ignores specified rules' do
         apply_manifest(pp4, catch_changes: do_catch_changes)
       end
-  
+
       pp5 = <<-PUPPETCODE
           class { 'firewall': }
           firewallchain { 'INPUT:filter:IPv4':
@@ -605,12 +604,12 @@ describe 'firewall basics', docker: true do
       PUPPETCODE
       it 'adds managed rules with ignored rules' do
         apply_manifest(pp5, catch_failures: true)
-  
+
         expect(shell('iptables-save').stdout).to match(%r{-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp})
       end
     end
   end
-  
+
   describe 'source' do
     describe 'when unmanaged rules exist' do
       pp1 = <<-PUPPETCODE
@@ -631,12 +630,12 @@ describe 'firewall basics', docker: true do
       it 'applies with 8.0.0.1 first' do
         apply_manifest(pp1, catch_failures: true)
       end
-  
+
       it 'adds a unmanaged rule without a comment' do
         shell('iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 102 -j ACCEPT')
         expect(shell('iptables-save').stdout).to match(%r{-A INPUT -s 8\.0\.0\.3(\/32)? -p tcp -m multiport --ports 102 -j ACCEPT})
       end
-  
+
       it 'contains the changable 8.0.0.1 rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.1(\/32)? -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT})
@@ -647,7 +646,7 @@ describe 'firewall basics', docker: true do
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT})
         end
       end
-  
+
       pp2 = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '101 test source changes':
@@ -661,7 +660,7 @@ describe 'firewall basics', docker: true do
         expect(apply_manifest(pp2, catch_failures: true).stdout)
           .to match(%r{Notice: \/Stage\[main\]\/Main\/Firewall\[101 test source changes\]\/source: source changed '8\.0\.0\.1\/32' to '8\.0\.0\.4\/32'})
       end
-  
+
       it 'does not contain the old changing 8.0.0.1 rule' do
         shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{8\.0\.0\.1})
@@ -678,7 +677,7 @@ describe 'firewall basics', docker: true do
         end
       end
     end
-  end  
+  end
 
   ['dst_type', 'src_type'].each do |type|
     describe type.to_s do

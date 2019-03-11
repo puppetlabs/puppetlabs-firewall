@@ -434,8 +434,8 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'inverting rules' do
       regex_array = [%r{-A INPUT (-s !|! -s) (10\.0\.0\.0\/8|10\.0\.0\.0\/255\.0\.0\.0).*}, %r{-A INPUT.*(--sports !|! --sports) 80,443.*},
-        %r{-A INPUT.*-m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN.*}, %r{-A INPUT.*-j DROP},
-        %r{-A INPUT (! -p|-p !) esp -m comment --comment "601 disallow esp protocol" -j ACCEPT}]
+                     %r{-A INPUT.*-m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN.*}, %r{-A INPUT.*-j DROP},
+                     %r{-A INPUT (! -p|-p !) esp -m comment --comment "601 disallow esp protocol" -j ACCEPT}]
       regex_array.each do |regex|
         expect(result.stdout).to match(regex)
       end
