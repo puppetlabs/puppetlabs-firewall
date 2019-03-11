@@ -219,6 +219,30 @@ describe 'firewall basics', docker: true do
     end
   end
 
+  describe 'firewall match marks', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
+    describe 'match_mark' do
+      context 'when 0x1' do
+        pp1 = <<-PUPPETCODE
+              class { '::firewall': }
+              firewall { '503 match_mark - test':
+                proto      => 'all',
+                match_mark => '0x1',
+                action     => reject,
+              }
+          PUPPETCODE
+        it 'applies' do
+          apply_manifest(pp1, catch_failures: true)
+        end
+  
+        it 'contains the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
+          end
+        end
+      end
+    end
+  end
+  
   describe 'port' do
     context 'when invalid ports' do
       pp25 = <<-PUPPETCODE

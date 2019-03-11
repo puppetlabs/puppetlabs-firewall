@@ -342,6 +342,12 @@ describe 'firewall attribute testing, exceptions' do
           hashlimit_htable_expire => '36000000',
           action                  => accept,
         }
+        firewall { '503 match_mark ip6tables - test':
+          proto      => 'all',
+          match_mark => '0x1',
+          action     => reject,
+          provider => 'ip6tables',
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -391,6 +397,9 @@ describe 'firewall attribute testing, exceptions' do
     end
     it 'hashlimit_name set to "upto-ip6"' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto-ip6 --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "803 - hashlimit_upto test ip6" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+    end
+    it 'match_mark is set' do
+      expect(result.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark ip6tables - test" -j REJECT --reject-with icmp6-port-unreachable})
     end
   end
 end
