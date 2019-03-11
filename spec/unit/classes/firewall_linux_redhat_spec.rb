@@ -165,7 +165,10 @@ describe 'firewall::linux::redhat', type: :class do
             ensure: 'running',
             enable: 'true',
           )
-          is_expected.not_to contain_service('iptables')
+          is_expected.to contain_service('iptables').with(
+            ensure: 'running',
+            enable: 'true',
+          )
         }
 
         context 'with ensure => stopped' do
@@ -173,6 +176,9 @@ describe 'firewall::linux::redhat', type: :class do
 
           it {
             is_expected.to contain_service('nftables').with(
+              ensure: 'stopped',
+            )
+            is_expected.to contain_service('iptables').with(
               ensure: 'stopped',
             )
           }
@@ -185,6 +191,9 @@ describe 'firewall::linux::redhat', type: :class do
             is_expected.to contain_service('nftables').with(
               enable: 'false',
             )
+            is_expected.to contain_service('iptables').with(
+              enable: 'false',
+            )
           }
         end
 
@@ -192,14 +201,21 @@ describe 'firewall::linux::redhat', type: :class do
           is_expected.to contain_service('firewalld').with(
             ensure: 'stopped',
             enable: false,
-            before: ['Package[nftables]', 'Service[nftables]'],
+            before: ['Package[iptables-services]', 'Package[nftables]', 'Service[iptables]', 'Service[nftables]'],
+          )
+        }
+
+        it {
+          is_expected.to contain_package('iptables-services').with(
+            ensure: 'present',
+            before: ['Service[iptables]', 'Service[nftables]'],
           )
         }
 
         it {
           is_expected.to contain_package('nftables').with(
             ensure: 'present',
-            before: 'Service[nftables]',
+            before: ['Service[iptables]', 'Service[nftables]'],
           )
         }
 

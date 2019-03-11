@@ -22,9 +22,9 @@ class firewall::params {
         }
         default: {
           if versioncmp($::operatingsystemrelease, '8.0') >= 0 {
-            $service_name = 'nftables'
-            $service_name_v6 = undef
-            $package_name = 'nftables'
+            $service_name = ['iptables', 'nftables']
+            $service_name_v6 = 'ip6tables'
+            $package_name = ['iptables-services', 'nftables']
             $sysconfig_manage = false
           } elsif versioncmp($::operatingsystemrelease, '7.0') >= 0 {
             $service_name = 'iptables'
