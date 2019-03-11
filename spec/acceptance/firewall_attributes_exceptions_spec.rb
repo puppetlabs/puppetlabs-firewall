@@ -642,6 +642,31 @@ describe 'firewall basics', docker: true do
     end
   end
 
+  describe 'tee_gateway', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
+    context 'when 10.0.0.2' do
+      pp1 = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall {
+            '810 - tee_gateway':
+              chain   => 'PREROUTING',
+              table   => 'mangle',
+              jump    => 'TEE',
+              gateway => '10.0.0.2',
+              proto   => all,
+          }
+      PUPPETCODE
+      it 'applies' do
+        apply_manifest(pp1, catch_failures: true)
+      end
+
+      it 'contains the rule' do
+        shell('iptables-save -t mangle') do |r|
+          expect(r.stdout).to match(%r{-A PREROUTING -m comment --comment "810 - tee_gateway" -j TEE --gateway 10.0.0.2})
+        end
+      end
+    end
+  end
+
   describe 'to' do
     context 'when Destination netmap 192.168.1.1' do
       pp89 = <<-PUPPETCODE

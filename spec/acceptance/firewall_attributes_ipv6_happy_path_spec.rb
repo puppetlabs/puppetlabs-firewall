@@ -243,6 +243,14 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           physdev_out        => "eth1",
           physdev_is_bridged => true,
         }
+        firewall { '811 - tee_gateway6':
+          chain    => 'PREROUTING',
+          table    => 'mangle',
+          jump     => 'TEE',
+          gateway  => '2001:db8::1',
+          proto   => all,
+          provider => 'ip6tables',
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -338,6 +346,9 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
     end
     it 'all the modules with single args is set' do
       expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable}) # rubocop:disable Metrics/LineLength
+    end
+    it 'tee_gateway is set' do
+      expect(result.stdout).to match(%r{-A PREROUTING -m comment --comment "811 - tee_gateway6" -j TEE --gateway 2001:db8::1})
     end
   end
 end
