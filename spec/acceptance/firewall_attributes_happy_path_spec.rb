@@ -291,6 +291,19 @@ describe 'firewall attribute testing, happy path' do
             physdev_out        => "eth1",
             physdev_is_bridged => true,
           }
+          firewall { '601 disallow esp protocol':
+            action => 'accept',
+            proto  => '! esp',
+          }
+          firewall { '602 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
+            chain     => 'INPUT',
+            ctstate     => 'NEW',
+            action    => 'drop',
+            proto     => 'tcp',
+            sport     => ['! http', '! 443'],
+            source    => '! 10.0.0.0/8',
+            tcp_flags => '! FIN,SYN,RST,ACK SYN',
+          }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -418,6 +431,14 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'all the modules with single args is set' do
       expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 100.0.0.1-100.0.0.2 -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Metrics/LineLength
+    end
+    it 'inverting rules' do
+      regex_array = [%r{-A INPUT (-s !|! -s) (10\.0\.0\.0\/8|10\.0\.0\.0\/255\.0\.0\.0).*}, %r{-A INPUT.*(--sports !|! --sports) 80,443.*},
+        %r{-A INPUT.*-m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN.*}, %r{-A INPUT.*-j DROP},
+        %r{-A INPUT (! -p|-p !) esp -m comment --comment "601 disallow esp protocol" -j ACCEPT}]
+      regex_array.each do |regex|
+        expect(result.stdout).to match(regex)
+      end
     end
   end
 end

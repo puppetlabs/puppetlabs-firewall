@@ -200,6 +200,25 @@ describe 'firewall basics', docker: true do
     end
   end
 
+  describe 'firewall inverting' do
+    context 'when inverting partial array rules' do
+      pp2 = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '603 drop 80,443 traffic':
+            chain     => 'INPUT',
+            action    => 'drop',
+            proto     => 'tcp',
+            sport     => ['! http', '443'],
+          }
+      PUPPETCODE
+      it 'raises a failure' do
+        apply_manifest(pp2, expect_failures: true) do |r|
+          expect(r.stderr).to match(%r{is not prefixed})
+        end
+      end
+    end
+  end
+
   describe 'port' do
     context 'when invalid ports' do
       pp25 = <<-PUPPETCODE
