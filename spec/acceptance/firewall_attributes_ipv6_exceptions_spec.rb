@@ -331,6 +331,17 @@ describe 'firewall attribute testing, exceptions' do
             clamp_mss_to_pmtu => true,
             provider          => 'ip6tables',
         }
+        firewall { '803 - hashlimit_upto test ip6':
+          chain                   => 'INPUT',
+          provider                => 'ip6tables',
+          hashlimit_name          => 'upto-ip6',
+          hashlimit_upto          => '16/sec',
+          hashlimit_burst         => '640',
+          hashlimit_htable_size   => '1310000',
+          hashlimit_htable_max    => '320000',
+          hashlimit_htable_expire => '36000000',
+          action                  => accept,
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -377,6 +388,9 @@ describe 'firewall attribute testing, exceptions' do
     end
     it 'clamp_mss_to_pmtu is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu})
+    end
+    it 'hashlimit_name set to "upto-ip6"' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto-ip6 --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "803 - hashlimit_upto test ip6" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
     end
   end
 end
