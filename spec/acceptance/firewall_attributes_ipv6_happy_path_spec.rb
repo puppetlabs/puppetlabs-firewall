@@ -215,6 +215,34 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           src_type  => ['LOCAL', '! LOCAL'],
           provider => 'ip6tables',
         }
+        firewall { '801 - ipt_modules tests':
+          proto              => tcp,
+          dport              => '8080',
+          action             => reject,
+          chain              => 'OUTPUT',
+          provider           => 'ip6tables',
+          uid                => 0,
+          gid                => 404,
+          src_range          => "2001::-2002::",
+          dst_range          => "2003::-2004::",
+          src_type           => 'LOCAL',
+          dst_type           => 'UNICAST',
+          physdev_in         => "eth0",
+          physdev_out        => "eth1",
+          physdev_is_bridged => true,
+        }
+        firewall { '802 - ipt_modules tests':
+          proto              => tcp,
+          dport              => '8080',
+          action             => reject,
+          chain              => 'OUTPUT',
+          provider           => 'ip6tables',
+          gid                => 404,
+          dst_range          => "2003::-2004::",
+          dst_type           => 'UNICAST',
+          physdev_out        => "eth1",
+          physdev_is_bridged => true,
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -304,6 +332,12 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
     end
     it 'src_type when multiple values' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype --src-type LOCAL -m addrtype ! --src-type LOCAL -m comment --comment "620 - test" -j ACCEPT})
+    end
+    it 'all the modules with multiple args is set' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable}) # rubocop:disable Metrics/LineLength
+    end
+    it 'all the modules with single args is set' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable}) # rubocop:disable Metrics/LineLength
     end
   end
 end
