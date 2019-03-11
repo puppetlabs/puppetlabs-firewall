@@ -249,6 +249,22 @@ describe 'firewall attribute testing, happy path' do
             uid => '!0',
             proto => 'all',
           }
+          firewall { '1000 - set_dscp':
+              proto     => 'tcp',
+              jump      => 'DSCP',
+              set_dscp  => '0x01',
+              port      => '997',
+              chain     => 'OUTPUT',
+              table     => 'mangle',
+          }
+          firewall { '1001 EF - set_dscp_class':
+              proto          => 'tcp',
+              jump           => 'DSCP',
+              port           => '997',
+              set_dscp_class => 'EF',
+              chain          => 'OUTPUT',
+              table          => 'mangle',
+          }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -364,6 +380,12 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'uid set to 0 negated' do
       expect(result.stdout).to match(%r{-A OUTPUT -m owner ! --uid-owner (0|root) -m comment --comment "804 - uid 0 negated" -j ACCEPT})
+    end
+    it 'set_dscp is set' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1000 - set_dscp" -j DSCP --set-dscp 0x01})
+    end
+    it 'set_dscp_class is set' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1001 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
     end
   end
 end

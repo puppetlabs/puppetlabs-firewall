@@ -295,6 +295,24 @@ describe 'firewall attribute testing, exceptions' do
           action => accept,
           physdev_is_out => true,
         }
+        firewall { '1002 - set_dscp':
+            proto     => 'tcp',
+            jump      => 'DSCP',
+            set_dscp  => '0x01',
+            port      => '997',
+            chain     => 'OUTPUT',
+            table     => 'mangle',
+            provider  => 'ip6tables',
+        }
+        firewall { '1003 EF - set_dscp_class':
+            proto          => 'tcp',
+            jump           => 'DSCP',
+            port           => '997',
+            set_dscp_class => 'EF',
+            chain          => 'OUTPUT',
+            table          => 'mangle',
+            provider       => 'ip6tables',
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -330,7 +348,11 @@ describe 'firewall attribute testing, exceptions' do
     it 'physdev_is_out is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-out -m multiport --ports 709 -m comment --comment "709 - test" -j ACCEPT})
     end
-    
+    it 'set_dscp is set' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1002 - set_dscp" -j DSCP --set-dscp 0x01})
+    end
+    it 'set_dscp_class is set' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1003 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
+    end
   end
-  
 end
