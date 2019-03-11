@@ -242,6 +242,102 @@ describe 'firewall basics', docker: true do
       end
     end
   end
+
+  describe 'nflog on older OSes', if: fact('iptables_version') < '1.3.7' do # rubocop:disable RSpec/MultipleDescribes : Describes are clearly seperate
+    pp1 = <<-PUPPETCODE
+        class {'::firewall': }
+        firewall { '503 - test':
+          jump  => 'NFLOG',
+          proto => 'all',
+          nflog_group => 3,
+        }
+    PUPPETCODE
+    it 'throws an error' do
+      apply_manifest(pp1, acceptable_error_codes: [0])
+    end
+  end
+  
+  describe 'nflog', unless: fact('iptables_version') < '1.3.7' do
+    describe 'nflog_group' do
+      it 'applies' do
+        pp2 = <<-PUPPETCODE
+          class {'::firewall': }
+          firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_group => 3}
+        PUPPETCODE
+        apply_manifest(pp2, catch_failures: true)
+      end
+  
+      it 'contains the rule' do
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{NFLOG --nflog-group 3})
+        end
+      end
+    end
+  
+    describe 'nflog_prefix' do
+      it 'applies' do
+        pp3 = <<-PUPPETCODE
+        class {'::firewall': }
+        firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_prefix => 'TEST PREFIX'}
+        PUPPETCODE
+        apply_manifest(pp3, catch_failures: true)
+      end
+  
+      it 'contains the rule' do
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{NFLOG --nflog-prefix +"TEST PREFIX"})
+        end
+      end
+    end
+  
+    describe 'nflog_range' do
+      it 'applies' do
+        pp4 = <<-PUPPETCODE
+          class {'::firewall': }
+          firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_range => 16}
+        PUPPETCODE
+        apply_manifest(pp4, catch_failures: true)
+      end
+  
+      it 'contains the rule' do
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{NFLOG --nflog-range 16})
+        end
+      end
+    end
+  
+    describe 'nflog_threshold' do
+      it 'applies' do
+        pp5 = <<-PUPPETCODE
+          class {'::firewall': }
+          firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_threshold => 2}
+        PUPPETCODE
+        apply_manifest(pp5, catch_failures: true)
+      end
+  
+      it 'contains the rule' do
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{NFLOG --nflog-threshold 2})
+        end
+      end
+    end
+  
+    describe 'multiple rules' do
+      it 'applies' do
+        pp6 = <<-PUPPETCODE
+          class {'::firewall': }
+          firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_threshold => 2, nflog_group => 3}
+        PUPPETCODE
+        apply_manifest(pp6, catch_failures: true)
+      end
+  
+      it 'contains the rules' do
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{NFLOG --nflog-group 2 --nflog-threshold 3})
+        end
+      end
+    end
+  end  
   
   describe 'port' do
     context 'when invalid ports' do
