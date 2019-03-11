@@ -313,6 +313,24 @@ describe 'firewall attribute testing, exceptions' do
             table          => 'mangle',
             provider       => 'ip6tables',
         }
+        firewall { '502 - set_mss':
+            proto     => 'tcp',
+            tcp_flags => 'SYN,RST SYN',
+            jump      => 'TCPMSS',
+            set_mss   => '1360',
+            mss       => '1361:1541',
+            chain     => 'FORWARD',
+            table     => 'mangle',
+            provider  => 'ip6tables',
+        }
+        firewall { '503 - clamp_mss_to_pmtu':
+            proto             => 'tcp',
+            chain             => 'FORWARD',
+            tcp_flags         => 'SYN,RST SYN',
+            jump              => 'TCPMSS',
+            clamp_mss_to_pmtu => true,
+            provider          => 'ip6tables',
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -353,6 +371,12 @@ describe 'firewall attribute testing, exceptions' do
     end
     it 'set_dscp_class is set' do
       expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1003 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
+    end
+    it 'set_mss and mss is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360})
+    end
+    it 'clamp_mss_to_pmtu is set' do
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "503 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu})
     end
   end
 end
