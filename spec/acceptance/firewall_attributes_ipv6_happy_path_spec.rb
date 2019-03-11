@@ -251,6 +251,20 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           proto   => all,
           provider => 'ip6tables',
         }
+        firewall { '805 - test':
+          proto              => tcp,
+          dport              => '8080',
+          action             => accept,
+          chain              => 'OUTPUT',
+          date_start         => '2016-01-19T04:17:07',
+          date_stop          => '2038-01-19T04:17:07',
+          time_start         => '6:00',
+          time_stop          => '17:00:00',
+          month_days         => '7',
+          week_days          => 'Tue',
+          kernel_timezone    => true,
+          provider           => 'ip6tables',
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -349,6 +363,11 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
     end
     it 'tee_gateway is set' do
       expect(result.stdout).to match(%r{-A PREROUTING -m comment --comment "811 - tee_gateway6" -j TEE --gateway 2001:db8::1})
+    end
+    it 'when set all time parameters' do
+      expect(result.stdout).to match(
+        %r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT}, # rubocop:disable Metrics/LineLength
+      )
     end
   end
 end
