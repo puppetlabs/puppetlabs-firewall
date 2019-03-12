@@ -175,8 +175,7 @@ describe 'firewall attribute testing, happy path' do
             reject       => 'icmp-net-unreachable',
             table        => 'filter',
           }
-          firewall {
-            '600 - set_mss':
+          firewall { '600 - set_mss':
               proto     => 'tcp',
               tcp_flags => 'SYN,RST SYN',
               jump      => 'TCPMSS',
@@ -185,13 +184,25 @@ describe 'firewall attribute testing, happy path' do
               chain     => 'FORWARD',
               table     => 'mangle',
           }
-          firewall {
-            '601 - clamp_mss_to_pmtu':
+          firewall { '601 - clamp_mss_to_pmtu':
               proto             => 'tcp',
               chain             => 'FORWARD',
               tcp_flags         => 'SYN,RST SYN',
               jump              => 'TCPMSS',
               clamp_mss_to_pmtu => true,
+          }
+          firewall { '601 disallow esp protocol':
+            action => 'accept',
+            proto  => '! esp',
+          }
+          firewall { '602 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
+            chain     => 'INPUT',
+            ctstate     => 'NEW',
+            action    => 'drop',
+            proto     => 'tcp',
+            sport     => ['! http', '! 443'],
+            source    => '! 10.0.0.0/8',
+            tcp_flags => '! FIN,SYN,RST,ACK SYN',
           }
           firewall { '700 - blah-A Test Rule':
             jump       => 'LOG',
@@ -290,19 +301,6 @@ describe 'firewall attribute testing, happy path' do
             dst_type           => 'UNICAST',
             physdev_out        => "eth1",
             physdev_is_bridged => true,
-          }
-          firewall { '601 disallow esp protocol':
-            action => 'accept',
-            proto  => '! esp',
-          }
-          firewall { '602 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
-            chain     => 'INPUT',
-            ctstate     => 'NEW',
-            action    => 'drop',
-            proto     => 'tcp',
-            sport     => ['! http', '! 443'],
-            source    => '! 10.0.0.0/8',
-            tcp_flags => '! FIN,SYN,RST,ACK SYN',
           }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)

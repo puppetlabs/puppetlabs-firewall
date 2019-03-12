@@ -233,9 +233,9 @@ describe 'firewall basics', docker: true do
         apply_manifest(pp, catch_failures: true)
         apply_manifest(pp, catch_changes: do_catch_changes)
       end
-     
+
       let(:result) { shell('iptables-save') }
-     
+
       it 'when unset' do
         expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "803 - test"})
       end
@@ -285,7 +285,7 @@ describe 'firewall basics', docker: true do
 
         apply_manifest(pp_does_not_change, catch_changes: do_catch_changes)
       end
-     
+
       let(:result) { shell('iptables-save') }
 
       it 'when unset or false' do
