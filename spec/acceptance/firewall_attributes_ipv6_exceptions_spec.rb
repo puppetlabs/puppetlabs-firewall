@@ -416,24 +416,23 @@ describe 'firewall ipv6 attribute testing, exceptions' do
         shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
       end
 
-      pp6 = <<-PUPPETCODE
+      let(:result) { shell('ip6tables-save') }
+
+      pp1 = <<-PUPPETCODE
             class { 'firewall': }
             firewallchain { 'INPUT:filter:IPv6':
               purge => true,
             }
         PUPPETCODE
       it 'purges only the specified chain' do
-        apply_manifest(pp6, expect_changes: true)
+        apply_manifest(pp1, expect_changes: true)
 
-        shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(%r{010 output-1::50})
-          expect(r.stdout).not_to match(%r{1::42})
-          expect(r.stderr).to eq('')
-        end
+        expect(result.stdout).to match(%r{010 output-1::50})
+        expect(result.stdout).not_to match(%r{1::42})
+        expect(result.stderr).to eq('')
       end
-      # rubocop:enable RSpec/ExampleLength
 
-      pp7 = <<-PUPPETCODE
+      pp2 = <<-PUPPETCODE
             class { 'firewall': }
             firewallchain { 'OUTPUT:filter:IPv6':
               purge => true,
@@ -446,10 +445,10 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
         PUPPETCODE
       it 'ignores managed rules' do
-        apply_manifest(pp7, catch_changes: do_catch_changes)
+        apply_manifest(pp2, catch_changes: do_catch_changes)
       end
 
-      pp8 = <<-PUPPETCODE
+      pp3 = <<-PUPPETCODE
             class { 'firewall': }
             firewallchain { 'INPUT:filter:IPv6':
               purge => true,
@@ -459,10 +458,10 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
         PUPPETCODE
       it 'ignores specified rules' do
-        apply_manifest(pp8, catch_changes: do_catch_changes)
+        apply_manifest(pp3, catch_changes: do_catch_changes)
       end
 
-      pp9 = <<-PUPPETCODE
+      pp4 = <<-PUPPETCODE
             class { 'firewall': }
             firewallchain { 'INPUT:filter:IPv6':
               purge => true,
@@ -496,9 +495,9 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
         PUPPETCODE
       it 'adds managed rules with ignored rules' do
-        apply_manifest(pp9, catch_failures: true)
+        apply_manifest(pp4, catch_failures: true)
 
-        expect(shell('ip6tables-save').stdout).to match(%r{-A INPUT -s 1::42(\/128)? -p tcp\s?\n-A INPUT -s 1::42(\/128)? -p udp})
+        expect(result.stdout).to match(%r{-A INPUT -s 1::42(\/128)? -p tcp\s?\n-A INPUT -s 1::42(\/128)? -p udp})
       end
     end
   end
