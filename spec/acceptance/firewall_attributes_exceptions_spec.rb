@@ -480,30 +480,6 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'match mark', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
-    describe 'match_mark' do
-      context 'when 0x1' do
-        pp1 = <<-PUPPETCODE
-              class { '::firewall': }
-              firewall { '503 match_mark - test':
-                proto      => 'all',
-                match_mark => '0x1',
-                action     => reject,
-              }
-          PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp1, catch_failures: true)
-        end
-
-        it 'contains the rule' do
-          shell('iptables-save') do |r|
-            expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
-          end
-        end
-      end
-    end
-  end
-
   describe 'name' do
     context 'when invalid ordering range specified' do
       pp = <<-PUPPETCODE
@@ -761,110 +737,6 @@ describe 'firewall basics', docker: true do
         apply_manifest(pp5, catch_failures: true)
 
         expect(shell('iptables-save').stdout).to match(%r{-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp})
-      end
-    end
-  end
-
-  describe 'recent' do
-    context 'when set' do
-      pp84 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '597 - test':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'set',
-            rdest        => true,
-            rname        => 'list1',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp84, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          # Mask added as of Ubuntu 14.04.
-          expect(r.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --set --name list1 (--mask 255.255.255.255 )?--rdest -m comment --comment "597 - test"})
-        end
-      end
-    end
-
-    context 'when rcheck' do
-      pp85 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '598 - test':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'rcheck',
-            rsource      => true,
-            rname        => 'list1',
-            rseconds     => 60,
-            rhitcount    => 5,
-            rttl         => true,
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp85, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(
-            %r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - test"},
-          )
-        end
-      end
-    end
-
-    context 'when update' do
-      pp86 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '599 - test':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'update',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp86, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --update --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "599 - test"})
-        end
-      end
-    end
-
-    context 'when remove' do
-      pp87 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '600 - test':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'remove',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp87, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "600 - test"})
-        end
       end
     end
   end
@@ -1455,6 +1327,28 @@ describe 'firewall basics', docker: true do
 
   # RHEL5 does not support --random
   unless os[:family] == 'redhat' && os[:release].start_with?('5')
+    describe 'match_mark' do
+      context 'when 0x1' do
+        pp1 = <<-PUPPETCODE
+              class { '::firewall': }
+              firewall { '503 match_mark - test':
+                proto      => 'all',
+                match_mark => '0x1',
+                action     => reject,
+              }
+          PUPPETCODE
+        it 'applies' do
+          apply_manifest(pp1, catch_failures: true)
+        end
+
+        it 'contains the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
+          end
+        end
+      end
+    end
+
     describe 'random' do
       context 'when 192.168.1.1' do
         pp40 = <<-PUPPETCODE

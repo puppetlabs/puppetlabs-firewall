@@ -302,6 +302,45 @@ describe 'firewall attribute testing, happy path' do
             physdev_out        => "eth1",
             physdev_is_bridged => true,
           }
+          firewall { '597 - recent set':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'set',
+            rdest        => true,
+            rname        => 'list1',
+          }
+          firewall { '598 - recent rcheck':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'rcheck',
+            rsource      => true,
+            rname        => 'list1',
+            rseconds     => 60,
+            rhitcount    => 5,
+            rttl         => true,
+          }
+          firewall { '599 - recent update':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'update',
+          }
+          firewall { '600 - recent remove':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'remove',
+          }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -437,6 +476,20 @@ describe 'firewall attribute testing, happy path' do
       regex_array.each do |regex|
         expect(result.stdout).to match(regex)
       end
+    end
+    it 'recent set to set' do
+      expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --set --name list1 (--mask 255.255.255.255 )?--rdest -m comment --comment "597 - recent set"})
+    end
+    it 'recent set to rcheck' do
+      expect(result.stdout).to match(
+        %r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - recent rcheck"},
+      )
+    end
+    it 'recent set to update' do
+      expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --update --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "599 - recent update"})
+    end
+    it 'recent set to remove' do
+      expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "600 - recent remove"})
     end
   end
 end
