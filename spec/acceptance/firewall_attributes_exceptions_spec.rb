@@ -210,6 +210,99 @@ describe 'firewall basics', docker: true do
     end
   end
 
+  describe 'isfragment' do
+    describe 'adding a rule' do
+      before(:all) do
+        pp = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '803 - test':
+            ensure => present,
+            proto  => 'tcp',
+          }
+          firewall { '804 - test':
+            ensure => present,
+            proto  => 'tcp',
+            isfragment => true,
+          }
+          firewall { '805 - test':
+            ensure => present,
+            proto  => 'tcp',
+            isfragment => false,
+          }
+        PUPPETCODE
+        apply_manifest(pp, catch_failures: true)
+        apply_manifest(pp, catch_changes: do_catch_changes)
+      end
+     
+      let(:result) { shell('iptables-save') }
+     
+      it 'when unset' do
+        expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "803 - test"})
+      end
+      it 'when set to true' do
+        expect(result.stdout).to match(%r{-A INPUT -p tcp -f -m comment --comment "804 - test"})
+      end
+      it 'when set to false' do
+        expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "805 - test"})
+      end
+    end
+    describe 'editing a rule and current value is false' do
+      before(:all) do
+        pp_idempotent = <<-PUPPETCODE
+          firewall { '807 - test':
+            ensure => present,
+            proto  => 'tcp',
+            isfragment => true,
+          }
+          firewall { '808 - test':
+            ensure => present,
+            proto  => 'tcp',
+            isfragment => false,
+          }
+        PUPPETCODE
+
+        pp_does_not_change = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '806 - test':
+            ensure => present,
+            proto  => 'tcp',
+            isfragment => false,
+          }
+          firewall { '809 - test':
+            ensure => present,
+            proto  => 'tcp',
+            isfragment => true,
+          }
+        PUPPETCODE
+
+        shell('iptables -A INPUT -p tcp -m comment --comment "806 - test"')
+        shell('iptables -A INPUT -p tcp -m comment --comment "807 - test"')
+        shell('iptables -A INPUT -p tcp -f -m comment --comment "808 - test"')
+        shell('iptables -A INPUT -p tcp -f -m comment --comment "809 - test"')
+
+        apply_manifest(pp_idempotent, catch_failures: true)
+        apply_manifest(pp_idempotent, catch_changes: do_catch_changes)
+
+        apply_manifest(pp_does_not_change, catch_changes: do_catch_changes)
+      end
+     
+      let(:result) { shell('iptables-save') }
+
+      it 'when unset or false' do
+        expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "806 - test"})
+      end
+      it 'when unset or false and current value is true' do
+        expect(result.stdout).to match(%r{-A INPUT -p tcp -f -m comment --comment "807 - test"})
+      end
+      it 'when set to true and current value is false' do
+        expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "808 - test"})
+      end
+      it 'when set to trueand current value is true' do
+        expect(result.stdout).to match(%r{-A INPUT -p tcp -f -m comment --comment "809 - test"})
+      end
+    end
+  end
+
   describe 'jump' do
     after :all do
       iptables_flush_all_tables
@@ -1144,7 +1237,7 @@ describe 'firewall basics', docker: true do
         it 'applies' do
           apply_manifest(pp1, catch_failures: true)
         end
-  
+
         it 'contains the rule' do
           shell('iptables-save -t mangle') do |r|
             expect(r.stdout).to match(%r{-A PREROUTING -m comment --comment "810 - tee_gateway" -j TEE --gateway 10.0.0.2})
@@ -1152,7 +1245,7 @@ describe 'firewall basics', docker: true do
         end
       end
     end
-  
+
     describe 'time tests' do
       context 'when set all time parameters' do
         pp1 = <<-PUPPETCODE
@@ -1175,7 +1268,7 @@ describe 'firewall basics', docker: true do
           apply_manifest(pp1, catch_failures: true)
           apply_manifest(pp1, catch_changes: do_catch_changes)
         end
-  
+
         it 'contains the rule' do
           shell('iptables-save') do |r|
             expect(r.stdout).to match(
@@ -1279,13 +1372,13 @@ describe 'firewall basics', docker: true do
         it "changes the value to #{value}" do
           apply_manifest(pp1, catch_failures: true)
           apply_manifest(pp1, catch_changes: true)
-  
+
           shell('iptables-save -t raw') do |r|
             expect(r.stdout).to match(%r{#{line_match}})
           end
         end
       end
-  
+
       shared_examples "doesn't change" do |value, line_match|
         pp2 = <<-PUPPETCODE
               class { '::firewall': }
@@ -1299,13 +1392,13 @@ describe 'firewall basics', docker: true do
         PUPPETCODE
         it "doesn't change the value to #{value}" do
           apply_manifest(pp2, catch_changes: true)
-  
+
           shell('iptables-save -t raw') do |r|
             expect(r.stdout).to match(%r{#{line_match}})
           end
         end
       end
-  
+
       describe 'adding a rule' do
         context 'when unset' do
           before :all do
@@ -1326,7 +1419,7 @@ describe 'firewall basics', docker: true do
           it_behaves_like 'is idempotent', 'socket => false,', %r{-A PREROUTING -p tcp -m comment --comment "598 - test"}
         end
       end
-  
+
       describe 'editing a rule' do
         context 'when unset or false and current value is false' do
           before :each do
