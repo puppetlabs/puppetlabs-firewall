@@ -216,35 +216,6 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'jump' do
-    after :all do
-      iptables_flush_all_tables
-    end
-
-    context 'when MARK' do
-      pp33 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewallchain { 'TEST:filter:IPv4':
-            ensure => present,
-          }
-          firewall { '567 - test':
-            proto  => tcp,
-            chain  => 'INPUT',
-            jump  => 'TEST',
-          }
-      PUPPETCODE
-      it 'applies' do
-        apply_manifest(pp33, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - test" -j TEST})
-        end
-      end
-    end
-  end
-
   describe 'puppet resource firewallchain command' do
     describe 'ensure' do
       context 'when present' do

@@ -360,6 +360,14 @@ describe 'firewall attribute testing, happy path' do
             hashlimit_htable_expire => '36000000',
             action                  => accept,
           }
+          firewallchain { 'TEST:filter:IPv4':
+            ensure => present,
+          }
+          firewall { '567 - test':
+            proto  => tcp,
+            chain  => 'INPUT',
+            jump  => 'TEST',
+          }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -492,6 +500,7 @@ describe 'firewall attribute testing, happy path' do
       regex_array = [%r{-A INPUT (-s !|! -s) (10\.0\.0\.0\/8|10\.0\.0\.0\/255\.0\.0\.0).*}, %r{-A INPUT.*(--sports !|! --sports) 80,443.*},
                      %r{-A INPUT.*-m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN.*}, %r{-A INPUT.*-j DROP},
                      %r{-A INPUT (! -p|-p !) esp -m comment --comment "601 disallow esp protocol" -j ACCEPT}]
+
       regex_array.each do |regex|
         expect(result.stdout).to match(regex)
       end
@@ -500,9 +509,7 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --set --name list1 (--mask 255.255.255.255 )?--rdest -m comment --comment "597 - recent set"})
     end
     it 'recent set to rcheck' do
-      expect(result.stdout).to match(
-        %r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - recent rcheck"},
-      )
+      expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - recent rcheck"}) # rubocop:disable Metrics/LineLength
     end
     it 'recent set to update' do
       expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --update --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "599 - recent update"})
@@ -511,14 +518,17 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "600 - recent remove"})
     end
     it 'hashlimit_above is set' do
-      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip},
-        %r{--hashlimit-name above}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
+      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip}, %r{--hashlimit-name above}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
+
       regex_array.each do |regex|
         expect(result.stdout).to match(regex)
       end
     end
     it 'hashlimit_upto is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "802 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+    end
+    it 'jump is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - test" -j TEST})
     end
   end
 end
