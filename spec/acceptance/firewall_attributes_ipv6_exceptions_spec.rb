@@ -1,68 +1,15 @@
 require 'spec_helper_acceptance'
 
-describe 'firewall attribute testing, exceptions' do
+describe 'firewall ipv6 attribute testing, exceptions' do
   before(:all) do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
   end
 
-  describe 'attributes test', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
-    describe 'hop_limit' do
-      context 'when invalid' do
-        pp43 = <<-PUPPETCODE
-            class { '::firewall': }
-            firewall { '571 - test':
-              ensure => present,
-              proto => tcp,
-              port   => '571',
-              action => accept,
-              hop_limit => 'invalid',
-              provider => 'ip6tables',
-            }
-        PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp43, expect_failures: true) do |r|
-            expect(r.stderr).to match(%r{Invalid value "invalid".})
-          end
-        end
-
-        it 'does not contain the rule' do
-          shell('ip6tables-save') do |r|
-            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 571 -m comment --comment "571 - test" -m hl --hl-eq invalid -j ACCEPT})
-          end
-        end
-      end
-    end
-
-    describe 'src_range' do
-      context 'when 2001::db8::1-2001:db8::ff' do
-        pp52 = <<-PUPPETCODE
-          class { '::firewall': }
-          firewall { '601 - test':
-            proto     => tcp,
-            port      => '601',
-            action    => accept,
-            provider  => 'ip6tables',
-            src_range => '2001::db8::1-2001:db8::ff',
-          }
-        PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp52, expect_failures: true) do |r|
-            expect(r.stderr).to match(%r{Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"})
-          end
-        end
-
-        it 'does not contain the rule' do
-          shell('ip6tables-save') do |r|
-            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --src-range 2001::db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - test" -j ACCEPT})
-          end
-        end
-      end
-    end
-
+  describe 'standard attributes', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
     describe 'dst_range' do
       context 'when 2001::db8::1-2001:db8::ff' do
-        pp54 = <<-PUPPETCODE
+        pp = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '602 - test':
             proto     => tcp,
@@ -73,7 +20,7 @@ describe 'firewall attribute testing, exceptions' do
           }
         PUPPETCODE
         it 'applies' do
-          apply_manifest(pp54, expect_failures: true) do |r|
+          apply_manifest(pp, expect_failures: true) do |r|
             expect(r.stderr).to match(%r{Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"})
           end
         end
@@ -89,7 +36,7 @@ describe 'firewall attribute testing, exceptions' do
     ['dst_type', 'src_type'].each do |type|
       describe type.to_s do
         context 'when BROKEN' do
-          pp67 = <<-PUPPETCODE
+          pp = <<-PUPPETCODE
               class { '::firewall': }
               firewall { '603 - test':
                 proto    => tcp,
@@ -99,7 +46,7 @@ describe 'firewall attribute testing, exceptions' do
               }
             PUPPETCODE
           it 'fails' do
-            apply_manifest(pp67, expect_failures: true) do |r|
+            apply_manifest(pp, expect_failures: true) do |r|
               expect(r.stderr).to match(%r{Invalid value "BROKEN".})
             end
           end
@@ -112,7 +59,7 @@ describe 'firewall attribute testing, exceptions' do
         end
 
         context 'when duplicated LOCAL' do
-          pp104 = <<-PUPPETCODE
+          pp = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '619 - test':
                   proto    => tcp,
@@ -122,7 +69,7 @@ describe 'firewall attribute testing, exceptions' do
                 }
             PUPPETCODE
           it 'fails' do
-            apply_manifest(pp104, expect_failures: true) do |r|
+            apply_manifest(pp, expect_failures: true) do |r|
               expect(r.stderr).to match(%r{#{type} elements must be unique})
             end
           end
@@ -135,7 +82,7 @@ describe 'firewall attribute testing, exceptions' do
         end
 
         context 'when multiple addrtype fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
-          pp106 = <<-PUPPETCODE
+          pp = <<-PUPPETCODE
                 class { '::firewall': }
                 firewall { '616 - test':
                   proto    => tcp,
@@ -145,7 +92,7 @@ describe 'firewall attribute testing, exceptions' do
                 }
             PUPPETCODE
           it 'fails' do
-            apply_manifest(pp106, expect_failures: true) do |r|
+            apply_manifest(pp, expect_failures: true) do |r|
               expect(r.stderr).to match(%r{Multiple #{type} elements are available from iptables version})
             end
           end
@@ -154,6 +101,33 @@ describe 'firewall attribute testing, exceptions' do
             shell('ip6tables-save') do |r|
               expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
             end
+          end
+        end
+      end
+    end
+
+    describe 'hop_limit' do
+      context 'when invalid' do
+        pp = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '571 - test':
+              ensure => present,
+              proto => tcp,
+              port   => '571',
+              action => accept,
+              hop_limit => 'invalid',
+              provider => 'ip6tables',
+            }
+        PUPPETCODE
+        it 'applies' do
+          apply_manifest(pp, expect_failures: true) do |r|
+            expect(r.stderr).to match(%r{Invalid value "invalid".})
+          end
+        end
+
+        it 'does not contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 571 -m comment --comment "571 - test" -m hl --hl-eq invalid -j ACCEPT})
           end
         end
       end
@@ -213,114 +187,35 @@ describe 'firewall attribute testing, exceptions' do
         end
       end
     end
-  end
 
-  describe 'purge tests' do
-    before :all do
-      iptables_flush_all_tables
-      ip6tables_flush_all_tables
-    end
-
-    context 'when ipv6 chain purge', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
-      after(:all) do
-        ip6tables_flush_all_tables
-      end
-      before(:each) do
-        ip6tables_flush_all_tables
-
-        shell('ip6tables -A INPUT -p tcp -s 1::42')
-        shell('ip6tables -A INPUT -p udp -s 1::42')
-        shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
-      end
-
-      pp6 = <<-PUPPETCODE
-            class { 'firewall': }
-            firewallchain { 'INPUT:filter:IPv6':
-              purge => true,
-            }
+    describe 'src_range' do
+      context 'when 2001::db8::1-2001:db8::ff' do
+        pp = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '601 - test':
+            proto     => tcp,
+            port      => '601',
+            action    => accept,
+            provider  => 'ip6tables',
+            src_range => '2001::db8::1-2001:db8::ff',
+          }
         PUPPETCODE
-      it 'purges only the specified chain' do
-        apply_manifest(pp6, expect_changes: true)
+        it 'applies' do
+          apply_manifest(pp, expect_failures: true) do |r|
+            expect(r.stderr).to match(%r{Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"})
+          end
+        end
 
-        shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(%r{010 output-1::50})
-          expect(r.stdout).not_to match(%r{1::42})
-          expect(r.stderr).to eq('')
+        it 'does not contain the rule' do
+          shell('ip6tables-save') do |r|
+            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --src-range 2001::db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - test" -j ACCEPT})
+          end
         end
       end
-      # rubocop:enable RSpec/ExampleLength
-
-      pp7 = <<-PUPPETCODE
-            class { 'firewall': }
-            firewallchain { 'OUTPUT:filter:IPv6':
-              purge => true,
-            }
-            firewall { '010 output-1::50':
-              chain    => 'OUTPUT',
-              proto    => 'all',
-              source   => '1::50',
-              provider => 'ip6tables',
-            }
-        PUPPETCODE
-      it 'ignores managed rules' do
-        apply_manifest(pp7, catch_changes: do_catch_changes)
-      end
-
-      pp8 = <<-PUPPETCODE
-            class { 'firewall': }
-            firewallchain { 'INPUT:filter:IPv6':
-              purge => true,
-              ignore => [
-                '-s 1::42',
-              ],
-            }
-        PUPPETCODE
-      it 'ignores specified rules' do
-        apply_manifest(pp8, catch_changes: do_catch_changes)
-      end
-
-      pp9 = <<-PUPPETCODE
-            class { 'firewall': }
-            firewallchain { 'INPUT:filter:IPv6':
-              purge => true,
-              ignore => [
-                '-s 1::42',
-              ],
-            }
-            firewall { '014 input-1::46':
-              chain    => 'INPUT',
-              proto    => 'all',
-              source   => '1::46',
-              provider => 'ip6tables',
-            }
-            -> firewall { '013 input-1::45':
-              chain    => 'INPUT',
-              proto    => 'all',
-              source   => '1::45',
-              provider => 'ip6tables',
-            }
-            -> firewall { '012 input-1::44':
-              chain    => 'INPUT',
-              proto    => 'all',
-              source   => '1::44',
-              provider => 'ip6tables',
-            }
-            -> firewall { '011 input-1::43':
-              chain    => 'INPUT',
-              proto    => 'all',
-              source   => '1::43',
-              provider => 'ip6tables',
-            }
-        PUPPETCODE
-      it 'adds managed rules with ignored rules' do
-        apply_manifest(pp9, catch_failures: true)
-
-        expect(shell('ip6tables-save').stdout).to match(%r{-A INPUT -s 1::42(\/128)? -p tcp\s?\n-A INPUT -s 1::42(\/128)? -p udp})
-      end
     end
   end
 
-  describe 'attributes test (unless redhat 5)', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
+  describe 'unless redhat 5 happy path', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
     before(:all) do
       pp = <<-PUPPETCODE
         firewall { '701 - test':
@@ -505,6 +400,106 @@ describe 'firewall attribute testing, exceptions' do
     end
     it 'match_mark is set' do
       expect(result.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark ip6tables - test" -j REJECT --reject-with icmp6-port-unreachable})
+    end
+  end
+
+  describe 'purge' do
+    context 'when ipv6 chain purge', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
+      after(:all) do
+        ip6tables_flush_all_tables
+      end
+      before(:each) do
+        ip6tables_flush_all_tables
+
+        shell('ip6tables -A INPUT -p tcp -s 1::42')
+        shell('ip6tables -A INPUT -p udp -s 1::42')
+        shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
+      end
+
+      pp6 = <<-PUPPETCODE
+            class { 'firewall': }
+            firewallchain { 'INPUT:filter:IPv6':
+              purge => true,
+            }
+        PUPPETCODE
+      it 'purges only the specified chain' do
+        apply_manifest(pp6, expect_changes: true)
+
+        shell('ip6tables-save') do |r|
+          expect(r.stdout).to match(%r{010 output-1::50})
+          expect(r.stdout).not_to match(%r{1::42})
+          expect(r.stderr).to eq('')
+        end
+      end
+      # rubocop:enable RSpec/ExampleLength
+
+      pp7 = <<-PUPPETCODE
+            class { 'firewall': }
+            firewallchain { 'OUTPUT:filter:IPv6':
+              purge => true,
+            }
+            firewall { '010 output-1::50':
+              chain    => 'OUTPUT',
+              proto    => 'all',
+              source   => '1::50',
+              provider => 'ip6tables',
+            }
+        PUPPETCODE
+      it 'ignores managed rules' do
+        apply_manifest(pp7, catch_changes: do_catch_changes)
+      end
+
+      pp8 = <<-PUPPETCODE
+            class { 'firewall': }
+            firewallchain { 'INPUT:filter:IPv6':
+              purge => true,
+              ignore => [
+                '-s 1::42',
+              ],
+            }
+        PUPPETCODE
+      it 'ignores specified rules' do
+        apply_manifest(pp8, catch_changes: do_catch_changes)
+      end
+
+      pp9 = <<-PUPPETCODE
+            class { 'firewall': }
+            firewallchain { 'INPUT:filter:IPv6':
+              purge => true,
+              ignore => [
+                '-s 1::42',
+              ],
+            }
+            firewall { '014 input-1::46':
+              chain    => 'INPUT',
+              proto    => 'all',
+              source   => '1::46',
+              provider => 'ip6tables',
+            }
+            -> firewall { '013 input-1::45':
+              chain    => 'INPUT',
+              proto    => 'all',
+              source   => '1::45',
+              provider => 'ip6tables',
+            }
+            -> firewall { '012 input-1::44':
+              chain    => 'INPUT',
+              proto    => 'all',
+              source   => '1::44',
+              provider => 'ip6tables',
+            }
+            -> firewall { '011 input-1::43':
+              chain    => 'INPUT',
+              proto    => 'all',
+              source   => '1::43',
+              provider => 'ip6tables',
+            }
+        PUPPETCODE
+      it 'adds managed rules with ignored rules' do
+        apply_manifest(pp9, catch_failures: true)
+
+        expect(shell('ip6tables-save').stdout).to match(%r{-A INPUT -s 1::42(\/128)? -p tcp\s?\n-A INPUT -s 1::42(\/128)? -p udp})
+      end
     end
   end
 end
