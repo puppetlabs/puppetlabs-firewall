@@ -1,4 +1,4 @@
-require 'spec_helper_acceptance'
+ require 'spec_helper_acceptance'
 
 describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
   before :all do
@@ -265,6 +265,16 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           kernel_timezone    => true,
           provider           => 'ip6tables',
         }
+        firewall { '801 - hashlimit_above test ipv6':
+          chain                       => 'INPUT',
+          provider                    => 'ip6tables',
+          proto                       => 'tcp',
+          hashlimit_name              => 'above-ip6',
+          hashlimit_above             => '526/sec',
+          hashlimit_htable_gcinterval => '10',
+          hashlimit_mode              => 'srcip,dstip',
+          action                      => accept,
+        }
 
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -368,6 +378,13 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
       expect(result.stdout).to match(
         %r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT}, # rubocop:disable Metrics/LineLength
       )
+    end
+    it 'hashlimit_above is set' do 
+      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip},
+        %r{--hashlimit-name above-ip6}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
+      regex_array.each do |regex|
+        expect(result.stdout).to match(regex)
+      end
     end
   end
 end

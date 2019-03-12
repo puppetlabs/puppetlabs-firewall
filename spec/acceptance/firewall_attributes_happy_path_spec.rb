@@ -341,6 +341,25 @@ describe 'firewall attribute testing, happy path' do
             table        => 'filter',
             recent       => 'remove',
           }
+          firewall { '800 - hashlimit_above test':
+            chain                       => 'INPUT',
+            proto                       => 'tcp',
+            hashlimit_name              => 'above',
+            hashlimit_above             => '526/sec',
+            hashlimit_htable_gcinterval => '10',
+            hashlimit_mode              => 'srcip,dstip',
+            action                      => accept,
+          }
+          firewall { '802 - hashlimit_upto test':
+            chain                   => 'INPUT',
+            hashlimit_name          => 'upto',
+            hashlimit_upto          => '16/sec',
+            hashlimit_burst         => '640',
+            hashlimit_htable_size   => '1310000',
+            hashlimit_htable_max    => '320000',
+            hashlimit_htable_expire => '36000000',
+            action                  => accept,
+          }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -490,6 +509,16 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'recent set to remove' do
       expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "600 - recent remove"})
+    end
+    it 'hashlimit_above is set' do
+      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip},
+        %r{--hashlimit-name above}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
+      regex_array.each do |regex|
+        expect(result.stdout).to match(regex)
+      end
+    end
+    it 'hashlimit_upto is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "802 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
     end
   end
 end
