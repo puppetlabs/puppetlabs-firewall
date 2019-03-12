@@ -23,6 +23,7 @@ describe 'puppet resource firewall command' do
   context 'when flush iptables and make sure it returns nothing afterwards' do
     before(:all) do
       iptables_flush_all_tables
+      ip6tables_flush_all_tables
     end
 
     # No rules, means no output thanks. And no errors as well.
