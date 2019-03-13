@@ -331,7 +331,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
     end
     it 'ipsec_policy when none' do
       expect(result.stdout).to match(
-        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol none -m comment --comment "608 - ipsec_policy none" -j REJECT --reject-with icmp6-adm-prohibited},
+        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol none -m comment --comment "608 - ipsec_policy none" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Metrics/LineLength
       )
     end
     it 'ipsec_dir when out' do

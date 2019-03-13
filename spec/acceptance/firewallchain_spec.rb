@@ -5,7 +5,7 @@ describe 'puppet resource firewallchain command' do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
   end
-  
+
   describe 'ensure' do
     context 'when present' do
       pp1 = <<-PUPPETCODE
