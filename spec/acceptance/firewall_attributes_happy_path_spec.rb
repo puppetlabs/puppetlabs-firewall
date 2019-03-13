@@ -102,6 +102,14 @@ describe 'firewall attribute testing, happy path' do
             action => accept,
             chain  => 'FORWARD',
           }
+          firewallchain { 'TEST:filter:IPv4':
+          ensure => present,
+          }
+          firewall { '567 - jump':
+            proto  => tcp,
+            chain  => 'INPUT',
+            jump  => 'TEST',
+          }
           firewall { '568 - tosource':
             proto  => tcp,
             table  => 'nat',
@@ -117,12 +125,13 @@ describe 'firewall attribute testing, happy path' do
             source => '200.200.200.200',
             todest => '192.168.1.1',
           }
-          firewall { '570 - toports':
-            proto  => icmp,
+          firewall { '570 - random':
+            proto  => all,
             table  => 'nat',
-            chain  => 'PREROUTING',
-            jump  => 'REDIRECT',
-            toports => '2222',
+            chain  => 'POSTROUTING',
+            jump   => 'MASQUERADE',
+            source => '172.30.0.0/16',
+            random => true
           }
           firewall { '572 - limit':
             ensure => present,
@@ -138,6 +147,13 @@ describe 'firewall attribute testing, happy path' do
             action => accept,
             limit => '500/sec',
             burst => '1500',
+          }
+          firewall { '574 - toports':
+            proto  => icmp,
+            table  => 'nat',
+            chain  => 'PREROUTING',
+            jump  => 'REDIRECT',
+            toports => '2222',
           }
           firewall { '581 - pkttype':
             ensure => present,
@@ -175,34 +191,73 @@ describe 'firewall attribute testing, happy path' do
             reject       => 'icmp-net-unreachable',
             table        => 'filter',
           }
-          firewall { '600 - set_mss':
-              proto     => 'tcp',
-              tcp_flags => 'SYN,RST SYN',
-              jump      => 'TCPMSS',
-              set_mss   => '1360',
-              mss       => '1361:1541',
-              chain     => 'FORWARD',
-              table     => 'mangle',
+          firewall { '597 - recent set':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'set',
+            rdest        => true,
+            rname        => 'list1',
+          }
+          firewall { '598 - recent rcheck':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'rcheck',
+            rsource      => true,
+            rname        => 'list1',
+            rseconds     => 60,
+            rhitcount    => 5,
+            rttl         => true,
+          }
+          firewall { '599 - recent update':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'update',
+          }
+          firewall { '600 - recent remove':
+            ensure       => 'present',
+            chain        => 'INPUT',
+            destination  => '30.0.0.0/8',
+            proto        => 'all',
+            table        => 'filter',
+            recent       => 'remove',
           }
           firewall { '601 - clamp_mss_to_pmtu':
-              proto             => 'tcp',
-              chain             => 'FORWARD',
-              tcp_flags         => 'SYN,RST SYN',
-              jump              => 'TCPMSS',
-              clamp_mss_to_pmtu => true,
+            proto             => 'tcp',
+            chain             => 'FORWARD',
+            tcp_flags         => 'SYN,RST SYN',
+            jump              => 'TCPMSS',
+            clamp_mss_to_pmtu => true,
           }
-          firewall { '601 disallow esp protocol':
-            action => 'accept',
-            proto  => '! esp',
-          }
-          firewall { '602 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
+          firewall { '602 - drop NEW external website packets with FIN/RST/ACK set and SYN unset':
             chain     => 'INPUT',
-            ctstate     => 'NEW',
+            ctstate   => 'NEW',
             action    => 'drop',
             proto     => 'tcp',
             sport     => ['! http', '! 443'],
             source    => '! 10.0.0.0/8',
             tcp_flags => '! FIN,SYN,RST,ACK SYN',
+          }
+          firewall { '603 - disallow esp protocol':
+            action => 'accept',
+            proto  => '! esp',
+          }
+          firewall { '604 - set_mss':
+            proto     => 'tcp',
+            tcp_flags => 'SYN,RST SYN',
+            jump      => 'TCPMSS',
+            set_mss   => '1360',
+            mss       => '1361:1541',
+            chain     => 'FORWARD',
+            table     => 'mangle',
           }
           firewall { '700 - blah-A Test Rule':
             jump       => 'LOG',
@@ -260,23 +315,26 @@ describe 'firewall attribute testing, happy path' do
             uid => '!0',
             proto => 'all',
           }
-          firewall { '1000 - set_dscp':
-              proto     => 'tcp',
-              jump      => 'DSCP',
-              set_dscp  => '0x01',
-              port      => '997',
-              chain     => 'OUTPUT',
-              table     => 'mangle',
+          firewall { '805 - hashlimit_above test':
+            chain                       => 'INPUT',
+            proto                       => 'tcp',
+            hashlimit_name              => 'above',
+            hashlimit_above             => '526/sec',
+            hashlimit_htable_gcinterval => '10',
+            hashlimit_mode              => 'srcip,dstip',
+            action                      => accept,
           }
-          firewall { '1001 EF - set_dscp_class':
-              proto          => 'tcp',
-              jump           => 'DSCP',
-              port           => '997',
-              set_dscp_class => 'EF',
-              chain          => 'OUTPUT',
-              table          => 'mangle',
+          firewall { '806 - hashlimit_upto test':
+            chain                   => 'INPUT',
+            hashlimit_name          => 'upto',
+            hashlimit_upto          => '16/sec',
+            hashlimit_burst         => '640',
+            hashlimit_htable_size   => '1310000',
+            hashlimit_htable_max    => '320000',
+            hashlimit_htable_expire => '36000000',
+            action                  => accept,
           }
-          firewall { '801 - ipt_modules tests':
+          firewall { '807 - ipt_modules tests':
             proto              => tcp,
             dport              => '8080',
             action             => reject,
@@ -291,7 +349,7 @@ describe 'firewall attribute testing, happy path' do
             physdev_out        => "eth1",
             physdev_is_bridged => true,
           }
-          firewall { '802 - ipt_modules tests':
+          firewall { '808 - ipt_modules tests':
             proto              => tcp,
             dport              => '8080',
             action             => reject,
@@ -302,79 +360,21 @@ describe 'firewall attribute testing, happy path' do
             physdev_out        => "eth1",
             physdev_is_bridged => true,
           }
-          firewall { '597 - recent set':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'set',
-            rdest        => true,
-            rname        => 'list1',
+          firewall { '1000 - set_dscp':
+            proto     => 'tcp',
+            jump      => 'DSCP',
+            set_dscp  => '0x01',
+            port      => '997',
+            chain     => 'OUTPUT',
+            table     => 'mangle',
           }
-          firewall { '598 - recent rcheck':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'rcheck',
-            rsource      => true,
-            rname        => 'list1',
-            rseconds     => 60,
-            rhitcount    => 5,
-            rttl         => true,
-          }
-          firewall { '599 - recent update':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'update',
-          }
-          firewall { '600 - recent remove':
-            ensure       => 'present',
-            chain        => 'INPUT',
-            destination  => '30.0.0.0/8',
-            proto        => 'all',
-            table        => 'filter',
-            recent       => 'remove',
-          }
-          firewall { '800 - hashlimit_above test':
-            chain                       => 'INPUT',
-            proto                       => 'tcp',
-            hashlimit_name              => 'above',
-            hashlimit_above             => '526/sec',
-            hashlimit_htable_gcinterval => '10',
-            hashlimit_mode              => 'srcip,dstip',
-            action                      => accept,
-          }
-          firewall { '802 - hashlimit_upto test':
-            chain                   => 'INPUT',
-            hashlimit_name          => 'upto',
-            hashlimit_upto          => '16/sec',
-            hashlimit_burst         => '640',
-            hashlimit_htable_size   => '1310000',
-            hashlimit_htable_max    => '320000',
-            hashlimit_htable_expire => '36000000',
-            action                  => accept,
-          }
-          firewallchain { 'TEST:filter:IPv4':
-            ensure => present,
-          }
-          firewall { '567 - jump':
-            proto  => tcp,
-            chain  => 'INPUT',
-            jump  => 'TEST',
-          }
-          firewall { '570 - random':
-            proto  => all,
-            table  => 'nat',
-            chain  => 'POSTROUTING',
-            jump   => 'MASQUERADE',
-            source => '172.30.0.0/16',
-            random => true
+          firewall { '1001 EF - set_dscp_class':
+            proto          => 'tcp',
+            jump           => 'DSCP',
+            port           => '997',
+            set_dscp_class => 'EF',
+            chain          => 'OUTPUT',
+            table          => 'mangle',
           }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -439,7 +439,7 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A PREROUTING -s 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - todest" -j DNAT --to-destination 192.168.1.1})
     end
     it 'toports is set' do
-      expect(result.stdout).to match(%r{-A PREROUTING -p icmp -m comment --comment "570 - toports" -j REDIRECT --to-ports 2222})
+      expect(result.stdout).to match(%r{-A PREROUTING -p icmp -m comment --comment "574 - toports" -j REDIRECT --to-ports 2222})
     end
     it 'limit is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 572 -m limit --limit 500\/sec -m comment --comment "572 - limit" -j ACCEPT})
@@ -460,7 +460,7 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A INPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir in --pol none -m comment --comment "596 - ipsec_policy none and in" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Metrics/LineLength
     end
     it 'set_mss is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "600 - set_mss" -j TCPMSS --set-mss 1360})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "604 - set_mss" -j TCPMSS --set-mss 1360})
     end
     it 'clamp_mss_to_pmtu is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m comment --comment "601 - clamp_mss_to_pmtu" -j TCPMSS --clamp-mss-to-pmtu})
@@ -499,15 +499,15 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1001 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
     end
     it 'all the modules with multiple args is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "807 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Metrics/LineLength
     end
     it 'all the modules with single args is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 100.0.0.1-100.0.0.2 -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 100.0.0.1-100.0.0.2 -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "808 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Metrics/LineLength
     end
     it 'inverting rules' do
       regex_array = [%r{-A INPUT (-s !|! -s) (10\.0\.0\.0\/8|10\.0\.0\.0\/255\.0\.0\.0).*}, %r{-A INPUT.*(--sports !|! --sports) 80,443.*},
                      %r{-A INPUT.*-m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN.*}, %r{-A INPUT.*-j DROP},
-                     %r{-A INPUT (! -p|-p !) esp -m comment --comment "601 disallow esp protocol" -j ACCEPT}]
+                     %r{-A INPUT (! -p|-p !) esp -m comment --comment "603 - disallow esp protocol" -j ACCEPT}]
 
       regex_array.each do |regex|
         expect(result.stdout).to match(regex)
@@ -533,7 +533,7 @@ describe 'firewall attribute testing, happy path' do
       end
     end
     it 'hashlimit_upto is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "802 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
     end
     it 'jump is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - jump" -j TEST})
