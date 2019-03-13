@@ -363,10 +363,18 @@ describe 'firewall attribute testing, happy path' do
           firewallchain { 'TEST:filter:IPv4':
             ensure => present,
           }
-          firewall { '567 - test':
+          firewall { '567 - jump':
             proto  => tcp,
             chain  => 'INPUT',
             jump  => 'TEST',
+          }
+          firewall { '570 - random':
+            proto  => all,
+            table  => 'nat',
+            chain  => 'POSTROUTING',
+            jump   => 'MASQUERADE',
+            source => '172.30.0.0/16',
+            random => true
           }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -528,7 +536,10 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "802 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
     end
     it 'jump is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - test" -j TEST})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - jump" -j TEST})
+    end
+    it 'random is set' do
+      expect(result.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - random" -j MASQUERADE --random})
     end
   end
 end

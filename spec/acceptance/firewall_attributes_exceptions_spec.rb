@@ -1112,32 +1112,6 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    describe 'random' do
-      context 'when 192.168.1.1' do
-        pp40 = <<-PUPPETCODE
-            class { '::firewall': }
-            firewall { '570 - test 2':
-              proto  => all,
-              table  => 'nat',
-              chain  => 'POSTROUTING',
-              jump   => 'MASQUERADE',
-              source => '172.30.0.0/16',
-              random => true
-            }
-        PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp40, catch_failures: true)
-          apply_manifest(pp40, catch_changes: do_catch_changes)
-        end
-
-        it 'contains the rule' do
-          shell('iptables-save -t nat') do |r|
-            expect(r.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - test 2" -j MASQUERADE --random})
-          end
-        end
-      end
-    end
-
     # iptables version 1.3.5 does not support masks on MARK rules
     describe 'set_mark' do
       context 'when 0x3e8/0xffffffff' do
