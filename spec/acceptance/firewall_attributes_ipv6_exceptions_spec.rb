@@ -20,6 +20,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           }
         PUPPETCODE
         it 'applies' do
+          require 'pry'; binding.pry
           apply_manifest(pp, expect_failures: true) do |r|
             expect(r.stderr).to match(%r{Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"})
           end
@@ -403,7 +404,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
     end
   end
 
-  describe 'ishasmorefrags/islastfrag/isfirstfrag' do
+  describe 'ishasmorefrags/islastfrag/isfirstfrag', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
     shared_examples 'is idempotent' do |values, line_match|
       pp2 = <<-PUPPETCODE
             class { '::firewall': }

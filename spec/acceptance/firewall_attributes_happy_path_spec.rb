@@ -125,14 +125,6 @@ describe 'firewall attribute testing, happy path' do
             source => '200.200.200.200',
             todest => '192.168.1.1',
           }
-          firewall { '570 - random':
-            proto  => all,
-            table  => 'nat',
-            chain  => 'POSTROUTING',
-            jump   => 'MASQUERADE',
-            source => '172.30.0.0/16',
-            random => true
-          }
           firewall { '572 - limit':
             ensure => present,
             proto => tcp,
@@ -315,25 +307,7 @@ describe 'firewall attribute testing, happy path' do
             uid => '!0',
             proto => 'all',
           }
-          firewall { '805 - hashlimit_above test':
-            chain                       => 'INPUT',
-            proto                       => 'tcp',
-            hashlimit_name              => 'above',
-            hashlimit_above             => '526/sec',
-            hashlimit_htable_gcinterval => '10',
-            hashlimit_mode              => 'srcip,dstip',
-            action                      => accept,
-          }
-          firewall { '806 - hashlimit_upto test':
-            chain                   => 'INPUT',
-            hashlimit_name          => 'upto',
-            hashlimit_upto          => '16/sec',
-            hashlimit_burst         => '640',
-            hashlimit_htable_size   => '1310000',
-            hashlimit_htable_max    => '320000',
-            hashlimit_htable_expire => '36000000',
-            action                  => accept,
-          }
+          
           firewall { '807 - ipt_modules tests':
             proto              => tcp,
             dport              => '8080',
@@ -380,6 +354,7 @@ describe 'firewall attribute testing, happy path' do
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
     end
+    
     let(:result) { shell('iptables-save') }
 
     it 'log_level and log_prefix' do
@@ -525,21 +500,8 @@ describe 'firewall attribute testing, happy path' do
     it 'recent set to remove' do
       expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --remove --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "600 - recent remove"})
     end
-    it 'hashlimit_above is set' do
-      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip}, %r{--hashlimit-name above}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
-
-      regex_array.each do |regex|
-        expect(result.stdout).to match(regex)
-      end
-    end
-    it 'hashlimit_upto is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
-    end
     it 'jump is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - jump" -j TEST})
-    end
-    it 'random is set' do
-      expect(result.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - random" -j MASQUERADE --random})
     end
   end
 end

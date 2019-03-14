@@ -1138,5 +1138,72 @@ describe 'firewall basics', docker: true do
         end
       end
     end
+
+    describe 'random' do
+      context 'when 192.168.1.1' do
+        pp40 = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '570 - random':
+              proto  => all,
+              table  => 'nat',
+              chain  => 'POSTROUTING',
+              jump   => 'MASQUERADE',
+              source => '172.30.0.0/16',
+              random => true
+            }
+        PUPPETCODE
+        it 'applies' do
+          apply_manifest(pp40, catch_failures: true)
+          apply_manifest(pp40, catch_changes: do_catch_changes)
+        end
+  
+        it 'contains the rule' do
+          shell('iptables-save -t nat') do |r|
+            expect(r.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - random" -j MASQUERADE --random})
+          end
+        end
+      end
+    end
+  end
+
+  describe 'hashlimit', unless: ((os[:family] == 'redhat' && os[:release][0] <= '5')) do
+    before(:all) do
+      pp = <<-PUPPETCODE
+        firewall { '805 - hashlimit_above test':
+          chain                       => 'INPUT',
+          proto                       => 'tcp',
+          hashlimit_name              => 'above',
+          hashlimit_above             => '526/sec',
+          hashlimit_htable_gcinterval => '10',
+          hashlimit_mode              => 'srcip,dstip',
+          action                      => accept,
+        }
+        firewall { '806 - hashlimit_upto test':
+          chain                   => 'INPUT',
+          hashlimit_name          => 'upto',
+          hashlimit_upto          => '16/sec',
+          hashlimit_burst         => '640',
+          hashlimit_htable_size   => '1310000',
+          hashlimit_htable_max    => '320000',
+          hashlimit_htable_expire => '36000000',
+          action                  => accept,
+        }
+      PUPPETCODE
+      apply_manifest(pp, catch_failures: true)
+      apply_manifest(pp, catch_changes: do_catch_changes)
+    end
+
+    let(:result) { shell('iptables-save') }
+
+    it 'hashlimit_above is set' do
+      regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip}, %r{--hashlimit-name above}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]
+
+      regex_array.each do |regex|
+        expect(result.stdout).to match(regex)
+      end
+    end
+    it 'hashlimit_upto is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+    end
   end
 end
