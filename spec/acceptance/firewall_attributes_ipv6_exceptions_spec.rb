@@ -20,7 +20,6 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           }
         PUPPETCODE
         it 'applies' do
-          require 'pry'; binding.pry
           apply_manifest(pp, expect_failures: true) do |r|
             expect(r.stderr).to match(%r{Invalid IP address "2001::db8::1" in range "2001::db8::1-2001:db8::ff"})
           end

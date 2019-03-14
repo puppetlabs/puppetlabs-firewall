@@ -307,7 +307,7 @@ describe 'firewall attribute testing, happy path' do
             uid => '!0',
             proto => 'all',
           }
-          
+
           firewall { '807 - ipt_modules tests':
             proto              => tcp,
             dport              => '8080',
@@ -354,7 +354,7 @@ describe 'firewall attribute testing, happy path' do
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
     end
-    
+
     let(:result) { shell('iptables-save') }
 
     it 'log_level and log_prefix' do

@@ -222,7 +222,7 @@ describe 'firewall basics', docker: true do
   #     iptables_flush_all_tables
   #     ip6tables_flush_all_tables
   #   end
-  
+
   #   shared_examples 'is idempotent' do |value, line_match|
   #     pp1 = <<-PUPPETCODE
   #           class { '::firewall': }
@@ -235,13 +235,13 @@ describe 'firewall basics', docker: true do
   #     it "changes the value to #{value}" do
   #       apply_manifest(pp1, catch_failures: true)
   #       apply_manifest(pp1, catch_changes: do_catch_changes)
-  
+
   #       shell('iptables-save') do |r|
   #         expect(r.stdout).to match(%r{#{line_match}})
   #       end
   #     end
   #   end
-  
+
   #   shared_examples "doesn't change" do |value, line_match|
   #     pp2 = <<-PUPPETCODE
   #           class { '::firewall': }
@@ -253,13 +253,13 @@ describe 'firewall basics', docker: true do
   #     PUPPETCODE
   #     it "doesn't change the value to #{value}" do
   #       apply_manifest(pp2, catch_changes: do_catch_changes)
-  
+
   #       shell('iptables-save') do |r|
   #         expect(r.stdout).to match(%r{#{line_match}})
   #       end
   #     end
   #   end
-  
+
   #   describe 'adding a rule' do
   #     context 'when unset' do
   #       before :all do
@@ -280,7 +280,7 @@ describe 'firewall basics', docker: true do
   #       it_behaves_like 'is idempotent', 'isfragment => false,', %r{-A INPUT -p tcp -m comment --comment "597 - test"}
   #     end
   #   end
-  
+
   #   describe 'editing a rule and current value is false' do
   #     context 'when unset or false' do
   #       before :each do
@@ -296,7 +296,7 @@ describe 'firewall basics', docker: true do
   #       end
   #       it_behaves_like 'is idempotent', 'isfragment => true,', %r{-A INPUT -p tcp -f -m comment --comment "597 - test"}
   #     end
-  
+
   #     context 'when set to true and current value is false' do
   #       before :each do
   #         iptables_flush_all_tables
@@ -1254,7 +1254,7 @@ describe 'firewall basics', docker: true do
           apply_manifest(pp40, catch_failures: true)
           apply_manifest(pp40, catch_changes: do_catch_changes)
         end
-  
+
         it 'contains the rule' do
           shell('iptables-save -t nat') do |r|
             expect(r.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - random" -j MASQUERADE --random})
