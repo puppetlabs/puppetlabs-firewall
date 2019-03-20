@@ -129,7 +129,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     string_from: '--from',
     string_to: '--to',
     table: '-t',
-    tcp_flags: '-m tcp --tcp-flags',
+    tcp_flags: ['-m tcp --tcp-flags', '--tcp-flags'],
     todest: '--to-destination',
     toports: '--to-ports',
     tosource: '--to-source',
