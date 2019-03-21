@@ -30,10 +30,10 @@ class firewall::linux::debian (
 
         refreshonly => true,
     }
-    package { $package_name:
+    ensure_packages([$package_name],{
       ensure  => $package_ensure,
-      require => Exec['iptables-persistent-debconf'],
-    }
+      require => Exec['iptables-persistent-debconf']
+    })
   }
 
   if($::operatingsystemrelease =~ /^6\./ and $enable == true and $::iptables_persistent_version
