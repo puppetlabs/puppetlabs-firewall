@@ -1,5 +1,5 @@
 require 'puppet/provider/firewall'
-require 'digest/md5'
+require 'digest'
 
 Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewall do
   include Puppet::Util::Firewall
@@ -647,7 +647,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # by appending a high level
     if !hash[:name]
       num = 9000 + counter
-      hash[:name] = "#{num} #{Digest::MD5.hexdigest(line)}"
+      hash[:name] = "#{num} #{Digest::SHA256.hexdigest(line)}"
     elsif not %r{^\d+[[:graph:][:space:]]+$} =~ hash[:name] # rubocop:disable Style/Not : Making this change breaks the code
       num = 9000 + counter
       hash[:name] = "#{num} #{%r{([[:graph:][:space:]]+)}.match(hash[:name])[1]}"

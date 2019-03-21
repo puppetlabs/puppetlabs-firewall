@@ -269,7 +269,7 @@ describe 'iptables provider' do
     let(:instance) { provider.new(resource) }
 
     it 'rule name contains a MD5 sum of the line' do
-      expect(resource[:name]).to eq("9000 #{Digest::MD5.hexdigest(resource[:line])}")
+      expect(resource[:name]).to eq("9000 #{Digest::SHA256.hexdigest(resource[:line])}")
     end
 
     resource_types = [:chain, :source, :destination, :proto, :dport, :sport, :action]
@@ -290,7 +290,7 @@ describe 'iptables provider' do
     let(:instance) { provider.new(resource) }
 
     it 'rule name contains a MD5 sum of the line' do
-      expect(resource[:name]).to eq("9000 #{Digest::MD5.hexdigest(resource[:line])}")
+      expect(resource[:name]).to eq("9000 #{Digest::SHA256.hexdigest(resource[:line])}")
     end
 
     resource_types = [:chain, :proto, :dport, :state, :action]
