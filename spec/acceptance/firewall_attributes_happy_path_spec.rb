@@ -18,7 +18,6 @@ describe 'firewall attribute testing, happy path' do
             log_level  => '3',
             log_prefix => 'IPTABLES dropped invalid: ',
           }
-
           firewall { '501 - connlimit':
             proto           => tcp,
             dport           => '2222',
@@ -349,6 +348,11 @@ describe 'firewall attribute testing, happy path' do
             set_dscp_class => 'EF',
             chain          => 'OUTPUT',
             table          => 'mangle',
+          }
+          firewall { '1002 - set ipvs':
+            proto          => 'tcp',
+            dport           => '4321',
+            chain          => 'OUTPUT',
           }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)

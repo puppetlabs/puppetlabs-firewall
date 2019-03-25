@@ -42,6 +42,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   has_feature :string_matching
   has_feature :queue_num
   has_feature :queue_bypass
+  has_feature :ipvs
 
   optional_commands(iptables: 'iptables',
                     iptables_save: 'iptables-save')
@@ -168,6 +169,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     hashlimit_htable_expire: '--hashlimit-htable-expire',
     hashlimit_htable_gcinterval: '--hashlimit-htable-gcinterval',
     bytecode: '-m bpf --bytecode',
+    ipvs: '-m ipvs --ipvs',
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -190,6 +192,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :kernel_timezone,
     :clusterip_new,
     :queue_bypass,
+    :ipvs,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
