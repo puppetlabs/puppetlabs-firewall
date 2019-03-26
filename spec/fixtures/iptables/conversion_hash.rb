@@ -980,6 +980,15 @@ HASH_TO_ARGS = {
     },
     args: ['-t', :filter, '-p', :tcp, '-m', 'conntrack', '--ctstate', 'ESTABLISHED,INVALID', '-m', 'comment', '--comment', '100 ctstates_set_from_array'],
   },
+  'ctstates_and_ctdir' => {
+    params: {
+      name: '100 ctstates_and_ctdir',
+      table: 'filter',
+      ctstate: ['ESTABLISHED'],
+      ctdir: 'REPLY',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'conntrack', '--ctstate', 'ESTABLISHED', '--ctdir', :REPLY, '-m', 'comment', '--comment', '100 ctstates_and_ctdir'],
+  },
   'comment_string_character_validation' => {
     params: {
       name: '000 allow from 192.168.0.1, please',

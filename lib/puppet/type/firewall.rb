@@ -940,6 +940,10 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:ctdir) do
+    newvalues(:REPLY, :ORIGINAL)
+  end
+
   # Connection mark
   newproperty(:connmark, required_features: :mark) do
     desc <<-PUPPETCODE
