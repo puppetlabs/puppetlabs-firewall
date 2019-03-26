@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.15.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v1.15.2) (2019-03-26)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.1...v1.15.2)
+
+### Fixed
+
+- \(MODULES-8615\) Fix rules with ipvs not parsing [\#828](https://github.com/puppetlabs/puppetlabs-firewall/pull/828) ([eimlav](https://github.com/eimlav))
+- \(MODULES-7333\) - Change hashing method from MD5 to SHA256 [\#827](https://github.com/puppetlabs/puppetlabs-firewall/pull/827) ([david22swan](https://github.com/david22swan))
+- \(MODULES-6547\) Fix existing rules with --dport not parsing [\#826](https://github.com/puppetlabs/puppetlabs-firewall/pull/826) ([eimlav](https://github.com/eimlav))
+- \(MODULES-8648\) - Fix for failures on SLES 11 [\#816](https://github.com/puppetlabs/puppetlabs-firewall/pull/816) ([david22swan](https://github.com/david22swan))
+- \(MODULES-8584\) Handle multiple escaped quotes in comments properly [\#815](https://github.com/puppetlabs/puppetlabs-firewall/pull/815) ([mateusz-gozdek-sociomantic](https://github.com/mateusz-gozdek-sociomantic))
+- External control for iptables-persistent [\#795](https://github.com/puppetlabs/puppetlabs-firewall/pull/795) ([identw](https://github.com/identw))
+
 ## [1.15.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.1) (2019-02-01)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.0...1.15.1)
