@@ -11,12 +11,12 @@ describe 'puppet resource firewall command' do
   end
 
   context 'when make sure it returns no errors when executed on a clean machine' do
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, some boxes come with rules, that is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, some boxes come with rules, that is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -26,12 +26,12 @@ describe 'puppet resource firewall command' do
       ip6tables_flush_all_tables
     end
 
-    # No rules, means no output thanks. And no errors as well.
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        r.stdout.should == "\n"
-      end
+      # No rules, means no output thanks. And no errors as well.
+      expect(result.exit_code).to be_zero
+      expect(result.stdout).to eq "\n"
     end
   end
 
@@ -41,12 +41,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -56,12 +56,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http"')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -71,12 +71,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http" -m comment --comment "http"')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -88,12 +88,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -t nat -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -j MASQUERADE')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -103,12 +103,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -t mangle -A PREROUTING -d 1.2.3.4 -p tcp -m tcp -m multiport --dports 80,443,8140 -j MARK --set-mark 42')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -121,12 +121,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -t nat -A POSTROUTING -d 1.2.3.4/32 -o eth0 -m statistic --mode random --probability 0.99 -j SNAT --to-source 2.3.4.7')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -140,12 +140,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -t filter -A FORWARD -s 192.168.122.0/24 -d 192.168.201.1/32 -o eth0 -m policy --dir out --pol ipsec --reqid 107 --proto esp -j ACCEPT')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -155,12 +155,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -A INPUT -s 10.0.0.0/8 -p udp -m udp -j ACCEPT')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -170,12 +170,12 @@ describe 'puppet resource firewall command' do
       shell('iptables -t nat -A OUTPUT -s 10.0.0.0/8 -p tcp -m ttl ! --ttl-eq 42 -j REDIRECT --to-ports 12299')
     end
 
+    let(:result) { shell('puppet resource firewall') }
+
     it do
-      shell('puppet resource firewall') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 
@@ -192,12 +192,13 @@ describe 'puppet resource firewall command' do
       ip6tables_flush_all_tables
       shell('ip6tables -A INPUT -d fe80::/64 -p tcp -m tcp --dport 546 --sport 547 -j ACCEPT -m comment --comment 000-foobar')
     end
+
+    let(:result) { shell('puppet resource firewall \'000-foobar\' provider=ip6tables') }
+
     it do
-      shell('puppet resource firewall \'000-foobar\' provider=ip6tables') do |r|
-        r.exit_code.should be_zero
-        # don't check stdout, testing preexisting rules, output is normal
-        r.stderr.should be_empty
-      end
+      # Don't check stdout, testing preexisting rules, output is normal
+      expect(result.exit_code).to be_zero
+      expect(result.stderr).to be_empty
     end
   end
 end
