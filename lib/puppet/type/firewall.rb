@@ -941,6 +941,15 @@ Puppet::Type.newtype(:firewall) do
   end
 
   newproperty(:ctdir) do
+    desc <<-PUPPETCODE
+      Matches a packet that is flowing in the specified direction.
+      If this flag is not specified at all, matches packets in both directions.
+      Values can be:
+
+      * REPLY
+      * ORIGINAL
+    PUPPETCODE
+
     newvalues(:REPLY, :ORIGINAL)
   end
 

@@ -436,6 +436,18 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
   end
 
+  describe ':ctdir' do
+    it 'accepts value as a string - REPLY' do
+      resource[:ctdir] = :REPLY
+      expect(resource[:ctdir]).to be :REPLY
+    end
+
+    it 'accepts value as a string - ORIGINAL' do
+      resource[:ctdir] = :ORIGINAL
+      expect(resource[:ctdir]).to be :ORIGINAL
+    end
+  end
+
   describe ':burst' do
     it 'accepts numeric values' do
       resource[:burst] = 12
