@@ -351,8 +351,9 @@ describe 'firewall attribute testing, happy path' do
           }
           firewall { '1002 - set ipvs':
             proto          => 'tcp',
-            dport           => '4321',
-            chain          => 'OUTPUT',
+            action         => accept,
+            chain          => 'INPUT',
+            ipvs           => true,
           }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
@@ -506,6 +507,9 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'jump is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - jump" -j TEST})
+    end
+    it 'ipvs is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m ipvs --ipvs -m comment --comment "1002 - set ipvs" -j ACCEPT})
     end
   end
 end

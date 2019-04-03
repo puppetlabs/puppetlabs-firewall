@@ -524,6 +524,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 
 * `bpf`: The ability to use Berkeley Paket Filter rules.
 
+* `ipvs`: The ability to match IP Virtual Server packets.
+
 #### Parameters
 
 * `action`: This is the action to perform on a match. Valid values for this action are:
@@ -638,6 +640,8 @@ If Puppet is managing the iptables or iptables-persistent packages, and the prov
 * `ipsec_policy`: Sets the ipsec policy type. Valid values are 'none', 'ipsec'. Requires the `ipsec_policy` feature.
 
 * `ipset`: Matches IP sets. Value must be 'ipset_name (src|dst|src,dst)' and can be negated by putting ! in front. Requires ipset kernel module. Will accept a single element or an array.
+
+* `ipvs`: Matches packets belonging to an IP Virtual server connection.
 
 * `isfirstfrag`: If true, matches when the packet is the first fragment of a fragmented ipv6 packet. Cannot be negated. Supported by ipv6 only. Valid values are 'true', 'false'. Requires the `isfirstfrag` feature.
 

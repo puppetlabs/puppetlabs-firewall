@@ -1750,6 +1750,7 @@ Puppet::Type.newtype(:firewall) do
     desc <<-PUPPETCODE
       Indicates that the current packet belongs to an IPVS connection.
     PUPPETCODE
+    newvalues(:true, :false)
   end
 
   autorequire(:firewallchain) do
