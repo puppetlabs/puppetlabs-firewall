@@ -2,9 +2,18 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## [v1.15.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v1.15.2) (2019-03-26)
+## [1.15.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.3) (2019-04-04)
 
-[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.1...v1.15.2)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.2...1.15.3)
+
+### Fixed
+
+- \(MODULES-8855\) Move ipvs test to exception spec [\#834](https://github.com/puppetlabs/puppetlabs-firewall/pull/834) ([eimlav](https://github.com/eimlav))
+- \(MODULES-8842\) Fix ipvs not idempotent [\#833](https://github.com/puppetlabs/puppetlabs-firewall/pull/833) ([eimlav](https://github.com/eimlav))
+
+## [1.15.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.2) (2019-03-26)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.1...1.15.2)
 
 ### Fixed
 
