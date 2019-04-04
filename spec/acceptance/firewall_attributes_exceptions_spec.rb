@@ -954,6 +954,29 @@ describe 'firewall basics', docker: true do
   end
 
   unless (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles')
+    describe 'ipvs' do
+      context 'when set' do
+        pp1 = <<-PUPPETCODE
+            class { '::firewall': }
+            firewall { '1002 - set ipvs':
+              proto          => 'tcp',
+              action         => accept,
+              chain          => 'INPUT',
+              ipvs           => true,
+            }
+        PUPPETCODE
+        it 'applies' do
+          apply_manifest(pp1, catch_failures: true)
+        end
+
+        it 'contains the rule' do
+          shell('iptables-save') do |r|
+            expect(r.stdout).to match(%r{-A INPUT -p tcp -m ipvs --ipvs -m comment --comment "1002 - set ipvs" -j ACCEPT})
+          end
+        end
+      end
+    end
+
     describe 'tee_gateway' do
       context 'when 10.0.0.2' do
         pp1 = <<-PUPPETCODE
