@@ -1,20 +1,27 @@
-# = Class: firewall::linux
+# @summary Main linux class, includes all other classes
 #
-# Installs the `iptables` package for Linux operating systems and includes
-# the appropriate sub-class for any distribution specific services and
-# additional packages.
+# @param ensure
+#   Controls the state of the ipv4 iptables service on your system. Valid options: 'running' or 'stopped'. Defaults to 'running'.
 #
-# == Parameters:
+# @param ensure_v6
+#   Controls the state of the ipv6 iptables service on your system. Valid options: 'running' or 'stopped'. Defaults to 'running'.
 #
-# [*ensure*]
-#   Ensure parameter passed onto Service[] resources. When `running` the
-#   service will be started on boot, and when `stopped` it will not.
-#   Default: running
+# @param pkg_ensure
+#   Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'. Defaults to 'latest'.
 #
-# [*ensure_v6*]
-#   Ensure parameter passed onto Service[] resources. When `running` the
-#   service will be started on boot, and when `stopped` it will not.
-#   Default: running
+# @param service_name
+#   Specify the name of the IPv4 iptables service. Defaults defined in firewall::params.
+#
+# @param service_name_v6
+#   Specify the name of the IPv6 iptables service. Defaults defined in firewall::params.
+#
+# @param package_name
+#   Specify the platform-specific package(s) to install. Defaults defined in firewall::params.
+#
+# @param ebtables_manage
+#   Controls whether puppet manages the ebtables package or not. If managed, the package will use the value of pkg_ensure.
+#
+# @api private
 #
 class firewall::linux (
   $ensure          = running,

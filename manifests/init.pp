@@ -1,15 +1,34 @@
-# = Class: firewall
+# @summary 
+# Performs the basic setup tasks required for using the firewall resources.
 #
-# Manages packages and services required by the firewall type/provider.
+# At the moment this takes care of:
 #
-# This class includes the appropriate sub-class for your operating system,
-# where supported.
+# iptables-persistent package installation
+# Include the firewall class for nodes that need to use the resources in this module:
 #
-# == Parameters:
+# @example
+#   class { 'firewall': }
 #
-# [*ensure*]
-#   Ensure parameter passed onto Service[] resources.
-#   Default: running
+# @param ensure
+#   Controls the state of the ipv4 iptables service on your system. Valid options: 'running' or 'stopped'.
+#
+# @param ensure_v6
+#   Controls the state of the ipv6 iptables service on your system. Valid options: 'running' or 'stopped'.
+#
+# @param pkg_ensure
+#   Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'.
+#
+# @param service_name
+#   Specify the name of the IPv4 iptables service.
+#
+# @param service_name_v6
+#   Specify the name of the IPv6 iptables service.
+#
+# @param package_name
+#   Specify the platform-specific package(s) to install.
+#
+# @param ebtables_manage
+#   Controls whether puppet manages the ebtables package or not. If managed, the package will use the value of pkg_ensure.
 #
 class firewall (
   $ensure          = running,

@@ -1,17 +1,22 @@
-# = Class: firewall::linux::gentoo
+# @summary
+#   Manages `iptables` and `ip6tables` services, and creates files used for persistence, on Gentoo Linux systems.
 #
-# Manages `iptables` and `ip6tables` services, and creates files used for
-# persistence, on Gentoo Linux systems.
+# @param ensure
+#   Ensure parameter passed onto Service[] resources. Valid options: 'running' or 'stopped'. Defaults to 'running'.
 #
-# == Parameters:
+# @param enable
+#   Enable parameter passed onto Service[] resources. Defaults to 'true'.
 #
-# [*ensure*]
-#   Ensure parameter passed onto Service[] resources.
-#   Default: running
+# @param service_name
+#   Specify the name of the IPv4 iptables service. Defaults defined in firewall::params.
 #
-# [*enable*]
-#   Enable parameter passed onto Service[] resources.
-#   Default: true
+# @param package_name
+#   Specify the platform-specific package(s) to install. Defaults defined in firewall::params.
+#
+# @param package_ensure
+#   Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'. Defaults to 'latest'.
+#
+# @api private
 #
 class firewall::linux::gentoo (
   $ensure         = 'running',

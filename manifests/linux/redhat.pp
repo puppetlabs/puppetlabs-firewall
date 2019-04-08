@@ -1,29 +1,34 @@
-# = Class: firewall::linux::redhat
+# @summary
+#   Manages the `iptables` service on RedHat-alike systems.
 #
-# Manages the `iptables` service on RedHat-alike systems.
+# @param ensure
+#   Ensure parameter passed onto Service[] resources. Valid options: 'running' or 'stopped'. Defaults to 'running'.
 #
-# == Parameters:
+# @param ensure_v6
+#   Ensure parameter passed onto Service[] resources. Valid options: 'running' or 'stopped'. Defaults to 'undef'.
 #
-# [*ensure*]
-#   Ensure parameter passed onto Service[] resources.
-#   Default: running
+# @param enable
+#   Enable parameter passed onto Service[] resources. Defaults to 'true'.
 #
-# [*ensure_v6*]
-#   Ensure parameter passed onto Service[] resources.
-#   Default: undef
+# @param enable_v6
+#   Enable parameter passed onto Service[] resources. Defaults to 'undef'.
 #
-# [*enable*]
-#   Enable parameter passed onto Service[] resources.
-#   Default: true
+# @param service_name
+#   Specify the name of the IPv4 iptables service. Defaults defined in firewall::params.
 #
-# [*enable_v6*]
-#   Enable parameter passed onto Service[] resources.
-#   Default: undef
+# @param service_name_v6
+#   Specify the name of the IPv4 iptables service. Defaults defined in firewall::params.
 #
-# [*sysconfig_manage*]
-#   Enable sysconfig configuration for iptables/ip6tables files. This is
-#   disabled for RedHat 8+ or CentOS 8+
-#   Default: true
+# @param package_name
+#   Specify the platform-specific package(s) to install. Defaults defined in firewall::params.
+#
+# @param package_ensure
+#   Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'. Defaults to 'latest'.
+#
+# @param sysconfig_manage
+#   Enable sysconfig configuration for iptables/ip6tables files. Defaults defined in firewall::params. This is disabled for RedHat/CentOS 8+.
+#
+# @api private
 #
 class firewall::linux::redhat (
   $ensure           = running,

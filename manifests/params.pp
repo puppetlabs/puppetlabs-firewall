@@ -1,4 +1,7 @@
-# Manifest containing module parameters
+# @summary Provides defaults for the Apt module parameters.
+# 
+# @api private
+#
 class firewall::params {
   $package_ensure = 'present'
   case $::osfamily {
