@@ -59,10 +59,10 @@ class firewall::linux::redhat (
   }
 
   if $package_name {
-    package { $package_name:
-      ensure => $package_ensure,
-      before => Service[$service_name],
-    }
+    ensure_packages($package_name, {
+        'ensure' => $package_ensure,
+        'before' => Service[$service_name]}
+    )
   }
 
   if ($::operatingsystem != 'Amazon')
