@@ -11,7 +11,8 @@ Puppet::Type.newtype(:firewallchain) do
   include Puppet::Util::Firewall
 
   @doc = <<-PUPPETCODE
-    This type provides the capability to manage rule chains for firewalls.
+    @summary
+      This type provides the capability to manage rule chains for firewalls.
 
     Currently this supports only iptables, ip6tables and ebtables on Linux. And
     provides support for setting the default policy on chains and tables that
@@ -21,6 +22,13 @@ Puppet::Type.newtype(:firewallchain) do
     If Puppet is managing the iptables, iptables-persistent, or iptables-services packages,
     and the provider is iptables_chain, the firewall resource will autorequire
     those packages to ensure that any required binaries are installed.
+
+    #### Providers
+      * iptables_chain is the only provider that supports firewallchain.
+
+    #### Features
+      * iptables_chain: The provider provides iptables chain features.
+      * policy: Default policy (inbuilt chains only).
   PUPPETCODE
 
   feature :iptables_chain, 'The provider provides iptables chain features.'
@@ -133,6 +141,7 @@ Puppet::Type.newtype(:firewallchain) do
         '(?i)foo' or '(?i:foo)'
 
       Full example:
+      ```
       firewallchain { 'INPUT:filter:IPv4':
         purge => true,
         ignore => [
@@ -140,6 +149,7 @@ Puppet::Type.newtype(:firewallchain) do
           '--comment "[^"]*(?i:ignore)[^"]*"', # ignore any rules with "ignore" (case insensitive) in the comment in the rule
         ],
       }
+      ```
     PUPPETCODE
 
     validate do |value|

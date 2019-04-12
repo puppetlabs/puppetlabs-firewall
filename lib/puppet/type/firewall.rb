@@ -13,8 +13,8 @@ Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
 
   @doc = <<-PUPPETCODE
-    This type provides the capability to manage firewall rules within
-    puppet.
+    @summary
+      This type provides the capability to manage firewall rules within puppet.
 
     **Autorequires:**
 
@@ -26,6 +26,109 @@ Puppet::Type.newtype(:firewall) do
     and the provider is iptables or ip6tables, the firewall resource will
     autorequire those packages to ensure that any required binaries are
     installed.
+
+    #### Providers
+      Note: Not all features are available with all providers.
+
+      * ip6tables: Ip6tables type provider
+
+        * Required binaries: ip6tables-save, ip6tables.
+        * Supported features: address_type, connection_limiting, dnat, hop_limiting, icmp_match,
+        interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfirstfrag,
+        ishasmorefrags, islastfrag, length, log_level, log_prefix, log_uid, mark, mask, mss,
+        owner, pkttype, queue_bypass, queue_num, rate_limiting, recent_limiting, reject_type,
+        snat, socket, state_match, string_matching, tcp_flags, hashlimit, bpf.
+
+      * iptables: Iptables type provider
+
+        * Required binaries: iptables-save, iptables.
+        * Default for kernel == linux.
+        * Supported features: address_type, clusterip, connection_limiting, dnat, icmp_match,
+        interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfragment, length,
+        log_level, log_prefix, log_uid, mark, mask, mss, netmap, nflog_group, nflog_prefix,
+        nflog_range, nflog_threshold, owner, pkttype, queue_bypass, queue_num, rate_limiting,
+        recent_limiting, reject_type, snat, socket, state_match, string_matching, tcp_flags, bpf.
+
+    #### Features
+      * address_type: The ability to match on source or destination address type.
+
+      * clusterip: Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them.
+
+      * connection_limiting: Connection limiting features.
+
+      * dnat: Destination NATing.
+
+      * hop_limiting: Hop limiting features.
+
+      * icmp_match: The ability to match ICMP types.
+
+      * interface_match: Interface matching.
+
+      * iprange: The ability to match on source or destination IP range.
+
+      * ipsec_dir: The ability to match IPsec policy direction.
+
+      * ipsec_policy: The ability to match IPsec policy.
+
+      * iptables: The provider provides iptables features.
+
+      * isfirstfrag: The ability to match the first fragment of a fragmented ipv6 packet.
+
+      * isfragment: The ability to match fragments.
+
+      * ishasmorefrags: The ability to match a non-last fragment of a fragmented ipv6 packet.
+
+      * islastfrag: The ability to match the last fragment of an ipv6 packet.
+
+      * length: The ability to match the length of the layer-3 payload.
+
+      * log_level: The ability to control the log level.
+
+      * log_prefix: The ability to add prefixes to log messages.
+
+      * log_uid: The ability to log the userid of the process which generated the packet.
+
+      * mark: The ability to match or set the netfilter mark value associated with the packet.
+
+      * mask: The ability to match recent rules based on the ipv4 mask.
+
+      * nflog_group: The ability to set the group number for NFLOG.
+
+      * nflog_prefix: The ability to set a prefix for nflog messages.
+
+      * nflog_range: The ability to set nflog_range.
+
+      * nflog_threshold: The ability to set nflog_threshold.
+
+      * owner: The ability to match owners.
+
+      * pkttype: The ability to match a packet type.
+
+      * rate_limiting: Rate limiting features.
+
+      * recent_limiting: The netfilter recent module.
+
+      * reject_type: The ability to control reject messages.
+
+      * set_mss: Set the TCP MSS of a packet.
+
+      * snat: Source NATing.
+
+      * socket: The ability to match open sockets.
+
+      * state_match: The ability to match stateful firewall states.
+
+      * string_matching: The ability to match a given string by using some pattern matching strategy.
+
+      * tcp_flags: The ability to match on particular TCP flag settings.
+
+      * netmap: The ability to map entire subnets via source or destination nat rules.
+
+      * hashlimit: The ability to use the hashlimit-module.
+
+      * bpf: The ability to use Berkeley Paket Filter rules.
+
+      * ipvs: The ability to match IP Virtual Server packets.
   PUPPETCODE
 
   feature :connection_limiting, 'Connection limiting features.'
@@ -76,7 +179,7 @@ Puppet::Type.newtype(:firewall) do
 
   ensurable do
     desc <<-PUPPETCODE
-      Manage the state of this rule. The default action is *present*.
+      Manage the state of this rule.
     PUPPETCODE
 
     newvalue(:present) do
@@ -298,7 +401,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:port, array_matching: :all) do
     desc <<-PUPPETCODE
-      DEPRECATED
+      *note* This property has been DEPRECATED
 
       The destination or source port to match for this filter (if the protocol
       supports ports). Will accept a single element or an array.
@@ -424,8 +527,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:proto) do
     desc <<-PUPPETCODE
-      The specific protocol to match for this rule. By default this is
-      *tcp*.
+      The specific protocol to match for this rule.
     PUPPETCODE
 
     newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
@@ -451,8 +553,8 @@ Puppet::Type.newtype(:firewall) do
       Note that you specify them in the order that iptables --list-rules
       would list them to avoid having puppet think you changed the flags.
       Example: FIN,SYN,RST,ACK SYN matches packets with the SYN bit set and the
-	       ACK,RST and FIN bits cleared.  Such packets are used to request
-               TCP  connection initiation.
+      ACK,RST and FIN bits cleared. Such packets are used to request
+      TCP  connection initiation.
     PUPPETCODE
   end
 
@@ -468,8 +570,6 @@ Puppet::Type.newtype(:firewall) do
       * POSTROUTING
 
       Or you can provide a user-based chain.
-
-      The default value is 'INPUT'.
     PUPPETCODE
 
     defaultto 'INPUT'
@@ -485,8 +585,6 @@ Puppet::Type.newtype(:firewall) do
       * filter
       * raw
       * rawpost
-
-      By default the setting is 'filter'.
     PUPPETCODE
 
     newvalues(:nat, :mangle, :filter, :raw, :rawpost)
@@ -1131,8 +1229,9 @@ Puppet::Type.newtype(:firewall) do
       Enable the recent module. Takes as an argument one of set, update,
       rcheck or remove. For example:
 
+        ```
         # If anyone's appeared on the 'badguy' blacklist within
-        # the last 60 seconds, drop their traffic, and update the timestamp.
+        #  the last 60 seconds, drop their traffic, and update the timestamp.
         firewall { '100 Drop badguy traffic':
           recent   => 'update',
           rseconds => 60,
@@ -1141,8 +1240,12 @@ Puppet::Type.newtype(:firewall) do
           action   => 'DROP',
           chain    => 'FORWARD',
         }
-        # No-one should be sending us traffic on eth0 from localhost
-        # Blacklist them
+        ```
+
+
+        ```
+        # No-one should be sending us traffic on eth0 from the
+        #  localhost, Blacklist them
         firewall { '101 blacklist strange traffic':
           recent      => 'set',
           rsource     => true,
@@ -1152,6 +1255,7 @@ Puppet::Type.newtype(:firewall) do
           action      => 'DROP',
           chain       => 'FORWARD',
         }
+        ```
     PUPPETCODE
 
     newvalues(:set, :update, :rcheck, :remove)
@@ -1278,7 +1382,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:stat_mode) do
     desc <<-PUPPETCODE
-      Set the matching mode for statistic matching. Supported modes are `random` and `nth`.
+      Set the matching mode for statistic matching.
     PUPPETCODE
 
     newvalues(:nth, :random)
@@ -1492,7 +1596,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:week_days, required_features: :iptables) do
     desc <<-PUPPETCODE
-      Only match on the given weekdays. Possible values are Mon, Tue, Wed, Thu, Fri, Sat, Sun.
+      Only match on the given weekdays.
     PUPPETCODE
 
     newvalues(:Mon, :Tue, :Wed, :Thu, :Fri, :Sat, :Sun)
@@ -1526,7 +1630,7 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:clusterip_hashmode, required_features: :clusterip) do
     desc <<-PUPPETCODE
       Used with the CLUSTERIP jump target.
-      Specify the hashing mode. Valid values: sourceip, sourceip-sourceport, sourceip-sourceport-destport.
+      Specify the hashing mode.
     PUPPETCODE
 
     newvalues(:sourceip, :'sourceip-sourceport', :'sourceip-sourceport-destport')
