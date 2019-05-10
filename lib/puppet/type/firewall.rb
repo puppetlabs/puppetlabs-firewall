@@ -619,7 +619,7 @@ Puppet::Type.newtype(:firewall) do
       unless value =~ %r{^[a-zA-Z0-9\-_]+$}
         raise ArgumentError, <<-PUPPETCODE
           Jump destination must consist of alphanumeric characters, an
-          underscore or a yphen.
+          underscore or a hyphen.
         PUPPETCODE
       end
 
@@ -652,7 +652,7 @@ Puppet::Type.newtype(:firewall) do
       unless value =~ %r{^[a-zA-Z0-9\-_]+$}
         raise ArgumentError, <<-PUPPETCODE
           Goto destination must consist of alphanumeric characters, an
-          underscore or a yphen.
+          underscore or a hyphen.
         PUPPETCODE
       end
 
