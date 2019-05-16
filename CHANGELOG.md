@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.0.0) (2019-05-14)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.3...v2.0.0)
+
+### Changed
+
+- pdksync - \(MODULES-8444\) - Raise lower Puppet bound [\#841](https://github.com/puppetlabs/puppetlabs-firewall/pull/841) ([david22swan](https://github.com/david22swan))
+
+### Added
+
+- \(FM-7903\) - Implement Puppet Strings [\#838](https://github.com/puppetlabs/puppetlabs-firewall/pull/838) ([david22swan](https://github.com/david22swan))
+
+### Fixed
+
+- \(MODULES-8736\) IPtables support on RHEL8 [\#824](https://github.com/puppetlabs/puppetlabs-firewall/pull/824) ([EmilienM](https://github.com/EmilienM))
+
 ## [1.15.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.3) (2019-04-04)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.2...1.15.3)
