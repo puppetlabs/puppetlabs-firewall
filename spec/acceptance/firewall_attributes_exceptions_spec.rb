@@ -1001,7 +1001,9 @@ describe 'firewall basics', docker: true do
         end
       end
     end
+  end
 
+  unless (os[:family] == 'redhat' && os[:release].start_with?('5', '6', '8')) || (os[:family] == 'sles')
     describe 'time tests' do
       context 'when set all time parameters' do
         pp1 = <<-PUPPETCODE
