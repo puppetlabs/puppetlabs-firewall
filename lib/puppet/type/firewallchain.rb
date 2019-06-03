@@ -49,8 +49,8 @@ Puppet::Type.newtype(:firewallchain) do
 
     validate do |value|
       if value !~ NAME_FORMAT
-        raise ArgumentError, 'Inbuilt chains must be in the form {chain}:{table}:{protocol} where {table} is one of FILTER,' \
-            ' NAT, MANGLE, RAW, RAWPOST, BROUTE, SECURITY or empty (alias for filter), chain can be anything without colons' \
+        raise ArgumentError, 'Inbuilt chains must be in the form {chain}:{table}:{protocol} where {table} is one of filter,' \
+            ' nat, mangle, raw, rawpost, broute, security or empty (alias for filter), chain can be anything without colons' \
             ' or one of PREROUTING, POSTROUTING, BROUTING, INPUT, FORWARD, OUTPUT for the inbuilt chains, and {protocol} being' \
             " IPv4, IPv6, ethernet (ethernet bridging) got '#{value}' table:'#{Regexp.last_match(1)}' chain:'#{Regexp.last_match(2)}' protocol:'#{Regexp.last_match(3)}'"
       else
