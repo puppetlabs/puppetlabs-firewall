@@ -26,7 +26,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
         end
 
         it 'does not contain the rule' do
-          shell('ip6tables-save') do |r|
+          run_shell('ip6tables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --dst-range 2001::db8::1-2001:db8::ff -m multiport --ports 602 -m comment --comment "602 - test" -j ACCEPT})
           end
         end
@@ -52,7 +52,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           end
 
           it 'does not contain the rule' do
-            shell('ip6tables-save') do |r|
+            run_shell('ip6tables-save') do |r|
               expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sBROKEN -m comment --comment "603 - test" -j ACCEPT})
             end
           end
@@ -75,7 +75,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           end
 
           it 'does not contain the rule' do
-            shell('ip6tables-save') do |r|
+            run_shell('ip6tables-save') do |r|
               expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL -m addrtype\s.*\sLOCAL -m comment --comment "619 - test" -j ACCEPT})
             end
           end
@@ -98,7 +98,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           end
 
           it 'does not contain the rule' do
-            shell('ip6tables-save') do |r|
+            run_shell('ip6tables-save') do |r|
               expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
             end
           end
@@ -126,7 +126,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
         end
 
         it 'does not contain the rule' do
-          shell('ip6tables-save') do |r|
+          run_shell('ip6tables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 571 -m comment --comment "571 - test" -m hl --hl-eq invalid -j ACCEPT})
           end
         end
@@ -134,7 +134,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
     end
 
     # ipset is hard to test, only testing on ubuntu 14
-    describe 'ipset', if: (host_inventory['facter']['os']['name'] == 'Ubuntu' && os[:release].start_with?('14')) do
+    describe 'ipset', if: (os[:family] == 'redhat' && os[:release].start_with?('14')) do
       before(:all) do
         pp = <<-PUPPETCODE
           exec { 'hackery pt 1':
@@ -182,7 +182,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
       end
 
       it 'contains the rule' do
-        shell('ip6tables-save') do |r|
+        run_shell('ip6tables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -p tcp -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP})
         end
       end
@@ -207,7 +207,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
         end
 
         it 'does not contain the rule' do
-          shell('ip6tables-save') do |r|
+          run_shell('ip6tables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --src-range 2001::db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - test" -j ACCEPT})
           end
         end
@@ -235,12 +235,12 @@ describe 'firewall ipv6 attribute testing, exceptions' do
               }
           PUPPETCODE
           it 'applies' do
-            apply_manifest(pp1, catch_failures: true)
-            apply_manifest(pp1, catch_changes: do_catch_changes)
+            apply_manifest(pp1, catch_failures: true, expect_failures: true)
+            apply_manifest(pp1, catch_changes: true, expect_failures: true)
           end
 
           it 'contains the rule' do
-            shell('ip6tables-save') do |r|
+            run_shell('ip6tables-save') do |r|
               expect(r.stdout).to match(
                 %r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - time" -j ACCEPT}, # rubocop:disable Metrics/LineLength
               )
@@ -386,11 +386,11 @@ describe 'firewall ipv6 attribute testing, exceptions' do
         }
 
       PUPPETCODE
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: do_catch_changes)
+      apply_manifest(pp, catch_failures: true, expect_failures: true)
+      apply_manifest(pp, catch_changes: true, expect_failures: true)
     end
 
-    let(:result) { shell('ip6tables-save') }
+    let(:result) { run_shell('ip6tables-save') }
 
     it 'physdev_in is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 701 -m comment --comment "701 - test" -j ACCEPT})
@@ -451,10 +451,10 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
       PUPPETCODE
       it "changes the values to #{values}" do
-        apply_manifest(pp2, catch_failures: true)
-        apply_manifest(pp2, catch_changes: do_catch_changes)
+        apply_manifest(pp2, catch_failures: true, expect_failures: true)
+        apply_manifest(pp2, catch_changes: true, expect_failures: true)
 
-        shell('ip6tables-save') do |r|
+        run_shell('ip6tables-save') do |r|
           expect(r.stdout).to match(%r{#{line_match}})
         end
       end
@@ -470,9 +470,9 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
       PUPPETCODE
       it "doesn't change the values to #{values}" do
-        apply_manifest(pp3, catch_changes: do_catch_changes)
+        apply_manifest(pp3, catch_changes: true, expect_failures: true)
 
-        shell('ip6tables-save') do |r|
+        run_shell('ip6tables-save') do |r|
           expect(r.stdout).to match(%r{#{line_match}})
         end
       end
@@ -503,7 +503,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
       context 'when unset or false' do
         before :each do
           ip6tables_flush_all_tables
-          shell('ip6tables -A INPUT -p tcp -m comment --comment "599 - test"')
+          run_shell('ip6tables -A INPUT -p tcp -m comment --comment "599 - test"')
         end
         context 'when current value is false' do
           it_behaves_like "doesn't change", 'ishasmorefrags => false, islastfrag => false, isfirstfrag => false', %r{-A INPUT -p tcp -m comment --comment "599 - test"}
@@ -516,7 +516,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
       context 'when set to true' do
         before :each do
           ip6tables_flush_all_tables
-          shell('ip6tables -A INPUT -p tcp -m frag --fragid 0 --fragmore -m frag --fragid 0 --fraglast -m frag --fragid 0 --fragfirst -m comment --comment "599 - test"')
+          run_shell('ip6tables -A INPUT -p tcp -m frag --fragid 0 --fragmore -m frag --fragid 0 --fraglast -m frag --fragid 0 --fragfirst -m comment --comment "599 - test"')
         end
         context 'when current value is false' do
           it_behaves_like 'is idempotent', 'ishasmorefrags => false, islastfrag => false, isfirstfrag => false', %r{-A INPUT -p tcp -m comment --comment "599 - test"}
@@ -537,12 +537,12 @@ describe 'firewall ipv6 attribute testing, exceptions' do
       before(:each) do
         ip6tables_flush_all_tables
 
-        shell('ip6tables -A INPUT -p tcp -s 1::42')
-        shell('ip6tables -A INPUT -p udp -s 1::42')
-        shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
+        run_shell('ip6tables -A INPUT -p tcp -s 1::42')
+        run_shell('ip6tables -A INPUT -p udp -s 1::42')
+        run_shell('ip6tables -A OUTPUT -s 1::50 -m comment --comment "010 output-1::50"')
       end
 
-      let(:result) { shell('ip6tables-save') }
+      let(:result) { run_shell('ip6tables-save') }
 
       pp1 = <<-PUPPETCODE
             class { 'firewall': }
@@ -551,7 +551,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
         PUPPETCODE
       it 'purges only the specified chain' do
-        apply_manifest(pp1, expect_changes: true)
+        apply_manifest(pp1, expect_changes: true, expect_failures: true)
 
         expect(result.stdout).to match(%r{010 output-1::50})
         expect(result.stdout).not_to match(%r{1::42})
@@ -571,7 +571,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
         PUPPETCODE
       it 'ignores managed rules' do
-        apply_manifest(pp2, catch_changes: do_catch_changes)
+        apply_manifest(pp2, catch_changes: true, expect_failures: true)
       end
 
       pp3 = <<-PUPPETCODE
@@ -584,7 +584,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
         PUPPETCODE
       it 'ignores specified rules' do
-        apply_manifest(pp3, catch_changes: do_catch_changes)
+        apply_manifest(pp3, catch_changes: true, expect_failures: true)
       end
 
       pp4 = <<-PUPPETCODE
@@ -621,7 +621,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
         PUPPETCODE
       it 'adds managed rules with ignored rules' do
-        apply_manifest(pp4, catch_failures: true)
+        apply_manifest(pp4, catch_failures: true, expect_failures: true)
 
         expect(result.stdout).to match(%r{-A INPUT -s 1::42(\/128)? -p tcp\s?\n-A INPUT -s 1::42(\/128)? -p udp})
       end

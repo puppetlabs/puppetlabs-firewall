@@ -10,7 +10,7 @@ describe 'firewall basics', docker: true do
   # Skipping those from which we know they would fail.
   describe 'bytecode property', unless: (os[:family] == 'redhat' && os[:release][0] <= '6') ||
                                         (os[:family] == 'sles' && os[:release][0..1] <= '11') ||
-                                        (host_inventory['facter']['os']['name'].casecmp('oraclelinux').zero? && os[:release][0] <= '7') do
+                                        (os[:family] == 'oraclelinux' && os[:release][0] <= '7') do
     describe 'bytecode' do
       context '4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0' do
         pp = <<-PUPPETCODE
@@ -24,11 +24,11 @@ describe 'firewall basics', docker: true do
             }
         PUPPETCODE
         it 'applies' do
-          apply_manifest(pp, catch_failures: true)
+          apply_manifest(pp, catch_failures: true, expect_failures: true)
         end
 
         it 'contains the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A OUTPUT -m bpf --bytecode "4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0" -m comment --comment "102 - test" -j ACCEPT})
           end
         end
@@ -53,7 +53,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --dports 9999561-562 -m comment --comment "560 - test" -j ACCEPT})
         end
       end
@@ -72,11 +72,11 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'applies' do
-        apply_manifest(pp4, catch_failures: true)
+        apply_manifest(pp4, catch_failures: true, expect_failures: true)
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT})
         end
       end
@@ -93,11 +93,11 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'applies' do
-        apply_manifest(pp5, catch_failures: true)
+        apply_manifest(pp5, catch_failures: true, expect_failures: true)
       end
 
       it 'does not contain the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT})
         end
       end
@@ -143,11 +143,11 @@ describe 'firewall basics', docker: true do
             isfragment => false,
           }
         PUPPETCODE
-        apply_manifest(pp, catch_failures: true)
-        apply_manifest(pp, catch_changes: do_catch_changes)
+        apply_manifest(pp, catch_failures: true, expect_failures: true)
+        apply_manifest(pp, catch_changes: true, expect_failures: true)
       end
 
-      let(:result) { shell('iptables-save') }
+      let(:result) { run_shell('iptables-save') }
 
       it 'when unset' do
         expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "803 - test"})
@@ -159,6 +159,7 @@ describe 'firewall basics', docker: true do
         expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "805 - test"})
       end
     end
+
     describe 'editing a rule and current value is false' do
       before(:all) do
         pp_idempotent = <<-PUPPETCODE
@@ -189,18 +190,18 @@ describe 'firewall basics', docker: true do
           }
         PUPPETCODE
 
-        shell('iptables -A INPUT -p tcp -m comment --comment "806 - test"')
-        shell('iptables -A INPUT -p tcp -m comment --comment "807 - test"')
-        shell('iptables -A INPUT -p tcp -f -m comment --comment "808 - test"')
-        shell('iptables -A INPUT -p tcp -f -m comment --comment "809 - test"')
+        run_shell('iptables -A INPUT -p tcp -m comment --comment "806 - test"')
+        run_shell('iptables -A INPUT -p tcp -m comment --comment "807 - test"')
+        run_shell('iptables -A INPUT -p tcp -f -m comment --comment "808 - test"')
+        run_shell('iptables -A INPUT -p tcp -f -m comment --comment "809 - test"')
 
-        apply_manifest(pp_idempotent, catch_failures: true)
-        apply_manifest(pp_idempotent, catch_changes: do_catch_changes)
+        apply_manifest(pp_idempotent, catch_failures: true, expect_failures: true)
+        apply_manifest(pp_idempotent, catch_changes: true, expect_failures: true)
 
-        apply_manifest(pp_does_not_change, catch_changes: do_catch_changes)
+        apply_manifest(pp_does_not_change, catch_changes: true, expect_failures: true)
       end
 
-      let(:result) { shell('iptables-save') }
+      let(:result) { run_shell('iptables-save') }
 
       it 'when unset or false' do
         expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "806 - test"})
@@ -233,10 +234,10 @@ describe 'firewall basics', docker: true do
   #           }
   #     PUPPETCODE
   #     it "changes the value to #{value}" do
-  #       apply_manifest(pp1, catch_failures: true)
-  #       apply_manifest(pp1, catch_changes: do_catch_changes)
+  #       apply_manifest(pp1, catch_failures: true, expect_failures: true)
+  #       apply_manifest(pp1, catch_changes: true, expect_failures: true)
 
-  #       shell('iptables-save') do |r|
+  #       run_shell('iptables-save') do |r|
   #         expect(r.stdout).to match(%r{#{line_match}})
   #       end
   #     end
@@ -252,9 +253,9 @@ describe 'firewall basics', docker: true do
   #           }
   #     PUPPETCODE
   #     it "doesn't change the value to #{value}" do
-  #       apply_manifest(pp2, catch_changes: do_catch_changes)
+  #       apply_manifest(pp2, catch_changes: true, expect_failures: true)
 
-  #       shell('iptables-save') do |r|
+  #       run_shell('iptables-save') do |r|
   #         expect(r.stdout).to match(%r{#{line_match}})
   #       end
   #     end
@@ -285,14 +286,14 @@ describe 'firewall basics', docker: true do
   #     context 'when unset or false' do
   #       before :each do
   #         iptables_flush_all_tables
-  #         shell('iptables -A INPUT -p tcp -m comment --comment "597 - test"')
+  #         run_shell('iptables -A INPUT -p tcp -m comment --comment "597 - test"')
   #       end
   #       it_behaves_like "doesn't change", 'isfragment => false,', %r{-A INPUT -p tcp -m comment --comment "597 - test"}
   #     end
   #     context 'when unset or false and current value is true' do
   #       before :each do
   #         iptables_flush_all_tables
-  #         shell('iptables -A INPUT -p tcp -m comment --comment "597 - test"')
+  #         run_shell('iptables -A INPUT -p tcp -m comment --comment "597 - test"')
   #       end
   #       it_behaves_like 'is idempotent', 'isfragment => true,', %r{-A INPUT -p tcp -f -m comment --comment "597 - test"}
   #     end
@@ -300,14 +301,14 @@ describe 'firewall basics', docker: true do
   #     context 'when set to true and current value is false' do
   #       before :each do
   #         iptables_flush_all_tables
-  #         shell('iptables -A INPUT -p tcp -f -m comment --comment "597 - test"')
+  #         run_shell('iptables -A INPUT -p tcp -f -m comment --comment "597 - test"')
   #       end
   #       it_behaves_like 'is idempotent', 'isfragment => false,', %r{-A INPUT -p tcp -m comment --comment "597 - test"}
   #     end
   #     context 'when set to trueand current value is true' do
   #       before :each do
   #         iptables_flush_all_tables
-  #         shell('iptables -A INPUT -p tcp -f -m comment --comment "597 - test"')
+  #         run_shell('iptables -A INPUT -p tcp -f -m comment --comment "597 - test"')
   #       end
   #       it_behaves_like "doesn't change", 'isfragment => true,', %r{-A INPUT -p tcp -f -m comment --comment "597 - test"}
   #     end
@@ -326,10 +327,10 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'applies' do
-        apply_manifest(pp88, catch_failures: true)
+        apply_manifest(pp88, catch_failures: true, expect_failures: true)
       end
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           if os[:family] == 'redhat' && os[:release].start_with?('5')
             expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})
           else
@@ -356,18 +357,19 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'nflog', unless: fact('iptables_version') < '1.3.7' do
+
+  describe 'nflog', unless: get_iptables_version < '1.3.7' do
     describe 'nflog_group' do
       it 'applies' do
         pp2 = <<-PUPPETCODE
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_group => 3}
         PUPPETCODE
-        apply_manifest(pp2, catch_failures: true)
+        apply_manifest(pp2, catch_failures: true, expect_failures: true)
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-group 3})
         end
       end
@@ -379,11 +381,11 @@ describe 'firewall basics', docker: true do
         class {'::firewall': }
         firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_prefix => 'TEST PREFIX'}
         PUPPETCODE
-        apply_manifest(pp3, catch_failures: true)
+        apply_manifest(pp3, catch_failures: true, expect_failures: true)
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-prefix +"TEST PREFIX"})
         end
       end
@@ -395,11 +397,11 @@ describe 'firewall basics', docker: true do
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_range => 16}
         PUPPETCODE
-        apply_manifest(pp4, catch_failures: true)
+        apply_manifest(pp4, catch_failures: true, expect_failures: true)
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-range 16})
         end
       end
@@ -411,11 +413,11 @@ describe 'firewall basics', docker: true do
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_threshold => 2}
         PUPPETCODE
-        apply_manifest(pp5, catch_failures: true)
+        apply_manifest(pp5, catch_failures: true, expect_failures: true)
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-threshold 2})
         end
       end
@@ -427,18 +429,18 @@ describe 'firewall basics', docker: true do
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_threshold => 2, nflog_group => 3}
         PUPPETCODE
-        apply_manifest(pp6, catch_failures: true)
+        apply_manifest(pp6, catch_failures: true, expect_failures: true)
       end
 
       it 'contains the rules' do
-        shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{NFLOG --nflog-group 2 --nflog-threshold 3})
+        run_shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{NFLOG --nflog-group 3 --nflog-threshold 2})
         end
       end
     end
   end
 
-  describe 'nflog on older OSes', if: fact('iptables_version') < '1.3.7' do
+  describe 'nflog on older OSes' do
     pp1 = <<-PUPPETCODE
         class {'::firewall': }
         firewall { '503 - test':
@@ -448,7 +450,8 @@ describe 'firewall basics', docker: true do
         }
     PUPPETCODE
     it 'throws an error' do
-      apply_manifest(pp1, acceptable_error_codes: [0])
+      res = apply_manifest(pp1, expect_failures: true)
+      expect(res[:exit_code]).to eql(0)
     end
   end
 
@@ -469,7 +472,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 9999562-563 -m comment --comment "562 - test" -j ACCEPT})
         end
       end
@@ -486,8 +489,8 @@ describe 'firewall basics', docker: true do
       before(:all) do
         iptables_flush_all_tables
 
-        shell('iptables -A INPUT -s 1.2.1.2')
-        shell('iptables -A INPUT -s 1.2.1.2')
+        run_shell('iptables -A INPUT -s 1.2.1.2')
+        run_shell('iptables -A INPUT -s 1.2.1.2')
       end
 
       pp1 = <<-PUPPETCODE
@@ -501,7 +504,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'saves' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{1\.2\.1\.2})
           expect(r.stderr).to eq('')
         end
@@ -515,9 +518,9 @@ describe 'firewall basics', docker: true do
       before(:each) do
         iptables_flush_all_tables
 
-        shell('iptables -A INPUT -p tcp -s 1.2.1.1')
-        shell('iptables -A INPUT -p udp -s 1.2.1.1')
-        shell('iptables -A OUTPUT -s 1.2.1.2 -m comment --comment "010 output-1.2.1.2"')
+        run_shell('iptables -A INPUT -p tcp -s 1.2.1.1')
+        run_shell('iptables -A INPUT -p udp -s 1.2.1.1')
+        run_shell('iptables -A OUTPUT -s 1.2.1.2 -m comment --comment "010 output-1.2.1.2"')
       end
 
       pp2 = <<-PUPPETCODE
@@ -529,7 +532,7 @@ describe 'firewall basics', docker: true do
       it 'purges only the specified chain' do
         apply_manifest(pp2, expect_changes: true)
 
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{010 output-1\.2\.1\.2})
           expect(r.stdout).not_to match(%r{1\.2\.1\.1})
           expect(r.stderr).to eq('')
@@ -549,7 +552,7 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'ignores managed rules' do
-        apply_manifest(pp3, catch_changes: do_catch_changes)
+        apply_manifest(pp3, catch_changes: true, expect_failures: true)
       end
 
       pp4 = <<-PUPPETCODE
@@ -562,7 +565,7 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'ignores specified rules' do
-        apply_manifest(pp4, catch_changes: do_catch_changes)
+        apply_manifest(pp4, catch_changes: true, expect_failures: true)
       end
 
       pp5 = <<-PUPPETCODE
@@ -597,15 +600,15 @@ describe 'firewall basics', docker: true do
       it 'adds managed rules with ignored rules' do
         apply_manifest(pp5, catch_failures: true)
 
-        expect(shell('iptables-save').stdout).to match(%r{-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp})
+        expect(run_shell('iptables-save').stdout).to match(%r{-A INPUT -s 1\.2\.1\.1(\/32)? -p tcp\s?\n-A INPUT -s 1\.2\.1\.1(\/32)? -p udp})
       end
     end
   end
 
   describe 'reset' do
     it 'deletes all rules' do
-      shell('ip6tables --flush')
-      shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
+      run_shell('ip6tables --flush')
+      run_shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
     end
   end
 
@@ -626,7 +629,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'contains the rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --sports 9999560-561 -m comment --comment "560 - test" -j ACCEPT})
         end
       end
@@ -655,17 +658,17 @@ describe 'firewall basics', docker: true do
       end
 
       it 'adds a unmanaged rule without a comment' do
-        shell('iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 102 -j ACCEPT')
-        expect(shell('iptables-save').stdout).to match(%r{-A INPUT -s 8\.0\.0\.3(\/32)? -p tcp -m multiport --ports 102 -j ACCEPT})
+        run_shell('iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 102 -j ACCEPT')
+        expect(run_shell('iptables-save').stdout).to match(%r{-A INPUT -s 8\.0\.0\.3(\/32)? -p tcp -m multiport --ports 102 -j ACCEPT})
       end
 
       it 'contains the changable 8.0.0.1 rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.1(\/32)? -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT})
         end
       end
       it 'contains the static 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample : The values being matched differ
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT})
         end
       end
@@ -680,22 +683,22 @@ describe 'firewall basics', docker: true do
             }
       PUPPETCODE
       it 'changes to 8.0.0.4 second' do
-        expect(apply_manifest(pp2, catch_failures: true).stdout)
+        expect(apply_manifest(pp2, catch_failures: true, expect_failures: true).stdout)
           .to match(%r{Notice: \/Stage\[main\]\/Main\/Firewall\[101 test source changes\]\/source: source changed '8\.0\.0\.1\/32' to '8\.0\.0\.4\/32'})
       end
 
       it 'does not contain the old changing 8.0.0.1 rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{8\.0\.0\.1})
         end
       end
       it 'contains the staic 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample : The values being matched differ
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT})
         end
       end
       it 'contains the changing new 8.0.0.4 rule' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.4(\/32)? -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT})
         end
       end
@@ -718,7 +721,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "613 - test" -j ACCEPT})
           end
         end
@@ -740,7 +743,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'does not contain the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "614 - test" -j ACCEPT})
           end
         end
@@ -762,7 +765,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'does not contain the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype --#{type.tr('_', '-')} LOCAL -m comment --comment "615 - test" -j ACCEPT})
           end
         end
@@ -782,7 +785,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
           end
         end
@@ -804,7 +807,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'does not contain the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
           end
         end
@@ -825,7 +828,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "617 - test" -j ACCEPT})
           end
         end
@@ -848,7 +851,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'does not contain the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m addrtype\s.*\sLOCAL --limit-iface-in -m comment --comment "618 - test" -j ACCEPT})
           end
         end
@@ -871,7 +874,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'contains the rule' do
-        shell('iptables-save -t mangle') do |r|
+        run_shell('iptables-save -t mangle') do |r|
           expect(r.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "566 - test" -j ACCEPT})
         end
       end
@@ -891,7 +894,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'does not contain the rule' do
-        shell('iptables-save -t nat') do |r|
+        run_shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m comment --comment "566 - test2" -j ACCEPT})
         end
       end
@@ -916,7 +919,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'contains the rule' do
-        shell('iptables-save -t nat') do |r|
+        run_shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(%r{-A PREROUTING -s 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - test" -j NETMAP --to 192.168.1.1})
         end
       end
@@ -924,8 +927,8 @@ describe 'firewall basics', docker: true do
 
     describe 'reset' do
       it 'deletes all rules' do
-        shell('ip6tables --flush')
-        shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
+        run_shell('ip6tables --flush')
+        run_shell('iptables --flush; iptables -t nat --flush; iptables -t mangle --flush')
       end
     end
 
@@ -946,7 +949,7 @@ describe 'firewall basics', docker: true do
       end
 
       it 'contains the rule' do
-        shell('iptables-save -t nat') do |r|
+        run_shell('iptables-save -t nat') do |r|
           expect(r.stdout).to match(%r{-A POSTROUTING -d 200.200.200.200(\/32)? -p tcp -m comment --comment "569 - test" -j NETMAP --to 192.168.1.1})
         end
       end
@@ -970,7 +973,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A INPUT -p tcp -m ipvs --ipvs -m comment --comment "1002 - set ipvs" -j ACCEPT})
           end
         end
@@ -995,7 +998,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save -t mangle') do |r|
+          run_shell('iptables-save -t mangle') do |r|
             expect(r.stdout).to match(%r{-A PREROUTING -m comment --comment "810 - tee_gateway" -j TEE --gateway 10.0.0.2})
           end
         end
@@ -1024,11 +1027,11 @@ describe 'firewall basics', docker: true do
         PUPPETCODE
         it 'applies' do
           apply_manifest(pp1, catch_failures: true)
-          apply_manifest(pp1, catch_changes: do_catch_changes)
+          apply_manifest(pp1, catch_changes: true)
         end
 
         it 'contains the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).to match(
               %r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT}, # rubocop:disable Metrics/LineLength
             )
@@ -1059,7 +1062,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save -t mangle') do |r|
+          run_shell('iptables-save -t mangle') do |r|
             expect(r.stdout).to match(%r{-A POSTROUTING -o virbr0 -p udp -m multiport --dports 68 -m comment --comment "576 - test" -j CHECKSUM --checksum-fill})
           end
         end
@@ -1086,7 +1089,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save -t nat') do |r|
+          run_shell('iptables-save -t nat') do |r|
             expect(r.stdout).to match(%r{-A PREROUTING -p tcp -m multiport --ports 585 -m socket -m comment --comment "585 - test" -j ACCEPT})
           end
         end
@@ -1110,7 +1113,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save -t nat') do |r|
+          run_shell('iptables-save -t nat') do |r|
             expect(r.stdout).to match(%r{-A PREROUTING -p tcp -m multiport --ports 586 -m comment --comment "586 - test" -j ACCEPT})
           end
         end
@@ -1128,10 +1131,10 @@ describe 'firewall basics', docker: true do
               }
         PUPPETCODE
         it "changes the value to #{value}" do
-          apply_manifest(pp1, catch_failures: true)
+          apply_manifest(pp1, catch_failures: true, )
           apply_manifest(pp1, catch_changes: true)
 
-          shell('iptables-save -t raw') do |r|
+          run_shell('iptables-save -t raw') do |r|
             expect(r.stdout).to match(%r{#{line_match}})
           end
         end
@@ -1151,7 +1154,7 @@ describe 'firewall basics', docker: true do
         it "doesn't change the value to #{value}" do
           apply_manifest(pp2, catch_changes: true)
 
-          shell('iptables-save -t raw') do |r|
+          run_shell('iptables-save -t raw') do |r|
             expect(r.stdout).to match(%r{#{line_match}})
           end
         end
@@ -1182,28 +1185,28 @@ describe 'firewall basics', docker: true do
         context 'when unset or false and current value is false' do
           before :each do
             iptables_flush_all_tables
-            shell('iptables -t raw -A PREROUTING -p tcp -m comment --comment "598 - test"')
+            run_shell('iptables -t raw -A PREROUTING -p tcp -m comment --comment "598 - test"')
           end
           it_behaves_like "doesn't change", 'socket => false,', %r{-A PREROUTING -p tcp -m comment --comment "598 - test"}
         end
         context 'when unset or false and current value is true' do
           before :each do
             iptables_flush_all_tables
-            shell('iptables -t raw -A PREROUTING -p tcp -m comment --comment "598 - test"')
+            run_shell('iptables -t raw -A PREROUTING -p tcp -m comment --comment "598 - test"')
           end
           it_behaves_like 'is idempotent', 'socket => true,', %r{-A PREROUTING -p tcp -m socket -m comment --comment "598 - test"}
         end
         context 'when set to true and current value is false' do
           before :each do
             iptables_flush_all_tables
-            shell('iptables -t raw -A PREROUTING -p tcp -m socket -m comment --comment "598 - test"')
+            run_shell('iptables -t raw -A PREROUTING -p tcp -m socket -m comment --comment "598 - test"')
           end
           it_behaves_like 'is idempotent', 'socket => false,', %r{-A PREROUTING -p tcp -m comment --comment "598 - test"}
         end
         context 'when set to true and current value is true' do
           before :each do
             iptables_flush_all_tables
-            shell('iptables -t raw -A PREROUTING -p tcp -m socket -m comment --comment "598 - test"')
+            run_shell('iptables -t raw -A PREROUTING -p tcp -m socket -m comment --comment "598 - test"')
           end
           it_behaves_like "doesn't change", 'socket => true,', %r{-A PREROUTING -p tcp -m socket -m comment --comment "598 - test"}
         end
@@ -1228,7 +1231,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save') do |r|
+          run_shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
           end
         end
@@ -1255,7 +1258,7 @@ describe 'firewall basics', docker: true do
         end
 
         it 'contains the rule' do
-          shell('iptables-save -t mangle') do |r|
+          run_shell('iptables-save -t mangle') do |r|
             expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 580 -m comment --comment "580 - test" -j MARK --set-xmark 0x3e8\/0xffffffff})
           end
         end
@@ -1276,12 +1279,12 @@ describe 'firewall basics', docker: true do
             }
         PUPPETCODE
         it 'applies' do
-          apply_manifest(pp40, catch_failures: true)
-          apply_manifest(pp40, catch_changes: do_catch_changes)
+          apply_manifest(pp40, catch_failures: true, expect_failures: true)
+          apply_manifest(pp40, catch_changes: true, expect_failures: true)
         end
 
         it 'contains the rule' do
-          shell('iptables-save -t nat') do |r|
+          run_shell('iptables-save -t nat') do |r|
             expect(r.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - random" -j MASQUERADE --random})
           end
         end
@@ -1312,11 +1315,11 @@ describe 'firewall basics', docker: true do
           action                  => accept,
         }
       PUPPETCODE
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: do_catch_changes)
+      apply_manifest(pp, catch_failures: true, expect_failures: true)
+      apply_manifest(pp, catch_changes: true, expect_failures: true)
     end
 
-    let(:result) { shell('iptables-save') }
+    let(:result) { run_shell('iptables-save') }
 
     it 'hashlimit_above is set' do
       regex_array = [%r{-A INPUT}, %r{-p tcp}, %r{--hashlimit-above 526\/sec}, %r{--hashlimit-mode srcip,dstip}, %r{--hashlimit-name above}, %r{--hashlimit-htable-gcinterval 10}, %r{-j ACCEPT}]

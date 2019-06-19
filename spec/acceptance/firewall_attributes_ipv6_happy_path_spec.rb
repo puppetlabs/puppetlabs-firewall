@@ -262,10 +262,10 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           provider => 'ip6tables',
         }
       PUPPETCODE
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: do_catch_changes)
+      apply_manifest(pp, catch_failures: true, expect_failures: true)
+      apply_manifest(pp, catch_changes: true, expect_failures: true)
     end
-    let(:result) { shell('ip6tables-save') }
+    let(:result) { run_shell('ip6tables-save') }
 
     it 'hop_limit is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 571 -m hl --hl-eq 5 -m comment --comment "571 - hop_limit" -j ACCEPT})

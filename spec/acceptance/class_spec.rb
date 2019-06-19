@@ -5,10 +5,8 @@ describe 'firewall class' do
     pp = "class { 'firewall': }"
 
     # Run it twice and test for idempotency
-    apply_manifest(pp, catch_failures: true)
-    if do_catch_changes
-      expect(apply_manifest(pp, catch_failures: true).exit_code).to be_zero
-    end
+    apply_manifest(pp, catch_failures: true, expect_failures: true)
+    expect(apply_manifest(pp, catch_failures: true, expect_failures: true).exit_code).to be_zero
   end
 
   it 'ensure => stopped:' do
@@ -16,9 +14,7 @@ describe 'firewall class' do
 
     # Run it twice and test for idempotency
     apply_manifest(pp, catch_failures: true)
-    if do_catch_changes
-      expect(apply_manifest(pp, catch_failures: true).exit_code).to be_zero
-    end
+    expect(apply_manifest(pp, catch_failures: true, expect_failures: true).exit_code).to be_zero
   end
 
   it 'ensure => running:' do
@@ -26,8 +22,6 @@ describe 'firewall class' do
 
     # Run it twice and test for idempotency
     apply_manifest(pp, catch_failures: true)
-    if do_catch_changes
-      expect(apply_manifest(pp, catch_failures: true).exit_code).to be_zero
-    end
+    expect(apply_manifest(pp, catch_failures: true, expect_failures: true).exit_code).to be_zero
   end
 end
