@@ -34,6 +34,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :string_matching
   has_feature :queue_num
   has_feature :queue_bypass
+  has_feature :ct_target
 
   optional_commands(ip6tables: 'ip6tables',
                     ip6tables_save: 'ip6tables-save')
@@ -164,6 +165,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     hashlimit_htable_expire: '--hashlimit-htable-expire',
     hashlimit_htable_gcinterval: '--hashlimit-htable-gcinterval',
     bytecode: '-m bpf --bytecode',
+    zone: '--zone',
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -258,5 +260,5 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
                     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
                     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-                    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :name]
+                    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :name]
 end
