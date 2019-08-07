@@ -607,7 +607,7 @@ Puppet::Type.newtype(:firewall) do
 
       But any valid chain name is allowed.
 
-      For the values ACCEPT, DROP and REJECT you must use the generic
+      For the values ACCEPT, DROP, and REJECT, you must use the generic
       'action' parameter. This is to enfore the use of generic parameters where
       possible for maximum cross-platform modelling.
 
@@ -727,7 +727,7 @@ Puppet::Type.newtype(:firewall) do
   # Reject ICMP type
   newproperty(:reject, required_features: :reject_type) do
     desc <<-PUPPETCODE
-      When combined with jump => "REJECT" you can specify a different icmp
+      When combined with action => "REJECT" you can specify a different icmp
       response to be sent back to the packet sender.
     PUPPETCODE
   end
