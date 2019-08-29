@@ -349,13 +349,6 @@ describe 'firewall attribute testing, happy path' do
             chain          => 'OUTPUT',
             table          => 'mangle',
           }
-          firewall { '1100 - ct_target tests - zone':
-            proto => 'all',
-            zone  => '4000',
-            jump  => 'CT',
-            chain => 'PREROUTING',
-            table => 'raw',
-          }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -509,6 +502,25 @@ describe 'firewall attribute testing, happy path' do
     it 'jump is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - jump" -j TEST})
     end
+  end
+
+  describe 'test attributes which are not available on rh5/6', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) do
+    before(:all) do
+      pp = <<-PUPPETCODE
+          firewall { '1100 - ct_target tests - zone':
+            proto => 'all',
+            zone  => '4000',
+            jump  => 'CT',
+            chain => 'PREROUTING',
+            table => 'raw',
+          }
+      PUPPETCODE
+      apply_manifest(pp, catch_failures: true)
+      apply_manifest(pp, catch_changes: do_catch_changes)
+    end
+
+    let(:result) { shell('iptables-save') }
+
     it 'zone is set' do
       expect(result.stdout).to match(%r{-A PREROUTING -m comment --comment "1100 - ct_target tests - zone" -j CT --zone 4000})
     end
