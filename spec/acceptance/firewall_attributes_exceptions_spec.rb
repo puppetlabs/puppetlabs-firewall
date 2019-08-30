@@ -357,8 +357,7 @@ describe 'firewall basics', docker: true do
     end
   end
 
-
-  describe 'nflog', unless: get_iptables_version < '1.3.7' do
+  describe 'nflog', unless: iptables_version < '1.3.7' do
     describe 'nflog_group' do
       it 'applies' do
         pp2 = <<-PUPPETCODE
@@ -451,7 +450,7 @@ describe 'firewall basics', docker: true do
     PUPPETCODE
     it 'throws an error' do
       res = apply_manifest(pp1, expect_failures: true)
-      expect(res[:exit_code]).to eql(0)
+      expect(res[:exit_code]).to be(0)
     end
   end
 
@@ -1131,7 +1130,7 @@ describe 'firewall basics', docker: true do
               }
         PUPPETCODE
         it "changes the value to #{value}" do
-          apply_manifest(pp1, catch_failures: true, )
+          apply_manifest(pp1, catch_failures: true)
           apply_manifest(pp1, catch_changes: true)
 
           run_shell('iptables-save -t raw') do |r|

@@ -10,7 +10,7 @@ def ip6tables_flush_all_tables
   end
 end
 
-def get_iptables_version
-  x=run_shell('iptables -V')
+def iptables_version
+  x = run_shell('iptables -V')
   x.stdout.split(' ')[1][1..-1]
 end
