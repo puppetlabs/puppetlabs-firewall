@@ -67,7 +67,7 @@ describe 'firewall basics', docker: true do
           firewall { '555 - test':
             ensure => present,
             proto  => tcp,
-            port   => '555',
+            dport   => '555',
             action => accept,
           }
       PUPPETCODE
@@ -77,7 +77,7 @@ describe 'firewall basics', docker: true do
 
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT})
+          expect(r.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 555 -m comment --comment "555 - test" -j ACCEPT})
         end
       end
     end
@@ -88,7 +88,7 @@ describe 'firewall basics', docker: true do
           firewall { '555 - test':
             ensure => absent,
             proto  => tcp,
-            port   => '555',
+            dport   => '555',
             action => accept,
           }
       PUPPETCODE
@@ -98,7 +98,7 @@ describe 'firewall basics', docker: true do
 
       it 'does not contain the rule' do
         run_shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 555 -m comment --comment "555 - test" -j ACCEPT})
+          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --dports 555 -m comment --comment "555 - test" -j ACCEPT})
         end
       end
     end
@@ -455,13 +455,13 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'port' do
-    context 'when invalid ports' do
+  describe 'dport' do
+    context 'when invalid dports' do
       pp25 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '562 - test':
             proto  => tcp,
-            port  => '9999562-563',
+            dport  => '9999562-563',
             action => accept,
           }
       PUPPETCODE
@@ -473,7 +473,7 @@ describe 'firewall basics', docker: true do
 
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 9999562-563 -m comment --comment "562 - test" -j ACCEPT})
+          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --dports 9999562-563 -m comment --comment "562 - test" -j ACCEPT})
         end
       end
     end
@@ -642,13 +642,13 @@ describe 'firewall basics', docker: true do
             class { '::firewall': }
             firewall { '101 test source changes':
               proto  => tcp,
-              port   => '101',
+              dport   => '101',
               action => accept,
               source => '8.0.0.1',
             }
             firewall { '100 test source static':
               proto  => tcp,
-              port   => '100',
+              dport   => '100',
               action => accept,
               source => '8.0.0.2',
             }
@@ -658,18 +658,18 @@ describe 'firewall basics', docker: true do
       end
 
       it 'adds a unmanaged rule without a comment' do
-        run_shell('iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --ports 102 -j ACCEPT')
-        expect(run_shell('iptables-save').stdout).to match(%r{-A INPUT -s 8\.0\.0\.3(\/32)? -p tcp -m multiport --ports 102 -j ACCEPT})
+        run_shell('iptables -A INPUT -t filter -s 8.0.0.3/32 -p tcp -m multiport --dports 102 -j ACCEPT')
+        expect(run_shell('iptables-save').stdout).to match(%r{-A INPUT -s 8\.0\.0\.3(\/32)? -p tcp -m multiport --dports 102 -j ACCEPT})
       end
 
       it 'contains the changable 8.0.0.1 rule' do
         run_shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.1(\/32)? -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT})
+          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.1(\/32)? -p tcp -m multiport --dports 101 -m comment --comment "101 test source changes" -j ACCEPT})
         end
       end
       it 'contains the static 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample : The values being matched differ
         run_shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT})
+          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --dports 100 -m comment --comment "100 test source static" -j ACCEPT})
         end
       end
 
@@ -677,7 +677,7 @@ describe 'firewall basics', docker: true do
             class { '::firewall': }
             firewall { '101 test source changes':
               proto  => tcp,
-              port   => '101',
+              dport   => '101',
               action => accept,
               source => '8.0.0.4',
             }
@@ -694,12 +694,12 @@ describe 'firewall basics', docker: true do
       end
       it 'contains the staic 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample : The values being matched differ
         run_shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --ports 100 -m comment --comment "100 test source static" -j ACCEPT})
+          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(\/32)? -p tcp -m multiport --dports 100 -m comment --comment "100 test source static" -j ACCEPT})
         end
       end
       it 'contains the changing new 8.0.0.4 rule' do
         run_shell('iptables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.4(\/32)? -p tcp -m multiport --ports 101 -m comment --comment "101 test source changes" -j ACCEPT})
+          expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.4(\/32)? -p tcp -m multiport --dports 101 -m comment --comment "101 test source changes" -j ACCEPT})
         end
       end
     end
@@ -1077,7 +1077,7 @@ describe 'firewall basics', docker: true do
             firewall { '585 - test':
               ensure => present,
               proto => tcp,
-              port   => '585',
+              dport   => '585',
               action => accept,
               chain  => 'PREROUTING',
               table  => 'nat',
@@ -1090,7 +1090,7 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           run_shell('iptables-save -t nat') do |r|
-            expect(r.stdout).to match(%r{-A PREROUTING -p tcp -m multiport --ports 585 -m socket -m comment --comment "585 - test" -j ACCEPT})
+            expect(r.stdout).to match(%r{-A PREROUTING -p tcp -m multiport --dports 585 -m socket -m comment --comment "585 - test" -j ACCEPT})
           end
         end
       end
@@ -1101,7 +1101,7 @@ describe 'firewall basics', docker: true do
             firewall { '586 - test':
               ensure => present,
               proto => tcp,
-              port   => '586',
+              dport   => '586',
               action => accept,
               chain  => 'PREROUTING',
               table  => 'nat',
@@ -1114,7 +1114,7 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           run_shell('iptables-save -t nat') do |r|
-            expect(r.stdout).to match(%r{-A PREROUTING -p tcp -m multiport --ports 586 -m comment --comment "586 - test" -j ACCEPT})
+            expect(r.stdout).to match(%r{-A PREROUTING -p tcp -m multiport --dports 586 -m comment --comment "586 - test" -j ACCEPT})
           end
         end
       end
@@ -1247,7 +1247,7 @@ describe 'firewall basics', docker: true do
               ensure => present,
               chain => 'OUTPUT',
               proto => tcp,
-              port   => '580',
+              dport   => '580',
               jump => 'MARK',
               table => 'mangle',
               set_mark => '0x3e8/0xffffffff',
@@ -1259,7 +1259,7 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           run_shell('iptables-save -t mangle') do |r|
-            expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 580 -m comment --comment "580 - test" -j MARK --set-xmark 0x3e8\/0xffffffff})
+            expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 580 -m comment --comment "580 - test" -j MARK --set-xmark 0x3e8\/0xffffffff})
           end
         end
       end
