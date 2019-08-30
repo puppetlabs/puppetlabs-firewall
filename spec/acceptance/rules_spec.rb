@@ -240,9 +240,8 @@ describe 'rules spec' do
     PUPPETCODE
     it 'applies cleanly' do
       # Run it twice and test for idempotency
-      r = apply_manifest(pp2, catch_failures: true, expect_failures: true)
-
-      r=apply_manifest(pp2, catch_changes: true, expect_failures: true)
+      apply_manifest(pp2, catch_failures: true, expect_failures: true)
+      apply_manifest(pp2, catch_changes: true, expect_failures: true)
     end
 
     regex_values = [
