@@ -13,7 +13,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           class { '::firewall': }
           firewall { '602 - test':
             proto     => tcp,
-            port      => '602',
+            dport      => '602',
             action    => accept,
             provider  => 'ip6tables',
             dst_range => '2001::db8::1-2001:db8::ff',
@@ -113,7 +113,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             firewall { '571 - test':
               ensure => present,
               proto => tcp,
-              port   => '571',
+              dport   => '571',
               action => accept,
               hop_limit => 'invalid',
               provider => 'ip6tables',
@@ -127,7 +127,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
 
         it 'does not contain the rule' do
           run_shell('ip6tables-save') do |r|
-            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --ports 571 -m comment --comment "571 - test" -m hl --hl-eq invalid -j ACCEPT})
+            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --dports 571 -m comment --comment "571 - test" -m hl --hl-eq invalid -j ACCEPT})
           end
         end
       end
@@ -194,7 +194,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           class { '::firewall': }
           firewall { '601 - test':
             proto     => tcp,
-            port      => '601',
+            dport      => '601',
             action    => accept,
             provider  => 'ip6tables',
             src_range => '2001::db8::1-2001:db8::ff',
@@ -208,7 +208,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
 
         it 'does not contain the rule' do
           run_shell('ip6tables-save') do |r|
-            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --src-range 2001::db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - test" -j ACCEPT})
+            expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m iprange --src-range 2001::db8::1-2001:db8::ff -m multiport --dports 601 -m comment --comment "601 - test" -j ACCEPT})
           end
         end
       end
@@ -258,7 +258,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '701',
+          dport   => '701',
           action => accept,
           physdev_in => 'eth0',
         }
@@ -266,7 +266,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '702',
+          dport   => '702',
           action => accept,
           physdev_out => 'eth1',
         }
@@ -274,7 +274,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '703',
+          dport   => '703',
           action => accept,
           physdev_in => 'eth0',
           physdev_out => 'eth1',
@@ -283,7 +283,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '704',
+          dport   => '704',
           action => accept,
           physdev_is_bridged => true,
         }
@@ -291,7 +291,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '705',
+          dport   => '705',
           action => accept,
           physdev_in => 'eth0',
           physdev_is_bridged => true,
@@ -300,7 +300,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '706',
+          dport   => '706',
           action => accept,
           physdev_out => 'eth1',
           physdev_is_bridged => true,
@@ -309,7 +309,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '707',
+          dport   => '707',
           action => accept,
           physdev_in => 'eth0',
           physdev_out => 'eth1',
@@ -319,7 +319,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '708',
+          dport   => '708',
           action => accept,
           physdev_is_in => true,
         }
@@ -327,7 +327,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           provider => 'ip6tables',
           chain => 'FORWARD',
           proto  => tcp,
-          port   => '709',
+          dport   => '709',
           action => accept,
           physdev_is_out => true,
         }
@@ -335,7 +335,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             proto     => 'tcp',
             jump      => 'DSCP',
             set_dscp  => '0x01',
-            port      => '997',
+            dport      => '997',
             chain     => 'OUTPUT',
             table     => 'mangle',
             provider  => 'ip6tables',
@@ -343,7 +343,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
         firewall { '1003 EF - set_dscp_class':
             proto          => 'tcp',
             jump           => 'DSCP',
-            port           => '997',
+            dport           => '997',
             set_dscp_class => 'EF',
             chain          => 'OUTPUT',
             table          => 'mangle',
@@ -393,37 +393,37 @@ describe 'firewall ipv6 attribute testing, exceptions' do
     let(:result) { run_shell('ip6tables-save') }
 
     it 'physdev_in is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --ports 701 -m comment --comment "701 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --dports 701 -m comment --comment "701 - test" -j ACCEPT})
     end
     it 'physdev_out is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --ports 702 -m comment --comment "702 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --dports 702 -m comment --comment "702 - test" -j ACCEPT})
     end
     it 'physdev_in and physdev_out is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 -m multiport --ports 703 -m comment --comment "703 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 -m multiport --dports 703 -m comment --comment "703 - test" -j ACCEPT})
     end
     it 'physdev_is_bridged is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-bridged -m multiport --ports 704 -m comment --comment "704 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-bridged -m multiport --dports 704 -m comment --comment "704 - test" -j ACCEPT})
     end
     it 'physdev_in and physdev_is_bridged is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-is-bridged -m multiport --ports 705 -m comment --comment "705 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-is-bridged -m multiport --dports 705 -m comment --comment "705 - test" -j ACCEPT})
     end
     it 'physdev_out and physdev_is_bridged is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m multiport --ports 706 -m comment --comment "706 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m multiport --dports 706 -m comment --comment "706 - test" -j ACCEPT})
     end
     it 'physdev_in and physdev_out and physdev_is_bridged is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --ports 707 -m comment --comment "707 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --dports 707 -m comment --comment "707 - test" -j ACCEPT})
     end
     it 'physdev_is_in is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-in -m multiport --ports 708 -m comment --comment "708 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-in -m multiport --dports 708 -m comment --comment "708 - test" -j ACCEPT})
     end
     it 'physdev_is_out is set' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-out -m multiport --ports 709 -m comment --comment "709 - test" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-is-out -m multiport --dports 709 -m comment --comment "709 - test" -j ACCEPT})
     end
     it 'set_dscp is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1002 - set_dscp" -j DSCP --set-dscp 0x01})
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 997 -m comment --comment "1002 - set_dscp" -j DSCP --set-dscp 0x01})
     end
     it 'set_dscp_class is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 997 -m comment --comment "1003 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 997 -m comment --comment "1003 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
     end
     it 'set_mss and mss is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "502 - set_mss" -j TCPMSS --set-mss 1360})

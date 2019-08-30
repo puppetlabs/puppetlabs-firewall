@@ -29,7 +29,7 @@ describe 'rules spec' do
           destination => '!10.0.0.0/8',
           proto       => 'tcp',
           ctstate       => 'NEW',
-          port        => [80,443,21,20,22,53,123,43,873,25,465],
+          sport        => [80,443,21,20,22,53,123,43,873,25,465],
           action      => 'accept',
         }
         firewall { '100 forward standard allow udp':
@@ -37,7 +37,7 @@ describe 'rules spec' do
           source      => '10.0.0.0/8',
           destination => '!10.0.0.0/8',
           proto       => 'udp',
-          port        => [53,123],
+          sport        => [53,123],
           action      => 'accept',
         }
         firewall { '100 forward standard allow icmp':
@@ -88,7 +88,7 @@ describe 'rules spec' do
           chain   => 'PREROUTING',
           iniface => 'eth0',
           proto   => 'tcp',
-          dport   => '1',
+          sport   => '1',
           toports => '22',
           jump    => 'REDIRECT',
         }
@@ -101,8 +101,8 @@ describe 'rules spec' do
       %r{INPUT ACCEPT}, %r{FORWARD ACCEPT}, %r{OUTPUT ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) -d 10.0.0.0\/(8|255\.0\.0\.0) -m comment --comment \"090 forward allow local\" -j ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT},
-      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m conntrack --ctstate NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Metrics/LineLength
-      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --ports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT}
+      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --sports 80,443,21,20,22,53,123,43,873,25,465 -m conntrack --ctstate NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Metrics/LineLength
+      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --sports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT}
     ]
     it 'contains appropriate rules' do
       run_shell('iptables-save') do |r|
