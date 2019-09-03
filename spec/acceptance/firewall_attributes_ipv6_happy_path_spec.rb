@@ -261,14 +261,6 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           proto   => all,
           provider => 'ip6tables',
         }
-        firewall { '1101 - ct_target tests - zone':
-          proto    => 'all',
-          zone     => '4000',
-          jump     => 'CT',
-          chain    => 'PREROUTING',
-          table    => 'raw',
-          provider => 'ip6tables',
-        }
       PUPPETCODE
       apply_manifest(pp, catch_failures: true)
       apply_manifest(pp, catch_changes: do_catch_changes)
@@ -374,8 +366,28 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         expect(result.stdout).to match(regex)
       end
     end
+  end
+
+  describe 'test CT target attributes which are not available on some OS', unless:
+      (os[:family] == 'redhat' && (os[:release].start_with?('5', '6') || os[:name] == 'OracleLinux')) || (os[:family] == 'Suse') do
+    before(:all) do
+      pp = <<-PUPPETCODE
+          firewall { '1100 - ct_target tests - zone':
+            proto => 'all',
+            zone  => '4000',
+            jump  => 'CT',
+            chain => 'PREROUTING',
+            table => 'raw',
+          }
+      PUPPETCODE
+      apply_manifest(pp, catch_failures: true)
+      apply_manifest(pp, catch_changes: do_catch_changes)
+    end
+
+    let(:result) { shell('iptables-save') }
+
     it 'zone is set' do
-      expect(result.stdout).to match(%r{-A PREROUTING -m comment --comment "1101 - ct_target tests - zone" -j CT --zone 4000})
+      expect(result.stdout).to match(%r{-A PREROUTING -m comment --comment "1100 - ct_target tests - zone" -j CT --zone 4000})
     end
   end
 end
