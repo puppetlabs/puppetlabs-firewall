@@ -558,6 +558,13 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
   end
 
+  describe 'ct_target' do
+    it 'allows me to set zone' do
+      resource[:zone] = 4000
+      expect(resource[:zone]).to be 4000
+    end
+  end
+
   [:chain, :jump].each do |param|
     describe param do
       it 'autorequires fwchain when table and provider are undefined' do

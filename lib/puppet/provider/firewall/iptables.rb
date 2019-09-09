@@ -43,6 +43,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   has_feature :queue_num
   has_feature :queue_bypass
   has_feature :ipvs
+  has_feature :ct_target
 
   optional_commands(iptables: 'iptables',
                     iptables_save: 'iptables-save')
@@ -170,6 +171,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     hashlimit_htable_gcinterval: '--hashlimit-htable-gcinterval',
     bytecode: '-m bpf --bytecode',
     ipvs: '-m ipvs --ipvs',
+    zone: '--zone',
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -304,7 +306,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :name
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :name
   ]
 
   def insert

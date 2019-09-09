@@ -129,6 +129,8 @@ Puppet::Type.newtype(:firewall) do
       * bpf: The ability to use Berkeley Paket Filter rules.
 
       * ipvs: The ability to match IP Virtual Server packets.
+
+      * ct_target: The ability to set connection tracking parameters for a packet or its associated connection.
   PUPPETCODE
 
   feature :connection_limiting, 'Connection limiting features.'
@@ -173,7 +175,7 @@ Puppet::Type.newtype(:firewall) do
   feature :hashlimit, 'Hashlimit features'
   feature :bpf, 'Berkeley Paket Filter feature'
   feature :ipvs, 'Packet belongs to an IP Virtual Server connection'
-
+  feature :ct_target, 'The ability to set connection tracking parameters for a packet or its associated connection'
   # provider specific features
   feature :iptables, 'The provider provides iptables features.'
 
@@ -1857,6 +1859,12 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:true, :false)
   end
 
+  newproperty(:zone, required_features: :ct_target) do
+    desc <<-PUPPETCODE
+      Assign this packet to zone id and only have lookups done in that zone.
+    PUPPETCODE
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
@@ -2065,6 +2073,18 @@ Puppet::Type.newtype(:firewall) do
     if value(:hashlimit_name)
       unless value(:hashlimit_upto) || value(:hashlimit_above)
         raise 'Either hashlimit_upto or hashlimit_above are required'
+      end
+    end
+
+    if value(:zone)
+      unless value(:jump).to_s == 'CT'
+        raise 'Parameter zone requires jump => CT'
+      end
+    end
+
+    if value(:jump).to_s == 'CT'
+      unless value(:table).to_s =~ %r{raw}
+        raise 'Parameter jump => CT only applies to table => raw'
       end
     end
   end
