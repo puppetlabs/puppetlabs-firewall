@@ -6,6 +6,10 @@ describe 'rules spec' do
     before :all do
       iptables_flush_all_tables
       ip6tables_flush_all_tables
+      if (os[:family] == 'redhat')
+        run_shell("mkdir -p /lib/modules/`uname -r`")
+        run_shell("depmod -a")
+      end
     end
 
     after :all do

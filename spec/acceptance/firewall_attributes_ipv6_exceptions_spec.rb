@@ -470,6 +470,8 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
       PUPPETCODE
       it "doesn't change the values to #{values}" do
+
+
         apply_manifest(pp3, catch_changes: true, expect_failures: true)
 
         run_shell('ip6tables-save') do |r|
