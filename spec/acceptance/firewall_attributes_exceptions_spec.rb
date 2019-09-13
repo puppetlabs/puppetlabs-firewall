@@ -1,13 +1,12 @@
 require 'spec_helper_acceptance'
 
-
 describe 'firewall basics', docker: true do
   before :all do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
-    if (os[:family] == 'redhat')
-      run_shell("mkdir -p /lib/modules/`uname -r`")
-      run_shell("depmod -a")
+    if os[:family] == 'redhat'
+      run_shell('mkdir -p /lib/modules/`uname -r`')
+      run_shell('depmod -a')
     end
   end
 
@@ -1135,8 +1134,8 @@ describe 'firewall basics', docker: true do
               }
         PUPPETCODE
         it "changes the value to #{value}" do
-          apply_manifest(pp1, catch_failures: true)
-          apply_manifest(pp1, catch_changes: true)
+          # apply_manifest(pp1, catch_failures: true)
+          apply_manifest(pp1, expect_changes: true)
 
           run_shell('iptables-save -t raw') do |r|
             expect(r.stdout).to match(%r{#{line_match}})
@@ -1156,9 +1155,7 @@ describe 'firewall basics', docker: true do
               }
         PUPPETCODE
         it "doesn't change the value to #{value}" do
-
-
-          apply_manifest(pp2, catch_changes: true)
+          apply_manifest(pp2, expect_changes: true)
 
           run_shell('iptables-save -t raw') do |r|
             expect(r.stdout).to match(%r{#{line_match}})
@@ -1215,10 +1212,7 @@ describe 'firewall basics', docker: true do
             run_shell('iptables -t raw -A PREROUTING -p tcp -m socket -m comment --comment "598 - test"')
           end
 
-
           it_behaves_like "doesn't change", 'socket => true,', %r{-A PREROUTING -p tcp -m socket -m comment --comment "598 - test"}
-
-
         end
       end
     end
@@ -1226,7 +1220,6 @@ describe 'firewall basics', docker: true do
 
   # RHEL5 does not support --random
   unless os[:family] == 'redhat' && os[:release].start_with?('5')
-
 
     describe 'match_mark' do
       context 'when 0x1' do
@@ -1244,7 +1237,6 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           run_shell('iptables-save') do |r|
-
             expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
           end
         end
@@ -1272,8 +1264,6 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           run_shell('iptables-save -t mangle') do |r|
-
-
             expect(r.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 580 -m comment --comment "580 - test" -j MARK --set-xmark 0x3e8\/0xffffffff})
           end
         end
@@ -1300,8 +1290,6 @@ describe 'firewall basics', docker: true do
 
         it 'contains the rule' do
           run_shell('iptables-save -t nat') do |r|
-
-
             expect(r.stdout).to match(%r{-A POSTROUTING -s 172\.30\.0\.0\/16 -m comment --comment "570 - random" -j MASQUERADE --random})
           end
         end

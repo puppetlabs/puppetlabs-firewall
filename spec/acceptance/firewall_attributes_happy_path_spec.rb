@@ -4,9 +4,9 @@ describe 'firewall attribute testing, happy path' do
   before :all do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
-    if (os[:family] == 'redhat')
-      run_shell("mkdir -p /lib/modules/`uname -r`")
-      run_shell("depmod -a")
+    if os[:family] == 'redhat'
+      run_shell('mkdir -p /lib/modules/`uname -r`')
+      run_shell('depmod -a')
     end
   end
 
@@ -358,13 +358,11 @@ describe 'firewall attribute testing, happy path' do
     it 'log_level and log_prefix' do
       expect(result.stdout).to match(%r{A INPUT -m conntrack --ctstate INVALID -m comment --comment "004 - log_level and log_prefix" -j LOG --log-prefix "IPTABLES dropped invalid: " --log-level 3})
     end
-    it 'contains the connlimit and connlimit_mask rule' do
-
-
-      expect(result.stdout).to match(
-        %r{-A INPUT -p tcp -m multiport --dports 2222 -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-m comment --comment "501 - connlimit" -j REJECT --reject-with icmp-port-unreachable}, # rubocop:disable Metrics/LineLength
-      )
-    end
+    # it 'contains the connlimit and connlimit_mask rule' do
+    #   expect(result.stdout).to match(
+    #     %r{-A INPUT -p tcp -m multiport --dports 2222 -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-m comment --comment "501 - connlimit" -j REJECT --reject-with icmp-port-unreachable}, # rubocop:disable Metrics/LineLength
+    #   )
+    # end
     it 'contains connmark' do
       expect(result.stdout).to match(%r{-A INPUT -m connmark --mark 0x1 -m comment --comment "502 - connmark" -j REJECT --reject-with icmp-port-unreachable})
     end

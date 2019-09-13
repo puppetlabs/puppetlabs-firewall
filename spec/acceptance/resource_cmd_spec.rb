@@ -8,13 +8,17 @@ describe 'puppet resource firewall command' do
     # In order to properly check stderr for anomalies we need to fix the deprecation warnings from puppet.conf.
     config = run_shell('puppet config print config').stdout
     run_shell("sed -i -e \'s/^templatedir.*$//\' #{config}")
+    run_shell('echo export LC_ALL=C > ~/.bashrc')
+    run_shell('source ~/.bashrc')
   end
 
   context 'when make sure it returns no errors when executed on a clean machine' do
+    run_shell('locale')
     let(:result) { run_shell('puppet resource firewall') }
 
     it do
       # Don't check stdout, some boxes come with rules, that is normal
+      run_shell('locale')
       expect(result.exit_code).to be_zero
       expect(result.stderr).to be_empty
     end
