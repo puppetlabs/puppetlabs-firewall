@@ -6,7 +6,6 @@ describe 'firewall basics', docker: true do
     ip6tables_flush_all_tables
     if os[:family] == 'redhat'
       run_shell('mkdir -p /lib/modules/`uname -r`')
-      run_shell('depmod -a')
     end
   end
 
