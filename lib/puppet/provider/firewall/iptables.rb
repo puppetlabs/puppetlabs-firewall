@@ -616,6 +616,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       :source,
       :sport,
       :src_range,
+      :src_type,
       :state,
     ].each do |prop|
       if hash[prop] && hash[prop].is_a?(Array)

@@ -856,6 +856,28 @@ describe 'firewall basics', docker: true do
     end
   end
 
+  describe 'inverse src_type' do
+    context 'when inverse src_type rule', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
+      pp9 = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '619 - test':
+            proto   => tcp,
+            action  => accept,
+            src_type => '! LOCAL --limit-iface-in',
+          }
+      PUPPETCODE
+      it 'applies' do
+        apply_manifest(pp9, catch_failures: true)
+      end
+
+      it 'contains the rule' do
+        shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{-A INPUT -p tcp -m addrtype ! --src-type LOCAL --limit-iface-in -m comment --comment "619 - test" -j ACCEPT})
+        end
+      end
+    end
+  end
+
   describe 'table' do
     context 'when mangle' do
       pp31 = <<-PUPPETCODE
