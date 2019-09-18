@@ -392,6 +392,17 @@ ARGS_TO_HASH = {
       src_type: ['! LOCAL'],
     },
   },
+  'physdev_negated' => {
+    line: '-A cali-POSTROUTING -o tunl0 -m comment --comment "010 cali:JHlpT-eSqR1TvyYm" -m physdev ! --physdev-is-in -j MASQUERADE',
+    table: 'filter',
+    params: {
+      chain: 'cali-POSTROUTING',
+      outiface: 'tunl0',
+      name: '010 cali:JHlpT-eSqR1TvyYm',
+      jump: 'MASQUERADE',
+      physdev_is_in: '! ',
+    },
+  },
   'addrtype_multiple' => {
     line: '-A cali-POSTROUTING -o tunl0 -m comment --comment "000 cali:JHlpT-eSqR1TvyYm" -m addrtype ! --src-type LOCAL --limit-iface-out -m addrtype --src-type LOCAL -j MASQUERADE',
     table: 'filter',
