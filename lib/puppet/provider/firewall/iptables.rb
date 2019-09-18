@@ -439,7 +439,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values.insert(ind, "-m addrtype --dst-type \"#{types.join(';')}\" ")
     end
     # the actual rule will have the ! mark before the option.
-    values = values.gsub(%r{(!)\s*(-\S+)\s*(\S*)}, '\2 "\1 \3"')
+    values = values.gsub(%r{(!)\s*(-\S+)\s*(\S*)}, '\2 "\1 \3"') unless values.include?('--physdev')
     # we do a similar thing for negated address masks (source and destination).
     values = values.gsub(%r{(?<=\s)(-\S+) (!)\s?(\S*)}, '\1 "\2 \3"')
     # fix negated physdev rules
@@ -473,6 +473,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
                  # only replace those -f that are not followed by an l to
                  # distinguish between -f and the '-f' inside of --tcp-flags.
                  values.sub(%r{\s-f(?!l)(?=.*--comment)}, ' -f true')
+               elsif resource_map[bool].eql?(%r{'--physdev-is-\S+'})
+                 values.sub(%r{'#{resource_map[bool]} "! "'}, "#{resource_map[bool]} true")
                else
                  # append `true` to booleans that are not already negated (followed by "!")
                  values.sub(%r{#{resource_map[bool]}(?! "!")}, "#{resource_map[bool]} true")
