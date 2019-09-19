@@ -15,8 +15,7 @@ describe 'puppet resource firewallchain command' do
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        apply_manifest(pp1, catch_failures: true, expect_failures: true)
-        apply_manifest(pp1, catch_changes: true, expect_failures: true)
+        idempotent_apply(pp1)
       end
 
       it 'finds the chain' do
@@ -34,8 +33,7 @@ describe 'puppet resource firewallchain command' do
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        apply_manifest(pp2, catch_failures: true, expect_failures: true)
-        apply_manifest(pp2, catch_changes: true, expect_failures: true)
+        idempotent_apply(pp2)
       end
 
       it 'fails to find the chain' do
@@ -113,8 +111,7 @@ describe 'puppet resource firewallchain command' do
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        apply_manifest(pp6, catch_failures: true, expect_failures: true)
-        apply_manifest(pp6, catch_changes: true, expect_failures: true)
+        idempotent_apply(pp6)
       end
 
       it 'finds the chain' do

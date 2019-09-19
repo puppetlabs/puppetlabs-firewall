@@ -7,8 +7,7 @@ describe 'rules spec' do
       iptables_flush_all_tables
       ip6tables_flush_all_tables
       if os[:family] == 'redhat'
-        run_shell('mkdir -p /lib/modules/`uname -r`')
-        run_shell('depmod -a')
+        pre_setup
       end
     end
 
@@ -244,8 +243,7 @@ describe 'rules spec' do
     PUPPETCODE
     it 'applies cleanly' do
       # Run it twice and test for idempotency
-      apply_manifest(pp2, catch_failures: true, expect_failures: true)
-      apply_manifest(pp2, catch_changes: true, expect_failures: true)
+      idempotent_apply(pp2)
     end
 
     regex_values = [

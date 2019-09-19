@@ -14,3 +14,8 @@ def iptables_version
   x = run_shell('iptables -V')
   x.stdout.split(' ')[1][1..-1]
 end
+
+def pre_setup
+  run_shell('mkdir -p /lib/modules/`uname -r`')
+  run_shell('depmod -a')
+end

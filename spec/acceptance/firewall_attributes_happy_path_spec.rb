@@ -501,7 +501,7 @@ describe 'firewall attribute testing, happy path' do
   end
 
   describe 'test CT target attributes which are not available on some OS', unless:
-      (os[:family] == 'redhat' && (os[:release].start_with?('5', '6') || host_inventory['facter']['os']['name'] == 'OracleLinux')) || (host_inventory['facter']['os']['family'] == 'Suse') do
+      (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) do
     before(:all) do
       pp = <<-PUPPETCODE
           firewall { '1100 - ct_target tests - zone':

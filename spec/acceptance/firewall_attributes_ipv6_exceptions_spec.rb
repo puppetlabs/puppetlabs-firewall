@@ -386,8 +386,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
         }
 
       PUPPETCODE
-      apply_manifest(pp, catch_failures: true, expect_failures: true)
-      apply_manifest(pp, catch_changes: true, expect_failures: true)
+      idempotent_apply(pp)
     end
 
     let(:result) { run_shell('ip6tables-save') }

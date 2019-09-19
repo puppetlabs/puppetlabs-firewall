@@ -1,12 +1,12 @@
 require 'spec_helper_acceptance'
+require 'pry'
 
 describe 'firewall basics', docker: true do
   before :all do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
     if os[:family] == 'redhat'
-      run_shell('mkdir -p /lib/modules/`uname -r`')
-      run_shell('depmod -a')
+      pre_setup
     end
   end
 

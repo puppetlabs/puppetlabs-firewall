@@ -53,8 +53,6 @@ describe 'standard usage tests' do
   PUPPETCODE
   it 'applies twice' do
     # Run it twice and test for idempotency
-    # idempotent_apply(pp)
-    apply_manifest(pp, catch_failures: true, expect_failures: true)
-    apply_manifest(pp, catch_changes: true, expect_failures: true)
+    idempotent_apply(pp)
   end
 end

@@ -784,6 +784,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         if should_negate
           resource_value, wrong_values = resource_value.map { |value|
             if value.is_a?(String)
+              # rubocop:disable Metrics/BlockNesting
               wrong = value unless value =~ %r{^!\s+}
               [value.sub(%r{^!\s*}, ''), wrong]
             else
