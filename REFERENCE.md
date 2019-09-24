@@ -492,7 +492,7 @@ The value for the iptables --jump parameter. Normal values are:
 
 But any valid chain name is allowed.
 
-For the values ACCEPT, DROP and REJECT you must use the generic
+For the values ACCEPT, DROP, and REJECT, you must use the generic
 'action' parameter. This is to enfore the use of generic parameters where
 possible for maximum cross-platform modelling.
 
@@ -559,7 +559,7 @@ this boolean will enable randomized port mapping.
 
 ##### `reject`
 
-When combined with jump => "REJECT" you can specify a different icmp
+When combined with action => "REJECT" you can specify a different icmp
 response to be sent back to the packet sender.
 
 ##### `log_level`
