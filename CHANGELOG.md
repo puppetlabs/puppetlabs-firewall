@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.1.0) (2019-09-24)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.0.0...v2.1.0)
+
+### Added
+
+- \(MODULES-6136\) Add zone property of CT target. [\#852](https://github.com/puppetlabs/puppetlabs-firewall/pull/852) ([rwf14f](https://github.com/rwf14f))
+- \(FM-8025\) Add RedHat 8 support [\#847](https://github.com/puppetlabs/puppetlabs-firewall/pull/847) ([eimlav](https://github.com/eimlav))
+
+### Fixed
+
+- MODULES-9801 - fix negated physdev [\#858](https://github.com/puppetlabs/puppetlabs-firewall/pull/858) ([lionce](https://github.com/lionce))
+
 ## [v2.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.0.0) (2019-05-14)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.3...v2.0.0)
