@@ -349,8 +349,7 @@ describe 'firewall attribute testing, happy path' do
             table          => 'mangle',
           }
       PUPPETCODE
-      apply_manifest(pp, catch_failures: true, expect_failures: true)
-      apply_manifest(pp, catch_changes: true, expect_failures: true)
+      idempotent_apply(pp)
     end
 
     let(:result) { run_shell('iptables-save') }
@@ -512,8 +511,7 @@ describe 'firewall attribute testing, happy path' do
             table => 'raw',
           }
       PUPPETCODE
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: do_catch_changes)
+      idempotent_apply(pp)
     end
 
     let(:result) { shell('iptables-save') }

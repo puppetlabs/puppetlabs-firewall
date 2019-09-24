@@ -235,8 +235,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
               }
           PUPPETCODE
           it 'applies' do
-            apply_manifest(pp1, catch_failures: true, expect_failures: true)
-            apply_manifest(pp1, catch_changes: true, expect_failures: true)
+            idempotent_apply(pp1)
           end
 
           it 'contains the rule' do
@@ -450,8 +449,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             }
       PUPPETCODE
       it "changes the values to #{values}" do
-        apply_manifest(pp2, catch_failures: true, expect_failures: true)
-        apply_manifest(pp2, catch_changes: true, expect_failures: true)
+        idempotent_apply(pp2)
 
         run_shell('ip6tables-save') do |r|
           expect(r.stdout).to match(%r{#{line_match}})

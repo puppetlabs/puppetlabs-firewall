@@ -147,8 +147,8 @@ describe 'firewall basics', docker: true do
             isfragment => false,
           }
         PUPPETCODE
-        apply_manifest(pp, catch_failures: true, expect_failures: true)
-        apply_manifest(pp, catch_changes: true, expect_failures: true)
+
+        idempotent_apply(pp)
       end
 
       let(:result) { run_shell('iptables-save') }
@@ -199,9 +199,7 @@ describe 'firewall basics', docker: true do
         run_shell('iptables -A INPUT -p tcp -f -m comment --comment "808 - test"')
         run_shell('iptables -A INPUT -p tcp -f -m comment --comment "809 - test"')
 
-        apply_manifest(pp_idempotent, catch_failures: true, expect_failures: true)
-        apply_manifest(pp_idempotent, catch_changes: true, expect_failures: true)
-
+        idempotent_apply(pp_idempotent)
         apply_manifest(pp_does_not_change, catch_changes: true, expect_failures: true)
       end
 
@@ -1028,9 +1026,8 @@ describe 'firewall basics', docker: true do
               kernel_timezone    => true,
             }
         PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp1, catch_failures: true)
-          apply_manifest(pp1, catch_changes: true)
+        it 'applies manifest twice' do
+          idempotent_apply(pp1)
         end
 
         it 'contains the rule' do
@@ -1283,9 +1280,8 @@ describe 'firewall basics', docker: true do
               random => true
             }
         PUPPETCODE
-        it 'applies' do
-          apply_manifest(pp40, catch_failures: true, expect_failures: true)
-          apply_manifest(pp40, catch_changes: true, expect_failures: true)
+        it 'applies manifest twice' do
+          idempotent_apply(pp40)
         end
 
         it 'contains the rule' do
@@ -1320,6 +1316,7 @@ describe 'firewall basics', docker: true do
           action                  => accept,
         }
       PUPPETCODE
+      idempotent_apply(pp)
       apply_manifest(pp, catch_failures: true, expect_failures: true)
       apply_manifest(pp, catch_changes: true, expect_failures: true)
     end
