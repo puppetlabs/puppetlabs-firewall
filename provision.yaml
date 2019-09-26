@@ -2,6 +2,9 @@
 default:
   provisioner: docker
   images: ['waffleimage/centos7']
+waffle_deb:
+  provisioner: docker_exp
+  images: ['waffleimage/debian8', 'waffleimage/debian9', 'waffleimage/ubuntu14.04', 'waffleimage/ubuntu16.04', 'waffleimage/ubuntu18.04']
 waffle_el:
   provisioner: docker
   images: ['waffleimage/centos6', 'waffleimage/scientificlinux6']

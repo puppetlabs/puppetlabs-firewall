@@ -10,7 +10,14 @@ def ip6tables_flush_all_tables
   end
 end
 
-def iptables_version
+def install_iptables
+  run_shell('iptables -V')
+rescue
+  run_shell('apt-get install iptables -y')
+end
+
+def iptables_installed_version
+  install_iptables
   x = run_shell('iptables -V')
   x.stdout.split(' ')[1][1..-1]
 end
