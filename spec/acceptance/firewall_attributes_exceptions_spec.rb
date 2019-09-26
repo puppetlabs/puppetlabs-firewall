@@ -455,7 +455,7 @@ describe 'firewall basics', docker: true do
         }
     PUPPETCODE
     it 'throws an error' do
-      res = apply_manifest(pp1, expect_failures: true)
+      res = apply_manifest(pp1)
       expect(res[:exit_code]).to be(0)
     end
   end
@@ -1156,7 +1156,7 @@ describe 'firewall basics', docker: true do
               }
         PUPPETCODE
         it "doesn't change the value to #{value}" do
-          apply_manifest(pp2, expect_changes: true)
+          apply_manifest(pp2)
 
           run_shell('iptables-save -t raw') do |r|
             expect(r.stdout).to match(%r{#{line_match}})
