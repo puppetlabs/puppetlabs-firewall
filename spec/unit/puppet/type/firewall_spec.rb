@@ -495,7 +495,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
           allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return iptables_version
         end
 
-        if iptables_installed_version == '1.3.2'
+        if iptables_version == '1.3.2'
           it 'allows me to set set-mark without mask' do
             resource[:set_mark] = '0x3e8'
             expect(resource[:set_mark]).to eql '0x3e8'

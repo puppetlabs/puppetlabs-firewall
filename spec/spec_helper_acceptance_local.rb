@@ -16,7 +16,7 @@ rescue
   run_shell('apt-get install iptables -y')
 end
 
-def iptables_installed_version
+def iptables_version
   install_iptables
   x = run_shell('iptables -V')
   x.stdout.split(' ')[1][1..-1]

@@ -32,7 +32,7 @@ describe 'firewall basics', docker: true do
                                                   }
                                               PUPPETCODE
         it 'applies' do
-          apply_manifest(pp, catch_failures: true, expect_failures: true)
+          apply_manifest(pp, catch_failures: true)
         end
 
         it 'contains the rule' do
@@ -80,7 +80,7 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'applies' do
-        apply_manifest(pp4, catch_failures: true, expect_failures: true)
+        apply_manifest(pp4, catch_failures: true)
       end
 
       it 'contains the rule' do
@@ -101,7 +101,7 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'applies' do
-        apply_manifest(pp5, catch_failures: true, expect_failures: true)
+        apply_manifest(pp5, catch_failures: true)
       end
 
       it 'does not contain the rule' do
@@ -204,7 +204,7 @@ describe 'firewall basics', docker: true do
         run_shell('iptables -A INPUT -p tcp -f -m comment --comment "809 - test"')
 
         idempotent_apply(pp_idempotent)
-        apply_manifest(pp_does_not_change, catch_changes: true, expect_failures: true)
+        apply_manifest(pp_does_not_change, catch_changes: true)
       end
 
       let(:result) { run_shell('iptables-save') }
@@ -333,7 +333,7 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'applies' do
-        apply_manifest(pp88, catch_failures: true, expect_failures: true)
+        apply_manifest(pp88, catch_failures: true)
       end
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
@@ -370,7 +370,7 @@ describe 'firewall basics', docker: true do
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_group => 3}
         PUPPETCODE
-        apply_manifest(pp2, catch_failures: true, expect_failures: true)
+        apply_manifest(pp2, catch_failures: true)
       end
 
       it 'contains the rule' do
@@ -386,7 +386,7 @@ describe 'firewall basics', docker: true do
         class {'::firewall': }
         firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_prefix => 'TEST PREFIX'}
         PUPPETCODE
-        apply_manifest(pp3, catch_failures: true, expect_failures: true)
+        apply_manifest(pp3, catch_failures: true)
       end
 
       it 'contains the rule' do
@@ -402,7 +402,7 @@ describe 'firewall basics', docker: true do
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_range => 16}
         PUPPETCODE
-        apply_manifest(pp4, catch_failures: true, expect_failures: true)
+        apply_manifest(pp4, catch_failures: true)
       end
 
       it 'contains the rule' do
@@ -418,7 +418,7 @@ describe 'firewall basics', docker: true do
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_threshold => 2}
         PUPPETCODE
-        apply_manifest(pp5, catch_failures: true, expect_failures: true)
+        apply_manifest(pp5, catch_failures: true)
       end
 
       it 'contains the rule' do
@@ -434,7 +434,7 @@ describe 'firewall basics', docker: true do
           class {'::firewall': }
           firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_threshold => 2, nflog_group => 3}
         PUPPETCODE
-        apply_manifest(pp6, catch_failures: true, expect_failures: true)
+        apply_manifest(pp6, catch_failures: true)
       end
 
       it 'contains the rules' do
@@ -557,7 +557,7 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'ignores managed rules' do
-        apply_manifest(pp3, catch_changes: true, expect_failures: true)
+        apply_manifest(pp3, catch_changes: true)
       end
 
       pp4 = <<-PUPPETCODE
@@ -570,7 +570,7 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'ignores specified rules' do
-        apply_manifest(pp4, catch_changes: true, expect_failures: true)
+        apply_manifest(pp4, catch_changes: true)
       end
 
       pp5 = <<-PUPPETCODE
@@ -688,7 +688,7 @@ describe 'firewall basics', docker: true do
             }
       PUPPETCODE
       it 'changes to 8.0.0.4 second' do
-        expect(apply_manifest(pp2, catch_failures: true, expect_failures: true).stdout)
+        expect(apply_manifest(pp2, catch_failures: true).stdout)
           .to match(%r{Notice: \/Stage\[main\]\/Main\/Firewall\[101 test source changes\]\/source: source changed '8\.0\.0\.1\/32' to '8\.0\.0\.4\/32'})
       end
 
@@ -1321,8 +1321,6 @@ describe 'firewall basics', docker: true do
         }
       PUPPETCODE
       idempotent_apply(pp)
-      apply_manifest(pp, catch_failures: true, expect_failures: true)
-      apply_manifest(pp, catch_changes: true, expect_failures: true)
     end
 
     let(:result) { run_shell('iptables-save') }

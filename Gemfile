@@ -67,7 +67,7 @@ extra_gemfiles = [
 
 extra_gemfiles.each do |gemfile|
   if File.file?(gemfile) && File.readable?(gemfile)
-    eval(File.read(gemfile), )
+    eval(File.read(gemfile), binding)
   end
 end
 # vim: syntax=ruby
