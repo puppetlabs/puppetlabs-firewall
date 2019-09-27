@@ -22,13 +22,13 @@ describe 'firewall attribute testing, happy path' do
             log_level  => '3',
             log_prefix => 'IPTABLES dropped invalid: ',
           }
-          firewall { '501 - connlimit':
-            proto           => tcp,
-            dport           => '2222',
-            connlimit_above => '10',
-            connlimit_mask  => '24',
-            action          => reject,
-          }
+          # firewall { '501 - connlimit':
+          #   proto           => tcp,
+          #   dport           => '2222',
+          #   connlimit_above => '10',
+          #   connlimit_mask  => '24',
+          #   action          => reject,
+          # }
           firewall { '502 - connmark':
             proto    => 'all',
             connmark => '0x1',
