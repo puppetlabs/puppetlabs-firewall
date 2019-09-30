@@ -26,3 +26,8 @@ def pre_setup
   run_shell('mkdir -p /lib/modules/`uname -r`')
   run_shell('depmod -a')
 end
+
+def update_profile_file
+  run_shell("sed -i '/mesg n/c\\test -t 0 && mesg n || true' ~/.profile")
+  run_shell("sed -i '/mesg n || true/c\\test -t 0 && mesg n || true' ~/.profile")
+end

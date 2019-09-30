@@ -3,10 +3,8 @@ require 'spec_helper_acceptance'
 describe 'firewall basics', docker: true do
   before :all do
     if os[:family] == 'ubuntu' || os[:family] == 'debian'
-      run_shell("sed -i '/mesg n/c\\test -t 0 && mesg n || true' ~/.profile")
-      run_shell("sed -i '/mesg n || true/c\\test -t 0 && mesg n || true' ~/.profile")
-    end
-    if os[:family] == 'redhat'
+      update_profile_file
+    elsif os[:family] == 'redhat'
       pre_setup
     end
     iptables_flush_all_tables
