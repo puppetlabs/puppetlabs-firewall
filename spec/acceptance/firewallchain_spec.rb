@@ -15,12 +15,11 @@ describe 'puppet resource firewallchain command' do
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        apply_manifest(pp1, catch_failures: true)
-        apply_manifest(pp1, catch_changes: do_catch_changes)
+        idempotent_apply(pp1)
       end
 
       it 'finds the chain' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{MY_CHAIN})
         end
       end
@@ -34,12 +33,11 @@ describe 'puppet resource firewallchain command' do
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        apply_manifest(pp2, catch_failures: true)
-        apply_manifest(pp2, catch_changes: do_catch_changes)
+        idempotent_apply(pp2)
       end
 
       it 'fails to find the chain' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{MY_CHAIN})
         end
       end
@@ -102,7 +100,7 @@ describe 'puppet resource firewallchain command' do
 
   describe 'policy' do
     after :all do
-      shell('iptables -t filter -P FORWARD ACCEPT')
+      run_shell('iptables -t filter -P FORWARD ACCEPT')
     end
 
     context 'when DROP' do
@@ -113,12 +111,11 @@ describe 'puppet resource firewallchain command' do
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        apply_manifest(pp6, catch_failures: true)
-        apply_manifest(pp6, catch_changes: do_catch_changes)
+        idempotent_apply(pp6)
       end
 
       it 'finds the chain' do
-        shell('iptables-save') do |r|
+        run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{FORWARD DROP})
         end
       end

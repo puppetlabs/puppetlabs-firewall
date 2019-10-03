@@ -1,17 +1,21 @@
 require 'spec_helper_acceptance'
+require 'spec_helper_acceptance_local'
 
 describe 'rules spec' do
   describe 'complex ruleset 1' do
     before :all do
+      if os[:family] == 'redhat'
+        pre_setup
+      end
       iptables_flush_all_tables
       ip6tables_flush_all_tables
     end
 
     after :all do
-      shell('iptables -t filter -P INPUT ACCEPT')
-      shell('iptables -t filter -P FORWARD ACCEPT')
-      shell('iptables -t filter -P OUTPUT ACCEPT')
-      shell('iptables -t filter --flush')
+      run_shell('iptables -t filter -P INPUT ACCEPT')
+      run_shell('iptables -t filter -P FORWARD ACCEPT')
+      run_shell('iptables -t filter -P OUTPUT ACCEPT')
+      run_shell('iptables -t filter --flush')
     end
 
     pp1 = <<-PUPPETCODE
@@ -28,7 +32,7 @@ describe 'rules spec' do
           destination => '!10.0.0.0/8',
           proto       => 'tcp',
           ctstate       => 'NEW',
-          port        => [80,443,21,20,22,53,123,43,873,25,465],
+          sport        => [80,443,21,20,22,53,123,43,873,25,465],
           action      => 'accept',
         }
         firewall { '100 forward standard allow udp':
@@ -36,7 +40,7 @@ describe 'rules spec' do
           source      => '10.0.0.0/8',
           destination => '!10.0.0.0/8',
           proto       => 'udp',
-          port        => [53,123],
+          sport        => [53,123],
           action      => 'accept',
         }
         firewall { '100 forward standard allow icmp':
@@ -87,24 +91,23 @@ describe 'rules spec' do
           chain   => 'PREROUTING',
           iniface => 'eth0',
           proto   => 'tcp',
-          dport   => '1',
+          sport   => '1',
           toports => '22',
           jump    => 'REDIRECT',
         }
     PUPPETCODE
     it 'applies cleanly' do
-      apply_manifest(pp1, catch_failures: true)
-      apply_manifest(pp1, catch_changes: true)
+      idempotent_apply(pp1)
     end
     regex_values = [
       %r{INPUT ACCEPT}, %r{FORWARD ACCEPT}, %r{OUTPUT ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) -d 10.0.0.0\/(8|255\.0\.0\.0) -m comment --comment \"090 forward allow local\" -j ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT},
-      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --ports 80,443,21,20,22,53,123,43,873,25,465 -m conntrack --ctstate NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Metrics/LineLength
-      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --ports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT}
+      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --sports 80,443,21,20,22,53,123,43,873,25,465 -m conntrack --ctstate NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Metrics/LineLength
+      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --sports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT}
     ]
     it 'contains appropriate rules' do
-      shell('iptables-save') do |r|
+      run_shell('iptables-save') do |r|
         regex_values.each do |line|
           expect(r.stdout).to match(line)
         end
@@ -114,10 +117,10 @@ describe 'rules spec' do
 
   describe 'complex ruleset 2' do
     after :all do
-      shell('iptables -t filter -P INPUT ACCEPT')
-      shell('iptables -t filter -P FORWARD ACCEPT')
-      shell('iptables -t filter -P OUTPUT ACCEPT')
-      shell('iptables -t filter --flush')
+      run_shell('iptables -t filter -P INPUT ACCEPT')
+      run_shell('iptables -t filter -P FORWARD ACCEPT')
+      run_shell('iptables -t filter -P OUTPUT ACCEPT')
+      run_shell('iptables -t filter --flush')
     end
 
     pp2 = <<-PUPPETCODE
@@ -239,8 +242,7 @@ describe 'rules spec' do
     PUPPETCODE
     it 'applies cleanly' do
       # Run it twice and test for idempotency
-      apply_manifest(pp2, catch_failures: true)
-      apply_manifest(pp2, catch_changes: true)
+      idempotent_apply(pp2)
     end
 
     regex_values = [
@@ -264,7 +266,7 @@ describe 'rules spec' do
       %r{-A OUTPUT (! -o|-o !) eth0:2 -p tcp -m multiport --dports 25 -m conntrack --ctstate NEW -m comment --comment \"025 smtp\" -j ACCEPT},
     ]
     it 'contains appropriate rules' do
-      shell('iptables-save') do |r|
+      run_shell('iptables-save') do |r|
         regex_values.each do |line|
           expect(r.stdout).to match(line)
         end

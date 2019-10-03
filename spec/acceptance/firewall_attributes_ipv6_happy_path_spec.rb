@@ -13,7 +13,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '571 - hop_limit':
           ensure => present,
           proto => tcp,
-          port   => '571',
+          dport   => '571',
           action => accept,
           hop_limit => '5',
           provider => 'ip6tables',
@@ -31,7 +31,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '587 - ishasmorefrags true':
           ensure => present,
           proto => tcp,
-          port   => '587',
+          dport   => '587',
           action => accept,
           ishasmorefrags => true,
           provider => 'ip6tables',
@@ -39,7 +39,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '588 - ishasmorefrags false':
           ensure => present,
           proto => tcp,
-          port   => '588',
+          dport   => '588',
           action => accept,
           ishasmorefrags => false,
           provider => 'ip6tables',
@@ -47,7 +47,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '589 - islastfrag true':
           ensure => present,
           proto => tcp,
-          port   => '589',
+          dport   => '589',
           action => accept,
           islastfrag => true,
           provider => 'ip6tables',
@@ -55,7 +55,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '590 - islastfrag false':
           ensure => present,
           proto => tcp,
-          port   => '590',
+          dport   => '590',
           action => accept,
           islastfrag => false,
           provider => 'ip6tables',
@@ -63,7 +63,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '591 - isfirstfrag true':
           ensure => present,
           proto => tcp,
-          port   => '591',
+          dport   => '591',
           action => accept,
           isfirstfrag => true,
           provider => 'ip6tables',
@@ -71,7 +71,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '592 - isfirstfrag false':
           ensure => present,
           proto => tcp,
-          port   => '592',
+          dport   => '592',
           action => accept,
           isfirstfrag => false,
           provider => 'ip6tables',
@@ -84,14 +84,14 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         }
         firewall { '601 - src_range':
           proto     => tcp,
-          port      => '601',
+          dport      => '601',
           action    => accept,
           src_range => '2001:db8::1-2001:db8::ff',
           provider  => 'ip6tables',
         }
         firewall { '602 - dst_range':
           proto     => tcp,
-          port      => '602',
+          dport      => '602',
           action    => accept,
           dst_range => '2001:db8::1-2001:db8::ff',
           provider  => 'ip6tables',
@@ -106,7 +106,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '605 - socket true':
           ensure   => present,
           proto    => tcp,
-          port     => '605',
+          dport     => '605',
           action   => accept,
           chain    => 'INPUT',
           socket   => true,
@@ -115,7 +115,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '606 - socket false':
           ensure   => present,
           proto    => tcp,
-          port     => '606',
+          dport     => '606',
           action   => accept,
           chain    => 'INPUT',
           socket   => false,
@@ -173,7 +173,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           ensure => present,
           chain => 'OUTPUT',
           proto => tcp,
-          port   => '611',
+          dport   => '611',
           jump => 'MARK',
           table => 'mangle',
           set_mark => '0x3e8/0xffffffff',
@@ -262,52 +262,51 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           provider => 'ip6tables',
         }
       PUPPETCODE
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: do_catch_changes)
+      idempotent_apply(pp)
     end
-    let(:result) { shell('ip6tables-save') }
+    let(:result) { run_shell('ip6tables-save') }
 
     it 'hop_limit is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 571 -m hl --hl-eq 5 -m comment --comment "571 - hop_limit" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 571 -m hl --hl-eq 5 -m comment --comment "571 - hop_limit" -j ACCEPT})
     end
     it 'checksum_fill is set' do
       expect(result.stdout).to match(%r{-A POSTROUTING -o virbr0 -p udp -m multiport --dports 68 -m comment --comment "576 - checksum_fill" -j CHECKSUM --checksum-fill})
     end
     it 'ishasmorefrags when true' do
-      expect(result.stdout).to match(%r{A INPUT -p tcp -m frag --fragid 0 --fragmore -m multiport --ports 587 -m comment --comment "587 - ishasmorefrags true" -j ACCEPT})
+      expect(result.stdout).to match(%r{A INPUT -p tcp -m frag --fragid 0 --fragmore -m multiport --dports 587 -m comment --comment "587 - ishasmorefrags true" -j ACCEPT})
     end
     it 'ishasmorefrags when false' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 588 -m comment --comment "588 - ishasmorefrags false" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 588 -m comment --comment "588 - ishasmorefrags false" -j ACCEPT})
     end
     it 'islastfrag when true' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m frag --fragid 0 --fraglast -m multiport --ports 589 -m comment --comment "589 - islastfrag true" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m frag --fragid 0 --fraglast -m multiport --dports 589 -m comment --comment "589 - islastfrag true" -j ACCEPT})
     end
     it 'islastfrag when false' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 590 -m comment --comment "590 - islastfrag false" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 590 -m comment --comment "590 - islastfrag false" -j ACCEPT})
     end
     it 'isfirstfrag when true' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m frag --fragid 0 --fragfirst -m multiport --ports 591 -m comment --comment "591 - isfirstfrag true" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m frag --fragid 0 --fragfirst -m multiport --dports 591 -m comment --comment "591 - isfirstfrag true" -j ACCEPT})
     end
     it 'isfirstfrag when false' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 592 -m comment --comment "592 - isfirstfrag false" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 592 -m comment --comment "592 - isfirstfrag false" -j ACCEPT})
     end
     it 'tcp_flags is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN ACK -m comment --comment "593 - tcpfrags" -j ACCEPT})
     end
     it 'src_range is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m iprange --src-range 2001:db8::1-2001:db8::ff -m multiport --ports 601 -m comment --comment "601 - src_range" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m iprange --src-range 2001:db8::1-2001:db8::ff -m multiport --dports 601 -m comment --comment "601 - src_range" -j ACCEPT})
     end
     it 'dst_range is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m iprange --dst-range 2001:db8::1-2001:db8::ff -m multiport --ports 602 -m comment --comment "602 - dst_range" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m iprange --dst-range 2001:db8::1-2001:db8::ff -m multiport --dports 602 -m comment --comment "602 - dst_range" -j ACCEPT})
     end
     it 'mac_source is set' do
       expect(result.stdout).to match(%r{-A INPUT -s 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "604 - mac_source"})
     end
     it 'socket when true' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 605 -m socket -m comment --comment "605 - socket true" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 605 -m socket -m comment --comment "605 - socket true" -j ACCEPT})
     end
     it 'socket when false' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --ports 606 -m comment --comment "606 - socket false" -j ACCEPT})
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 606 -m comment --comment "606 - socket false" -j ACCEPT})
     end
     it 'ipsec_policy when ipsec' do
       expect(result.stdout).to match(
@@ -330,7 +329,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
       )
     end
     it 'set_mark is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --ports 611 -m comment --comment "611 - set_mark" -j MARK --set-xmark 0x3e8\/0xffffffff})
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 611 -m comment --comment "611 - set_mark" -j MARK --set-xmark 0x3e8\/0xffffffff})
     end
     it 'dst_type when MULTICAST' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype\s--dst-type\sMULTICAST -m comment --comment "613 - dst_type MULTICAST" -j ACCEPT})
@@ -365,29 +364,6 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
       regex_array.each do |regex|
         expect(result.stdout).to match(regex)
       end
-    end
-  end
-
-  describe 'test CT target attributes which are not available on some OS', unless:
-      (os[:family] == 'redhat' && (os[:release].start_with?('5', '6') || host_inventory['facter']['os']['name'] == 'OracleLinux')) || (host_inventory['facter']['os']['family'] == 'Suse') do
-    before(:all) do
-      pp = <<-PUPPETCODE
-          firewall { '1100 - ct_target tests - zone':
-            proto => 'all',
-            zone  => '4000',
-            jump  => 'CT',
-            chain => 'PREROUTING',
-            table => 'raw',
-          }
-      PUPPETCODE
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: do_catch_changes)
-    end
-
-    let(:result) { shell('iptables-save') }
-
-    it 'zone is set' do
-      expect(result.stdout).to match(%r{-A PREROUTING -m comment --comment "1100 - ct_target tests - zone" -j CT --zone 4000})
     end
   end
 end
