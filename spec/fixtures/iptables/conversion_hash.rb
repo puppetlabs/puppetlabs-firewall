@@ -254,6 +254,13 @@ ARGS_TO_HASH = {
       name: '9000 comment_without_quotes',
     },
   },
+  'comments_without_quotes' => {
+    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment 100-comment_without-quotes',
+    table: 'filter',
+    params: {
+      name: '100-comment_without-quotes',
+    },
+  },
   'string_escape_sequences' => {
     line: '-A INPUT -m comment --comment "000 parse escaped \\"s, \\"s, \\\'s, \\\'s, \\\\s and \\\\s"',
     table: 'filter',
