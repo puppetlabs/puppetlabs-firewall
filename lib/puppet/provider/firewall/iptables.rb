@@ -419,7 +419,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     if values =~ %r{-m comment --comment}
       ind = values.index('-m comment --comment')
       comments = values.scan(%r{-m comment --comment "((?:\\"|[^"])*)"})
-      comments += values.scan(%r{-m comment --comment ([^"]+?)\b})
+      comments += values.scan(%r{-m comment --comment ([^"\s]+)\b})
       values = values.gsub(%r{-m comment --comment (".*?[^\\"]"|[^ ].*)( |$)}, '')
       values = values.gsub(%r{-m comment --comment ([^"].*?)[ $]}, '')
       values.insert(ind, "-m comment --comment \"#{comments.join(';')}\" ")
