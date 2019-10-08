@@ -4,6 +4,10 @@ describe 'firewall ipv6 attribute testing, exceptions' do
   before(:all) do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
+    if os[:family] == 'debian' && os[:release] == '10'
+      # in order to avoid this stderr: Warning: ip6tables-legacy tables present, use ip6tables-legacy-save to see them\n"
+      run_shell('update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy')
+    end
   end
 
   describe 'standard attributes', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do

@@ -9,6 +9,10 @@ describe 'firewall basics', docker: true do
     end
     iptables_flush_all_tables
     ip6tables_flush_all_tables
+    if os[:family] == 'debian' && os[:release] == '10'
+      # in order to avoid this stderr: Warning: ip6tables-legacy tables present, use ip6tables-legacy-save to see them\n"
+      run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy')
+    end
   end
 
   # --bytecode is only supported by operatingsystems using nftables (in general Linux kernel 3.13, RedHat 7 (and derivates) with 3.10)
