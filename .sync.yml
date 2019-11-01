@@ -7,15 +7,7 @@
   unmanaged: true
 
 .travis.yml:
-  bundle_args: --without system_tests
-  docker_sets:
-    - set: docker/centos-7
-    - set: docker/ubuntu-14.04
-  docker_defaults:
-    bundler_args: ""
-  secure: ""
-  branches:
-    - release
+  unmanaged: true
 
 appveyor.yml:
   delete: true
