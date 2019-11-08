@@ -8,6 +8,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
   has_feature :iptables
   has_feature :connection_limiting
+  has_feature :conntrack
   has_feature :rate_limiting
   has_feature :recent_limiting
   has_feature :snat
@@ -67,7 +68,19 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     connlimit_above: '-m connlimit --connlimit-above',
     connlimit_mask: '--connlimit-mask',
     connmark: '-m connmark --mark',
-    ctstate: '-m conntrack --ctstate',
+    ctstate: '--ctstate',
+    ctproto: '--ctproto',
+    ctorigsrc: '--ctorigsrc',
+    ctorigdst: '--ctorigdst',
+    ctreplsrc: '--ctreplsrc',
+    ctrepldst: '--ctrepldst',
+    ctorigsrcport: '--ctorigsrcport',
+    ctorigdstport: '--ctorigdstport',
+    ctreplsrcport: '--ctreplsrcport',
+    ctrepldstport: '--ctrepldstport',
+    ctstatus: '--ctstatus',
+    ctexpire: '--ctexpire',
+    ctdir: '--ctdir',
     destination: '-d',
     dport: ['-m multiport --dports', '--dport'],
     dst_range: '--dst-range',
@@ -214,6 +227,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     addrtype: [:src_type, :dst_type],
     iprange: [:src_range, :dst_range],
     owner: [:uid, :gid],
+    conntrack: [:ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst, 
+                :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir],
     time: [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
     geoip: [:src_cc, :dst_cc],
     hashlimit: [:hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst, :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask,
@@ -296,7 +311,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :proto, :isfragment, :stat_mode, :stat_every, :stat_packet, :stat_probability,
     :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
     :src_type, :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy,
-    :state, :ctstate, :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
+    :state, :ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
+    :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
+    :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
     :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
@@ -545,7 +562,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # POST PARSE CLUDGING
     #####################
 
-    [:dport, :sport, :port, :state, :ctstate].each do |prop|
+    [:dport, :sport, :port, :state, :ctstate, :ctstatus].each do |prop|
       hash[prop] = hash[prop].split(',') unless hash[prop].nil?
     end
 
@@ -607,6 +624,17 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     [
       :connmark,
       :ctstate,
+      :ctproto,
+      :ctorigsrc,
+      :ctorigdst,
+      :ctreplsrc,
+      :ctrepldst,
+      :ctorigsrcport,
+      :ctorigdstport,
+      :ctreplsrcport,
+      :ctrepldstport,
+      :ctstatus,
+      :ctexpire,
       :destination,
       :dport,
       :dst_range,
@@ -646,6 +674,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # iptables-save and user supplied resources is consistent.
     hash[:state]   = hash[:state].sort   unless hash[:state].nil?
     hash[:ctstate] = hash[:ctstate].sort unless hash[:ctstate].nil?
+    hash[:ctstatus] = hash[:ctstatus].sort unless hash[:ctstatus].nil?
 
     # This forces all existing, commentless rules or rules with invalid comments to be moved
     # to the bottom of the stack.
