@@ -439,7 +439,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
   describe ':ctproto' do
     it 'accepts numeric value' do
       resource[:ctproto] = 6
-      expect(resource[:ctproto]).to eql 6
+      expect(resource[:ctproto]).to be 6
     end
     it 'accepts negated string value' do
       resource[:ctproto] = '! 6'
@@ -480,7 +480,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     describe port do
       it "should accept #{port} as numeric value" do
         resource[port] = 80
-        expect(resource[port]).to eql 80
+        expect(resource[port]).to be 80
       end
       it "should accept #{port} as range value" do
         resource[port] = '80:81'
@@ -517,7 +517,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
   describe ':ctexpire' do
     it 'accepts numeric values' do
       resource[:ctexpire] = 100
-      expect(resource[:ctexpire]).to eql 100
+      expect(resource[:ctexpire]).to be 100
     end
 
     it 'accepts numeric range values' do

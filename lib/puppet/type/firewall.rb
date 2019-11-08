@@ -947,7 +947,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:ctproto, required_features: :conntrack) do
     desc <<-PUPPETCODE
-      The specific layer-4 protocol number to match for this rule using the 
+      The specific layer-4 protocol number to match for this rule using the
       conntrack module.
     PUPPETCODE
     newvalue(%r{^!?\s?\d+$})
@@ -979,9 +979,9 @@ Puppet::Type.newtype(:firewall) do
       begin
         @resource.host_to_mask(value, protocol)
         if protocol == :IPv4
-          value.chomp("/32")
+          value.chomp('/32')
         elsif protocol == :IPv6
-          value.chomp("/128")
+          value.chomp('/128')
         end
       rescue StandardError => e
         raise("host_to_ip failed for #{value}, exception #{e}")
@@ -1015,9 +1015,9 @@ Puppet::Type.newtype(:firewall) do
       begin
         @resource.host_to_mask(value, protocol)
         if protocol == :IPv4
-          value.chomp("/32")
+          value.chomp('/32')
         elsif protocol == :IPv6
-          value.chomp("/128")
+          value.chomp('/128')
         end
       rescue StandardError => e
         raise("host_to_ip failed for #{value}, exception #{e}")
@@ -1051,9 +1051,9 @@ Puppet::Type.newtype(:firewall) do
       begin
         @resource.host_to_mask(value, protocol)
         if protocol == :IPv4
-          value.chomp("/32")
+          value.chomp('/32')
         elsif protocol == :IPv6
-          value.chomp("/128")
+          value.chomp('/128')
         end
       rescue StandardError => e
         raise("host_to_ip failed for #{value}, exception #{e}")
@@ -1087,9 +1087,9 @@ Puppet::Type.newtype(:firewall) do
       begin
         @resource.host_to_mask(value, protocol)
         if protocol == :IPv4
-          value.chomp("/32")
+          value.chomp('/32')
         elsif protocol == :IPv6
-          value.chomp("/128")
+          value.chomp('/128')
         end
       rescue StandardError => e
         raise("host_to_ip failed for #{value}, exception #{e}")
@@ -1099,7 +1099,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:ctorigsrcport, required_features: :conntrack) do
     desc <<-PUPPETCODE
-      The original source port to match for this filter using the conntrack module. 
+      The original source port to match for this filter using the conntrack module.
       For example:
 
           ctorigsrcport => '80'
@@ -1118,7 +1118,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:ctorigdstport, required_features: :conntrack) do
     desc <<-PUPPETCODE
-      The original destination port to match for this filter using the conntrack module. 
+      The original destination port to match for this filter using the conntrack module.
       For example:
 
           ctorigdstport => '80'
@@ -1137,7 +1137,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:ctreplsrcport, required_features: :conntrack) do
     desc <<-PUPPETCODE
-      The reply source port to match for this filter using the conntrack module. 
+      The reply source port to match for this filter using the conntrack module.
       For example:
 
           ctreplsrcport => '80'
@@ -1156,7 +1156,7 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:ctrepldstport, required_features: :conntrack) do
     desc <<-PUPPETCODE
-      The reply destination port to match for this filter using the conntrack module. 
+      The reply destination port to match for this filter using the conntrack module.
       For example:
 
           ctrepldstport => '80'
@@ -1214,8 +1214,8 @@ Puppet::Type.newtype(:firewall) do
 
   newproperty(:ctdir, required_features: :conntrack) do
     desc <<-PUPPETCODE
-      Matches a packet that is flowing in the specified direction using the 
-      conntrack module. If this flag is not specified at all, matches packets 
+      Matches a packet that is flowing in the specified direction using the
+      conntrack module. If this flag is not specified at all, matches packets
       in both directions. Values can be:
 
       * REPLY
