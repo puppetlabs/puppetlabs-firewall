@@ -142,6 +142,29 @@ Rules are persisted automatically between reboots, although there are known issu
   }
   ~~~
 
+  Internal chains can not be deleted. In order to avoid all the confusing Warning/Notice messages when using purge => true, like these ones:
+
+    Notice: Compiled catalog for blonde-height.delivery.puppetlabs.net in environment production in 0.05 seconds
+    Warning: Firewallchain[INPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain INPUT:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[INPUT:mangle:IPv4]/ensure: removed
+    Warning: Firewallchain[FORWARD:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain FORWARD:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[FORWARD:mangle:IPv4]/ensure: removed
+    Warning: Firewallchain[OUTPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain OUTPUT:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[OUTPUT:mangle:IPv4]/ensure: removed
+    Warning: Firewallchain[POSTROUTING:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain POSTROUTING:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[POSTROUTING:mangle:IPv4]/ensure: removed
+
+  Please create firewallchains for every internal chain. Here is an example:
+
+   ~~~ puppet
+    firewallchain { 'POSTROUTING:mangle:IPv6':
+      ensure  => present,
+    }
+    resources { 'firewallchain':
+      purge => true,
+    }
+  ~~~
+
   **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs for the firewall chain to be purged. This is different than the `purge` parameter available in `firewallchain`.
 
 2.  Use the following code to set up the default parameters for all of the firewall rules that you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order and avoid locking you out of your box during the first Puppet run.
