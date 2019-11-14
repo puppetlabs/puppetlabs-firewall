@@ -74,7 +74,7 @@ class firewall (
       }
       contain "${title}::linux"
     }
-    'FreeBSD': {
+    'FreeBSD', 'windows': {
     }
     default: {
       fail("${title}: Kernel '${::kernel}' is not currently supported")
