@@ -246,7 +246,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
             resource_map_new[argument][0] = "-m #{ipt_module} #{resource_map_original[argument].first}"
             break
           end
-        elsif compare.include?(resource_map_original[argument])
+        elsif compare.include?(resource_map_original[argument]+' ')
           resource_map_new[argument] = "-m #{ipt_module} #{resource_map_original[argument]}"
           break
         end
