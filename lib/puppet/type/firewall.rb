@@ -9,6 +9,8 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..'))
 require 'puppet/util/firewall'
 
+$__FW_ignore_chains = []
+
 Puppet::Type.newtype(:firewall) do
   include Puppet::Util::Firewall
 
@@ -1482,6 +1484,16 @@ Puppet::Type.newtype(:firewall) do
     desc <<-PUPPETCODE
       Read-only property for caching the rule line.
     PUPPETCODE
+  end
+
+  newparam(:ignore_chains) do
+    desc <<-PUPPETCODE
+      Chains to ignore when purging rules
+    PUPPETCODE
+
+    munge do |value|
+      $__FW_ignore_chains = value
+    end
   end
 
   newproperty(:mac_source) do

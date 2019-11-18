@@ -376,9 +376,22 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     rules = []
     counter = 1
 
+    ignore_exps = [
+      '^\#\s+',
+      '^\:\S+',
+      '^COMMIT',
+      '^FATAL',
+    ]
+
+    $__FW_ignore_chains.each do |chain|
+      ignore_exps << '^-A ' + chain + ' .*$'
+    end
+
+    ignore_exp_str = ignore_exps.join('|')
+
     # String#lines would be nice, but we need to support Ruby 1.8.5
     iptables_save.split("\n").each do |line|
-      unless line =~ %r{^\#\s+|^\:\S+|^COMMIT|^FATAL}
+      unless line =~ %r{#{ignore_exp_str}}
         if line =~ %r{^\*}
           table = line.sub(%r{\*}, '')
         else
