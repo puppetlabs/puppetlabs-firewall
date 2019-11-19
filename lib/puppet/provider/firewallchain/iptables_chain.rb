@@ -62,9 +62,10 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
       if chain =~ INTERNAL_CHAINS
         # can't delete internal chains
         warning "Attempting to destroy internal chain #{@resource[:name]}"
+      else
+        debug "Deleting chain #{chain} on table #{table}"
+        t.call ['-t', table, '-X', chain]
       end
-      debug "Deleting chain #{chain} on table #{table}"
-      t.call ['-t', table, '-X', chain]
     end
   end
 
