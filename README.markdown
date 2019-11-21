@@ -142,6 +142,29 @@ Rules are persisted automatically between reboots, although there are known issu
   }
   ~~~
 
+  Internal chains can not be deleted. In order to avoid all the confusing Warning/Notice messages when using purge => true, like these ones:
+
+    Notice: Compiled catalog for blonde-height.delivery.puppetlabs.net in environment production in 0.05 seconds
+    Warning: Firewallchain[INPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain INPUT:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[INPUT:mangle:IPv4]/ensure: removed
+    Warning: Firewallchain[FORWARD:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain FORWARD:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[FORWARD:mangle:IPv4]/ensure: removed
+    Warning: Firewallchain[OUTPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain OUTPUT:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[OUTPUT:mangle:IPv4]/ensure: removed
+    Warning: Firewallchain[POSTROUTING:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain POSTROUTING:mangle:IPv4
+    Notice: /Stage[main]/Main/Firewallchain[POSTROUTING:mangle:IPv4]/ensure: removed
+
+  Please create firewallchains for every internal chain. Here is an example:
+
+   ~~~ puppet
+    firewallchain { 'POSTROUTING:mangle:IPv6':
+      ensure  => present,
+    }
+    resources { 'firewallchain':
+      purge => true,
+    }
+  ~~~
+
   **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs for the firewall chain to be purged. This is different than the `purge` parameter available in `firewallchain`.
 
 2.  Use the following code to set up the default parameters for all of the firewall rules that you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order and avoid locking you out of your box during the first Puppet run.
@@ -451,17 +474,20 @@ Report found bugs in JIRA:
 
 ## Development
 
-Puppet modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can’t access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
+Acceptance tests for this module leverage [puppet_litmus](https://github.com/puppetlabs/puppet_litmus).
+To run the acceptance tests follow the instructions [here](https://github.com/puppetlabs/puppet_litmus/wiki/Tutorial:-use-Litmus-to-execute-acceptance-tests-with-a-sample-module-(MoTD)#install-the-necessary-gems-for-the-module).
+You can also find a tutorial and walkthrough of using Litmus and the PDK on [YouTube](https://www.youtube.com/watch?v=FYfR7ZEGHoE).
 
-We want to keep it as easy as possible to contribute changes so that our modules work in your environment. There are a few guidelines that we need contributors to follow so that we can have a chance of keeping on top of things.
+If you run into an issue with this module, or if you would like to request a feature, please [file a ticket](https://tickets.puppetlabs.com/browse/MODULES/).
+Every Monday the Puppet IA Content Team has [office hours](https://puppet.com/community/office-hours) in the [Puppet Community Slack](http://slack.puppet.com/), alternating between an EMEA friendly time (1300 UTC) and an Americas friendly time (0900 Pacific, 1700 UTC).
 
-Read the module's CONTRIBUTING.md before contributing.
+If you have problems getting this module up and running, please [contact Support](http://puppetlabs.com/services/customer-support).
 
-This module supports:
+If you submit a change to this module, be sure to regenerate the reference documentation as follows:
 
-* iptables
-* ip6tables
-* ebtables (chains only)
+```bash
+puppet strings generate --format markdown --out REFERENCE.md
+```
 
 ### Testing
 
