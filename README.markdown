@@ -143,7 +143,8 @@ resources { 'firewallchain':
 }
 ```
 
-  Internal chains can not be deleted. In order to avoid all the confusing Warning/Notice messages when using purge => true, like these ones:
+Internal chains can not be deleted. In order to avoid all the confusing
+Warning/Notice messages when using `purge => true`, like these ones:
 
     Notice: Compiled catalog for blonde-height.delivery.puppetlabs.net in environment production in 0.05 seconds
     Warning: Firewallchain[INPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain INPUT:mangle:IPv4
