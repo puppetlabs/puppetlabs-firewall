@@ -468,9 +468,9 @@ To prevent this issue, do not use MCollective to kick off Puppet runs. Use any o
 
 #### Reporting Issues
 
-Report found bugs in JIRA:
+Please report any bugs in the Puppetlabs JIRA issue tracker:
 
-<http://tickets.puppetlabs.com>
+<https://tickets.puppetlabs.com/projects/MODULES/issues>
 
 ## Development
 
