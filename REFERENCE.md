@@ -639,6 +639,17 @@ table, using the conntrack module. Values can be:
 * RELATED
 * UNTRACKED
 
+##### `ctdir`
+
+Valid values: REPLY, ORIGINAL
+
+Matches a packet that is flowing in the specified direction.
+If this flag is not specified at all, matches packets in both directions.
+Values can be:
+
+* REPLY
+* ORIGINAL
+
 ##### `connmark`
 
 Match the Netfilter mark value associated with the packet.  Accepts either of:
