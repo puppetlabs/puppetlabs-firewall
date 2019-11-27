@@ -1338,4 +1338,45 @@ describe 'firewall basics', docker: true do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
     end
   end
+
+  describe 'ctstate' do
+    context 'when invalid value' do
+      pp = <<-PUPPETCODE
+      firewall { '004 - log_level and log_prefix':
+        chain      => 'INPUT',
+        proto      => 'all',
+        ctstate    => 'foobar',
+        jump       => 'LOG',
+        log_level  => '3',
+        log_prefix => 'IPTABLES dropped invalid: ',
+      }
+      PUPPETCODE
+      it 'fails' do
+        apply_manifest(pp, expect_failures: true) do |r|
+          expect(r.stderr).to match(%r{ctstate})
+        end
+      end
+    end
+  end
+
+  describe 'ctdir' do
+    context 'when invalid value' do
+      pp = <<-PUPPETCODE
+      firewall { '004 - log_level and log_prefix':
+        chain      => 'INPUT',
+        proto      => 'all',
+        ctstate    => 'INVALID',
+        ctdir      => 'foobar',
+        jump       => 'LOG',
+        log_level  => '3',
+        log_prefix => 'IPTABLES dropped invalid: ',
+      }
+      PUPPETCODE
+      it 'fails' do
+        apply_manifest(pp, expect_failures: true) do |r|
+          expect(r.stderr).to match(%r{ctdir})
+        end
+      end
+    end
+  end
 end
