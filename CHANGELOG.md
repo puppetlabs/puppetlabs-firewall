@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.2.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.2.0) (2019-12-09)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.1.0...v2.2.0)
+
+### Added
+
+- Add support for Debian Unstable [\#876](https://github.com/puppetlabs/puppetlabs-firewall/pull/876) ([martialblog](https://github.com/martialblog))
+- \(FM-8673\) - Support added for CentOS 8 [\#873](https://github.com/puppetlabs/puppetlabs-firewall/pull/873) ([david22swan](https://github.com/david22swan))
+- FM-8400 - add debian10 support [\#862](https://github.com/puppetlabs/puppetlabs-firewall/pull/862) ([lionce](https://github.com/lionce))
+- FM-8219 - Convert to litmus [\#855](https://github.com/puppetlabs/puppetlabs-firewall/pull/855) ([lionce](https://github.com/lionce))
+
+### Fixed
+
+- Change - Avoid puppet failures on windows nodes [\#874](https://github.com/puppetlabs/puppetlabs-firewall/pull/874) ([blackknight36](https://github.com/blackknight36))
+- Fix parsing iptables rules with hyphen in comments [\#861](https://github.com/puppetlabs/puppetlabs-firewall/pull/861) ([Hexta](https://github.com/Hexta))
+
 ## [v2.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.1.0) (2019-09-24)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.0.0...v2.1.0)
