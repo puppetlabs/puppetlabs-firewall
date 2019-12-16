@@ -66,59 +66,60 @@ The rules in the `pre` and `post` classes are fairly general. These two classes 
 
 1. Add the `pre` class to `my_fw/manifests/pre.pp`, and any default rules to your pre.pp file first — in the order you want them to run.
 
-  ~~~ puppet
-  class my_fw::pre {
-    Firewall {
-      require => undef,
-    }
-
-    # Default firewall rules
-    firewall { '000 accept all icmp':
-      proto  => 'icmp',
-      action => 'accept',
-    }->
-    firewall { '001 accept all to lo interface':
-      proto   => 'all',
-      iniface => 'lo',
-      action  => 'accept',
-    }->
-    firewall { '002 reject local traffic not on loopback interface':
-      iniface     => '! lo',
-      proto       => 'all',
-      destination => '127.0.0.1/8',
-      action      => 'reject',
-    }->
-    firewall { '003 accept related established rules':
-      proto  => 'all',
-      state  => ['RELATED', 'ESTABLISHED'],
-      action => 'accept',
-    }
+```puppet
+class my_fw::pre {
+  Firewall {
+    require => undef,
   }
-  ~~~
 
- The rules in `pre` allow basic networking (such as ICMP and TCP) and ensure that existing connections are not closed.
+  # Default firewall rules
+  firewall { '000 accept all icmp':
+    proto  => 'icmp',
+    action => 'accept',
+  }
+  -> firewall { '001 accept all to lo interface':
+    proto   => 'all',
+    iniface => 'lo',
+    action  => 'accept',
+  }
+  -> firewall { '002 reject local traffic not on loopback interface':
+    iniface     => '! lo',
+    proto       => 'all',
+    destination => '127.0.0.1/8',
+    action      => 'reject',
+  }
+  -> firewall { '003 accept related established rules':
+    proto  => 'all',
+    state  => ['RELATED', 'ESTABLISHED'],
+    action => 'accept',
+  }
+}
+```
+
+The rules in `pre` allow basic networking (such as ICMP and TCP) and ensure that
+existing connections are not closed.
 
 2. Add the `post` class to `my_fw/manifests/post.pp` and include any default rules — apply these last.
 
-  ~~~ puppet
-  class my_fw::post {
-    firewall { '999 drop all':
-      proto  => 'all',
-      action => 'drop',
-      before => undef,
-    }
+```puppet
+class my_fw::post {
+  firewall { '999 drop all':
+    proto  => 'all',
+    action => 'drop',
+    before => undef,
   }
-  ~~~
+}
+```
 
 Alternatively, the [firewallchain](#type-firewallchain) type can be used to set the default policy:
 
-  ~~~ puppet
-  firewallchain { 'INPUT:filter:IPv4':
-    ensure => present,
-    policy => drop,
-    before => undef,
-  }
-  ~~~
+```puppet
+firewallchain { 'INPUT:filter:IPv4':
+  ensure => present,
+  policy => drop,
+  before => undef,
+}
+```
 
 #### Create firewall rules
 
@@ -128,21 +129,22 @@ Rules are persisted automatically between reboots, although there are known issu
 
 1. In site.pp or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
 
-  ~~~ puppet
-  resources { 'firewall':
-    purge => true,
-  }
-  ~~~
+```puppet
+resources { 'firewall':
+  purge => true,
+}
+```
 
   To purge unmanaged firewall chains, add:
 
-  ~~~ puppet
-  resources { 'firewallchain':
-    purge => true,
-  }
-  ~~~
+```puppet
+resources { 'firewallchain':
+  purge => true,
+}
+```
 
-  Internal chains can not be deleted. In order to avoid all the confusing Warning/Notice messages when using purge => true, like these ones:
+Internal chains can not be deleted. In order to avoid all the confusing
+Warning/Notice messages when using `purge => true`, like these ones:
 
     Notice: Compiled catalog for blonde-height.delivery.puppetlabs.net in environment production in 0.05 seconds
     Warning: Firewallchain[INPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain INPUT:mangle:IPv4
@@ -156,37 +158,38 @@ Rules are persisted automatically between reboots, although there are known issu
 
   Please create firewallchains for every internal chain. Here is an example:
 
-   ~~~ puppet
-    firewallchain { 'POSTROUTING:mangle:IPv6':
-      ensure  => present,
-    }
-    resources { 'firewallchain':
-      purge => true,
-    }
-  ~~~
+```puppet
+firewallchain { 'POSTROUTING:mangle:IPv6':
+  ensure  => present,
+}
+
+resources { 'firewallchain':
+  purge => true,
+}
+```
 
   **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs for the firewall chain to be purged. This is different than the `purge` parameter available in `firewallchain`.
 
 2.  Use the following code to set up the default parameters for all of the firewall rules that you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order and avoid locking you out of your box during the first Puppet run.
 
-  ~~~ puppet
-  Firewall {
-    before  => Class['my_fw::post'],
-    require => Class['my_fw::pre'],
-  }
-  ~~~
+```puppet
+Firewall {
+  before  => Class['my_fw::post'],
+  require => Class['my_fw::pre'],
+}
+```
 
 3. Declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an external node classifier or the following code:
 
-  ~~~ puppet
-  class { ['my_fw::pre', 'my_fw::post']: }
-  ~~~
+```puppet
+class { ['my_fw::pre', 'my_fw::post']: }
+```
 
 4. Include the `firewall` class to ensure the correct packages are installed:
 
-  ~~~ puppet
-  class { 'firewall': }
-  ~~~
+```puppet
+class { 'firewall': }
+```
 
 ### Upgrading
 
@@ -216,33 +219,33 @@ In iptables, the title of the rule is stored using the comment feature of the un
 
 Basic accept ICMP request example:
 
-~~~ puppet
+```puppet
 firewall { '000 accept all icmp requests':
   proto  => 'icmp',
   action => 'accept',
 }
-~~~
+```
 
 Drop all:
 
-~~~ puppet
+```puppet
 firewall { '999 drop all other requests':
   action => 'drop',
 }
-~~~
+```
 
 #### Example of an IPv6 rule
 
 IPv6 rules can be specified using the _ip6tables_ provider:
 
-~~~ puppet
+```puppet
 firewall { '006 Allow inbound SSH (v6)':
   dport    => 22,
-  proto    => tcp,
-  action   => accept,
+  proto    => 'tcp',
+  action   => 'accept',
   provider => 'ip6tables',
 }
-~~~
+```
 
 ### Application-specific rules
 
@@ -255,18 +258,20 @@ remain close to the services managed by the profile.
 
 This is an example of firewall rules in a profile:
 
-~~~ puppet
+```puppet
 class profile::apache {
   include apache
-  apache::vhost { 'mysite': ensure => present }
+  apache::vhost { 'mysite':
+    ensure => present,
+  }
 
   firewall { '100 allow http and https access':
     dport  => [80, 443],
-    proto  => tcp,
-    action => accept,
+    proto  => 'tcp',
+    action => 'accept',
   }
 }
-~~~
+```
 
 ### Rule inversion
 
@@ -276,11 +281,12 @@ Parameters that understand inversion are: connmark, ctstate, destination, dport,
 
 Examples:
 
-~~~ puppet
+```puppet
 firewall { '001 disallow esp protocol':
   action => 'accept',
   proto  => '! esp',
 }
+
 firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
   chain     => 'INPUT',
   state     => 'NEW',
@@ -290,23 +296,23 @@ firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN u
   source    => '! 10.0.0.0/8',
   tcp_flags => '! FIN,SYN,RST,ACK SYN',
 }
-~~~
+```
 
 ### Additional uses for the firewall module
 
 You can apply firewall rules to specific nodes. Usually, you should put the firewall rule in another class and apply that class to a node. Apply a rule to a node as follows:
 
-~~~ puppet
+```puppet
 node 'some.node.com' {
   firewall { '111 open port 111':
     dport => 111,
   }
 }
-~~~
+```
 
 You can also do more complex things with the `firewall` resource. This example sets up static NAT for the source network 10.1.2.0/24:
 
-~~~ puppet
+```puppet
 firewall { '100 snat for network foo2':
   chain    => 'POSTROUTING',
   jump     => 'MASQUERADE',
@@ -315,67 +321,69 @@ firewall { '100 snat for network foo2':
   source   => '10.1.2.0/24',
   table    => 'nat',
 }
-~~~
+```
 
 
 You can also change the TCP MSS value for VPN client traffic:
 
-~~~ puppet
+```puppet
 firewall { '110 TCPMSS for VPN clients':
   chain     => 'FORWARD',
   table     => 'mangle',
   source    => '10.0.2.0/24',
-  proto     => tcp,
+  proto     => 'tcp',
   tcp_flags => 'SYN,RST SYN',
   mss       => '1361:1541',
   set_mss   => '1360',
   jump      => 'TCPMSS',
 }
-~~~
+```
 
 The following will mirror all traffic sent to the server to a secondary host on the LAN with the TEE target:
 
-~~~ puppet
+```puppet
 firewall { '503 Mirror traffic to IDS':
-  proto   => all,
+  proto   => 'all',
   jump    => 'TEE',
   gateway => '10.0.0.2',
   chain   => 'PREROUTING',
   table   => 'mangle',
 }
-~~~
+```
 
 The following example creates a new chain and forwards any port 5000 access to it.
 
-~~~ puppet
+```puppet
 firewall { '100 forward to MY_CHAIN':
   chain   => 'INPUT',
   jump    => 'MY_CHAIN',
 }
+
 # The namevar here is in the format chain_name:table:protocol
 firewallchain { 'MY_CHAIN:filter:IPv4':
   ensure  => present,
 }
+
 firewall { '100 my rule':
   chain   => 'MY_CHAIN',
   action  => 'accept',
   proto   => 'tcp',
   dport   => 5000,
 }
-~~~
+```
 
 Setup NFLOG for a rule.
 
-~~~ puppet
+```puppet
 firewall {'666 for NFLOG':
-  proto => 'all',
-  jump  => 'NFLOG',
-  nflog_group => 3,
-  nflog_prefix => "nflog-test",
-  nflog_range = 256,
+  proto           => 'all',
+  jump            => 'NFLOG',
+  nflog_group     => 3,
+  nflog_prefix    => 'nflog-test',
+  nflog_range     => 256,
   nflog_threshold => 1,
 }
-~~~
+```
 
 ### Additional information
 
@@ -435,7 +443,7 @@ A community module, [alexharvey-firewall_multi](https://forge.puppet.com/alexhar
 
 For example:
 
-~~~ puppet
+```puppet
 firewall_multi { '100 allow http and https access':
   source => [
     '10.0.10.0/24',
@@ -443,10 +451,10 @@ firewall_multi { '100 allow http and https access':
     '10.1.1.128',
   ],
   dport  => [80, 443],
-  proto  => tcp,
-  action => accept,
+  proto  => 'tcp',
+  action => 'accept',
 }
-~~~
+```
 
 For more information see the documentation at [alexharvey-firewall_multi](https://forge.puppet.com/alexharvey/firewall_multi).
 
@@ -468,9 +476,9 @@ To prevent this issue, do not use MCollective to kick off Puppet runs. Use any o
 
 #### Reporting Issues
 
-Report found bugs in JIRA:
+Please report any bugs in the Puppetlabs JIRA issue tracker:
 
-<http://tickets.puppetlabs.com>
+<https://tickets.puppetlabs.com/projects/MODULES/issues>
 
 ## Development
 
@@ -498,12 +506,14 @@ Make sure you have:
 
 Install the necessary gems:
 
-~~~ text
+```text
 bundle install
-~~~
+```
 
 And run the tests from the root of the source code:
 
-~~~ text
+```text
 bundle exec rake parallel_spec
-~~~
+```
+
+See also `.travis.yml` for information on running the acceptance and other tests.
