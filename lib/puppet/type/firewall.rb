@@ -33,7 +33,7 @@ Puppet::Type.newtype(:firewall) do
       * ip6tables: Ip6tables type provider
 
         * Required binaries: ip6tables-save, ip6tables.
-        * Supported features: address_type, connection_limiting, dnat, hop_limiting, icmp_match,
+        * Supported features: address_type, connection_limiting, conntrack, dnat, hop_limiting, icmp_match,
         interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfirstfrag,
         ishasmorefrags, islastfrag, length, log_level, log_prefix, log_uid, mark, mask, mss,
         owner, pkttype, queue_bypass, queue_num, rate_limiting, recent_limiting, reject_type,
@@ -43,7 +43,7 @@ Puppet::Type.newtype(:firewall) do
 
         * Required binaries: iptables-save, iptables.
         * Default for kernel == linux.
-        * Supported features: address_type, clusterip, connection_limiting, dnat, icmp_match,
+        * Supported features: address_type, clusterip, connection_limiting, conntrack, dnat, icmp_match,
         interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfragment, length,
         log_level, log_prefix, log_uid, mark, mask, mss, netmap, nflog_group, nflog_prefix,
         nflog_range, nflog_threshold, owner, pkttype, queue_bypass, queue_num, rate_limiting,
@@ -55,6 +55,8 @@ Puppet::Type.newtype(:firewall) do
       * clusterip: Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them.
 
       * connection_limiting: Connection limiting features.
+
+      * conntrack: Connection tracking features.
 
       * dnat: Destination NATing.
 
@@ -134,6 +136,7 @@ Puppet::Type.newtype(:firewall) do
   PUPPETCODE
 
   feature :connection_limiting, 'Connection limiting features.'
+  feature :conntrack, 'Connection tracking features.'
   feature :hop_limiting, 'Hop limiting features.'
   feature :rate_limiting, 'Rate limiting features.'
   feature :recent_limiting, 'The netfilter recent module'
@@ -910,7 +913,7 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  newproperty(:ctstate, array_matching: :all, required_features: :state_match) do
+  newproperty(:ctstate, array_matching: :all, required_features: :conntrack) do
     desc <<-PUPPETCODE
       Matches a packet based on its state in the firewall stateful inspection
       table, using the conntrack module. Values can be:
@@ -920,9 +923,11 @@ Puppet::Type.newtype(:firewall) do
       * NEW
       * RELATED
       * UNTRACKED
+      * SNAT
+      * DNAT
     PUPPETCODE
 
-    newvalues(:INVALID, :ESTABLISHED, :NEW, :RELATED, :UNTRACKED)
+    newvalues(:INVALID, :ESTABLISHED, :NEW, :RELATED, :UNTRACKED, :SNAT, :DNAT)
 
     # States should always be sorted. This normalizes the resource states to
     # keep it consistent with the sorted result from iptables-save.
@@ -938,6 +943,286 @@ Puppet::Type.newtype(:firewall) do
       value = [value] unless value.is_a?(Array)
       value.join(',')
     end
+  end
+
+  newproperty(:ctproto, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The specific layer-4 protocol number to match for this rule using the
+      conntrack module.
+    PUPPETCODE
+    newvalue(%r{^!?\s?\d+$})
+  end
+
+  newproperty(:ctorigsrc, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The original source address using the conntrack module. For example:
+
+          ctorigsrc => '192.168.2.0/24'
+
+      You can also negate a mask by putting ! in front. For example:
+
+          ctorigsrc => '! 192.168.2.0/24'
+
+      The ctorigsrc can also be an IPv6 address if your provider supports it.
+    PUPPETCODE
+
+    munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        raise('cannot work out protocol family')
+      end
+
+      begin
+        @resource.host_to_mask(value, protocol)
+        if protocol == :IPv4
+          value.chomp('/32')
+        elsif protocol == :IPv6
+          value.chomp('/128')
+        end
+      rescue StandardError => e
+        raise("host_to_ip failed for #{value}, exception #{e}")
+      end
+    end
+  end
+
+  newproperty(:ctorigdst, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The original destination address using the conntrack module. For example:
+
+          ctorigdst => '192.168.2.0/24'
+
+      You can also negate a mask by putting ! in front. For example:
+
+          ctorigdst => '! 192.168.2.0/24'
+
+      The ctorigdst can also be an IPv6 address if your provider supports it.
+    PUPPETCODE
+
+    munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        raise('cannot work out protocol family')
+      end
+
+      begin
+        @resource.host_to_mask(value, protocol)
+        if protocol == :IPv4
+          value.chomp('/32')
+        elsif protocol == :IPv6
+          value.chomp('/128')
+        end
+      rescue StandardError => e
+        raise("host_to_ip failed for #{value}, exception #{e}")
+      end
+    end
+  end
+
+  newproperty(:ctreplsrc, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The reply source address using the conntrack module. For example:
+
+          ctreplsrc => '192.168.2.0/24'
+
+      You can also negate a mask by putting ! in front. For example:
+
+          ctreplsrc => '! 192.168.2.0/24'
+
+      The ctreplsrc can also be an IPv6 address if your provider supports it.
+    PUPPETCODE
+
+    munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        raise('cannot work out protocol family')
+      end
+
+      begin
+        @resource.host_to_mask(value, protocol)
+        if protocol == :IPv4
+          value.chomp('/32')
+        elsif protocol == :IPv6
+          value.chomp('/128')
+        end
+      rescue StandardError => e
+        raise("host_to_ip failed for #{value}, exception #{e}")
+      end
+    end
+  end
+
+  newproperty(:ctrepldst, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The reply destination address using the conntrack module. For example:
+
+          ctrepldst => '192.168.2.0/24'
+
+      You can also negate a mask by putting ! in front. For example:
+
+          ctrepldst => '! 192.168.2.0/24'
+
+      The ctrepldst can also be an IPv6 address if your provider supports it.
+    PUPPETCODE
+
+    munge do |value|
+      case @resource[:provider]
+      when :iptables
+        protocol = :IPv4
+      when :ip6tables
+        protocol = :IPv6
+      else
+        raise('cannot work out protocol family')
+      end
+
+      begin
+        @resource.host_to_mask(value, protocol)
+        if protocol == :IPv4
+          value.chomp('/32')
+        elsif protocol == :IPv6
+          value.chomp('/128')
+        end
+      rescue StandardError => e
+        raise("host_to_ip failed for #{value}, exception #{e}")
+      end
+    end
+  end
+
+  newproperty(:ctorigsrcport, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The original source port to match for this filter using the conntrack module.
+      For example:
+
+          ctorigsrcport => '80'
+
+      You can also specify a port range: For example:
+
+          ctorigsrcport => '80:81'
+
+      You can also negate a port by putting ! in front. For example:
+
+          ctorigsrcport => '! 80'
+
+    PUPPETCODE
+    newvalue(%r{^!?\s?\d+$|^!?\s?\d+\:\d+$})
+  end
+
+  newproperty(:ctorigdstport, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The original destination port to match for this filter using the conntrack module.
+      For example:
+
+          ctorigdstport => '80'
+
+      You can also specify a port range: For example:
+
+          ctorigdstport => '80:81'
+
+      You can also negate a port by putting ! in front. For example:
+
+          ctorigdstport => '! 80'
+
+    PUPPETCODE
+    newvalue(%r{^!?\s?\d+$|^!?\s?\d+\:\d+$})
+  end
+
+  newproperty(:ctreplsrcport, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The reply source port to match for this filter using the conntrack module.
+      For example:
+
+          ctreplsrcport => '80'
+
+      You can also specify a port range: For example:
+
+          ctreplsrcport => '80:81'
+
+      You can also negate a port by putting ! in front. For example:
+
+          ctreplsrcport => '! 80'
+
+    PUPPETCODE
+    newvalue(%r{^!?\s?\d+$|^!?\s?\d+\:\d+$})
+  end
+
+  newproperty(:ctrepldstport, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      The reply destination port to match for this filter using the conntrack module.
+      For example:
+
+          ctrepldstport => '80'
+
+      You can also specify a port range: For example:
+
+          ctrepldstport => '80:81'
+
+      You can also negate a port by putting ! in front. For example:
+
+          ctrepldstport => '! 80'
+
+    PUPPETCODE
+    newvalue(%r{^!?\s?\d+$|^!?\s?\d+\:\d+$})
+  end
+
+  newproperty(:ctstatus, array_matching: :all, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      Matches a packet based on its status using the conntrack module. Values can be:
+
+      * EXPECTED
+      * SEEN_REPLY
+      * ASSURED
+      * CONFIRMED
+    PUPPETCODE
+
+    newvalues(:NONE, :EXPECTED, :SEEN_REPLY, :ASSURED, :CONFIRMED)
+
+    # Statuses should always be sorted. This normalizes the resource status to
+    # keep it consistent with the sorted result from iptables-save.
+    def should=(values)
+      @should = super(values).sort_by { |sym| sym.to_s }
+    end
+
+    def to_s?(value)
+      should_to_s(value)
+    end
+
+    def should_to_s(value)
+      value = [value] unless value.is_a?(Array)
+      value.join(',')
+    end
+  end
+
+  newproperty(:ctexpire, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      Matches a packet based on lifetime remaining in seconds or range of values
+      using the conntrack module. For example:
+
+          ctexpire => '100:150'
+
+    PUPPETCODE
+    newvalue(%r{^!?\s?\d+$|^!?\s?\d+\:\d+$})
+  end
+
+  newproperty(:ctdir, required_features: :conntrack) do
+    desc <<-PUPPETCODE
+      Matches a packet that is flowing in the specified direction using the
+      conntrack module. If this flag is not specified at all, matches packets
+      in both directions. Values can be:
+
+      * REPLY
+      * ORIGINAL
+    PUPPETCODE
+
+    newvalues(:REPLY, :ORIGINAL)
   end
 
   # Connection mark

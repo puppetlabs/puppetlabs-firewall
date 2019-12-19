@@ -3,6 +3,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
 
   has_feature :iptables
   has_feature :connection_limiting
+  has_feature :conntrack
   has_feature :hop_limiting
   has_feature :rate_limiting
   has_feature :recent_limiting
@@ -71,7 +72,19 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     connlimit_above: '-m connlimit --connlimit-above',
     connlimit_mask: '--connlimit-mask',
     connmark: '-m connmark --mark',
-    ctstate: '-m conntrack --ctstate',
+    ctstate: '--ctstate',
+    ctproto: '--ctproto',
+    ctorigsrc: '--ctorigsrc',
+    ctorigdst: '--ctorigdst',
+    ctreplsrc: '--ctreplsrc',
+    ctrepldst: '--ctrepldst',
+    ctorigsrcport: '--ctorigsrcport',
+    ctorigdstport: '--ctorigdstport',
+    ctreplsrcport: '--ctreplsrcport',
+    ctrepldstport: '--ctrepldstport',
+    ctstatus: '--ctstatus',
+    ctexpire: '--ctexpire',
+    ctdir: '--ctdir',
     destination: '-d',
     dport: ['-m multiport --dports', '--dport'],
     dst_range: '--dst-range',
@@ -207,6 +220,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     addrtype: [:src_type, :dst_type],
     iprange: [:src_range, :dst_range],
     owner: [:uid, :gid],
+    conntrack: [:ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
+                :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir],
     time: [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
     geoip: [:src_cc, :dst_cc],
     hashlimit: [:hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst, :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask,
@@ -253,7 +268,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
                     :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
                     :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy, :state,
-                    :ctstate, :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
+                    :ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
+                    :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
+                    :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
                     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
                     :string_from, :string_to, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
                     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
