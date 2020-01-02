@@ -763,6 +763,13 @@ Puppet::Type.newtype(:firewall) do
       When combined with jump => "LOG" specifies the log prefix to use when
       logging.
     PUPPETCODE
+
+    munge do |value|
+      if value == ''
+        raise('log_prefix should not be an empty string')
+      end
+      value
+    end
   end
 
   newproperty(:log_uid, required_features: :log_uid) do
@@ -2303,7 +2310,7 @@ Puppet::Type.newtype(:firewall) do
       end
     end
 
-    if value(:log_prefix) || value(:log_level) || value(:log_uid)
+    if value(:log_prefix) || value(:log_level) || value(:log_uid) == :true
       unless value(:jump).to_s == 'LOG'
         raise 'Parameter log_prefix, log_level and log_uid require jump => LOG'
       end
@@ -2343,13 +2350,13 @@ Puppet::Type.newtype(:firewall) do
       raise "Parameter 'stat_probability' requires 'stat_mode' to be set to 'random'"
     end
 
-    if value(:checksum_fill)
+    if value(:checksum_fill) == :true
       unless value(:jump).to_s == 'CHECKSUM' && value(:table).to_s == 'mangle'
         raise 'Parameter checksum_fill requires jump => CHECKSUM and table => mangle'
       end
     end
 
-    if value(:queue_num) || value(:queue_bypass)
+    if value(:queue_num) || value(:queue_bypass) == :true
       unless value(:jump).to_s == 'NFQUEUE'
         raise 'Paramter queue_number and queue_bypass require jump => NFQUEUE'
       end
