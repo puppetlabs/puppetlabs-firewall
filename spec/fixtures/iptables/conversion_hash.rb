@@ -421,6 +421,14 @@ ARGS_TO_HASH = {
       src_type: ['! LOCAL --limit-iface-out', 'LOCAL'],
     },
   },
+  'u32' => {
+    line: '-A cali-fw-cali08818b3e1e0 -m u32 --u32 "0x0>>0x16&0x3c@0xc>>0x8=0x1000"',
+    table: 'filter',
+    params: {
+      chain: 'cali-fw-cali08818b3e1e0',
+      name:  '9000 fff92a2f7e1c5e95f852fdd7e4bd103785db4ae08bc24edd8ed530403bc16e45',
+    },
+  },
   'iniface_1_negated' => {
     line: '-A INPUT ! -i eth0 -j DROP -m comment --comment "060 iniface"',
     table: 'filter',
