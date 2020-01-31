@@ -609,6 +609,7 @@ Puppet::Type.newtype(:firewall) do
       * MASQUERADE
       * REDIRECT
       * MARK
+      * CT
 
       But any valid chain name is allowed.
 
