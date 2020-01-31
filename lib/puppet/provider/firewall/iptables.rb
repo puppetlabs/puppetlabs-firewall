@@ -59,6 +59,12 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
                 '--set-xmark'
               end
 
+  kernelversion = Facter.value('kernelversion')
+  if (kernelversion && Puppet::Util::Package.versioncmp(kernelversion, '3.13') >= 0) &&
+     (iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.6.2') >= 0)
+    has_feature :random_fully
+  end
+
   @protocol = 'IPv4'
 
   @resource_map = {
@@ -115,6 +121,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     proto: '-p',
     queue_num: '--queue-num',
     queue_bypass: '--queue-bypass',
+    random_fully: '--random-fully',
     random: '--random',
     rdest: '--rdest',
     reap: '--reap',
@@ -195,6 +202,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :clamp_mss_to_pmtu,
     :isfragment,
     :log_uid,
+    :random_fully,
     :random,
     :rdest,
     :reap,
@@ -319,7 +327,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
     :nflog_group, :nflog_prefix, :nflog_range, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
-    :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random, :log_prefix,
+    :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random_fully, :random, :log_prefix,
     :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
@@ -493,6 +501,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
                  values.sub(%r{\s-f(?!l)(?=.*--comment)}, ' -f true')
                elsif resource_map[bool].eql?(%r{'--physdev-is-\S+'})
                  values.sub(%r{'#{resource_map[bool]} "! "'}, "#{resource_map[bool]} true")
+               elsif bool == :random
+                 values.sub(%r{#{resource_map[bool]}(\s|$)(?!"!")}, "#{resource_map[bool]} true")
                else
                  # append `true` to booleans that are not already negated (followed by "!")
                  values.sub(%r{#{resource_map[bool]}(?! "!")}, "#{resource_map[bool]} true")

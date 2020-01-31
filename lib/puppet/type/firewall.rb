@@ -133,6 +133,8 @@ Puppet::Type.newtype(:firewall) do
       * ipvs: The ability to match IP Virtual Server packets.
 
       * ct_target: The ability to set connection tracking parameters for a packet or its associated connection.
+
+      * random_fully: The ability to use --random-fully flag.
   PUPPETCODE
 
   feature :connection_limiting, 'Connection limiting features.'
@@ -179,6 +181,7 @@ Puppet::Type.newtype(:firewall) do
   feature :bpf, 'Berkeley Paket Filter feature'
   feature :ipvs, 'Packet belongs to an IP Virtual Server connection'
   feature :ct_target, 'The ability to set connection tracking parameters for a packet or its associated connection'
+  feature :random_fully, 'The ability to use --random-fully flag'
   # provider specific features
   feature :iptables, 'The provider provides iptables features.'
 
@@ -719,6 +722,17 @@ Puppet::Type.newtype(:firewall) do
     desc <<-PUPPETCODE
       For NETMAP this will replace the destination IP
     PUPPETCODE
+  end
+
+  newproperty(:random_fully, required_features: :random_fully) do
+    desc <<-PUPPETCODE
+      When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT"
+      this boolean will enable fully randomized port mapping.
+
+      **NOTE** Requires Kernel >= 3.13 and iptables >= 1.6.2
+    PUPPETCODE
+
+    newvalues(:true, :false)
   end
 
   newproperty(:random, required_features: :dnat) do

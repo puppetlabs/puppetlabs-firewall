@@ -49,6 +49,12 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                 '--set-xmark'
               end
 
+  kernelversion = Facter.value('kernelversion')
+  if (kernelversion && Puppet::Util::Package.versioncmp(kernelversion, '3.13') >= 0) &&
+     (ip6tables_version && Puppet::Util::Package.versioncmp(ip6tables_version, '1.6.2') >= 0)
+    has_feature :random_fully
+  end
+
   def initialize(*args)
     ip6tables_version = Facter.value('ip6tables_version')
     raise ArgumentError, 'The ip6tables provider is not supported on version 1.3 of iptables' if ip6tables_version && ip6tables_version.match(%r{1\.3\.\d})
