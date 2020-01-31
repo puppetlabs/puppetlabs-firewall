@@ -7,6 +7,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   @doc = 'Iptables type provider'
 
   has_feature :iptables
+  has_feature :condition
   has_feature :connection_limiting
   has_feature :conntrack
   has_feature :rate_limiting
@@ -65,6 +66,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     burst: '--limit-burst',
     checksum_fill: '--checksum-fill',
     clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
+    condition: '--condition',
     connlimit_above: '-m connlimit --connlimit-above',
     connlimit_mask: '--connlimit-mask',
     connmark: '-m connmark --mark',
@@ -227,6 +229,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     addrtype: [:src_type, :dst_type],
     iprange: [:src_range, :dst_range],
     owner: [:uid, :gid],
+    condition: [:condition],
     conntrack: [:ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
                 :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir],
     time: [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
@@ -323,7 +326,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :name
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :condition, :name
   ]
 
   def insert
@@ -623,6 +626,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # Invert any rules that are prefixed with a '!'
     [
       :connmark,
+      :condition,
       :ctstate,
       :ctproto,
       :ctorigsrc,
