@@ -609,6 +609,7 @@ Puppet::Type.newtype(:firewall) do
       * MASQUERADE
       * REDIRECT
       * MARK
+      * CT
 
       But any valid chain name is allowed.
 
@@ -2157,6 +2158,12 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
   end
 
+  newproperty(:helper, required_features: :ct_target) do
+    desc <<-PUPPETCODE
+      Invoke the nf_conntrack_xxx helper module for this packet.
+    PUPPETCODE
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
@@ -2371,6 +2378,12 @@ Puppet::Type.newtype(:firewall) do
     if value(:zone)
       unless value(:jump).to_s == 'CT'
         raise 'Parameter zone requires jump => CT'
+      end
+    end
+
+    if value(:helper)
+      unless value(:jump).to_s == 'CT'
+        raise 'Parameter helper requires jump => CT'
       end
     end
 
