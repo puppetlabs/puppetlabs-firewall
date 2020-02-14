@@ -322,6 +322,12 @@ describe 'firewall attribute testing, happy path' do
             physdev_out        => "eth1",
             physdev_is_bridged => true,
           }
+          firewall { '900 - set rpfilter':
+            table    => 'raw',
+            chain    => 'PREROUTING',
+            action   => 'accept',
+            rpfilter => 'invert',
+          }
           firewall { '1000 - set_dscp':
             proto     => 'tcp',
             jump      => 'DSCP',

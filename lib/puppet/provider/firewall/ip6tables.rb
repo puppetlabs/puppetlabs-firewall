@@ -36,6 +36,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :queue_num
   has_feature :queue_bypass
   has_feature :ct_target
+  has_feature :rpfilter
 
   optional_commands(ip6tables: 'ip6tables',
                     ip6tables_save: 'ip6tables-save')
@@ -130,6 +131,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     reject: '--reject-with',
     rhitcount: '--hitcount',
     rname: '--name',
+    rpfilter: '-m rpfilter',
     rseconds: '--seconds',
     rsource: '--rsource',
     rttl: '--rttl',
@@ -200,6 +202,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :rsource,
     :rdest,
     :reap,
+    :rpfilter,
     :rttl,
     :socket,
     :physdev_is_bridged,
@@ -284,5 +287,5 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
                     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
                     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-                    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :helper, :name]
+                    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :helper, :rpfilter, :name]
 end

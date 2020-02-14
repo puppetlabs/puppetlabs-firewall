@@ -1639,6 +1639,17 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:true, :false)
   end
 
+  newproperty(:rpfilter, required_features: :rpfilter) do
+    desc <<-PUPPETCODE
+      Enable the rpfilter module.
+    PUPPETCODE
+
+    newvalues(:loose, :validmark, :'accept-local', :invert)
+    munge do |value|
+      _value = '--' + value
+    end
+  end
+
   newproperty(:socket, required_features: :socket) do
     desc <<-PUPPETCODE
       If true, matches if an open socket can be found by doing a coket lookup
