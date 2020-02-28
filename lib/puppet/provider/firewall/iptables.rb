@@ -140,7 +140,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     stat_probability: '--probability',
     state: '-m state --state',
     string: '-m string --string',
-    string_hex: '-m string --hex-string'
+    string_hex: '-m string --hex-string',
     string_algo: '--algo',
     string_from: '--from',
     string_to: '--to',
