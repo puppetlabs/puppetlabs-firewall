@@ -714,7 +714,7 @@ ARGS_TO_HASH = {
     },
   },
   'hexstring_matching_1' => {
-    line: "-A INPUT -m string --hex-string '|0000FF0001|' --algo bm",
+    line: '-A INPUT -m string --hex-string "|0000FF0001|" --algo bm',
     table: 'filter',
     params: {
       string_hex: '|0000FF0001|',
