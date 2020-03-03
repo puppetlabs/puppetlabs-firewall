@@ -1338,4 +1338,35 @@ describe 'firewall basics', docker: true do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
     end
   end
+
+  describe 'random-fully' do
+    supports_random_fully = if os[:family] == 'redhat' && os[:release].start_with?('8')
+                              true
+                            elsif os[:family] == 'debian' && os[:release].start_with?('10')
+                              true
+                            else
+                              false
+                            end
+
+    before(:all) do
+      pp = <<-PUPPETCODE
+        firewall { '901 - set random-fully':
+          table        => 'nat',
+          chain        => 'POSTROUTING',
+          jump         => 'MASQUERADE',
+          random_fully => true,
+        }
+      PUPPETCODE
+      idempotent_apply(pp)
+    end
+
+    let(:result) { run_shell('iptables-save') }
+
+    it 'adds random-fully rule', if: supports_random_fully do
+      expect(result.stdout).to match(%r{-A POSTROUTING -p tcp -m comment --comment "901 - set random-fully" -j MASQUERADE --random-fully})
+    end
+    it 'adds rule without random-fully', unless: supports_random_fully do
+      expect(result.stdout).to match(%r{-A POSTROUTING -p tcp -m comment --comment "901 - set random-fully" -j MASQUERADE})
+    end
+  end
 end
