@@ -180,8 +180,11 @@ module Puppet::Util::Firewall
 
     # Older iptables-persistent doesn't provide save action.
     if os_key == 'Debian'
-      Facter.fact(:iptables_persistent_version)
-      persist_ver = Facter.value(:iptables_persistent_version)
+      # We need to call flush to clear Facter cache as it's possible the cached value will be nil due to the fact
+      # that the iptables-persistent package was potentially installed after the initial Fact gathering.
+      fact = Facter.fact(:iptables_persistent_version)
+      fact.flush if fact.respond_to?(:flush)
+      persist_ver = fact.value
       if persist_ver && Puppet::Util::Package.versioncmp(persist_ver, '0.5.0') < 0
         os_key = 'Debian_manual'
       end
