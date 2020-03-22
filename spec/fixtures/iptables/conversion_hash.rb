@@ -713,6 +713,14 @@ ARGS_TO_HASH = {
       string_from: '1',
     },
   },
+  'hexstring_matching_1' => {
+    line: '-A INPUT -m string --hex-string "|0000FF0001|" --algo bm',
+    table: 'filter',
+    params: {
+      string_hex: '|0000FF0001|'.
+      string_algo: 'bm',
+    },
+  },
   'nfqueue_jump1' => {
     line: '-A INPUT -m tcp -p tcp -s 1.2.3.4/32 -d 4.3.2.1/32 -j NFQUEUE --queue-num 50 -m comment --comment "000 nfqueue specify queue_num"',
     table: 'filter',
