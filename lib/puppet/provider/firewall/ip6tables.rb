@@ -203,6 +203,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     bytecode: '-m bpf --bytecode',
     zone: '--zone',
     helper: '--helper',
+    notrack: '--notrack',
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -229,6 +230,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :time_contiguous,
     :kernel_timezone,
     :queue_bypass,
+    :notrack,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
@@ -306,5 +308,5 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
                     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
                     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-                    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :helper, :rpfilter, :name]
+                    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :helper, :rpfilter, :name, :notrack]
 end
