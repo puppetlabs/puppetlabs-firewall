@@ -123,7 +123,7 @@ installed.
   * ip6tables: Ip6tables type provider
 
     * Required binaries: ip6tables-save, ip6tables.
-    * Supported features: address_type, connection_limiting, dnat, hop_limiting, icmp_match,
+    * Supported features: address_type, connection_limiting, conntrack, dnat, hop_limiting, icmp_match,
     interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfirstfrag,
     ishasmorefrags, islastfrag, length, log_level, log_prefix, log_uid, mark, mask, mss,
     owner, pkttype, queue_bypass, queue_num, rate_limiting, recent_limiting, reject_type,
@@ -133,7 +133,7 @@ installed.
 
     * Required binaries: iptables-save, iptables.
     * Default for kernel == linux.
-    * Supported features: address_type, clusterip, connection_limiting, dnat, icmp_match,
+    * Supported features: address_type, clusterip, connection_limiting, conntrack, dnat, icmp_match,
     interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfragment, length,
     log_level, log_prefix, log_uid, mark, mask, mss, netmap, nflog_group, nflog_prefix,
     nflog_range, nflog_threshold, owner, pkttype, queue_bypass, queue_num, rate_limiting,
@@ -145,6 +145,8 @@ installed.
   * clusterip: Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them.
 
   * connection_limiting: Connection limiting features.
+
+  * conntrack: Connection tracking features.
 
   * dnat: Destination NATing.
 
@@ -221,6 +223,8 @@ installed.
   * ipvs: The ability to match IP Virtual Server packets.
 
   * ct_target: The ability to set connection tracking parameters for a packet or its associated connection.
+
+  * random_fully: The ability to use --random-fully flag.
 
 #### Properties
 
@@ -489,6 +493,7 @@ The value for the iptables --jump parameter. Normal values are:
 * MASQUERADE
 * REDIRECT
 * MARK
+* CT
 
 But any valid chain name is allowed.
 
@@ -549,6 +554,15 @@ For DNAT this is the port that will replace the destination port.
 ##### `to`
 
 For NETMAP this will replace the destination IP
+
+##### `random_fully`
+
+Valid values: `true`, `false`
+
+When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT"
+this boolean will enable fully randomized port mapping.
+
+**NOTE** Requires Kernel >= 3.13 and iptables >= 1.6.2
 
 ##### `random`
 
@@ -628,7 +642,7 @@ table. Values can be:
 
 ##### `ctstate`
 
-Valid values: INVALID, ESTABLISHED, NEW, RELATED, UNTRACKED
+Valid values: INVALID, ESTABLISHED, NEW, RELATED, UNTRACKED, SNAT, DNAT
 
 Matches a packet based on its state in the firewall stateful inspection
 table, using the conntrack module. Values can be:
@@ -638,6 +652,162 @@ table, using the conntrack module. Values can be:
 * NEW
 * RELATED
 * UNTRACKED
+* SNAT
+* DNAT
+
+##### `ctproto`
+
+Valid values: %r{^!?\s?\d+$}
+
+The specific layer-4 protocol number to match for this rule using the
+conntrack module.
+
+##### `ctorigsrc`
+
+The original source address using the conntrack module. For example:
+
+    ctorigsrc => '192.168.2.0/24'
+
+You can also negate a mask by putting ! in front. For example:
+
+    ctorigsrc => '! 192.168.2.0/24'
+
+The ctorigsrc can also be an IPv6 address if your provider supports it.
+
+##### `ctorigdst`
+
+The original destination address using the conntrack module. For example:
+
+    ctorigdst => '192.168.2.0/24'
+
+You can also negate a mask by putting ! in front. For example:
+
+    ctorigdst => '! 192.168.2.0/24'
+
+The ctorigdst can also be an IPv6 address if your provider supports it.
+
+##### `ctreplsrc`
+
+The reply source address using the conntrack module. For example:
+
+    ctreplsrc => '192.168.2.0/24'
+
+You can also negate a mask by putting ! in front. For example:
+
+    ctreplsrc => '! 192.168.2.0/24'
+
+The ctreplsrc can also be an IPv6 address if your provider supports it.
+
+##### `ctrepldst`
+
+The reply destination address using the conntrack module. For example:
+
+    ctrepldst => '192.168.2.0/24'
+
+You can also negate a mask by putting ! in front. For example:
+
+    ctrepldst => '! 192.168.2.0/24'
+
+The ctrepldst can also be an IPv6 address if your provider supports it.
+
+##### `ctorigsrcport`
+
+Valid values: %r{^!?\s?\d+$|^!?\s?\d+\:\d+$}
+
+The original source port to match for this filter using the conntrack module.
+For example:
+
+    ctorigsrcport => '80'
+
+You can also specify a port range: For example:
+
+    ctorigsrcport => '80:81'
+
+You can also negate a port by putting ! in front. For example:
+
+    ctorigsrcport => '! 80'
+
+##### `ctorigdstport`
+
+Valid values: %r{^!?\s?\d+$|^!?\s?\d+\:\d+$}
+
+The original destination port to match for this filter using the conntrack module.
+For example:
+
+    ctorigdstport => '80'
+
+You can also specify a port range: For example:
+
+    ctorigdstport => '80:81'
+
+You can also negate a port by putting ! in front. For example:
+
+    ctorigdstport => '! 80'
+
+##### `ctreplsrcport`
+
+Valid values: %r{^!?\s?\d+$|^!?\s?\d+\:\d+$}
+
+The reply source port to match for this filter using the conntrack module.
+For example:
+
+    ctreplsrcport => '80'
+
+You can also specify a port range: For example:
+
+    ctreplsrcport => '80:81'
+
+You can also negate a port by putting ! in front. For example:
+
+    ctreplsrcport => '! 80'
+
+##### `ctrepldstport`
+
+Valid values: %r{^!?\s?\d+$|^!?\s?\d+\:\d+$}
+
+The reply destination port to match for this filter using the conntrack module.
+For example:
+
+    ctrepldstport => '80'
+
+You can also specify a port range: For example:
+
+    ctrepldstport => '80:81'
+
+You can also negate a port by putting ! in front. For example:
+
+    ctrepldstport => '! 80'
+
+##### `ctstatus`
+
+Valid values: NONE, EXPECTED, SEEN_REPLY, ASSURED, CONFIRMED
+
+Matches a packet based on its status using the conntrack module. Values can be:
+
+* EXPECTED
+* SEEN_REPLY
+* ASSURED
+* CONFIRMED
+
+##### `ctexpire`
+
+Valid values: %r{^!?\s?\d+$|^!?\s?\d+\:\d+$}
+
+Matches a packet based on lifetime remaining in seconds or range of values
+using the conntrack module. For example:
+
+    ctexpire => '100:150'
+
+##### `ctdir`
+
+Valid values: REPLY, ORIGINAL
+
+Matches a packet that is flowing in the specified direction using the
+conntrack module. If this flag is not specified at all, matches packets
+in both directions. Values can be:
+
+* REPLY
+* ORIGINAL
 
 ##### `connmark`
 
@@ -815,6 +985,12 @@ packet matches that of the packet which hit the `recent => 'set'` rule.
 This may be useful if you have problems with people faking their source
 address in order to DoS you via this module by disallowing others access
 to your site by sending bogus packets to you.  Must be boolean true.
+
+##### `rpfilter`
+
+Valid values: loose, validmark, accept-local, invert
+
+Enable the rpfilter module.
 
 ##### `socket`
 
@@ -1135,6 +1311,10 @@ Indicates that the current packet belongs to an IPVS connection.
 ##### `zone`
 
 Assign this packet to zone id and only have lookups done in that zone.
+
+##### `helper`
+
+Invoke the nf_conntrack_xxx helper module for this packet.
 
 #### Parameters
 
