@@ -1026,6 +1026,11 @@ Sets the length of layer-3 payload to match.
 String matching feature. Matches the packet against the pattern
 given as an argument.
 
+##### `string_hex`
+
+String matching feature. Matches the package against the hex pattern
+given as an argument.
+
 ##### `string_algo`
 
 Valid values: bm, kmp
