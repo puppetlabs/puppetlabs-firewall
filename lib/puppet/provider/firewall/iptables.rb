@@ -406,8 +406,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     counter = 1
 
     # String#lines would be nice, but we need to support Ruby 1.8.5
-    nf_warning_msg = "# Warning: iptables-legacy tables present, use iptables-legacy-save to see them\n"
-    iptables_save.gsub(nf_warning_msg, '').split("\n").each do |line|
+    nf_warning_msg = "# Warning: ip6?tables-legacy tables present, use ip6?tables-legacy-save to see them\n"
+    iptables_save.gsub(%r{#{nf_warning_msg}}, '').split("\n").each do |line|
       unless line =~ %r{^\#\s+|^\:\S+|^COMMIT|^FATAL}
         if line =~ %r{^\*}
           table = line.sub(%r{\*}, '')
