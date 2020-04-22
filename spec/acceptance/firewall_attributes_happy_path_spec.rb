@@ -243,10 +243,13 @@ describe 'firewall attribute testing, happy path' do
             jump       => 'LOG',
             log_prefix => 'FW-A-INPUT: ',
           }
-          firewall { '701 - log_uid':
-            chain   => 'OUTPUT',
-            jump    => 'LOG',
-            log_uid => true,
+          firewall { '701 - log_uid, tcp-sequences and options':
+            chain            => 'OUTPUT',
+            jump             => 'LOG',
+            log_uid          => true,
+            log_tcp_sequence => true,
+            log_tcp_options  => true,
+            log_ip_options   => true,
           }
           firewall { '711 - physdev_in':
             chain => 'FORWARD',
@@ -433,8 +436,8 @@ describe 'firewall attribute testing, happy path' do
     it 'comment containing "-A "' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "700 - blah-A Test Rule" -j LOG --log-prefix "FW-A-INPUT: "})
     end
-    it 'set log_uid' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m comment --comment "701 - log_uid" -j LOG --log-uid})
+    it 'set log_uid, log_tcp_sequence, log_tcp_options, log_ip_options' do
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m comment --comment "701 - log_uid, tcp-sequences and options" -j LOG --log-tcp-sequence --log-tcp-options --log-ip-options --log-uid})
     end
     it 'set physdev_in' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 -m multiport --dports 711 -m comment --comment "711 - physdev_in" -j ACCEPT})

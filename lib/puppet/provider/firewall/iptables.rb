@@ -22,6 +22,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   has_feature :log_level
   has_feature :log_prefix
   has_feature :log_uid
+  has_feature :log_tcp_sequence
+  has_feature :log_tcp_options
+  has_feature :log_ip_options
   has_feature :mark
   has_feature :mss
   has_feature :nflog_group
@@ -107,6 +110,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     log_level: '--log-level',
     log_prefix: '--log-prefix',
     log_uid: '--log-uid',
+    log_tcp_sequence: '--log-tcp-sequence',
+    log_tcp_options: '--log-tcp-options',
+    log_ip_options: '--log-ip-options',
     mac_source: ['-m mac --mac-source', '--mac-source'],
     mask: '--mask',
     match_mark: '-m mark --mark',
@@ -205,6 +211,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :clamp_mss_to_pmtu,
     :isfragment,
     :log_uid,
+    :log_tcp_sequence,
+    :log_tcp_options,
+    :log_ip_options,
     :random_fully,
     :random,
     :rdest,
@@ -331,7 +340,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
     :nflog_group, :nflog_prefix, :nflog_range, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
     :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random_fully, :random, :log_prefix,
-    :log_level, :log_uid, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
+    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
