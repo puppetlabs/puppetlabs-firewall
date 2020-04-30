@@ -17,6 +17,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :log_level
   has_feature :log_prefix
   has_feature :log_uid
+  has_feature :log_tcp_sequence
+  has_feature :log_tcp_options
+  has_feature :log_ip_options
   has_feature :mark
   has_feature :mss
   has_feature :tcp_flags
@@ -114,6 +117,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     log_level: '--log-level',
     log_prefix: '--log-prefix',
     log_uid: '--log-uid',
+    log_tcp_sequence: '--log-tcp-sequence',
+    log_tcp_options: '--log-tcp-options',
+    log_ip_options: '--log-ip-options',
     mask: '--mask',
     match_mark: '-m mark --mark',
     name: '-m comment --comment',
@@ -199,6 +205,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :islastfrag,
     :isfirstfrag,
     :log_uid,
+    :log_tcp_sequence,
+    :log_tcp_options,
+    :log_ip_options,
     :rsource,
     :rdest,
     :reap,
@@ -283,7 +292,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
                     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
                     :string_from, :string_to, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
-                    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
+                    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options,
+                    :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
                     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
                     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
                     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
