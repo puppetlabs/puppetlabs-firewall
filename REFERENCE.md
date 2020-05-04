@@ -1316,6 +1316,10 @@ Assign this packet to zone id and only have lookups done in that zone.
 
 Invoke the nf_conntrack_xxx helper module for this packet.
 
+##### `cgroup`
+
+Matches against the net_cls cgroup ID of the packet.
+
 #### Parameters
 
 The following parameters are available in the `firewall` type.
