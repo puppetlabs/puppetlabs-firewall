@@ -2234,6 +2234,12 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
   end
 
+  newproperty(:cgroup) do
+    desc <<-PUPPETCODE
+      Matches against the net_cls cgroup ID of the packet.
+    PUPPETCODE
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil

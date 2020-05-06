@@ -763,6 +763,13 @@ ARGS_TO_HASH = {
     produce_warning: true,
     params: {},
   },
+  'cgroup_matching_1' => {
+    line: '-A INPUT -m cgroup --cgroup "0x100001"',
+    table: 'filter',
+    params: {
+      cgroup: '0x100001',
+    },
+  },
 }.freeze
 
 # This hash is for testing converting a hash to an argument line.
