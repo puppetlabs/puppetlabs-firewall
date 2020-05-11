@@ -166,6 +166,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     tosource: '--to-source',
     to: '--to',
     uid: '--uid-owner',
+    u32: ['-m u32 --u32', '--u32'],
     physdev_in: '--physdev-in',
     physdev_out: '--physdev-out',
     physdev_is_bridged: '--physdev-is-bridged',
