@@ -32,7 +32,6 @@ jobs:
       - "bundle exec rake 'litmus:provision_list[travis_deb]'"
       - "bundle exec rake 'litmus:install_agent[puppet5]'"
       - "bundle exec rake litmus:install_module"
-      dist: trusty
       bundler_args:
       env: PLATFORMS=travis_deb_puppet5
       rvm: 2.5.7
@@ -44,7 +43,6 @@ jobs:
       - "bundle exec rake 'litmus:provision_list[travis_ub]'"
       - "bundle exec rake 'litmus:install_agent[puppet5]'"
       - "bundle exec rake litmus:install_module"
-      dist: trusty
       bundler_args:
       env: PLATFORMS=travis_ub_puppet5
       rvm: 2.5.7
@@ -56,7 +54,6 @@ jobs:
       - "bundle exec rake 'litmus:provision_list[travis_el7]'"
       - "bundle exec rake 'litmus:install_agent[puppet5]'"
       - "bundle exec rake litmus:install_module"
-      dist: trusty
       bundler_args:
       env: PLATFORMS=travis_el7_puppet5
       rvm: 2.5.7
@@ -68,7 +65,6 @@ jobs:
       - "bundle exec rake 'litmus:provision_list[travis_deb]'"
       - "bundle exec rake 'litmus:install_agent[puppet6]'"
       - "bundle exec rake litmus:install_module"
-      dist: trusty
       bundler_args:
       env: PLATFORMS=travis_deb_puppet6
       rvm: 2.5.7
@@ -80,7 +76,6 @@ jobs:
       - "bundle exec rake 'litmus:provision_list[travis_ub]'"
       - "bundle exec rake 'litmus:install_agent[puppet6]'"
       - "bundle exec rake litmus:install_module"
-      dist: trusty
       bundler_args:
       env: PLATFORMS=travis_ub_puppet6
       rvm: 2.5.7
@@ -92,7 +87,6 @@ jobs:
       - "bundle exec rake 'litmus:provision_list[travis_el7]'"
       - "bundle exec rake 'litmus:install_agent[puppet6]'"
       - "bundle exec rake litmus:install_module"
-      dist: trusty
       bundler_args:
       env: PLATFORMS=travis_el7_puppet6
       rvm: 2.5.7
