@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.4.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.4.0) (2020-05-13)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.3.0...v2.4.0)
+
+### Added
+
+- Add support for u32 module in iptables [\#917](https://github.com/puppetlabs/puppetlabs-firewall/pull/917) ([sanfrancrisko](https://github.com/sanfrancrisko))
+- Add support for cgroup arg [\#916](https://github.com/puppetlabs/puppetlabs-firewall/pull/916) ([akerl-unpriv](https://github.com/akerl-unpriv))
+- Extend LOG options [\#914](https://github.com/puppetlabs/puppetlabs-firewall/pull/914) ([martialblog](https://github.com/martialblog))
+
+### Fixed
+
+- \(MODULES-8543\) Remove nftables' backend warning from iptables\_save outtput [\#911](https://github.com/puppetlabs/puppetlabs-firewall/pull/911) ([NITEMAN](https://github.com/NITEMAN))
+
 ## [v2.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.3.0) (2020-03-26)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.2.0...v2.3.0)
