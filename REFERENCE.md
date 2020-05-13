@@ -125,7 +125,8 @@ installed.
     * Required binaries: ip6tables-save, ip6tables.
     * Supported features: address_type, connection_limiting, conntrack, dnat, hop_limiting, icmp_match,
     interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfirstfrag,
-    ishasmorefrags, islastfrag, length, log_level, log_prefix, log_uid, mark, mask, mss,
+    ishasmorefrags, islastfrag, length, log_level, log_prefix, log_uid,
+    log_tcp_sequence, log_tcp_options, log_ip_options, mask, mss,
     owner, pkttype, queue_bypass, queue_num, rate_limiting, recent_limiting, reject_type,
     snat, socket, state_match, string_matching, tcp_flags, hashlimit, bpf.
 
@@ -135,7 +136,8 @@ installed.
     * Default for kernel == linux.
     * Supported features: address_type, clusterip, connection_limiting, conntrack, dnat, icmp_match,
     interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfragment, length,
-    log_level, log_prefix, log_uid, mark, mask, mss, netmap, nflog_group, nflog_prefix,
+    log_level, log_prefix, log_uid, log_tcp_sequence, log_tcp_options, log_ip_options,
+    mark, mask, mss, netmap, nflog_group, nflog_prefix,
     nflog_range, nflog_threshold, owner, pkttype, queue_bypass, queue_num, rate_limiting,
     recent_limiting, reject_type, snat, socket, state_match, string_matching, tcp_flags, bpf.
 
@@ -179,6 +181,12 @@ installed.
   * log_prefix: The ability to add prefixes to log messages.
 
   * log_uid: The ability to log the userid of the process which generated the packet.
+
+  * log_tcp_sequence: The ability to log TCP sequence numbers.
+
+  * log_tcp_options: The ability to log TCP packet header.
+
+  * log_ip_options: The ability to log IP/IPv6 packet header.
 
   * mark: The ability to match or set the netfilter mark value associated with the packet.
 
@@ -592,6 +600,27 @@ Valid values: `true`, `false`
 
 When combined with jump => "LOG" specifies the uid of the process making
 the connection.
+
+##### `log_tcp_sequence`
+
+Valid values: `true`, `false`
+
+When combined with jump => "LOG" enables logging of the TCP sequence
+numbers.
+
+##### `log_tcp_options`
+
+Valid values: `true`, `false`
+
+When combined with jump => "LOG" logging of the TCP packet
+header.
+
+##### `log_ip_options`
+
+Valid values: `true`, `false`
+
+When combined with jump => "LOG" logging of the TCP IP/IPv6
+packet header.
 
 ##### `nflog_group`
 
