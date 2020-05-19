@@ -22,6 +22,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :log_ip_options
   has_feature :mark
   has_feature :mss
+  has_feature :nflog_group
+  has_feature :nflog_prefix
+  has_feature :nflog_range
+  has_feature :nflog_threshold
   has_feature :tcp_flags
   has_feature :pkttype
   has_feature :ishasmorefrags
@@ -125,6 +129,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     name: '-m comment --comment',
     mac_source: ['-m mac --mac-source', '--mac-source'],
     mss: '-m tcpmss --mss',
+    nflog_group: '--nflog-group',
+    nflog_prefix: '--nflog-prefix',
+    nflog_range: '--nflog-range',
+    nflog_threshold: '--nflog-threshold',
     outiface: '-o',
     pkttype: '-m pkttype --pkt-type',
     port: '-m multiport --ports',
@@ -291,7 +299,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
                     :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
                     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_algo,
-                    :string_from, :string_to, :jump, :clamp_mss_to_pmtu, :gateway, :todest,
+                    :string_from, :string_to, :jump, :nflog_group, :nflog_prefix, :nflog_range, :nflog_threshold, :clamp_mss_to_pmtu, :gateway, :todest,
                     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options,
                     :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
                     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
