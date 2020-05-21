@@ -123,6 +123,6 @@ HASH_TO_ARGS6 = {
       provider: 'ip6tables',
       table: 'filter',
     },
-    args: ['-t', :filter, '-p', :tcp, '-j', 'NFLOG', '--nflog-group', '1', '--nflog-prefix', 'myprefix', '-m', 'comment', '--comment', '100 nflog'],
+    args: ['-t', :filter, '-p', :tcp, '-j', 'NFLOG', '--nflog-group', 1, '--nflog-prefix', 'myprefix', '-m', 'comment', '--comment', '100 nflog'],
   },
 }.freeze
