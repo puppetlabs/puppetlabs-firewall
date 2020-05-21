@@ -114,4 +114,15 @@ HASH_TO_ARGS6 = {
     },
     args: ['-t', :filter, '-p', :tcp, '-m', 'hl', '--hl-eq', 255, '-m', 'comment', '--comment', '100 hop limit'],
   },
+  'nflog' => {
+    params: {
+      name: '100 nflog',
+      jump: 'NFLOG',
+      nflog_group: '1',
+      nflog_prefix: 'myprefix',
+      provider: 'ip6tables',
+      table: 'filter',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-J', 'NFLOG', '--nflog-group', '1', '--nflog-prefix', 'myprefix' '-m', 'comment', '--comment', '100 nflog'],
+  },
 }.freeze
