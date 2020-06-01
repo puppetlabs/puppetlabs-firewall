@@ -34,6 +34,14 @@ ARGS_TO_HASH6 = {
       dport: ['546'],
     },
   },
+  'hexstring_matching_1' => {
+    line: '-A INPUT -m string --hex-string "|0000FF0001|" --algo bm',
+    table: 'filter',
+    params: {
+      string_hex: '|0000FF0001|',
+      string_algo: 'bm',
+    },
+  }
 }.freeze
 
 # This hash is for testing converting a hash to an argument line.
