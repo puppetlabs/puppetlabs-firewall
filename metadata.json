@@ -2,7 +2,7 @@
   "name": "puppetlabs-firewall",
   "version": "2.4.0",
   "author": "puppetlabs",
-  "summary": "Manages Firewalls such as iptables",
+  "summary": "Manages Firewalls such as iptables - Test",
   "license": "Apache-2.0",
   "source": "https://github.com/puppetlabs/puppetlabs-firewall",
   "project_page": "http://github.com/puppetlabs/puppetlabs-firewall",
