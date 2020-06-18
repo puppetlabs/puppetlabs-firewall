@@ -13,7 +13,11 @@ end
 def install_iptables
   run_shell('iptables -V')
 rescue
-  run_shell('apt-get install iptables -y')
+  if os[:family] == 'redhat'
+    run_shell('yum install iptables -y')
+  else
+    run_shell('apt-get install iptables -y')
+  end
 end
 
 def iptables_version
