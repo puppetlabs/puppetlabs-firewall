@@ -126,7 +126,7 @@ installed.
     * Supported features: address_type, connection_limiting, conntrack, dnat, hop_limiting, icmp_match,
     interface_match, iprange, ipsec_dir, ipsec_policy, ipset, iptables, isfirstfrag,
     ishasmorefrags, islastfrag, length, log_level, log_prefix, log_uid,
-    log_tcp_sequence, log_tcp_options, log_ip_options, mask, mss,
+    log_tcp_sequence, log_tcp_options, log_ip_options, mask, mss, nflog_group, nflog_prefix, nflog_range, nflog_threshold,
     owner, pkttype, queue_bypass, queue_num, rate_limiting, recent_limiting, reject_type,
     snat, socket, state_match, string_matching, tcp_flags, hashlimit, bpf.
 
