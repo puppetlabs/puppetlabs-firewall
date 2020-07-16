@@ -11,6 +11,9 @@ describe 'firewall attribute testing, happy path' do
 
   describe 'attributes test' do
     before(:all) do
+      notrack_manifest = "jump => 'CT', notrack => true"
+      notrack_manifest = "jump => 'NOTRACK'" if os[:family] == 'redhat' && [5, 6].include?(os[:release].to_i)
+
       pp = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '004 - log_level and log_prefix':
@@ -347,6 +350,13 @@ describe 'firewall attribute testing, happy path' do
             chain          => 'OUTPUT',
             table          => 'mangle',
           }
+          firewall { '004 do not track UDP connections to port 53':
+            chain => 'PREROUTING',
+            table => 'raw',
+            proto  => 'udp',
+            dport => 53,
+            #{notrack_manifest}
+          }
       PUPPETCODE
       idempotent_apply(pp)
     end
@@ -486,6 +496,11 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'jump is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m comment --comment "567 - jump" -j TEST})
+    end
+    it 'notrack is set' do
+      notrack_rule = '-A PREROUTING -p udp -m multiport --dports 53 -m comment --comment "004 do not track UDP connections to port 53" -j CT --notrack'
+      notrack_rule = '-A PREROUTING -p udp -m multiport --dports 53 -m comment --comment "004 do not track UDP connections to port 53" -j NOTRACK' if os[:family] == 'redhat' && [5, 6].include?(os[:release].to_i)
+      expect(result.stdout).to match(%r{#{notrack_rule}})
     end
   end
 end

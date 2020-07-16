@@ -778,6 +778,17 @@ ARGS_TO_HASH = {
       cgroup: '0x100001',
     },
   },
+  'notrack' => {
+    line: '-A PREROUTING -p udp -m multiport --dports 53 -m comment --comment "004 do not track UDP connections to port 53" -j CT --notrack',
+    table: 'raw',
+    params: {
+      chain: 'PREROUTING',
+      proto: 'udp',
+      dport: ['53'],
+      jump: 'CT',
+      notrack: true
+    }
+  },
 }.freeze
 
 # This hash is for testing converting a hash to an argument line.
