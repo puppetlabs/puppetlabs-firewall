@@ -2073,6 +2073,9 @@ Puppet::Type.newtype(:firewall) do
       String matching feature. Matches the package against the hex pattern
       given as an argument.
     PUPPETCODE
+    munge do |value|
+      _value = value.delete(' ')
+    end
   end
 
   newproperty(:string_algo, required_features: :string_matching) do

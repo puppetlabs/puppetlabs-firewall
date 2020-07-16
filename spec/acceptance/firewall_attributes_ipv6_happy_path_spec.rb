@@ -261,6 +261,15 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           proto   => all,
           provider => 'ip6tables',
         }
+        firewall { '812 - hex_string':
+          chain       => 'INPUT',
+          proto       => 'tcp',
+          string_hex  => '|f4 6d 04 25 b2 02 00 0a|',
+          string_algo => 'kmp',
+          string_to   => '65535',
+          action      => accept,
+          provider    => 'ip6tables',
+        }
       PUPPETCODE
       idempotent_apply(pp)
     end
@@ -364,6 +373,9 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
       regex_array.each do |regex|
         expect(result.stdout).to match(regex)
       end
+    end
+    it 'checks hex_string value' do
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m string --hex-string "|f46d0425b202000a|" --algo kmp --to 65535 -m comment --comment "812 - hex_string" -j ACCEPT})
     end
   end
 end
