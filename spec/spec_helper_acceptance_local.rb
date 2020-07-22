@@ -49,23 +49,16 @@ RSpec.configure do |c|
         package { 'iptables':
           ensure   => 'latest',
         }
-<<<<<<< HEAD
         PUPPETCODE
-=======
-      PUPPETCODE
->>>>>>> 7163c3a... Add acceptance and unit test for notrack parameter
       LitmusHelper.instance.apply_manifest(pp)
       LitmusHelper.instance.run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
       LitmusHelper.instance.run_shell('update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
     end
-<<<<<<< HEAD
-=======
     pp = <<-PUPPETCODE
       package { 'conntrack-tools':
         ensure => 'latest',
       }
     PUPPETCODE
     LitmusHelper.instance.apply_manifest(pp)
->>>>>>> 7163c3a... Add acceptance and unit test for notrack parameter
   end
 end
