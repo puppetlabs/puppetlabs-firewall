@@ -54,5 +54,11 @@ RSpec.configure do |c|
       LitmusHelper.instance.run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
       LitmusHelper.instance.run_shell('update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
     end
+    pp = <<-PUPPETCODE
+      package { 'conntrack-tools':
+        ensure => 'latest',
+      }
+    PUPPETCODE
+    LitmusHelper.instance.apply_manifest(pp)
   end
 end

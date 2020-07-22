@@ -2243,6 +2243,15 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
   end
 
+  newproperty(:notrack, required_features: :ct_target) do
+    # use this parameter with latest version of iptables
+    desc <<-PUPPETCODE
+     Invoke the disable connection tracking for this packet.
+     This parameter can be used with iptables version >= 1.8.3
+    PUPPETCODE
+    newvalues(:true, :false)
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
@@ -2464,6 +2473,12 @@ Puppet::Type.newtype(:firewall) do
     if value(:helper)
       unless value(:jump).to_s == 'CT'
         raise 'Parameter helper requires jump => CT'
+      end
+    end
+
+    if value(:notrack)
+      unless value(:jump).to_s == 'CT'
+        raise 'Parameter notrack requires jump => CT'
       end
     end
 
