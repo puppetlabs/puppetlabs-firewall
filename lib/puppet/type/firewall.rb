@@ -2247,6 +2247,7 @@ Puppet::Type.newtype(:firewall) do
     # use this parameter with latest version of iptables
     desc <<-PUPPETCODE
      Invoke the disable connection tracking for this packet.
+     This parameter can be used with iptables version >= 1.8.3
     PUPPETCODE
     newvalues(:true, :false)
   end
