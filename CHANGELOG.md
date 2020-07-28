@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.5.0) (2020-07-28)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.4.0...v2.5.0)
+
+### Added
+
+- Add acceptance and unit test [\#931](https://github.com/puppetlabs/puppetlabs-firewall/pull/931) ([adrianiurca](https://github.com/adrianiurca))
+- \[IAC-899\] - Add acceptance test for string\_hex parameter [\#930](https://github.com/puppetlabs/puppetlabs-firewall/pull/930) ([adrianiurca](https://github.com/adrianiurca))
+- Add support for NFLOG options to ip6tables [\#921](https://github.com/puppetlabs/puppetlabs-firewall/pull/921) ([frh](https://github.com/frh))
+
 ## [v2.4.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.4.0) (2020-05-13)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.3.0...v2.4.0)
