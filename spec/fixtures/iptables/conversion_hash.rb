@@ -234,38 +234,43 @@ ARGS_TO_HASH = {
     },
   },
   'comment_string_character_validation' => {
-    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment "000 allow from 192.168.0.1, please"',
+    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment "000 allow from 192.168.0.1, please" -j ACCEPT',
     table: 'filter',
     params: {
       source: '192.168.0.1/32',
+      action: 'accept',
     },
   },
   'multiple_comments' => {
-    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment "000 allow from 192.168.0.1, please" -m comment --comment "another comment"',
+    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment "000 allow from 192.168.0.1, please" -m comment --comment "another comment" -j ACCEPT',
     table: 'filter',
     params: {
       name: '000 allow from 192.168.0.1, please;another comment',
+      action: 'accept',
     },
   },
-  'comments_without_quotes' => {
-    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment comment_without_quotes',
+  'comments_without_quotes_with_underscores' => {
+    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment comment_without_quotes -j ACCEPT',
     table: 'filter',
     params: {
       name: '9000 comment_without_quotes',
+      action: 'accept',
     },
   },
-  'comments_without_quotes' => {
-    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment 100-comment_without-quotes',
+  'comments_without_quotes_with_dashes' => {
+    line: '-A INPUT -s 192.168.0.1/32 -m comment --comment 100-comment_without-quotes -j ACCEPT',
     table: 'filter',
     params: {
       name: '100-comment_without-quotes',
+      action: 'accept',
     },
   },
   'string_escape_sequences' => {
-    line: '-A INPUT -m comment --comment "000 parse escaped \\"s, \\"s, \\\'s, \\\'s, \\\\s and \\\\s"',
+    line: '-A INPUT -m comment --comment "000 parse escaped \\"s, \\"s, \\\'s, \\\'s, \\\\s and \\\\s" -j ACCEPT',
     table: 'filter',
     params: {
       name: '000 parse escaped "s, "s, \'s, \'s, \\s and \\s',
+      action: 'accept',
     },
   },
   'log_level_debug' => {
