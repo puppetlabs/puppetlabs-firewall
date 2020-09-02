@@ -351,7 +351,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :name, :notrack, :condition
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :condition, :name, :notrack
   ]
 
   def insert
@@ -455,6 +455,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     values = values.gsub(%r{(!\s+)?--tcp-flags (\S*) (\S*)}, '--tcp-flags "\1\2 \3"')
     # --hex-string output is in quotes, need to move ! inside quotes
     values = values.gsub(%r{(!\s+)?--hex-string "(\S*?)"}, '--hex-string "\1\2"')
+    # --condition output is in quotes, need to move ! inside quotes
+    values = values.gsub(%r{(!\s+)?--condition "(\S*?)"}, '--condition "\1\2"')
     # --match-set can have multiple values with weird iptables format
     if values =~ %r{-m set (!\s+)?--match-set}
       values = values.gsub(%r{(!\s+)?--match-set (\S*) (\S*)}, '--match-set \1\2 \3')

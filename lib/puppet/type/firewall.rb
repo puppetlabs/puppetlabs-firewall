@@ -2254,7 +2254,7 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
     newvalues(:true, :false)
   end
-  
+
   newproperty(:condition, required_features: :condition) do
     desc <<-PUPPETCODE
       Match on boolean value (0/1) stored in /proc/net/nf_condition/name.

@@ -474,6 +474,20 @@ To prevent this issue, do not use MCollective to kick off Puppet runs. Use any o
 * Use a cron job.
 * Click [Run Puppet](https://docs.puppet.com/pe/2016.1/console_classes_groups_running_puppet.html#run-puppet-on-an-individual-node) in the console.
 
+### condition parameter
+
+The `condition` parameter requires `xtables-addons` to be installed locally.
+For ubuntu distributions `xtables-addons-common` package can be installed by running command: `apt-get install xtables-addons-common` or
+running a manifest:
+
+```puppet
+package { 'xtables-addons-common':
+  ensure => 'latest',
+}
+```
+
+For other distributions(RedHat, Debian, Centos etc) is required a manual installation of `xtables-addons` package.
+
 #### Reporting Issues
 
 Please report any bugs in the Puppetlabs JIRA issue tracker:

@@ -44,13 +44,13 @@ def update_profile_file
 end
 
 RSpec.configure do |c|
+  # This flag is disabling some tests on docker/vagrant containers
+  # To enable tests on abs/vmpooler machines just set to `true` this flag
+  c.filter_run_excluding ubuntu_vmpooler: false
   c.before :suite do
     if os[:family] == 'debian' && os[:release].to_i == 10
       pp = <<-PUPPETCODE
         package { 'net-tools':
-          ensure   => 'latest',
-        }
-        package { 'iptables':
           ensure   => 'latest',
         }
         PUPPETCODE
@@ -61,6 +61,12 @@ RSpec.configure do |c|
     pp = <<-PUPPETCODE
       package { 'conntrack-tools':
         ensure => 'latest',
+      }
+      package { 'xtables-addons-common':
+        ensure => 'latest',
+      }
+      package { 'iptables':
+        ensure   => 'latest',
       }
     PUPPETCODE
     LitmusHelper.instance.apply_manifest(pp)
