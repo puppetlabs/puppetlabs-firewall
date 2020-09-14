@@ -1,6 +1,6 @@
 # firewall
 
-[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-firewall.png?branch=master)](https://travis-ci.org/puppetlabs/puppetlabs-firewall)
+[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-firewall.png?branch=main)](https://travis-ci.org/puppetlabs/puppetlabs-firewall)
 
 #### Table of Contents
 
@@ -49,9 +49,9 @@ Firewall uses Ruby-based providers, so you must enable [pluginsync](http://docs.
 
 In the following two sections, you create new classes and then create firewall rules related to those classes. These steps are optional but provide a framework for firewall rules, which is helpful if you’re just starting to create them.
 
-If you already have rules in place, then you don’t need to do these two sections. However, be aware of the ordering of your firewall rules. The module will dynamically apply rules in the order they appear in the catalog, meaning a deny rule could be applied before the allow rules. This might mean the module hasn’t established some of the important connections, such as the connection to the Puppet master.
+If you already have rules in place, then you don’t need to do these two sections. However, be aware of the ordering of your firewall rules. The module will dynamically apply rules in the order they appear in the catalog, meaning a deny rule could be applied before the allow rules. This might mean the module hasn’t established some of the important connections, such as the connection to the Puppet server.
 
-The following steps are designed to ensure that you keep your SSH and other connections, primarily your connection to your Puppet master. If you create the `pre` and `post` classes described in the first section, then you also need to create the rules described in the second section.
+The following steps are designed to ensure that you keep your SSH and other connections, primarily your connection to your Puppet server. If you create the `pre` and `post` classes described in the first section, then you also need to create the rules described in the second section.
 
 #### Create the `my_fw::pre` and `my_fw::post` Classes
 
@@ -398,7 +398,7 @@ Or
 
 ## Reference
 
-For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-firewall/blob/master/REFERENCE.md). For information on the facts, see below.
+For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-firewall/blob//REFERENCE.md). For information on the facts, see below.
 
 Facts:
 
@@ -420,7 +420,7 @@ Retrieves the version of iptables-persistent from your OS. This is a Debian/Ubun
 
 ## Limitations
 
-For an extensive list of supported operating systems, see [metadata.json](https://github.com/puppetlabs/puppetlabs-firewall/blob/master/metadata.json)
+For an extensive list of supported operating systems, see [metadata.json](https://github.com/puppetlabs/puppetlabs-firewall/blob/main/metadata.json)
 
 ### SLES
 
