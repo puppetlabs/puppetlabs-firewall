@@ -679,7 +679,7 @@ specify ranges of ports in the sport/dport parameter:
 
 ##### Changes
 
-* (#10295) Work around bug #4248 whereby the puppet/util paths are not being loaded correctly on the puppetmaster
+* (#10295) Work around bug #4248 whereby the puppet/util paths are not being loaded correctly on the puppet server
 * (#10002) Change to dport and sport to handle ranges, and fix handling of name to name to port
 * (#10263) Fix tests on Puppet 2.6.x
 * (#10163) Cleanup some of the inline documentation and README file to align with general forge usage

@@ -1,5 +1,5 @@
 # This is a workaround for bug: #4248 whereby ruby files outside of the normal
-# provider/type path do not load until pluginsync has occured on the puppetmaster
+# provider/type path do not load until pluginsync has occured on the puppet server
 #
 # In this case I'm trying the relative path first, then falling back to normal
 # mechanisms. This should be fixed in future versions of puppet but it looks
