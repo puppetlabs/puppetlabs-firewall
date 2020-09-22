@@ -26,7 +26,8 @@
 #   Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'. Defaults to 'latest'.
 #
 # @param sysconfig_manage
-#   Enable sysconfig configuration for iptables/ip6tables files. Defaults defined in firewall::params. This is disabled for RedHat/CentOS 8+.
+#   Enable sysconfig configuration for iptables/ip6tables files. Defaults defined in firewall::params.
+#   This is disabled for RedHat/CentOS 8+.
 #
 # @api private
 #
@@ -35,11 +36,11 @@ class firewall::linux::redhat (
   $ensure_v6        = undef,
   $enable           = true,
   $enable_v6        = undef,
-  $service_name     = $::firewall::params::service_name,
-  $service_name_v6  = $::firewall::params::service_name_v6,
-  $package_name     = $::firewall::params::package_name,
-  $package_ensure   = $::firewall::params::package_ensure,
-  $sysconfig_manage = $::firewall::params::sysconfig_manage,
+  $service_name     = $firewall::params::service_name,
+  $service_name_v6  = $firewall::params::service_name_v6,
+  $package_name     = $firewall::params::package_name,
+  $package_ensure   = $firewall::params::package_ensure,
+  $sysconfig_manage = $firewall::params::sysconfig_manage,
 ) inherits ::firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
   $_enable_v6 = pick($enable_v6, $enable)
@@ -48,8 +49,8 @@ class firewall::linux::redhat (
   # package, which provides the /usr/libexec/iptables/iptables.init used by
   # lib/puppet/util/firewall.rb.
   if ($::operatingsystem != 'Amazon')
-    and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
-    or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
+  and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
+  or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
     service { 'firewalld':
       ensure => stopped,
       enable => false,
@@ -66,13 +67,13 @@ class firewall::linux::redhat (
   if $package_name {
     ensure_packages($package_name, {
         'ensure' => $package_ensure,
-        'before' => Service[$service_name]}
+      'before' => Service[$service_name] }
     )
   }
 
   if ($::operatingsystem != 'Amazon')
-    and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
-    or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
+  and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
+  or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
     if $ensure == 'running' {
       exec { '/usr/bin/systemctl daemon-reload':
         require     => Package[$package_name],
@@ -84,7 +85,7 @@ class firewall::linux::redhat (
   }
 
   if ($::operatingsystem == 'Amazon') and (versioncmp($::operatingsystemmajrelease, '4') >= 0)
-    or ($::operatingsystem == 'Amazon') and (versioncmp($::operatingsystemmajrelease, '2') >= 0) {
+  or ($::operatingsystem == 'Amazon') and (versioncmp($::operatingsystemmajrelease, '2') >= 0) {
     service { $service_name:
       ensure    => $ensure,
       enable    => $enable,
@@ -116,14 +117,14 @@ class firewall::linux::redhat (
 
   if $sysconfig_manage {
     file { "/etc/sysconfig/${service_name}":
-      ensure => present,
+      ensure => file,
       owner  => 'root',
       group  => 'root',
       mode   => '0600',
     }
     if $service_name_v6 {
       file { "/etc/sysconfig/${service_name_v6}":
-        ensure => present,
+        ensure => file,
         owner  => 'root',
         group  => 'root',
         mode   => '0600',
@@ -178,7 +179,6 @@ class firewall::linux::redhat (
           }
 
           default: {}
-
         }
       }
       default: {}

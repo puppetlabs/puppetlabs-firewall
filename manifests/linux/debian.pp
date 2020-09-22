@@ -21,23 +21,22 @@
 class firewall::linux::debian (
   $ensure         = running,
   $enable         = true,
-  $service_name   = $::firewall::params::service_name,
-  $package_name   = $::firewall::params::package_name,
-  $package_ensure = $::firewall::params::package_ensure,
+  $service_name   = $firewall::params::service_name,
+  $package_name   = $firewall::params::package_name,
+  $package_ensure = $firewall::params::package_ensure,
 ) inherits ::firewall::params {
-
   if $package_name {
     #Fixes hang while installing iptables-persistent on debian 8
-    exec {'iptables-persistent-debconf':
-        command     => "/bin/echo \"${package_name} ${package_name}/autosave_v4 boolean false\" |
+    exec { 'iptables-persistent-debconf':
+      command     => "/bin/echo \"${package_name} ${package_name}/autosave_v4 boolean false\" |
                       /usr/bin/debconf-set-selections && /bin/echo \"${package_name} ${package_name}/autosave_v6 boolean false\" |
                       /usr/bin/debconf-set-selections",
 
-        refreshonly => true,
+      refreshonly => true,
     }
     ensure_packages([$package_name],{
-      ensure  => $package_ensure,
-      require => Exec['iptables-persistent-debconf']
+        ensure  => $package_ensure,
+        require => Exec['iptables-persistent-debconf']
     })
   }
 
