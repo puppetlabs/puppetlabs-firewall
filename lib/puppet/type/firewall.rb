@@ -2062,10 +2062,6 @@ Puppet::Type.newtype(:firewall) do
       String matching feature. Matches the packet against the pattern
       given as an argument.
     PUPPETCODE
-
-    munge do |value|
-      _value = "'" + value + "'"
-    end
   end
 
   newproperty(:string_hex) do

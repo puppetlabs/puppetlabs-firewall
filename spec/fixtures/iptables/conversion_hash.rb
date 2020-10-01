@@ -1390,7 +1390,7 @@ HASH_TO_ARGS = {
       table: 'filter',
       string: 'GET /index.html',
     },
-    args: ['-t', :filter, '-p', :tcp, '-m', 'string', '--string', "'GET /index.html'", '-m', 'comment', '--comment', '000 string_matching'],
+    args: ['-t', :filter, '-p', :tcp, '-m', 'string', '--string', "GET /index.html", '-m', 'comment', '--comment', '000 string_matching'],
   },
   'string_matching_2' => {
     params: {
@@ -1399,7 +1399,7 @@ HASH_TO_ARGS = {
       string: 'GET /index.html',
       string_algo: 'bm',
     },
-    args: ['-t', :filter, '-p', :tcp, '-m', 'string', '--string', "'GET /index.html'", '--algo', :bm, '-m', 'comment', '--comment', '000 string_matching'],
+    args: ['-t', :filter, '-p', :tcp, '-m', 'string', '--string', "GET /index.html", '--algo', :bm, '-m', 'comment', '--comment', '000 string_matching'],
   },
   'string_matching_3' => {
     params: {
@@ -1409,7 +1409,7 @@ HASH_TO_ARGS = {
       string_from: '1',
       string_to: '65535',
     },
-    args: ['-t', :filter, '-p', :tcp, '-m', 'string', '--string', "'GET /index.html'", '--from', '1', '--to', '65535', '-m', 'comment', '--comment', '000 string_matching'],
+    args: ['-t', :filter, '-p', :tcp, '-m', 'string', '--string', "GET /index.html", '--from', '1', '--to', '65535', '-m', 'comment', '--comment', '000 string_matching'],
   },
   'nfqueue_jump1' => {
     params: {
