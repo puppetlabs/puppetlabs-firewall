@@ -57,7 +57,6 @@ class firewall::params {
             $service_name = 'iptables-persistent'
             $package_name = 'iptables-persistent'
           }
-
         }
         'Ubuntu': {
           if versioncmp($::operatingsystemrelease, '14.10') >= 0 {
@@ -67,7 +66,6 @@ class firewall::params {
             $service_name = 'iptables-persistent'
             $package_name = 'iptables-persistent'
           }
-
         }
         default: {
           $service_name = 'iptables-persistent'
