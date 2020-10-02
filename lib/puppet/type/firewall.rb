@@ -549,7 +549,7 @@ Puppet::Type.newtype(:firewall) do
       The specific protocol to match for this rule.
     PUPPETCODE
 
-    newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
+    newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :carp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
       [proto, "! #{proto}".to_sym]
     }.flatten)
     defaultto 'tcp'
