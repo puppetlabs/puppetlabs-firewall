@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.5.0) (2020-10-01)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.5.0...v2.5.0)
+
+### Added
+
+- pdksync - \(IAC-973\) - Update travis/appveyor to run on new default branch main [\#933](https://github.com/puppetlabs/puppetlabs-firewall/pull/933) ([david22swan](https://github.com/david22swan))
+
+### Fixed
+
+- Fix extra quotes in firewall string matching [\#944](https://github.com/puppetlabs/puppetlabs-firewall/pull/944) ([IBBoard](https://github.com/IBBoard))
+- \(IAC-987\) - Removal of inappropriate terminology [\#942](https://github.com/puppetlabs/puppetlabs-firewall/pull/942) ([david22swan](https://github.com/david22swan))
+
 ## [v2.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.5.0) (2020-07-28)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.4.0...v2.5.0)
