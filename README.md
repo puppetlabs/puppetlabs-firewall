@@ -127,7 +127,28 @@ The rules you create here are helpful if you don’t have any existing rules; th
 
 Rules are persisted automatically between reboots, although there are known issues with ip6tables on older Debian/Ubuntu distributions. There are also known issues with ebtables.
 
-1. In site.pp or another top-scope file, add the following code to set up a metatype to purge unmanaged firewall resources. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
+1. Use the following code to set up the default parameters for all of the firewall rules that you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order and avoid locking you out of your box during the first Puppet run.
+
+```puppet
+Firewall {
+  before  => Class['my_fw::post'],
+  require => Class['my_fw::pre'],
+}
+```
+
+2. Declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an external node classifier or the following code:
+
+```puppet
+class { ['my_fw::pre', 'my_fw::post']: }
+```
+
+3. Include the `firewall` class to ensure the correct packages are installed:
+
+```puppet
+class { 'firewall': }
+```
+
+4. If you want to remove unmanaged firewall rules, add the following code to set up a metatype to purge unmanaged firewall resources in your site.pp or another top-scope file. This will clear any existing rules and make sure that only rules defined in Puppet exist on the machine.
 
 ```puppet
 resources { 'firewall':
@@ -168,28 +189,9 @@ resources { 'firewallchain':
 }
 ```
 
-  **Note** - If there are unmanaged rules in unmanaged chains, it will take two Puppet runs for the firewall chain to be purged. This is different than the `purge` parameter available in `firewallchain`.
+> **Note:** If there are unmanaged rules in unmanaged chains, it will take a second Puppet run for the firewall chain to be purged.
 
-2.  Use the following code to set up the default parameters for all of the firewall rules that you will establish later. These defaults will ensure that the `pre` and `post` classes are run in the correct order and avoid locking you out of your box during the first Puppet run.
-
-```puppet
-Firewall {
-  before  => Class['my_fw::post'],
-  require => Class['my_fw::pre'],
-}
-```
-
-3. Declare the `my_fw::pre` and `my_fw::post` classes to satisfy dependencies. You can declare these classes using an external node classifier or the following code:
-
-```puppet
-class { ['my_fw::pre', 'my_fw::post']: }
-```
-
-4. Include the `firewall` class to ensure the correct packages are installed:
-
-```puppet
-class { 'firewall': }
-```
+> **Note:** If you need more fine-grained control about which unmananged rules get removed, investigate the `purge` and `ignore_foreign` parameters available in `firewallchain`.
 
 ### Upgrading
 
