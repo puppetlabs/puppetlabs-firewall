@@ -163,6 +163,15 @@ Puppet::Type.newtype(:firewallchain) do
     end
   end
 
+  newparam(:ignore_foreign, boolean: true) do
+    desc <<-PUPPETCODE
+      Ignore rules that do not match the puppet title pattern "^\d+[[:graph:][:space:]]" when purging unmanaged firewall rules in this chain.
+      This can be used to ignore rules that were not put in by puppet. Beware that nothing keeps other systems from configuring firewall rules with a comment that starts with digits, and is indistinguishable from puppet-configured rules.
+    PUPPETCODE
+    newvalues(false, true)
+    defaultto false
+  end
+
   # Classes would be a better abstraction, pending:
   # http://projects.puppetlabs.com/issues/19001
   autorequire(:package) do
@@ -239,6 +248,9 @@ Puppet::Type.newtype(:firewallchain) do
 
     # Remove rules which match our ignore filter
     rules_resources.delete_if { |res| value(:ignore).find_index { |f| res.provider.properties[:line].match(f) } } if value(:ignore)
+
+    # Remove rules that were (presumably) not put in by puppet
+    rules_resources.delete_if { |res| res.provider.properties[:name].match(%r{^(\d+)[[:graph:][:space:]]})[1].to_i >= 9000 } if value(:ignore_foreign) == :true
 
     # We mark all remaining rules for deletion, and then let the catalog override us on rules which should be present
     rules_resources.each { |res| res[:ensure] = :absent }
