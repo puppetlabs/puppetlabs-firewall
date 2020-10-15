@@ -77,7 +77,7 @@ Data type: `Any`
 
 Specify the name of the IPv4 iptables service.
 
-Default value: `$::firewall::params::service_name`
+Default value: `$firewall::params::service_name`
 
 ##### `service_name_v6`
 
@@ -85,7 +85,7 @@ Data type: `Any`
 
 Specify the name of the IPv6 iptables service.
 
-Default value: `$::firewall::params::service_name_v6`
+Default value: `$firewall::params::service_name_v6`
 
 ##### `package_name`
 
@@ -93,7 +93,7 @@ Data type: `Any`
 
 Specify the platform-specific package(s) to install.
 
-Default value: `$::firewall::params::package_name`
+Default value: `$firewall::params::package_name`
 
 ##### `ebtables_manage`
 
@@ -1455,6 +1455,18 @@ firewallchain { 'INPUT:filter:IPv4':
   ],
 }
 ```
+
+##### `ignore_foreign`
+
+Valid values: ``false``, ``true``
+
+Ignore rules that do not match the puppet title pattern "^\d+[[:graph:][:space:]]" when purging unmanaged firewall rules
+in this chain.
+This can be used to ignore rules that were not put in by puppet. Beware that nothing keeps other systems from
+configuring firewall rules with a comment that starts with digits, and is indistinguishable from puppet-configured
+rules.
+
+Default value: ``false``
 
 ##### `name`
 

@@ -2,9 +2,17 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## [v2.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.5.0) (2020-10-01)
+## [v2.7.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.7.0) (2020-10-15)
 
-[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.5.0...v2.5.0)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.6.0...v2.7.0)
+
+### Added
+
+- \(IAC-1190\) add `ignore\_foreign` when purging firewallchains [\#948](https://github.com/puppetlabs/puppetlabs-firewall/pull/948) ([DavidS](https://github.com/DavidS))
+
+## [v2.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.6.0) (2020-10-01)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.5.0...v2.6.0)
 
 ### Added
 
