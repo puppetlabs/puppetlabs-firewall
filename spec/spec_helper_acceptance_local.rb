@@ -43,7 +43,7 @@ def update_profile_file
   run_shell("sed -i '/mesg n || true/c\\test -t 0 && mesg n || true' ~/.profile")
 end
 
-def get_os_name # rubocop:disable Style/AccessorMethodName: Do not prefix reader method names with get_
+def fetch_os_name
   @facter_os_name ||= run_shell('facter os.name').stdout.delete("\n").downcase
 end
 
