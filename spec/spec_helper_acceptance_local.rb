@@ -44,7 +44,7 @@ def update_profile_file
 end
 
 def get_os_name # rubocop:disable Style/AccessorMethodName: Do not prefix reader method names with get_
-  run_shell('facter os.name').stdout.delete("\n").downcase
+  @facter_os_name ||= run_shell('facter os.name').stdout.delete("\n").downcase
 end
 
 RSpec.configure do |c|
