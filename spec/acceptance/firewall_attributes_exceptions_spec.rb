@@ -19,7 +19,7 @@ describe 'firewall basics', docker: true do
   # Skipping those from which we know they would fail.
   describe 'bytecode property', unless: (os[:family] == 'redhat' && os[:release][0] <= '6') ||
                                         (os[:family] == 'sles' && os[:release][0..1] <= '11') ||
-                                        (os[:family] == 'oraclelinux' && os[:release][0] <= '7') ||
+                                        (get_os_name == 'oraclelinux' && os[:release][0] <= '7') ||
                                         (os[:family] == 'ubuntu') do
     describe 'bytecode' do
       context '4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0' do

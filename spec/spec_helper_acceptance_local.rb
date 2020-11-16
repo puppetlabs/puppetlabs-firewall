@@ -43,6 +43,10 @@ def update_profile_file
   run_shell("sed -i '/mesg n || true/c\\test -t 0 && mesg n || true' ~/.profile")
 end
 
+def get_os_name # rubocop:disable Style/AccessorMethodName: Do not prefix reader method names with get_
+  run_shell('facter os.name').stdout.delete("\n").downcase
+end
+
 RSpec.configure do |c|
   c.before :suite do
     if os[:family] == 'debian' && os[:release].to_i == 10
