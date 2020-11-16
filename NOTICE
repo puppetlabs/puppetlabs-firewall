@@ -1,6 +1,14 @@
 Puppet Module - puppetlabs-firewall
 
 Copyright 2018 Puppet, Inc.
+Copyright 2011 Jonathan Boyett
+Copyright 2011 Media Temple, Inc.
+
+Some of the iptables code was taken from puppet-iptables which was:
+
+Copyright 2011 Bob.sh Limited
+Copyright 2008 Camptocamp Association
+Copyright 2007 Dmitri Priimak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
