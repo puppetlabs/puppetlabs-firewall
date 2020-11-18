@@ -2,6 +2,7 @@
 ".gitlab-ci.yml":
   delete: true
 ".travis.yml":
+  dist: trusty # acceptance tests have stopped working on newer versions - probably related to docker behaviour
   global_env: 
     - HONEYCOMB_WRITEKEY="7f3c63a70eecc61d635917de46bea4e6",HONEYCOMB_DATASET="litmus tests"
   deploy_to_forge:
@@ -41,3 +42,7 @@ Gemfile:
 spec/spec_helper.rb:
   mock_with: ":rspec"
   coverage_report: true
+.gitpod.Dockerfile:
+  unmanaged: false
+.gitpod.yml:
+  unmanaged: false
