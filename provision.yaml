@@ -33,6 +33,10 @@ travis_el7:
   provisioner: docker
   images:
   - litmusimage/centos:7
+travis_el8:
+  provisioner: docker
+  images:
+  - litmusimage/centos:8
 release_checks_5:
   provisioner: abs
   images:

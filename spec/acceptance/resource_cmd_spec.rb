@@ -9,6 +9,7 @@ describe 'puppet resource firewall command' do
     config = run_shell('puppet config print config').stdout
     run_shell("sed -i -e \'s/^templatedir.*$//\' #{config}")
     run_shell('echo export LC_ALL=C > ~/.bashrc')
+    run_shell('echo export PATH="/opt/puppetlabs/bin:$PATH" > ~/.bashrc')
     run_shell('source ~/.bashrc')
   end
 
