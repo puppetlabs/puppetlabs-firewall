@@ -1316,7 +1316,7 @@ describe 'firewall basics', docker: true do
           hashlimit_name          => 'upto',
           hashlimit_upto          => '16/sec',
           hashlimit_burst         => '640',
-          hashlimit_htable_size   => '1310000',
+          hashlimit_htable_size   => '1000000',
           hashlimit_htable_max    => '320000',
           hashlimit_htable_expire => '36000000',
           action                  => accept,
@@ -1335,7 +1335,7 @@ describe 'firewall basics', docker: true do
       end
     end
     it 'hashlimit_upto is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1310000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1000000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
     end
   end
 
