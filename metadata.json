@@ -78,7 +78,7 @@
       "version_requirement": ">= 5.5.10 < 7.0.0"
     }
   ],
-  "template-url": "https://github.com/puppetlabs/pdk-templates#adrianiurca-allow-use-dist-locally",
-  "template-ref": "remotes/origin/adrianiurca-allow-use-dist-locally-0-g55e608a",
+  "template-url": "https://github.com/puppetlabs/pdk-templates#main",
+  "template-ref": "heads/main-0-gd9b4054",
   "pdk-version": "1.18.1"
 }
