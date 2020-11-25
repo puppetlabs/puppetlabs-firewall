@@ -3,29 +3,41 @@
   delete: true
 ".travis.yml":
   dist: trusty # acceptance tests have stopped working on newer versions - probably related to docker behaviour
-  global_env: 
+  global_env:
     - HONEYCOMB_WRITEKEY="7f3c63a70eecc61d635917de46bea4e6",HONEYCOMB_DATASET="litmus tests"
   deploy_to_forge:
     enabled: false
   branches:
-  - release
+    - release
   use_litmus: true
   litmus:
     provision_list:
-    - ---travis_el
-    - travis_deb
-    - travis_el7
+      - ---travis_el
+      - travis_deb
+      - travis_el7
     complex:
-    - collection:
-        puppet_collection:
-        - puppet6
-        provision_list:
-        - travis_ub_6
-    - collection:
-        puppet_collection:
-        - puppet5
-        provision_list:
-        - travis_ub_5
+      - collection:
+          puppet_collection:
+            - puppet6
+          provision_list:
+            - travis_ub_6
+      - collection:
+          puppet_collection:
+            - puppet5
+          provision_list:
+            - travis_ub_5
+      - collection:
+          puppet_collection:
+            - puppet5
+          provision_list:
+            - travis_el8
+          dist: xenial
+      - collection:
+          puppet_collection:
+            - puppet6
+          provision_list:
+            - travis_el8
+          dist: xenial
   simplecov: true
   notifications:
     slack:
@@ -35,10 +47,10 @@ appveyor.yml:
 Gemfile:
   optional:
     ":development":
-    - gem: github_changelog_generator
-      git: https://github.com/skywinder/github-changelog-generator
-      ref: 20ee04ba1234e9e83eb2ffb5056e23d641c7a018
-      condition: Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.2.2')
+      - gem: github_changelog_generator
+        git: https://github.com/skywinder/github-changelog-generator
+        ref: 20ee04ba1234e9e83eb2ffb5056e23d641c7a018
+        condition: Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.2.2')
 spec/spec_helper.rb:
   mock_with: ":rspec"
   coverage_report: true
