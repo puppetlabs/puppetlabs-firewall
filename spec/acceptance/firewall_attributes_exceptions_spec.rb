@@ -1369,4 +1369,31 @@ describe 'firewall basics', docker: true do
       expect(result.stdout).to match(%r{-A POSTROUTING -p tcp -m comment --comment "901 - set random-fully" -j MASQUERADE})
     end
   end
+
+  describe 'condition', condition_parameter_test: false do
+    context 'is set' do
+      pp = <<-PUPPETCODE
+        if $facts['os']['name'] == 'Ubuntu' and versioncmp($facts['os']['release']['full'], '14.04') > 0 {
+          firewall { '010 isblue ipv4':
+            ensure    => 'present',
+            condition => '! isblue',
+            chain     => 'INPUT',
+            iniface   => 'enp0s8',
+            proto     => 'icmp',
+            action    => 'drop',
+          }
+        }
+      PUPPETCODE
+      it 'applies' do
+        apply_manifest(pp)
+      end
+      if fetch_os_name == 'ubuntu' && os[:release].to_i > 14
+        it 'contains the rule' do
+          run_shell('iptables-save') do |r|
+            expect(r.stdout).to match(%r{-A INPUT -i enp0s8 -p icmp -m condition ! --condition "isblue"  -m comment --comment "010 isblue ipv4" -j DROP})
+          end
+        end
+      end
+    end
+  end
 end

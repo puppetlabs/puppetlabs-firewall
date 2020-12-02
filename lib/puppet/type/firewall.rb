@@ -56,6 +56,8 @@ Puppet::Type.newtype(:firewall) do
 
       * clusterip: Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them.
 
+      * condition: Match if a specific condition variable is (un)set (requires xtables-addons)
+
       * connection_limiting: Connection limiting features.
 
       * conntrack: Connection tracking features.
@@ -146,6 +148,7 @@ Puppet::Type.newtype(:firewall) do
   PUPPETCODE
 
   feature :connection_limiting, 'Connection limiting features.'
+  feature :condition, 'Match if a specific condition variable is (un)set.'
   feature :conntrack, 'Connection tracking features.'
   feature :hop_limiting, 'Hop limiting features.'
   feature :rate_limiting, 'Rate limiting features.'
@@ -2246,6 +2249,19 @@ Puppet::Type.newtype(:firewall) do
      This parameter can be used with iptables version >= 1.8.3
     PUPPETCODE
     newvalues(:true, :false)
+  end
+
+  newproperty(:condition, required_features: :condition) do
+    desc <<-PUPPETCODE
+      Match on boolean value (0/1) stored in /proc/net/nf_condition/name.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          Condition must be a string.
+        PUPPETCODE
+      end
+    end
   end
 
   autorequire(:firewallchain) do
