@@ -48,6 +48,10 @@ def fetch_os_name
 end
 
 RSpec.configure do |c|
+  # This flag is disabling test 'condition' from firewall_attributes_exceptions
+  # because this test is failing on docker containers, but it's compatible with vmpooler machines
+  # To enable tests on abs/vmpooler machines just set to `true` this flag
+  c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
     if fetch_os_name == 'centos' && os[:release].to_i == 8
       pp = <<-PUPPETCODE
@@ -65,9 +69,6 @@ RSpec.configure do |c|
         package { 'net-tools':
           ensure   => 'latest',
         }
-        package { 'iptables':
-          ensure   => 'latest',
-        }
         PUPPETCODE
       LitmusHelper.instance.apply_manifest(pp)
       LitmusHelper.instance.run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
@@ -76,6 +77,12 @@ RSpec.configure do |c|
     pp = <<-PUPPETCODE
       package { 'conntrack-tools':
         ensure => 'latest',
+      }
+      package { 'xtables-addons-common':
+        ensure => 'latest',
+      }
+      package { 'iptables':
+        ensure   => 'latest',
       }
     PUPPETCODE
     LitmusHelper.instance.apply_manifest(pp)

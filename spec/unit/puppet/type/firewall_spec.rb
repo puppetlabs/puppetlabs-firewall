@@ -823,6 +823,13 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
   end
 
+  describe ':condition' do
+    it 'accepts value as a string' do
+      resource[:condition] = 'somefile'
+      expect(resource[:condition]).to eq('somefile')
+    end
+  end
+
   describe 'autorequire packages' do
     [:iptables, :ip6tables].each do |provider|
       it "provider #{provider} should autorequire package iptables" do
