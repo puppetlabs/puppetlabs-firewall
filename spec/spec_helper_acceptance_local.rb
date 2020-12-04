@@ -44,9 +44,10 @@ def update_profile_file
 end
 
 RSpec.configure do |c|
-  # This flag is disabling some tests on docker/vagrant containers
+  # This flag is disabling test 'condition' from firewall_attributes_exceptions
+  # because this test is failing on docker containers, but it's compatible with vmpooler machines
   # To enable tests on abs/vmpooler machines just set to `true` this flag
-  c.filter_run_excluding ubuntu_vmpooler: false
+  c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
     if os[:family] == 'debian' && os[:release].to_i == 10
       pp = <<-PUPPETCODE

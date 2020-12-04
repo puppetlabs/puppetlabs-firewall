@@ -1370,7 +1370,7 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  describe 'condition', ubuntu_vmpooler: false do
+  describe 'condition', condition_parameter_test: false do
     context 'is set' do
       pp = <<-PUPPETCODE
         if $facts['os']['name'] == 'Ubuntu' and versioncmp($facts['os']['release']['full'], '14.04') > 0 {
