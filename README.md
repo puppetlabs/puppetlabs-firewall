@@ -486,7 +486,7 @@ package { 'xtables-addons-common':
 }
 ```
 
-For other distributions(RedHat, Debian, Centos etc) is required a manual installation of `xtables-addons` package.
+For other distributions (RedHat, Debian, Centos etc) manual installation of the `xtables-addons` package is required.
 
 #### Reporting Issues
 
