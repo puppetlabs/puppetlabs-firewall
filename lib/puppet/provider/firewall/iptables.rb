@@ -456,7 +456,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # --hex-string output is in quotes, need to move ! inside quotes
     values = values.gsub(%r{(!\s+)?--hex-string "(\S*?)"}, '--hex-string "\1\2"')
     # --condition output is in quotes, need to move ! inside quotes
-    values = values.gsub(%r{(!\s+)?--condition "(\S*?)"}, '--condition "\1\2"')
+    values.gsub!(%r{(!\s+)?--condition "(\S*?)"}, '--condition "\1\2"')
     # --match-set can have multiple values with weird iptables format
     if values =~ %r{-m set (!\s+)?--match-set}
       values = values.gsub(%r{(!\s+)?--match-set (\S*) (\S*)}, '--match-set \1\2 \3')
