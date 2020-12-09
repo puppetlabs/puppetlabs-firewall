@@ -8,8 +8,16 @@ describe 'puppet resource firewall command' do
     # In order to properly check stderr for anomalies we need to fix the deprecation warnings from puppet.conf.
     config = run_shell('puppet config print config').stdout
     run_shell("sed -i -e \'s/^templatedir.*$//\' #{config}")
-    run_shell('echo export LC_ALL=C > ~/.bashrc')
-    run_shell('echo export PATH="/opt/puppetlabs/bin:$PATH" > ~/.bashrc')
+    if fetch_os_name == 'redhat' && [6, 7].include?(os[:release].to_i)
+      run_shell('echo export LC_ALL="C" > /etc/profile.d/my-custom.lang.sh')
+      run_shell('echo "## US English ##" >> /etc/profile.d/my-custom.lang.sh')
+      run_shell('echo export LANG=en_US.UTF-8 >> /etc/profile.d/my-custom.lang.sh')
+      run_shell('echo export LANGUAGE=en_US.UTF-8 >> /etc/profile.d/my-custom.lang.sh')
+      run_shell('echo export LC_COLLATE=C >> /etc/profile.d/my-custom.lang.sh')
+      run_shell('echo export LC_CTYPE=en_US.UTF-8 >> /etc/profile.d/my-custom.lang.sh')
+      run_shell('source /etc/profile.d/my-custom.lang.sh')
+    end
+    run_shell('echo export LC_ALL="C" >> ~/.bashrc')
     run_shell('source ~/.bashrc')
   end
 
