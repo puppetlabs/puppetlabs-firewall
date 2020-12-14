@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.8.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.8.0) (2020-12-14)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.7.0...v2.8.0)
+
+### Added
+
+- pdksync - \(feat\) - Add support for Puppet 7 [\#959](https://github.com/puppetlabs/puppetlabs-firewall/pull/959) ([daianamezdrea](https://github.com/daianamezdrea))
+- \(IAC-966\) - MODULES-10522: Add support for the --condition parameter [\#941](https://github.com/puppetlabs/puppetlabs-firewall/pull/941) ([adrianiurca](https://github.com/adrianiurca))
+
+### Fixed
+
+- Restore copyright names [\#951](https://github.com/puppetlabs/puppetlabs-firewall/pull/951) ([hunner](https://github.com/hunner))
+
 ## [v2.7.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.7.0) (2020-10-15)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.6.0...v2.7.0)
@@ -152,7 +165,6 @@ All notable changes to this project will be documented in this file. The format 
 - Changed regex for iniface and outiface to allow '@' in interface names [\#791](https://github.com/puppetlabs/puppetlabs-firewall/pull/791) ([GeorgeCox](https://github.com/GeorgeCox))
 - \(MODULES-8214\) Handle src\_type and dst\_type as array [\#790](https://github.com/puppetlabs/puppetlabs-firewall/pull/790) ([mateusz-gozdek-sociomantic](https://github.com/mateusz-gozdek-sociomantic))
 - \(MODULES-7990\) Merge multiple comments into one while parsing rules [\#789](https://github.com/puppetlabs/puppetlabs-firewall/pull/789) ([mateusz-gozdek-sociomantic](https://github.com/mateusz-gozdek-sociomantic))
-- add -g flag handling in ip6tables.rb provider [\#788](https://github.com/puppetlabs/puppetlabs-firewall/pull/788) ([cestith](https://github.com/cestith))
 - \(MODULES-7681\) Add support for bytecode property [\#771](https://github.com/puppetlabs/puppetlabs-firewall/pull/771) ([baurmatt](https://github.com/baurmatt))
 
 ### Fixed

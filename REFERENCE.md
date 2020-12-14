@@ -147,6 +147,8 @@ installed.
 
   * clusterip: Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them.
 
+  * condition: Match if a specific condition variable is (un)set (requires xtables-addons)
+
   * connection_limiting: Connection limiting features.
 
   * conntrack: Connection tracking features.
@@ -334,6 +336,10 @@ Valid values: `%r{\d+}`
 
 Used with the CLUSTERIP jump target.
 Number of total nodes within this cluster.
+
+##### `condition`
+
+Match on boolean value (0/1) stored in /proc/net/nf_condition/name.
 
 ##### `connlimit_above`
 
