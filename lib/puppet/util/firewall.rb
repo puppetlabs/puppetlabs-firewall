@@ -8,7 +8,7 @@ require 'puppet/util/ipcidr'
 module Puppet::Util::Firewall
   # Translate the symbolic names for icmp packet types to integers
   def icmp_name_to_number(value_icmp, protocol)
-    if value_icmp =~ %r{\d{1,2}$}
+    if %r{\d{1,2}$}.match?(value_icmp)
       value_icmp
     elsif protocol == 'inet'
       case value_icmp
@@ -49,7 +49,7 @@ module Puppet::Util::Firewall
 
   # Convert log_level names to their respective numbers
   def log_level_name_to_number(value)
-    if value =~ %r{\A[0-7]\z}
+    if %r{\A[0-7]\z}.match?(value)
       value
     else
       case value
@@ -77,12 +77,12 @@ module Puppet::Util::Firewall
   # nothing.
   def string_to_port(value, proto)
     proto = proto.to_s
-    unless proto =~ %r{^(tcp|udp)$}
+    unless %r{^(tcp|udp)$}.match?(proto)
       proto = 'tcp'
     end
 
     m = value.to_s.match(%r{^(!\s+)?(\S+)})
-    return "#{m[1]}#{m[2]}" if m[2] =~ %r{^\d+(-\d+)?$}
+    return "#{m[1]}#{m[2]}" if %r{^\d+(-\d+)?$}.match?(m[2])
     "#{m[1]}#{Socket.getservbyname(m[2], proto)}"
   end
 
@@ -125,7 +125,7 @@ module Puppet::Util::Firewall
         begin
           new_value = Puppet::Util::IPCidr.new(addr, family)
           break
-        rescue # rubocop:disable Lint/HandleExceptions
+        rescue
         end
       end
 
@@ -160,7 +160,7 @@ module Puppet::Util::Firewall
       if value.between?(0, 0xffffffff)
         return '0x' + value.to_s(16)
       end
-    rescue ArgumentError # rubocop:disable Lint/HandleExceptions
+    rescue ArgumentError
       # pass
     end
     nil

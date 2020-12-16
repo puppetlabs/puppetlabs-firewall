@@ -501,7 +501,8 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'notrack is set' do
       notrack_rule = '-A PREROUTING -p udp -m multiport --dports 53 -m comment --comment "004 do not track UDP connections to port 53" -j CT --notrack'
-      notrack_rule = '-A PREROUTING -p udp -m multiport --dports 53 -m comment --comment "004 do not track UDP connections to port 53" -j NOTRACK' if os[:family] == 'redhat' && [5, 6].include?(os[:release].to_i)
+      notrack_rule = '-A PREROUTING -p udp -m multiport --dports 53 -m comment --comment "004 do not track UDP connections to port 53" -j NOTRACK' if os[:family] == 'redhat' && [5,
+                                                                                                                                                                                  6].include?(os[:release].to_i)
       expect(result.stdout).to match(%r{#{notrack_rule}})
     end
   end

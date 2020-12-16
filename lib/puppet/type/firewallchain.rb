@@ -61,7 +61,7 @@ Puppet::Type.newtype(:firewallchain) do
         protocol = Regexp.last_match(3)
         case table
         when 'filter'
-          if chain =~ %r{^(PREROUTING|POSTROUTING|BROUTING)$}
+          if %r{^(PREROUTING|POSTROUTING|BROUTING)$}.match?(chain)
             raise ArgumentError, "INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table 'filter'"
           end
         when 'mangle'
@@ -69,25 +69,25 @@ Puppet::Type.newtype(:firewallchain) do
             raise ArgumentError, "PREROUTING, POSTROUTING, INPUT, FORWARD and OUTPUT are the only inbuilt chains that can be used in table 'mangle'"
           end
         when 'nat'
-          if chain =~ %r{^(BROUTING|FORWARD)$}
+          if %r{^(BROUTING|FORWARD)$}.match?(chain)
             raise ArgumentError, "PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table 'nat'"
           end
           if Gem::Version.new(Facter['kernelmajversion'].value.dup) < Gem::Version.new('3.7') && protocol =~ %r{^(IP(v6)?)?$}
             raise ArgumentError, "table nat isn't valid in IPv6. You must specify ':IPv4' as the name suffix"
           end
         when 'raw'
-          if chain =~ %r{^(POSTROUTING|BROUTING|INPUT|FORWARD)$}
+          if %r{^(POSTROUTING|BROUTING|INPUT|FORWARD)$}.match?(chain)
             raise ArgumentError, 'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\''
           end
         when 'broute'
           if protocol != 'ethernet'
             raise ArgumentError, 'BROUTE is only valid with protocol \'ethernet\''
           end
-          if chain =~ %r{^PREROUTING|POSTROUTING|INPUT|FORWARD|OUTPUT$}
+          if %r{^PREROUTING|POSTROUTING|INPUT|FORWARD|OUTPUT$}.match?(chain)
             raise ArgumentError, 'BROUTING is the only inbuilt chain allowed on on table \'broute\''
           end
         when 'security'
-          if chain =~ %r{^(PREROUTING|POSTROUTING|BROUTING)$}
+          if %r{^(PREROUTING|POSTROUTING|BROUTING)$}.match?(chain)
             raise ArgumentError, "INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table 'security'"
           end
         end

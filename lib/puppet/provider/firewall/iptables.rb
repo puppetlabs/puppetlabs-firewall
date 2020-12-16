@@ -378,7 +378,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       #
       # This tries deleting again with -p all to see if that helps.
       #
-      # rubocop:disable Lint/HandleExceptions
       if self.class.instance_variable_get(:@protocol) == 'IPv6' && properties[:proto] == 'all'
         begin
           iptables delete_args.concat(['-p', 'all'])
@@ -426,8 +425,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # String#lines would be nice, but we need to support Ruby 1.8.5
     nf_warning_msg = "# Warning: ip6?tables-legacy tables present, use ip6?tables-legacy-save to see them\n"
     iptables_save.gsub(%r{#{nf_warning_msg}}, '').split("\n").each do |line|
-      unless line =~ %r{^\#\s+|^\:\S+|^COMMIT|^FATAL}
-        if line =~ %r{^\*}
+      unless %r{^\#\s+|^\:\S+|^COMMIT|^FATAL}.match?(line)
+        if %r{^\*}.match?(line)
           table = line.sub(%r{\*}, '')
         else
           hash = rule_to_hash(line, table, counter)
@@ -460,7 +459,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # --condition output is in quotes, need to move ! inside quotes
     values.gsub!(%r{(!\s+)?--condition "(\S*?)"}, '--condition "\1\2"')
     # --match-set can have multiple values with weird iptables format
-    if values =~ %r{-m set (!\s+)?--match-set}
+    if %r{-m set (!\s+)?--match-set}.match?(values)
       values = values.gsub(%r{(!\s+)?--match-set (\S*) (\S*)}, '--match-set \1\2 \3')
       ind  = values.index('-m set --match-set')
       sets = values.scan(%r{-m set --match-set ((?:!\s+)?\S* \S*)})
@@ -468,7 +467,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
     end
     # --comment can have multiple values, the same as --match-set
-    if values =~ %r{-m comment --comment}
+    if %r{-m comment --comment}.match?(values)
       ind = values.index('-m comment --comment')
       comments = values.scan(%r{-m comment --comment "((?:\\"|[^"])*)"})
       comments += values.scan(%r{-m comment --comment ([^"\s]+)\b})
@@ -476,14 +475,14 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values = values.gsub(%r{-m comment --comment ([^"].*?)[ $]}, '')
       values.insert(ind, "-m comment --comment \"#{comments.join(';')}\" ")
     end
-    if values =~ %r{-m addrtype (!\s+)?--src-type}
+    if %r{-m addrtype (!\s+)?--src-type}.match?(values)
       values = values.gsub(%r{(!\s+)?--src-type (\S*)(\s--limit-iface-(in|out))?}, '--src-type \1\2\3')
       ind = values.index('-m addrtype --src-type')
       types = values.scan(%r{-m addrtype --src-type ((?:!\s+)?\S*(?: --limit-iface-(?:in|out))?)})
       values = values.gsub(%r{-m addrtype --src-type ((?:!\s+)?\S*(?: --limit-iface-(?:in|out))?) ?}, '')
       values.insert(ind, "-m addrtype --src-type \"#{types.join(';')}\" ")
     end
-    if values =~ %r{-m addrtype (!\s+)?--dst-type}
+    if %r{-m addrtype (!\s+)?--dst-type}.match?(values)
       values = values.gsub(%r{(!\s+)?--dst-type (\S*)(\s--limit-iface-(in|out))?}, '--dst-type \1\2\3')
       ind = values.index('-m addrtype --dst-type')
       types = values.scan(%r{-m addrtype --dst-type ((?:!\s+)?\S*(?: --limit-iface-(?:in|out))?)})
@@ -555,7 +554,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     ############
 
     # Here we iterate across our values to generate an array of keys
-    parser_list.reverse.each do |k|
+    parser_list.reverse_each do |k|
       resource_map_key = resource_map[k]
       [resource_map_key].flatten.each do |opt|
         if values.slice!(%r{\s#{opt}})
@@ -566,13 +565,13 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     end
 
     # Manually remove chain
-    if values =~ %r{(\s|^)-A\s}
+    if %r{(\s|^)-A\s}.match?(values)
       values = values.sub(%r{(\s|^)-A\s}, '\1')
       keys << :chain
     end
 
     # Manually remove table (used in some tests)
-    if values =~ %r{^-t\s}
+    if %r{^-t\s}.match?(values)
       values = values.sub(%r{^-t\s}, '')
       keys << :table
     end
@@ -588,7 +587,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # string, handling any quoted characters present in the value, and then
     # zipping the values with the array of keys.
     keys.zip(valrev) do |f, v|
-      hash[f] = if v =~ %r{^".*"$}
+      hash[f] = if %r{^".*"$}.match?(v)
                   v.sub(%r{^"(.*)"$}, '\1').gsub(%r{\\(\\|'|")}, '\1')
                 else
                   v.dup
@@ -852,7 +851,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
           resource_value, wrong_values = resource_value.map { |value|
             if value.is_a?(String)
               # rubocop:disable Metrics/BlockNesting
-              wrong = value unless value =~ %r{^!\s+}
+              wrong = value unless %r{^!\s+}.match?(value)
               [value.sub(%r{^!\s*}, ''), wrong]
             else
               [value, nil]

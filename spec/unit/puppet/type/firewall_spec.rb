@@ -45,7 +45,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     [:accept, :drop, :reject].each do |action|
-      it "should accept value #{action}" do
+      it "accepts value #{action}" do
         resource[:action] = action
         expect(resource[:action]).to eql action
       end
@@ -58,7 +58,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe ':chain' do
     [:INPUT, :FORWARD, :OUTPUT, :PREROUTING, :POSTROUTING].each do |chain|
-      it "should accept chain value #{chain}" do
+      it "accepts chain value #{chain}" do
         resource[:chain] = chain
         expect(resource[:chain]).to eql chain
       end
@@ -71,7 +71,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe ':table' do
     [:nat, :mangle, :filter, :raw].each do |table|
-      it "should accept table value #{table}" do
+      it "accepts table value #{table}" do
         resource[:table] = table
         expect(resource[:table]).to eql table
       end
@@ -84,7 +84,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe ':proto' do
     [:ip, :tcp, :udp, :icmp, :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :pim, :all].each do |proto|
-      it "should accept proto value #{proto}" do
+      it "accepts proto value #{proto}" do
         resource[:proto] = proto
         expect(resource[:proto]).to eql proto
       end
@@ -102,14 +102,14 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'NFLOG', 'MASQUERADE', 'REDIRECT', 'MARK'].each do |jump|
-      it "should accept jump value #{jump}" do
+      it "accepts jump value #{jump}" do
         resource[:jump] = jump
         expect(resource[:jump]).to eql jump
       end
     end
 
     ['ACCEPT', 'DROP', 'REJECT'].each do |jump|
-      it "should now fail when value #{jump}" do
+      it "nows fail when value #{jump}" do
         expect(-> { resource[:jump] = jump }).to raise_error(Puppet::Error)
       end
     end
@@ -121,17 +121,17 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   [:source, :destination].each do |addr|
     describe addr do
-      it "should accept a #{addr} as a string" do
+      it "accepts a #{addr} as a string" do
         resource[addr] = '127.0.0.1'
         expect(resource[addr]).to eql '127.0.0.1/32'
       end
       ['0.0.0.0/0', '::/0'].each do |prefix|
-        it "should be nil for zero prefix length address #{prefix}" do
+        it "is nil for zero prefix length address #{prefix}" do
           resource[addr] = prefix
           expect(resource[addr]).to be nil
         end
       end
-      it "should accept a negated #{addr} as a string" do
+      it "accepts a negated #{addr} as a string" do
         resource[addr] = '! 127.0.0.1'
         expect(resource[addr]).to eql '! 127.0.0.1/32'
       end
@@ -172,43 +172,42 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   [:dport, :sport].each do |port|
     describe port do
-      it "should accept a #{port} as string" do
+      it "accepts a #{port} as string" do
         resource[port] = '22'
         expect(resource[port]).to eql ['22']
       end
 
-      it "should accept a #{port} as an array" do
+      it "accepts a #{port} as an array" do
         resource[port] = ['22', '23']
         expect(resource[port]).to eql ['22', '23']
       end
 
-      it "should accept a #{port} as a number" do
+      it "accepts a #{port} as a number" do
         resource[port] = 22
         expect(resource[port]).to eql ['22']
       end
 
-      it "should accept a #{port} as a hyphen separated range" do
+      it "accepts a #{port} as a hyphen separated range" do
         resource[port] = ['22-1000']
         expect(resource[port]).to eql ['22-1000']
       end
 
       it "should accept a #{port} as a combination of arrays of single and " \
         'hyphen separated ranges' do
-
         resource[port] = ['22-1000', '33', '3000-4000']
         expect(resource[port]).to eql ['22-1000', '33', '3000-4000']
       end
 
-      it "should convert a port name for #{port} to its number" do
+      it "converts a port name for #{port} to its number" do
         resource[port] = 'ssh'
         expect(resource[port]).to eql ['22']
       end
 
-      it "should not accept something invalid for #{port}" do
+      it "does not accept something invalid for #{port}" do
         expect { resource[port] = 'something odd' }.to raise_error(Puppet::Error, %r{^Parameter .+ failed.+Munging failed for value ".+" in class .+: no such service})
       end
 
-      it "should not accept something invalid in an array for #{port}" do
+      it "does not accept something invalid in an array for #{port}" do
         expect { resource[port] = ['something odd', 'something even odder'] }.to raise_error(Puppet::Error, %r{^Parameter .+ failed.+Munging failed for value ".+" in class .+: no such service})
       end
     end
@@ -233,7 +232,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
      :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].each do |type|
       ['! ', ''].each do |negation|
         ['', ' --limit-iface-in', ' --limit-iface-out'].each do |limit|
-          it "should accept #{addrtype} value #{negation}#{type}#{limit}" do
+          it "accepts #{addrtype} value #{negation}#{type}#{limit}" do
             resource[addrtype] = type
             expect(resource[addrtype]).to eql [type]
           end
@@ -241,22 +240,22 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       end
     end
 
-    it "should fail when #{addrtype} value is not recognized" do
+    it "fails when #{addrtype} value is not recognized" do
       expect(-> { resource[addrtype] = 'foo' }).to raise_error(Puppet::Error)
     end
   end
 
   [:iniface, :outiface].each do |iface|
     describe iface do
-      it "should accept #{iface} value as a string" do
+      it "accepts #{iface} value as a string" do
         resource[iface] = 'eth1'
         expect(resource[iface]).to eql 'eth1'
       end
-      it "should accept a negated #{iface} value as a string" do
+      it "accepts a negated #{iface} value as a string" do
         resource[iface] = '! eth1'
         expect(resource[iface]).to eql '! eth1'
       end
-      it "should accept an interface alias for the #{iface} value as a string" do
+      it "accepts an interface alias for the #{iface} value as a string" do
         resource[iface] = 'eth1:2'
         expect(resource[iface]).to eql 'eth1:2'
       end
@@ -265,7 +264,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   [:tosource, :todest, :to].each do |addr|
     describe addr do
-      it "should accept #{addr} value as a string" do
+      it "accepts #{addr} value as a string" do
         resource[addr] = '127.0.0.1'
       end
     end
@@ -450,27 +449,27 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   [:ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst].each do |addr|
     describe addr do
-      it "should accept a #{addr} as a string without /32" do
+      it "accepts a #{addr} as a string without /32" do
         resource[addr] = '127.0.0.1'
         expect(resource[addr]).to eql '127.0.0.1'
       end
-      it "should accept a #{addr} as a string with /32" do
+      it "accepts a #{addr} as a string with /32" do
         resource[addr] = '127.0.0.1/32'
         expect(resource[addr]).to eql '127.0.0.1'
       end
-      it "should accept a #{addr} as a string with cidr" do
+      it "accepts a #{addr} as a string with cidr" do
         resource[addr] = '10.0.0.0/8'
         expect(resource[addr]).to eql '10.0.0.0/8'
       end
-      it "should accept a #{addr} as a string with ipv6 cidr" do
+      it "accepts a #{addr} as a string with ipv6 cidr" do
         resource[addr] = '2001:DB8::/64'
         expect(resource[addr]).to eql '2001:DB8::/64'
       end
-      it "should accept a negated #{addr} as a string" do
+      it "accepts a negated #{addr} as a string" do
         resource[addr] = '! 127.0.0.1'
         expect(resource[addr]).to eql '! 127.0.0.1'
       end
-      it "should accept a negated #{addr} as a string with cidr" do
+      it "accepts a negated #{addr} as a string with cidr" do
         resource[addr] = '! 10.0.0.0/8'
         expect(resource[addr]).to eql '! 10.0.0.0/8'
       end
@@ -479,19 +478,19 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   [:ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport].each do |port|
     describe port do
-      it "should accept #{port} as numeric value" do
+      it "accepts #{port} as numeric value" do
         resource[port] = 80
         expect(resource[port]).to be 80
       end
-      it "should accept #{port} as range value" do
+      it "accepts #{port} as range value" do
         resource[port] = '80:81'
         expect(resource[port]).to eql '80:81'
       end
-      it "should accept a negated #{port} as string value" do
+      it "accepts a negated #{port} as string value" do
         resource[port] = '! 80'
         expect(resource[port]).to eql '! 80'
       end
-      it "should accept a negated #{port} as range value" do
+      it "accepts a negated #{port} as range value" do
         resource[port] = '! 80:81'
         expect(resource[port]).to eql '! 80:81'
       end
@@ -555,7 +554,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe ':recent' do
     ['set', 'update', 'rcheck', 'remove'].each do |recent|
-      it "should accept recent value #{recent}" do
+      it "accepts recent value #{recent}" do
         resource[:recent] = recent
         expect(resource[:recent]).to eql "--#{recent}"
       end
@@ -648,7 +647,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
         end
 
         ['/', '1000/', 'pwnie'].each do |bad_mark|
-          it "should fail with malformed mark '#{bad_mark}'" do
+          it "fails with malformed mark '#{bad_mark}'" do
             expect(-> { resource[:set_mark] = bad_mark }).to raise_error(Puppet::Error)
           end
         end
@@ -728,7 +727,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
       # test where autorequire is still needed (table != filter)
       ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
-        it "should autorequire fwchain #{test_chain} when table is mangle and provider is undefined" do
+        it "autorequires fwchain #{test_chain} when table is mangle and provider is undefined" do
           resource[param] = test_chain
           resource[:table] = :mangle
           expect(resource[:provider]).to be :iptables
@@ -742,7 +741,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
           expect(rel.target.ref).to eql resource.ref
         end
 
-        it "should autorequire fwchain #{test_chain} when table is mangle and provider is ip6tables" do
+        it "autorequires fwchain #{test_chain} when table is mangle and provider is ip6tables" do
           resource[param] = test_chain
           resource[:table] = :mangle
           resource[:provider] = :ip6tables
@@ -759,7 +758,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
       # test of case where autorequire should not happen
       ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
-        it "should not autorequire fwchain #{test_chain} when table and provider are undefined" do
+        it "does not autorequire fwchain #{test_chain} when table and provider are undefined" do
           resource[param] = test_chain
           expect(resource[:table]).to be :filter
           expect(resource[:provider]).to be :iptables
@@ -772,7 +771,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
           expect(rel).to be nil
         end
 
-        it "should not autorequire fwchain #{test_chain} when table is undefined and provider is ip6tables" do
+        it "does not autorequire fwchain #{test_chain} when table is undefined and provider is ip6tables" do
           resource[param] = test_chain
           expect(resource[:table]).to be :filter
           resource[:provider] = :ip6tables
@@ -813,7 +812,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe ':pkttype' do
     [:multicast, :broadcast, :unicast].each do |pkttype|
-      it "should accept pkttype value #{pkttype}" do
+      it "accepts pkttype value #{pkttype}" do
         resource[:pkttype] = pkttype
         expect(resource[:pkttype]).to eql pkttype
       end

@@ -52,7 +52,6 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
       'Debian' => '0.0.20090701',
       'Ubuntu' => '0.5.3ubuntu2',
     }.each do |os, ver|
-
       if os == 'Debian'
         os_release = '8.0'
       elsif os == 'Ubuntu'

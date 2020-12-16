@@ -58,7 +58,7 @@ describe 'Puppet::Util::Firewall' do
       subject(:host) { resource }
 
       ['inet5', 'inet8', 'foo'].each do |proto|
-        it "should reject invalid proto #{proto}" do
+        it "rejects invalid proto #{proto}" do
           expect { host.icmp_name_to_number('echo-reply', proto) }
             .to raise_error(ArgumentError, "unsupported protocol family '#{proto}'")
         end
@@ -123,8 +123,9 @@ describe 'Puppet::Util::Firewall' do
   end
 
   describe '#persist_iptables' do
-    before(:each) { Facter.clear }
     subject(:host) { resource }
+
+    before(:each) { Facter.clear }
 
     # rubocop:disable RSpec/SubjectStub
     describe 'when proto is IPv4' do
