@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Facter.add(:ip6tables_version) do
   confine kernel: :Linux
   setcode do

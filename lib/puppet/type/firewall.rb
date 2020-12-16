@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # See: #10295 for more details.
 #
 # This is a workaround for bug: #4248 whereby ruby files outside of the normal

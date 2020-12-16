@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper_acceptance'
 
 describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
@@ -319,17 +321,17 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
     end
     it 'ipsec_policy when ipsec' do
       expect(result.stdout).to match(
-        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "607 - ipsec_policy ipsec" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Metrics/LineLength
+        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "607 - ipsec_policy ipsec" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Layout/LineLength
       )
     end
     it 'ipsec_policy when none' do
       expect(result.stdout).to match(
-        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol none -m comment --comment "608 - ipsec_policy none" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Metrics/LineLength
+        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol none -m comment --comment "608 - ipsec_policy none" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Layout/LineLength
       )
     end
     it 'ipsec_dir when out' do
       expect(result.stdout).to match(
-        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "609 - ipsec_dir out" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Metrics/LineLength
+        %r{-A OUTPUT -d 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -m policy --dir out --pol ipsec -m comment --comment "609 - ipsec_dir out" -j REJECT --reject-with icmp6-adm-prohibited}, # rubocop:disable Layout/LineLength
       )
     end
     it 'ipsec_dir when in' do
@@ -359,10 +361,10 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m addrtype --src-type LOCAL -m addrtype ! --src-type LOCAL -m comment --comment "620 - src_type multiple values" -j ACCEPT})
     end
     it 'all the modules with multiple args is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 2001::-2002::\s+--dst-range 2003::-2004:: -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "801 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable}) # rubocop:disable Layout/LineLength
     end
     it 'all the modules with single args is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 2003::-2004:: -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "802 - ipt_modules tests" -j REJECT --reject-with icmp6-port-unreachable}) # rubocop:disable Layout/LineLength
     end
     it 'tee_gateway is set' do
       expect(result.stdout).to match(%r{-A PREROUTING -m comment --comment "811 - tee_gateway6" -j TEE --gateway 2001:db8::1})

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This is a workaround for bug: #4248 whereby ruby files outside of the normal
 # provider/type path do not load until pluginsync has occured on the puppet server
 #

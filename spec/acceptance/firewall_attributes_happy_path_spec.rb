@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper_acceptance'
 
 describe 'firewall attribute testing, happy path' do
@@ -368,7 +370,7 @@ describe 'firewall attribute testing, happy path' do
     end
     # it 'contains the connlimit and connlimit_mask rule' do
     #   expect(result.stdout).to match(
-    #     %r{-A INPUT -p tcp -m multiport --dports 2222 -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-m comment --comment "501 - connlimit" -j REJECT --reject-with icmp-port-unreachable}, # rubocop:disable Metrics/LineLength
+    #     %r{-A INPUT -p tcp -m multiport --dports 2222 -m connlimit --connlimit-above 10 --connlimit-mask 24 (--connlimit-saddr )?-m comment --comment "501 - connlimit" -j REJECT --reject-with icmp-port-unreachable}, # rubocop:disable Layout/LineLength
     #   )
     # end
     it 'contains connmark' do
@@ -432,10 +434,10 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -f -m multiport --dports 583 -m comment --comment "583 - isfragment" -j ACCEPT})
     end
     it 'ipsec_policy ipsec and dir out' do
-      expect(result.stdout).to match(%r{-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir out --pol ipsec -m comment --comment "595 - ipsec_policy ipsec and out" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A OUTPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir out --pol ipsec -m comment --comment "595 - ipsec_policy ipsec and out" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Layout/LineLength
     end
     it 'ipsec_policy none and dir in' do
-      expect(result.stdout).to match(%r{-A INPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir in --pol none -m comment --comment "596 - ipsec_policy none and in" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A INPUT -d 20.0.0.0\/(8|255\.0\.0\.0) -m policy --dir in --pol none -m comment --comment "596 - ipsec_policy none and in" -j REJECT --reject-with icmp-net-unreachable}) # rubocop:disable Layout/LineLength
     end
     it 'set_mss is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "604 - set_mss" -j TCPMSS --set-mss 1360})
@@ -456,7 +458,7 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-out eth1 -m multiport --dports 712 -m comment --comment "712 - physdev_out" -j ACCEPT})
     end
     it 'physdev_in eth0 and physdev_out eth1 and physdev_is_bridged' do
-      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --dports 713 -m comment --comment "713 - physdev_in physdev_out physdev_is_bridged" -j ACCEPT}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A FORWARD -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m multiport --dports 713 -m comment --comment "713 - physdev_in physdev_out physdev_is_bridged" -j ACCEPT}) # rubocop:disable Layout/LineLength
     end
     it 'gid set to root' do
       expect(result.stdout).to match(%r{-A OUTPUT -m owner --gid-owner (0|root) -m comment --comment "801 - gid root" -j ACCEPT})
@@ -477,16 +479,16 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m multiport --dports 997 -m comment --comment "1001 EF - set_dscp_class" -j DSCP --set-dscp 0x2e})
     end
     it 'all the modules with multiple args is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "807 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-in eth0 --physdev-out eth1 --physdev-is-bridged -m iprange --src-range 90.0.0.1-90.0.0.2\s+--dst-range 100.0.0.1-100.0.0.2 -m owner --uid-owner (0|root) --gid-owner 404 -m multiport --dports 8080 -m addrtype --src-type LOCAL --dst-type UNICAST -m comment --comment "807 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Layout/LineLength
     end
     it 'all the modules with single args is set' do
-      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 100.0.0.1-100.0.0.2 -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "808 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A OUTPUT -p tcp -m physdev\s+--physdev-out eth1 --physdev-is-bridged -m iprange --dst-range 100.0.0.1-100.0.0.2 -m owner --gid-owner 404 -m multiport --dports 8080 -m addrtype --dst-type UNICAST -m comment --comment "808 - ipt_modules tests" -j REJECT --reject-with icmp-port-unreachable}) # rubocop:disable Layout/LineLength
     end
     it 'recent set to set' do
       expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --set --name list1 (--mask 255.255.255.255 )?--rdest -m comment --comment "597 - recent set"})
     end
     it 'recent set to rcheck' do
-      expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - recent rcheck"}) # rubocop:disable Metrics/LineLength
+      expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --rcheck --seconds 60 --hitcount 5 --rttl --name list1 (--mask 255.255.255.255 )?--rsource -m comment --comment "598 - recent rcheck"}) # rubocop:disable Layout/LineLength
     end
     it 'recent set to update' do
       expect(result.stdout).to match(%r{-A INPUT -d 30.0.0.0\/(8|255\.0\.0\.0) -m recent --update --name DEFAULT (--mask 255.255.255.255 )?--rsource -m comment --comment "599 - recent update"})

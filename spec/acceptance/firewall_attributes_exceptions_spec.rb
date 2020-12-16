@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper_acceptance'
 
 describe 'firewall basics', docker: true do
@@ -1039,7 +1041,7 @@ describe 'firewall basics', docker: true do
         it 'contains the rule' do
           run_shell('iptables-save') do |r|
             expect(r.stdout).to match(
-              %r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT}, # rubocop:disable Metrics/LineLength
+              %r{-A OUTPUT -p tcp -m multiport --dports 8080 -m time --timestart 06:00:00 --timestop 17:00:00 --monthdays 7 --weekdays Tue --datestart 2016-01-19T04:17:07 --datestop 2038-01-19T04:17:07 --kerneltz -m comment --comment "805 - test" -j ACCEPT}, # rubocop:disable Layout/LineLength
             )
           end
         end
@@ -1335,7 +1337,7 @@ describe 'firewall basics', docker: true do
       end
     end
     it 'hashlimit_upto is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1000000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Metrics/LineLength : Cannot reduce line to required length
+      expect(result.stdout).to match(%r{-A INPUT -p tcp -m hashlimit --hashlimit-upto 16\/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1000000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Layout/LineLength : Cannot reduce line to required length
     end
   end
 

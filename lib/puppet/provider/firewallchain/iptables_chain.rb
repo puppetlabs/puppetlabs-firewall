@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::Type.type(:firewallchain).provide :iptables_chain do
   include Puppet::Util::Firewall
 

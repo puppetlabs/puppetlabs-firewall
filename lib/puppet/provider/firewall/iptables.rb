@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'puppet/provider/firewall'
 require 'digest'
 
@@ -858,7 +860,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
           }.transpose
           wrong_values = wrong_values.compact
           unless wrong_values.empty?
-            raise "All values of the '#{res}' property must be prefixed with a '!' when inverting, but '#{wrong_values.join("', '")}' #{(wrong_values.length > 1) ? 'are' : 'is'} not prefixed; aborting" # rubocop:disable Metrics/LineLength : Line length cannot be reduced
+            raise "All values of the '#{res}' property must be prefixed with a '!' when inverting, but '#{wrong_values.join("', '")}' #{(wrong_values.length > 1) ? 'are' : 'is'} not prefixed; aborting" # rubocop:disable Layout/LineLength : Line length cannot be reduced
           end
           args.insert(-2, '!')
           # rubocop:enable Metrics/BlockNesting

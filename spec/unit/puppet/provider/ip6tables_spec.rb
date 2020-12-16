@@ -1,4 +1,5 @@
 #!/usr/bin/env rspec # rubocop:disable Lint/ScriptPermission : Puppet error?
+# frozen_string_literal: true
 
 require 'spec_helper'
 if Puppet::Util::Package.versioncmp(Puppet.version, '3.4.0') < 0

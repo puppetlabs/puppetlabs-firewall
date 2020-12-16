@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Facter.add(:iptables_persistent_version) do
   confine operatingsystem: ['Debian', 'Ubuntu']
   setcode do
