@@ -30,8 +30,7 @@ module Puppet::Util
     end
 
     def cidr
-      cidr = '%s/%s' % [to_s, prefixlen]
-      cidr
+      "#{self}/#{prefixlen}"
     end
   end
 end

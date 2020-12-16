@@ -125,7 +125,7 @@ module Puppet::Util::Firewall
         begin
           new_value = Puppet::Util::IPCidr.new(addr, family)
           break
-        rescue
+        rescue # looking for the one that works # rubocop:disable Lint/SuppressedException
         end
       end
 

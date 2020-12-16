@@ -47,7 +47,7 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
               expect { resource[:name] = name }.to raise_error(Puppet::Error)
             end
           elsif protocol != 'ethernet' && table == 'broute'
-            it "fails #{name}" do # rubocop:disable RSpec/RepeatedExample
+            it "fails #{name}" do # rubocop:disable RSpec/RepeatedExample,RSpec/RepeatedDescription
               expect { resource[:name] = name }.to raise_error(Puppet::Error)
             end
           else
@@ -74,7 +74,7 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
             expect(resource[:name]).to eql name
           end
         else
-          it "fails #{name}" do # rubocop:disable RSpec/RepeatedExample
+          it "fails #{name}" do # rubocop:disable RSpec/RepeatedExample,RSpec/RepeatedDescription
             expect { resource[:name] = name }.to raise_error(Puppet::Error)
           end
         end
@@ -141,8 +141,6 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
         expect(rel.target.ref).to eql resource.ref
       end
     end
-    # rubocop:enable RSpec/ExampleLength
-    # rubocop:enable RSpec/MultipleExpectations
   end
 
   describe 'purge iptables rules' do
@@ -170,7 +168,6 @@ PUPPETCODE
       allow(Puppet::Type.type(:firewall).provider(:iptables)).to receive(:iptables_save).and_return(stub_return)
       allow(Puppet::Type.type(:firewall).provider(:ip6tables)).to receive(:ip6tables_save).and_return(stub_return)
     end
-    # rubocop:enable Layout/IndentHeredoc
 
     it 'generates iptables resources' do
       allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return('1.4.21')

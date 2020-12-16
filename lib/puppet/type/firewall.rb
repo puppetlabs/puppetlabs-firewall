@@ -2279,8 +2279,9 @@ Puppet::Type.newtype(:firewall) do
 
     unless protocol.nil?
       table = value(:table)
+      main_chains = ['INPUT', 'OUTPUT', 'FORWARD']
       [value(:chain), value(:jump)].each do |chain|
-        reqs << "#{chain}:#{table}:#{protocol}" unless chain.nil? || (['INPUT', 'OUTPUT', 'FORWARD'].include?(chain) && table == :filter)
+        reqs << "#{chain}:#{table}:#{protocol}" unless chain.nil? || (main_chains.include?(chain) && table == :filter)
       end
     end
 
@@ -2360,8 +2361,8 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:set_mark)
-      unless value(:jump).to_s  =~ %r{MARK} &&
-             value(:table).to_s =~ %r{mangle}
+      unless value(:jump).to_s.include?(MARK) &&
+             value(:table).to_s.include?(mangle)
         raise 'Parameter set_mark only applies to ' \
           'the mangle table and when jump => MARK'
       end

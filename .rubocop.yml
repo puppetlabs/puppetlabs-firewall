@@ -89,6 +89,8 @@ Performance/CaseWhenSplat:
 Performance/Casecmp:
   Enabled: true
 Performance/CollectionLiteralInLoop:
+  Exclude:
+  - spec/**/*
   Enabled: true
 Performance/CompareWithBlock:
   Enabled: true
@@ -294,6 +296,8 @@ Metrics/AbcSize:
   Enabled: false
 Metrics/BlockLength:
   Enabled: false
+Metrics/BlockNesting:
+  Enabled: false
 Metrics/ClassLength:
   Enabled: false
 Metrics/CyclomaticComplexity:
@@ -307,6 +311,8 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: false
 Migration/DepartmentName:
+  Enabled: false
+Naming/AccessorMethodName:
   Enabled: false
 Naming/BlockParameterName:
   Enabled: false
