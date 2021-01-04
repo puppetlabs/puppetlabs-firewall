@@ -2361,8 +2361,8 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:set_mark)
-      unless value(:jump).to_s.include?(MARK) &&
-             value(:table).to_s.include?(mangle)
+      unless value(:jump).to_s.include?('MARK') &&
+             value(:table).to_s.include?('mangle')
         raise 'Parameter set_mark only applies to ' \
           'the mangle table and when jump => MARK'
       end

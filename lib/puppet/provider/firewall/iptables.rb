@@ -833,7 +833,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       args = args.flatten
 
       # On negations, the '!' has to be before the option (eg: "! -d 1.2.3.4")
-      if resource_value.is_a?(String) && resource_value.sub!(%r{^!\s*}, '')
+      if resource_value.is_a?(String) && resource_value.start_with?('!')
+        resource_value = resource_value.sub(%r{^!\s*}, '')
         # we do this after adding the 'dash' argument because of ones like "-m multiport --dports", where we want it before the "--dports" but after "-m multiport".
         # so we insert before whatever the last argument is
         args.insert(-2, '!')
