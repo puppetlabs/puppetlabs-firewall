@@ -140,7 +140,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe 'source error checking' do
     it 'Invalid address when 256.168.2.0/24' do
-      expect(-> { resource[:source] = '256.168.2.0/24' }).to raise_error(
+      expect { resource[:source] = '256.168.2.0/24' }.to raise_error(
         Puppet::Error, %r{host_to_ip failed}
       )
     end
@@ -148,7 +148,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe 'destination error checking' do
     it 'Invalid address when 256.168.2.0/24' do
-      expect(-> { resource[:destination] = '256.168.2.0/24' }).to raise_error(
+      expect { resource[:destination] = '256.168.2.0/24' }.to raise_error(
         Puppet::Error, %r{host_to_ip failed}
       )
     end
@@ -156,7 +156,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe 'src_range error checking' do
     it 'Invalid IP when 392.168.1.1-192.168.1.10' do
-      expect(-> { resource[:src_range] = '392.168.1.1-192.168.1.10' }).to raise_error(
+      expect { resource[:src_range] = '392.168.1.1-192.168.1.10' }.to raise_error(
         Puppet::Error, %r{Invalid IP address}
       )
     end
@@ -164,7 +164,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
   describe 'dst_range error checking' do
     it 'Invalid IP when 392.168.1.1-192.168.1.10' do
-      expect(-> { resource[:dst_range] = '392.168.1.1-192.168.1.10' }).to raise_error(
+      expect { resource[:dst_range] = '392.168.1.1-192.168.1.10' }.to raise_error(
         Puppet::Error, %r{Invalid IP address}
       )
     end
