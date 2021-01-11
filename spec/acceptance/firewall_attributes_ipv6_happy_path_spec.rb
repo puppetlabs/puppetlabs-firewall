@@ -272,6 +272,16 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
           action      => accept,
           provider    => 'ip6tables',
         }
+        firewall { '500 allow v6 non-any queries':
+          chain       => 'OUTPUT',
+          proto       => 'udp',
+          dport       => '53',
+          string_hex  => '! |0000ff0001|',
+          string_algo => 'bm',
+          to          => '65535',
+          action      => 'accept',
+          provider    => 'ip6tables',
+        }
       PUPPETCODE
       idempotent_apply(pp)
     end
@@ -378,6 +388,10 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
     end
     it 'checks hex_string value' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m string --hex-string "|f46d0425b202000a|" --algo kmp --to 65535 -m comment --comment "812 - hex_string" -j ACCEPT})
+    end
+    it 'checks hex_string value which include negation operator' do
+      regex_string = %r{-A OUTPUT -p udp -m multiport --dports 53 -m string ! --hex-string "|0000ff0001|" --algo bm --to 65535 -m comment --comment "500 allow v6 non-any queries" -j ACCEPT}
+      expect(result.stdout).to match(regex_string)
     end
   end
 end

@@ -2075,7 +2075,11 @@ Puppet::Type.newtype(:firewall) do
       given as an argument.
     PUPPETCODE
     munge do |value|
-      _value = value.split('|').map { |x| x.include?('!') ? x : "|#{x.delete(' ')}|" }.join
+      _value = if value.include?('!')
+                 value.split('|').map { |x| x.include?('!') ? x : "|#{x.delete(' ')}|" }.join
+               else
+                 value.delete(' ')
+               end
     end
   end
 
