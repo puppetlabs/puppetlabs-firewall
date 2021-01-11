@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::Type.type(:firewallchain).provide :iptables_chain do
   include Puppet::Util::Firewall
 
@@ -35,13 +37,13 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
       re: %r{^:(.+)\s(\S+)$},
     },
   }.freeze
-  INTERNAL_CHAINS = %r{^(PREROUTING|POSTROUTING|BROUTING|INPUT|FORWARD|OUTPUT)$}
-  TABLES = 'nat|mangle|filter|raw|rawpost|broute|security'.freeze
-  NAME_FORMAT = %r{^(.+):(#{TABLES}):(IP(v[46])?|ethernet)$}
+  INTERNAL_CHAINS = %r{^(PREROUTING|POSTROUTING|BROUTING|INPUT|FORWARD|OUTPUT)$}.freeze
+  TABLES = 'nat|mangle|filter|raw|rawpost|broute|security'
+  NAME_FORMAT = %r{^(.+):(#{TABLES}):(IP(v[46])?|ethernet)$}.freeze
 
   def create
     allvalidchains do |t, chain, table, protocol|
-      if chain =~ INTERNAL_CHAINS
+      if INTERNAL_CHAINS.match?(chain)
         # can't create internal chains
         warning "Attempting to create internal chain #{@resource[:name]}"
       end
@@ -59,7 +61,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
 
   def destroy
     allvalidchains do |t, chain, table|
-      if chain =~ INTERNAL_CHAINS
+      if INTERNAL_CHAINS.match?(chain)
         # can't delete internal chains
         warning "Attempting to destroy internal chain #{@resource[:name]}"
       else
@@ -71,7 +73,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
 
   def exists?
     allvalidchains do |_t, chain|
-      if chain =~ INTERNAL_CHAINS
+      if INTERNAL_CHAINS.match?(chain)
         # If the chain isn't present, it's likely because the module isn't loaded.
         # If this is true, then we fall into 2 cases
         # 1) It'll be loaded on demand
@@ -158,7 +160,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
             next
           end
         end
-      rescue Puppet::Error # rubocop:disable Lint/HandleExceptions
+      rescue Puppet::Error
         # ignore command not found for ebtables or anything that doesn't exist
       end
     end

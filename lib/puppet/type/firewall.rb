@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # See: #10295 for more details.
 #
 # This is a workaround for bug: #4248 whereby ruby files outside of the normal
@@ -639,7 +641,7 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
 
     validate do |value|
-      unless value =~ %r{^[a-zA-Z0-9\-_]+$}
+      unless %r{^[a-zA-Z0-9\-_]+$}.match?(value)
         raise ArgumentError, <<-PUPPETCODE
           Jump destination must consist of alphanumeric characters, an
           underscore or a hyphen.
@@ -672,7 +674,7 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
 
     validate do |value|
-      unless value =~ %r{^[a-zA-Z0-9\-_]+$}
+      unless %r{^[a-zA-Z0-9\-_]+$}.match?(value)
         raise ArgumentError, <<-PUPPETCODE
           Goto destination must consist of alphanumeric characters, an
           underscore or a hyphen.
@@ -1755,7 +1757,7 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
 
     validate do |value|
-      unless value =~ %r{^\d+$}
+      unless %r{^\d+$}.match?(value)
         raise ArgumentError, <<-PUPPETCODE
           stat_every value must be a digit
         PUPPETCODE
@@ -1906,11 +1908,11 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
 
     munge do |value|
-      if value =~ %r{^([0-9]):}
+      if %r{^([0-9]):}.match?(value)
         value = "0#{value}"
       end
 
-      if value =~ %r{^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$}
+      if %r{^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$}.match?(value)
         value = "#{value}:00"
       end
 
@@ -1925,11 +1927,11 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
 
     munge do |value|
-      if value =~ %r{^([0-9]):}
+      if %r{^([0-9]):}.match?(value)
         value = "0#{value}"
       end
 
-      if value =~ %r{^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$}
+      if %r{^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$}.match?(value)
         value = "#{value}:00"
       end
 
@@ -2277,8 +2279,9 @@ Puppet::Type.newtype(:firewall) do
 
     unless protocol.nil?
       table = value(:table)
+      main_chains = ['INPUT', 'OUTPUT', 'FORWARD']
       [value(:chain), value(:jump)].each do |chain|
-        reqs << "#{chain}:#{table}:#{protocol}" unless chain.nil? || (['INPUT', 'OUTPUT', 'FORWARD'].include?(chain) && table == :filter)
+        reqs << "#{chain}:#{table}:#{protocol}" unless chain.nil? || (main_chains.include?(chain) && table == :filter)
       end
     end
 
@@ -2344,29 +2347,29 @@ Puppet::Type.newtype(:firewall) do
     # Now we analyse the individual properties to make sure they apply to
     # the correct combinations.
     if value(:uid)
-      unless value(:chain).to_s =~ %r{OUTPUT|POSTROUTING}
+      unless %r{OUTPUT|POSTROUTING}.match?(value(:chain).to_s)
         raise 'Parameter uid only applies to chains ' \
           'OUTPUT,POSTROUTING'
       end
     end
 
     if value(:gid)
-      unless value(:chain).to_s =~ %r{OUTPUT|POSTROUTING}
+      unless %r{OUTPUT|POSTROUTING}.match?(value(:chain).to_s)
         raise 'Parameter gid only applies to chains ' \
           'OUTPUT,POSTROUTING'
       end
     end
 
     if value(:set_mark)
-      unless value(:jump).to_s  =~ %r{MARK} &&
-             value(:table).to_s =~ %r{mangle}
+      unless value(:jump).to_s.include?('MARK') &&
+             value(:table).to_s.include?('mangle')
         raise 'Parameter set_mark only applies to ' \
           'the mangle table and when jump => MARK'
       end
     end
 
     if value(:dport)
-      unless value(:proto).to_s =~ %r{tcp|udp|sctp}
+      unless %r{tcp|udp|sctp}.match?(value(:proto).to_s)
         raise '[%s] Parameter dport only applies to sctp, tcp and udp ' \
           'protocols. Current protocol is [%s] and dport is [%s]' %
               [value(:name), should(:proto), should(:dport)]
@@ -2392,7 +2395,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'DNAT'
-      unless value(:table).to_s =~ %r{nat}
+      unless %r{nat}.match?(value(:table).to_s)
         raise 'Parameter jump => DNAT only applies to table => nat'
       end
 
@@ -2402,7 +2405,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'SNAT'
-      unless value(:table).to_s =~ %r{nat}
+      unless %r{nat}.match?(value(:table).to_s)
         raise 'Parameter jump => SNAT only applies to table => nat'
       end
 
@@ -2412,7 +2415,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'MASQUERADE'
-      unless value(:table).to_s =~ %r{nat}
+      unless %r{nat}.match?(value(:table).to_s)
         raise 'Parameter jump => MASQUERADE only applies to table => nat'
       end
     end
@@ -2495,7 +2498,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'CT'
-      unless value(:table).to_s =~ %r{raw}
+      unless %r{raw}.match?(value(:table).to_s)
         raise 'Parameter jump => CT only applies to table => raw'
       end
     end

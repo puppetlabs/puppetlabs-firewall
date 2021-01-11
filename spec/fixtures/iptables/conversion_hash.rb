@@ -595,7 +595,7 @@ ARGS_TO_HASH = {
     },
   },
   'connlimit_above' => {
-    line: '-A INPUT -p tcp -m multiport --dports 22 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "061 REJECT connlimit_above 10"', # rubocop:disable Metrics/LineLength
+    line: '-A INPUT -p tcp -m multiport --dports 22 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "061 REJECT connlimit_above 10"', # rubocop:disable Layout/LineLength
     table: 'filter',
     params: {
       proto: 'tcp',
@@ -605,7 +605,7 @@ ARGS_TO_HASH = {
     },
   },
   'connlimit_above_with_connlimit_mask' => {
-    line: '-A INPUT -p tcp -m multiport --dports 22 -m connlimit --connlimit-above 10 --connlimit-mask 24 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "061 REJECT connlimit_above 10 with mask 24"', # rubocop:disable Metrics/LineLength,
+    line: '-A INPUT -p tcp -m multiport --dports 22 -m connlimit --connlimit-above 10 --connlimit-mask 24 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "061 REJECT connlimit_above 10 with mask 24"', # rubocop:disable Layout/LineLength,
     table: 'filter',
     params: {
       proto: 'tcp',
@@ -634,7 +634,7 @@ ARGS_TO_HASH = {
     },
   },
   'drop_new_packets_without_syn' => {
-    line: '-t filter ! -s 10.0.0.0/8 ! -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP -m comment --comment "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset"', # rubocop:disable Metrics/LineLength
+    line: '-t filter ! -s 10.0.0.0/8 ! -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP -m comment --comment "064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset"', # rubocop:disable Layout/LineLength
     table: 'filter',
     params: {
       name: '064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset',
@@ -659,7 +659,7 @@ ARGS_TO_HASH = {
     },
   },
   'match_mark' => {
-    line: '-A INPUT -p tcp -m mark --mark 0x1 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "066 REJECT connlimit_above 10 with mask 32 and mark matches"', # rubocop:disable Metrics/LineLength
+    line: '-A INPUT -p tcp -m mark --mark 0x1 -m connlimit --connlimit-above 10 --connlimit-mask 32 -j REJECT --reject-with icmp-port-unreachable -m comment --comment "066 REJECT connlimit_above 10 with mask 32 and mark matches"', # rubocop:disable Layout/LineLength
     table: 'filter',
     params: {
       proto: 'tcp',
@@ -811,7 +811,7 @@ HASH_TO_ARGS = {
       sport: ['7061', '7062'],
       table: 'filter',
     },
-    args: ['-t', :filter, '-s', '1.1.1.1/32', '-d', '1.1.1.1/32', '-p', :tcp, '-m', 'multiport', '--sports', '7061,7062', '-m', 'multiport', '--dports', '7061,7062', '-j', 'ACCEPT', '-m', 'comment', '--comment', '000 allow foo'], # rubocop:disable Metrics/LineLength
+    args: ['-t', :filter, '-s', '1.1.1.1/32', '-d', '1.1.1.1/32', '-p', :tcp, '-m', 'multiport', '--sports', '7061,7062', '-m', 'multiport', '--dports', '7061,7062', '-j', 'ACCEPT', '-m', 'comment', '--comment', '000 allow foo'], # rubocop:disable Layout/LineLength
   },
   'long_rule_2' => {
     params: {
@@ -826,7 +826,7 @@ HASH_TO_ARGS = {
       sport: ['7061', '7062'],
       table: 'filter',
     },
-    args: ['-t', :filter, '-s', '1.1.1.1/32', '-d', '2.10.13.0/24', '-p', :udp, '-m', 'multiport', '--sports', '7061,7062', '-m', 'multiport', '--dports', '7061', '-j', 'my_custom_chain', '-m', 'comment', '--comment', '700 allow bar'], # rubocop:disable Metrics/LineLength
+    args: ['-t', :filter, '-s', '1.1.1.1/32', '-d', '2.10.13.0/24', '-p', :udp, '-m', 'multiport', '--sports', '7061,7062', '-m', 'multiport', '--dports', '7061', '-j', 'my_custom_chain', '-m', 'comment', '--comment', '700 allow bar'], # rubocop:disable Layout/LineLength
   },
   'no_action' => {
     params: {
@@ -1286,7 +1286,7 @@ HASH_TO_ARGS = {
       connlimit_mask: '24',
       action: 'reject',
     },
-    args: ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '22', '-j', 'REJECT', '-m', 'connlimit', '--connlimit-above', '10', '--connlimit-mask', '24', '-m', 'comment', '--comment', '061 REJECT connlimit_above 10 with mask 24'], # rubocop:disable Metrics/LineLength
+    args: ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '22', '-j', 'REJECT', '-m', 'connlimit', '--connlimit-above', '10', '--connlimit-mask', '24', '-m', 'comment', '--comment', '061 REJECT connlimit_above 10 with mask 24'], # rubocop:disable Layout/LineLength
   },
   'connmark' => {
     params: {
@@ -1318,7 +1318,7 @@ HASH_TO_ARGS = {
       source: '! 10.0.0.0/8',
       tcp_flags: '! FIN,SYN,RST,ACK SYN',
     },
-    args: ['-t', :filter, '!', '-s', '10.0.0.0/8', '!', '-p', :tcp, '-m', 'tcp', '!', '--tcp-flags', 'FIN,SYN,RST,ACK', 'SYN', '-m', 'state', '--state', 'NEW', '-j', 'DROP', '-m', 'comment', '--comment', '064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset'], # rubocop:disable Metrics/LineLength
+    args: ['-t', :filter, '!', '-s', '10.0.0.0/8', '!', '-p', :tcp, '-m', 'tcp', '!', '--tcp-flags', 'FIN,SYN,RST,ACK', 'SYN', '-m', 'state', '--state', 'NEW', '-j', 'DROP', '-m', 'comment', '--comment', '064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset'], # rubocop:disable Layout/LineLength
   },
   'negate_dport_and_sport' => {
     params: {
@@ -1332,7 +1332,7 @@ HASH_TO_ARGS = {
       dport: ['! 67', '! 66'],
       proto: 'udp',
     },
-    args: ['-t', :filter, '-s', '0.0.0.0/32', '-d', '255.255.255.255/32', '-p', :udp, '-m', 'multiport', '!', '--sports', '68,69', '-m', 'multiport', '!', '--dports', '67,66', '-j', 'ACCEPT', '-m', 'comment', '--comment', '065 negate dport and sport'], # rubocop:disable Metrics/LineLength
+    args: ['-t', :filter, '-s', '0.0.0.0/32', '-d', '255.255.255.255/32', '-p', :udp, '-m', 'multiport', '!', '--sports', '68,69', '-m', 'multiport', '!', '--dports', '67,66', '-j', 'ACCEPT', '-m', 'comment', '--comment', '065 negate dport and sport'], # rubocop:disable Layout/LineLength
   },
   'match_mark' => {
     params: {
@@ -1344,7 +1344,7 @@ HASH_TO_ARGS = {
       match_mark: '0x1',
       action: 'reject',
     },
-    args: ['-t', :filter, '-p', :tcp, '-j', 'REJECT', '-m', 'mark', '--mark', '0x1', '-m', 'connlimit', '--connlimit-above', '10', '--connlimit-mask', '32', '-m', 'comment', '--comment', '066 REJECT connlimit_above 10 with mask 32 and mark matches'], # rubocop:disable Metrics/LineLength
+    args: ['-t', :filter, '-p', :tcp, '-j', 'REJECT', '-m', 'mark', '--mark', '0x1', '-m', 'connlimit', '--connlimit-above', '10', '--connlimit-mask', '32', '-m', 'comment', '--comment', '066 REJECT connlimit_above 10 with mask 32 and mark matches'], # rubocop:disable Layout/LineLength
   },
   'clamp_mss_to_pmtu' => {
     params: {
@@ -1432,7 +1432,7 @@ HASH_TO_ARGS = {
       queue_num: '50',
       queue_bypass: true,
     },
-    args: ['-t', :filter, '-s', '1.2.3.4/32', '-d', '4.3.2.1/32', '-p', :tcp, '-j', 'NFQUEUE', '--queue-num', '50', '--queue-bypass', '-m', 'comment', '--comment', '002 nfqueue specify queue_num and queue_bypass'], # rubocop:disable Metrics/LineLength
+    args: ['-t', :filter, '-s', '1.2.3.4/32', '-d', '4.3.2.1/32', '-p', :tcp, '-j', 'NFQUEUE', '--queue-num', '50', '--queue-bypass', '-m', 'comment', '--comment', '002 nfqueue specify queue_num and queue_bypass'], # rubocop:disable Layout/LineLength
   },
   'nfqueue_jump3' => {
     params: {

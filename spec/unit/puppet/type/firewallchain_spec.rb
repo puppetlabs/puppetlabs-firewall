@@ -1,4 +1,5 @@
 #!/usr/bin/env rspec
+# frozen_string_literal: true
 
 require 'spec_helper'
 
@@ -36,21 +37,21 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
         ['test', '$5()*&%\'"^$09):'].each do |chainname|
           name = "#{chainname}:#{table}:#{protocol}"
           if table == 'nat' && protocol == 'IPv6'
-            it "should accept #{name} for Linux 3.7+" do
+            it "accepts #{name} for Linux 3.7+" do
               allow(Facter.fact(:kernelmajversion)).to receive(:value).and_return('3.7')
               resource[:name] = name
               expect(resource[:name]).to eql name
             end
-            it "should fail #{name} for Linux 2.6" do
+            it "fails #{name} for Linux 2.6" do
               allow(Facter.fact(:kernelmajversion)).to receive(:value).and_return('2.6')
               expect { resource[:name] = name }.to raise_error(Puppet::Error)
             end
           elsif protocol != 'ethernet' && table == 'broute'
-            it "should fail #{name}" do # rubocop:disable RSpec/RepeatedExample
+            it "fails #{name}" do # rubocop:disable RSpec/RepeatedExample,RSpec/RepeatedDescription
               expect { resource[:name] = name }.to raise_error(Puppet::Error)
             end
           else
-            it "should accept name #{name}" do # rubocop:disable RSpec/RepeatedExample
+            it "accepts name #{name}" do # rubocop:disable RSpec/RepeatedExample
               resource[:name] = name
               expect(resource[:name]).to eql name
             end
@@ -68,12 +69,12 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
                   'IPv4'
                 end
         if allowedinternalchains.include? internalchain
-          it "should allow #{name}" do # rubocop:disable RSpec/RepeatedExample
+          it "allows #{name}" do # rubocop:disable RSpec/RepeatedExample
             resource[:name] = name
             expect(resource[:name]).to eql name
           end
         else
-          it "should fail #{name}" do # rubocop:disable RSpec/RepeatedExample
+          it "fails #{name}" do # rubocop:disable RSpec/RepeatedExample,RSpec/RepeatedDescription
             expect { resource[:name] = name }.to raise_error(Puppet::Error)
           end
         end
@@ -91,7 +92,7 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
 
   describe ':policy' do
     [:accept, :drop, :queue, :return].each do |policy|
-      it "should accept policy #{policy}" do
+      it "accepts policy #{policy}" do
         resource[:policy] = policy
         expect(resource[:policy]).to eql policy
       end
@@ -140,8 +141,6 @@ describe firewallchain do # rubocop:disable RSpec/MultipleDescribes
         expect(rel.target.ref).to eql resource.ref
       end
     end
-    # rubocop:enable RSpec/ExampleLength
-    # rubocop:enable RSpec/MultipleExpectations
   end
 
   describe 'purge iptables rules' do
@@ -169,7 +168,6 @@ PUPPETCODE
       allow(Puppet::Type.type(:firewall).provider(:iptables)).to receive(:iptables_save).and_return(stub_return)
       allow(Puppet::Type.type(:firewall).provider(:ip6tables)).to receive(:ip6tables_save).and_return(stub_return)
     end
-    # rubocop:enable Layout/IndentHeredoc
 
     it 'generates iptables resources' do
       allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return('1.4.21')

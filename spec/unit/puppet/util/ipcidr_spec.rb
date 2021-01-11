@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'puppet/util/ipcidr'
 
@@ -52,6 +54,12 @@ describe 'Puppet::Util::IPCidr' do
     it { expect(host.cidr).to eql '0.0.0.0/0' }
     it { expect(host.prefixlen).to be 0 }
     it { expect(host.netmask).to eql '0.0.0.0' }
+  end
+
+  describe 'ipv4 invalid address' do
+    subject(:host) { Puppet::Util::IPCidr.new('256.168.2.0/24') }
+
+    it { expect { host }.to raise_error ArgumentError, %r{256.168.2.0/24} }
   end
 
   describe 'ipv6 address' do

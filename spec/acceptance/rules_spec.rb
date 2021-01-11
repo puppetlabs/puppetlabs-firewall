@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper_acceptance'
 require 'spec_helper_acceptance_local'
 
@@ -103,7 +105,7 @@ describe 'rules spec' do
       %r{INPUT ACCEPT}, %r{FORWARD ACCEPT}, %r{OUTPUT ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) -d 10.0.0.0\/(8|255\.0\.0\.0) -m comment --comment \"090 forward allow local\" -j ACCEPT},
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p icmp -m comment --comment \"100 forward standard allow icmp\" -j ACCEPT},
-      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --sports 80,443,21,20,22,53,123,43,873,25,465 -m conntrack --ctstate NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Metrics/LineLength
+      %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p tcp -m multiport --sports 80,443,21,20,22,53,123,43,873,25,465 -m conntrack --ctstate NEW -m comment --comment \"100 forward standard allow tcp\" -j ACCEPT}, # rubocop:disable Layout/LineLength
       %r{-A FORWARD -s 10.0.0.0\/(8|255\.0\.0\.0) (! -d|-d !) 10.0.0.0\/(8|255\.0\.0\.0) -p udp -m multiport --sports 53,123 -m comment --comment \"100 forward standard allow udp\" -j ACCEPT}
     ]
     it 'contains appropriate rules' do

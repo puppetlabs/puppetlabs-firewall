@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require 'ipaddr'
 
@@ -7,7 +8,7 @@ module Puppet::Util
     def initialize(ipaddr, family = Socket::AF_UNSPEC)
       super(ipaddr, family)
     rescue ArgumentError => e
-      raise ArgumentError, "Invalid address from IPAddr.new: #{ipaddr}" if e.message =~ %r{invalid address}
+      raise ArgumentError, "Invalid address from IPAddr.new: #{ipaddr}" if %r{invalid address}.match?(e.message)
       raise e
     end
 
@@ -29,8 +30,7 @@ module Puppet::Util
     end
 
     def cidr
-      cidr = '%s/%s' % [to_s, prefixlen]
-      cidr
+      "#{self}/#{prefixlen}"
     end
   end
 end

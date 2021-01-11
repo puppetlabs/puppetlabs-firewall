@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'puppet/provider/firewall'
 require 'digest'
 
@@ -376,14 +378,12 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       #
       # This tries deleting again with -p all to see if that helps.
       #
-      # rubocop:disable Lint/HandleExceptions
       if self.class.instance_variable_get(:@protocol) == 'IPv6' && properties[:proto] == 'all'
         begin
           iptables delete_args.concat(['-p', 'all'])
-        rescue Puppet::ExecutionFailure => e
+        rescue Puppet::ExecutionFailure => e # rubocop:disable Lint/SuppressedException
         end
       end
-      # rubocop:enable Lint/HandleExceptions
 
       # Check to see if the iptables rule is already gone. This can sometimes
       # happen as a side effect of other resource changes. If it's not gone,
@@ -424,8 +424,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # String#lines would be nice, but we need to support Ruby 1.8.5
     nf_warning_msg = "# Warning: ip6?tables-legacy tables present, use ip6?tables-legacy-save to see them\n"
     iptables_save.gsub(%r{#{nf_warning_msg}}, '').split("\n").each do |line|
-      unless line =~ %r{^\#\s+|^\:\S+|^COMMIT|^FATAL}
-        if line =~ %r{^\*}
+      unless %r{^\#\s+|^\:\S+|^COMMIT|^FATAL}.match?(line)
+        if %r{^\*}.match?(line)
           table = line.sub(%r{\*}, '')
         else
           hash = rule_to_hash(line, table, counter)
@@ -458,7 +458,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # --condition output is in quotes, need to move ! inside quotes
     values.gsub!(%r{(!\s+)?--condition "(\S*?)"}, '--condition "\1\2"')
     # --match-set can have multiple values with weird iptables format
-    if values =~ %r{-m set (!\s+)?--match-set}
+    if %r{-m set (!\s+)?--match-set}.match?(values)
       values = values.gsub(%r{(!\s+)?--match-set (\S*) (\S*)}, '--match-set \1\2 \3')
       ind  = values.index('-m set --match-set')
       sets = values.scan(%r{-m set --match-set ((?:!\s+)?\S* \S*)})
@@ -466,7 +466,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
     end
     # --comment can have multiple values, the same as --match-set
-    if values =~ %r{-m comment --comment}
+    if %r{-m comment --comment}.match?(values)
       ind = values.index('-m comment --comment')
       comments = values.scan(%r{-m comment --comment "((?:\\"|[^"])*)"})
       comments += values.scan(%r{-m comment --comment ([^"\s]+)\b})
@@ -474,14 +474,14 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values = values.gsub(%r{-m comment --comment ([^"].*?)[ $]}, '')
       values.insert(ind, "-m comment --comment \"#{comments.join(';')}\" ")
     end
-    if values =~ %r{-m addrtype (!\s+)?--src-type}
+    if %r{-m addrtype (!\s+)?--src-type}.match?(values)
       values = values.gsub(%r{(!\s+)?--src-type (\S*)(\s--limit-iface-(in|out))?}, '--src-type \1\2\3')
       ind = values.index('-m addrtype --src-type')
       types = values.scan(%r{-m addrtype --src-type ((?:!\s+)?\S*(?: --limit-iface-(?:in|out))?)})
       values = values.gsub(%r{-m addrtype --src-type ((?:!\s+)?\S*(?: --limit-iface-(?:in|out))?) ?}, '')
       values.insert(ind, "-m addrtype --src-type \"#{types.join(';')}\" ")
     end
-    if values =~ %r{-m addrtype (!\s+)?--dst-type}
+    if %r{-m addrtype (!\s+)?--dst-type}.match?(values)
       values = values.gsub(%r{(!\s+)?--dst-type (\S*)(\s--limit-iface-(in|out))?}, '--dst-type \1\2\3')
       ind = values.index('-m addrtype --dst-type')
       types = values.scan(%r{-m addrtype --dst-type ((?:!\s+)?\S*(?: --limit-iface-(?:in|out))?)})
@@ -553,7 +553,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     ############
 
     # Here we iterate across our values to generate an array of keys
-    parser_list.reverse.each do |k|
+    parser_list.reverse_each do |k|
       resource_map_key = resource_map[k]
       [resource_map_key].flatten.each do |opt|
         if values.slice!(%r{\s#{opt}})
@@ -564,13 +564,13 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     end
 
     # Manually remove chain
-    if values =~ %r{(\s|^)-A\s}
+    if %r{(\s|^)-A\s}.match?(values)
       values = values.sub(%r{(\s|^)-A\s}, '\1')
       keys << :chain
     end
 
     # Manually remove table (used in some tests)
-    if values =~ %r{^-t\s}
+    if %r{^-t\s}.match?(values)
       values = values.sub(%r{^-t\s}, '')
       keys << :table
     end
@@ -586,7 +586,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # string, handling any quoted characters present in the value, and then
     # zipping the values with the array of keys.
     keys.zip(valrev) do |f, v|
-      hash[f] = if v =~ %r{^".*"$}
+      hash[f] = if %r{^".*"$}.match?(v)
                   v.sub(%r{^"(.*)"$}, '\1').gsub(%r{\\(\\|'|")}, '\1')
                 else
                   v.dup
@@ -629,7 +629,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       '0x2e' => 'ef',
     }
     [:set_dscp_class].each do |prop|
-      [:set_dscp].each do |dmark|
+      [:set_dscp].each do |dmark| # rubocop:disable Performance/CollectionLiteralInLoop
         next unless hash[dmark]
         hash[prop] = valid_dscp_classes[hash[dmark]]
       end
@@ -637,7 +637,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
     # Convert booleans removing the previous cludge we did
     @known_booleans.each do |bool|
-      unless [nil, 'true', '!'].include?(hash[bool])
+      unless [nil, 'true', '!'].include?(hash[bool]) # rubocop:disable Performance/CollectionLiteralInLoop
         raise "Parser error: #{bool} was meant to be a boolean but received value: #{hash[bool]}."
       end
     end
@@ -651,9 +651,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         elem.tr(':', '-')
       end
     end
-    if hash[:length]
-      hash[:length].tr!(':', '-')
-    end
+    hash[:length]&.tr!(':', '-')
 
     # Invert any rules that are prefixed with a '!'
     [
@@ -684,7 +682,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       :src_range,
       :state,
     ].each do |prop|
-      if hash[prop] && hash[prop].is_a?(Array)
+      if hash[prop]&.is_a?(Array)
         # find if any are negated, then negate all if so
         should_negate = hash[prop].index do |value|
           value.match(%r{^(!)\s+})
@@ -697,7 +695,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       elsif hash[prop]
         m = hash[prop].match(%r{^(!?)\s?(.*)})
         neg = '! ' if m[1] == '!'
-        hash[prop] = if [:source, :destination].include?(prop)
+        hash[prop] = if [:source, :destination].include?(prop) # rubocop:disable Performance/CollectionLiteralInLoop
                        # Normalise all rules to CIDR notation.
                        "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
                      else
@@ -813,6 +811,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       raise "#{prop} elements must be unique" if resource[prop].map { |type| type.to_s.gsub(%r{--limit-iface-(in|out)}, '') }.uniq.length != resource[prop].length
     end
 
+    complex_args = [:ipset, :dst_type, :src_type]
+
     resource_list.each do |res|
       resource_value = nil
       if resource[res]
@@ -833,24 +833,23 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       args = args.flatten
 
       # On negations, the '!' has to be before the option (eg: "! -d 1.2.3.4")
-      if resource_value.is_a?(String) && resource_value.sub!(%r{^!\s*}, '')
+      if resource_value.is_a?(String) && resource_value.start_with?('!')
+        resource_value = resource_value.sub(%r{^!\s*}, '')
         # we do this after adding the 'dash' argument because of ones like "-m multiport --dports", where we want it before the "--dports" but after "-m multiport".
         # so we insert before whatever the last argument is
         args.insert(-2, '!')
       elsif resource_value.is_a?(Symbol) && resource_value.to_s.match(%r{^!})
-        # ruby 1.8.7 can't .match Symbols ------------------ ^
         resource_value = resource_value.to_s.sub!(%r{^!\s*}, '').to_sym
         args.insert(-2, '!')
-      elsif resource_value.is_a?(Array) && ![:ipset, :dst_type, :src_type].include?(res)
+      elsif resource_value.is_a?(Array) && !complex_args.include?(res)
+
         should_negate = resource_value.index do |value|
-          # ruby 1.8.7 can't .match symbols
           value.to_s.match(%r{^(!)\s+})
         end
         if should_negate
           resource_value, wrong_values = resource_value.map { |value|
             if value.is_a?(String)
-              # rubocop:disable Metrics/BlockNesting
-              wrong = value unless value =~ %r{^!\s+}
+              wrong = value unless %r{^!\s+}.match?(value)
               [value.sub(%r{^!\s*}, ''), wrong]
             else
               [value, nil]
@@ -858,7 +857,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
           }.transpose
           wrong_values = wrong_values.compact
           unless wrong_values.empty?
-            raise "All values of the '#{res}' property must be prefixed with a '!' when inverting, but '#{wrong_values.join("', '")}' #{(wrong_values.length > 1) ? 'are' : 'is'} not prefixed; aborting" # rubocop:disable Metrics/LineLength : Line length cannot be reduced
+            raise "All values of the '#{res}' property must be prefixed with a '!' when inverting, but " \
+              "'#{wrong_values.join("', '")}' #{(wrong_values.length > 1) ? 'are' : 'is'} not prefixed; aborting"
           end
           args.insert(-2, '!')
           # rubocop:enable Metrics/BlockNesting
@@ -867,14 +867,15 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
-      if [:sport, :dport, :port].include?(res)
+      if [:sport, :dport, :port].include?(res) # rubocop:disable Performance/CollectionLiteralInLoop
         resource_value = resource_value.map do |elem|
           elem.tr('-', ':')
         end
       end
 
       # ipset can accept multiple values with weird iptables arguments
-      if [:ipset, :dst_type, :src_type].include?(res)
+      if complex_args.include?(res)
+
         resource_value.join(" #{[resource_map[res]].flatten.first} ").split(' ').each do |a|
           if a.sub!(%r{^!\s*}, '')
             # Negate ipset options
