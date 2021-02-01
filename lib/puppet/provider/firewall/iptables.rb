@@ -629,7 +629,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       '0x2e' => 'ef',
     }
     [:set_dscp_class].each do |prop|
-      [:set_dscp].each do |dmark| # rubocop:disable Performance/CollectionLiteralInLoop
+      [:set_dscp].each do |dmark|
         next unless hash[dmark]
         hash[prop] = valid_dscp_classes[hash[dmark]]
       end
@@ -637,7 +637,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
     # Convert booleans removing the previous cludge we did
     @known_booleans.each do |bool|
-      unless [nil, 'true', '!'].include?(hash[bool]) # rubocop:disable Performance/CollectionLiteralInLoop
+      unless [nil, 'true', '!'].include?(hash[bool])
         raise "Parser error: #{bool} was meant to be a boolean but received value: #{hash[bool]}."
       end
     end
@@ -695,7 +695,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       elsif hash[prop]
         m = hash[prop].match(%r{^(!?)\s?(.*)})
         neg = '! ' if m[1] == '!'
-        hash[prop] = if [:source, :destination].include?(prop) # rubocop:disable Performance/CollectionLiteralInLoop
+        hash[prop] = if [:source, :destination].include?(prop)
                        # Normalise all rules to CIDR notation.
                        "#{neg}#{Puppet::Util::IPCidr.new(m[2]).cidr}"
                      else
@@ -867,7 +867,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
       # For sport and dport, convert hyphens to colons since the type
       # expects hyphens for ranges of ports.
-      if [:sport, :dport, :port].include?(res) # rubocop:disable Performance/CollectionLiteralInLoop
+      if [:sport, :dport, :port].include?(res)
         resource_value = resource_value.map do |elem|
           elem.tr('-', ':')
         end
