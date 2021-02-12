@@ -651,7 +651,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         elem.tr(':', '-')
       end
     end
-    hash[:length]&.tr!(':', '-')
+    if hash[:length]
+      hash[:length].tr!(':', '-')
+    end
 
     # Invert any rules that are prefixed with a '!'
     [
@@ -682,7 +684,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       :src_range,
       :state,
     ].each do |prop|
-      if hash[prop]&.is_a?(Array)
+      if hash[prop] && hash[prop].is_a?(Array)
         # find if any are negated, then negate all if so
         should_negate = hash[prop].index do |value|
           value.match(%r{^(!)\s+})
