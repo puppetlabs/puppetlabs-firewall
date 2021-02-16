@@ -23,17 +23,6 @@
             - travis_ub_6
       - collection:
           puppet_collection:
-            - puppet5
-          provision_list:
-            - travis_ub_5
-      - collection:
-          puppet_collection:
-            - puppet5
-          provision_list:
-            - travis_el8
-          dist: xenial
-      - collection:
-          puppet_collection:
             - puppet6
           provision_list:
             - travis_el8
