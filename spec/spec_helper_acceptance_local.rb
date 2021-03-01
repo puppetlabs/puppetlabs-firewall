@@ -22,11 +22,16 @@ end
 def install_iptables
   LitmusHelper.instance.run_shell('iptables -V')
 rescue
-  if os[:family] == 'redhat'
-    LitmusHelper.instance.run_shell('yum install iptables-services -y')
-  else
-    LitmusHelper.instance.run_shell('apt-get install iptables -y')
-  end
+  install_pp = <<-PUPPETCODE
+    $iptables_package_name = $facts['os']['family'] ? {
+      'RedHat' => 'iptables-services',
+      default  => 'iptables',
+    }
+    package { $iptables_package_name:
+      ensure => 'latest',
+    }
+  PUPPETCODE
+  LitmusHelper.instance.apply_manifest(install_pp)
 end
 
 def iptables_version
@@ -55,7 +60,7 @@ RSpec.configure do |c|
   # To enable tests on abs/vmpooler machines just set to `true` this flag
   c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
-    if fetch_os_name == 'centos' && os[:release].to_i == 8
+    if os[:family] == 'redhat'
       pp = <<-PUPPETCODE
         package { 'iptables-services':
           ensure => 'latest',
@@ -65,11 +70,15 @@ RSpec.configure do |c|
         }
       PUPPETCODE
       LitmusHelper.instance.apply_manifest(pp)
+      LitmusHelper.instance.run_shell('yum install system-config-firewall-base -y')
+      LitmusHelper.instance.run_shell('lokkit --default=server')
+      LitmusHelper.instance.run_shell('service ip6tables restart')
+      pre_setup
     end
     if os[:family] == 'debian' && os[:release].to_i == 10
       pp = <<-PUPPETCODE
         package { 'net-tools':
-          ensure   => 'latest',
+          ensure => 'latest',
         }
         PUPPETCODE
       LitmusHelper.instance.apply_manifest(pp)

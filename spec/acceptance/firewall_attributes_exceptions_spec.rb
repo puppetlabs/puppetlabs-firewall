@@ -6,8 +6,6 @@ describe 'firewall basics', docker: true do
   before :all do
     if os[:family] == 'ubuntu' || os[:family] == 'debian'
       update_profile_file
-    elsif os[:family] == 'redhat'
-      pre_setup
     end
     iptables_flush_all_tables
     ip6tables_flush_all_tables

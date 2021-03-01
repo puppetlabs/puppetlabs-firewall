@@ -6,9 +6,6 @@ require 'spec_helper_acceptance_local'
 describe 'rules spec' do
   describe 'complex ruleset 1' do
     before :all do
-      if os[:family] == 'redhat'
-        pre_setup
-      end
       iptables_flush_all_tables
       ip6tables_flush_all_tables
     end
