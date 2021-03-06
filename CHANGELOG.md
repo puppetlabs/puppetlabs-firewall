@@ -45,6 +45,10 @@ All notable changes to this project will be documented in this file. The format 
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.5.0...v2.6.0)
 
+### Added
+
+- pdksync - \(IAC-973\) - Update travis/appveyor to run on new default branch main [\#933](https://github.com/puppetlabs/puppetlabs-firewall/pull/933) ([david22swan](https://github.com/david22swan))
+
 ### Fixed
 
 - Fix extra quotes in firewall string matching [\#944](https://github.com/puppetlabs/puppetlabs-firewall/pull/944) ([IBBoard](https://github.com/IBBoard))
@@ -66,7 +70,6 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Added
 
-- pdksync - \(IAC-973\) - Update travis/appveyor to run on new default branch main [\#933](https://github.com/puppetlabs/puppetlabs-firewall/pull/933) ([david22swan](https://github.com/david22swan))
 - Add support for u32 module in iptables [\#917](https://github.com/puppetlabs/puppetlabs-firewall/pull/917) ([sanfrancrisko](https://github.com/sanfrancrisko))
 - Add support for cgroup arg [\#916](https://github.com/puppetlabs/puppetlabs-firewall/pull/916) ([akerl-unpriv](https://github.com/akerl-unpriv))
 - Extend LOG options [\#914](https://github.com/puppetlabs/puppetlabs-firewall/pull/914) ([martialblog](https://github.com/martialblog))
