@@ -576,7 +576,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     end
 
     # manually remove comments if they made it this far
-    if values =~ %r{-m comment --comment}
+    if %r{-m comment --comment}.match?(values)
       values = values.sub(%r{-m comment --comment "((?:\\"|[^"])*)"}, {})
     end
 
