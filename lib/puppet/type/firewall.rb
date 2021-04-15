@@ -170,6 +170,7 @@ Puppet::Type.newtype(:firewall) do
   feature :log_tcp_options, 'Add TCP packet header to log messages'
   feature :log_ip_options, 'Add IP/IPv6 packet header to log messages'
   feature :mark, 'Match or Set the netfilter mark value associated with the packet'
+  feature :hmark, 'Mark the packets depending on certain criteria'
   feature :mss, 'Match a given TCP MSS value or range.'
   feature :tcp_flags, 'The ability to match on particular TCP flag settings'
   feature :pkttype, 'Match a packet type'
@@ -1314,6 +1315,136 @@ Puppet::Type.newtype(:firewall) do
       value = mark
 
       value
+    end
+  end
+
+  newproperty(:hmark_tuple, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      The tuple to match hmark on.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_tuple must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_mod, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      The hmark modulus for hash calculation.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_mode must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_offset, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Offset to start marks from.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_offset must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_src_prefix, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Hmark source address mask (cidr).
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_src_prefix must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_dst_prefix, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Hmark destination address mask (cidr).
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_dst_prefix must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_sport_mask, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Hmark 16 bit source port mask in hexadecimal.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_sport_mask must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_dport_mask, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Hmark 16 bit destination port mask in hexadecimal.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_dport_mask must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_spi_mask, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Hmark 32 bit field with spi mask.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_spi_mask must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_proto_mask, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Hmark 8 bit field with layer 4 protocol number.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_proto_mask must be a string.
+        PUPPETCODE
+      end
+    end
+  end
+
+  newproperty(:hmark_rnd, required_features: :hmark) do
+    desc <<-PUPPETCODE
+      Hmark 32 bit random custom value to feed hash calculation.
+    PUPPETCODE
+    validate do |value|
+      unless value.is_a?(String)
+        raise ArgumentError, <<-PUPPETCODE
+          hmark_rnd must be a string.
+        PUPPETCODE
+      end
     end
   end
 
@@ -2506,5 +2637,14 @@ Puppet::Type.newtype(:firewall) do
         raise 'Parameter jump => CT only applies to table => raw'
       end
     end
+
+    if value(:hmark_tuple) || value(:hmark_mod) || value(:hmark_offset) || value(:hmark_src_prefix) ||
+       value(:hmark_dst_prefix) || value(:hmark_sport_mask) || value(:hmark_dport_mask) ||
+       value(:hmark_spi_mask) || value(:hmark_proto_mask) || value(:hmark_rnd) == :true
+      unless value(:jump).to_s == 'HMARK'
+        raise 'HMARK parameters require jump => HMARK'
+      end
+    end
+
   end
 end
