@@ -9,7 +9,7 @@ describe 'firewall class' do
     end
   end
 
-  it 'runs successfully' do
+  it 'runs successfully', unless: os[:family] == 'redhat' && os[:release].to_i == 6 do
     pp = "class { 'firewall': }"
     idempotent_apply(pp)
   end
@@ -19,7 +19,7 @@ describe 'firewall class' do
     idempotent_apply(pp)
   end
 
-  it 'ensure => running:' do
+  it 'ensure => running:', unless: os[:family] == 'redhat' && os[:release].to_i == 6 do
     pp = "class { 'firewall': ensure => running }"
     idempotent_apply(pp)
   end

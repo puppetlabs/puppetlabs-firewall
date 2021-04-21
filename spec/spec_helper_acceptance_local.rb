@@ -55,6 +55,20 @@ RSpec.configure do |c|
   # To enable tests on abs/vmpooler machines just set to `true` this flag
   c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
+    if ['centos', 'oraclelinux', 'scientific'].include?(fetch_os_name) && [6, 7].include?(os[:release].to_i)
+      LitmusHelper.instance.run_shell('yum update -y')
+      LitmusHelper.instance.run_shell('depmod -a')
+      ['filter', 'nat', 'mangle', 'raw'].each do |t|
+        LitmusHelper.instance.run_shell("modprobe iptable_#{t}")
+        LitmusHelper.instance.run_shell("modprobe ip6table_#{t}")
+      end
+      LitmusHelper.instance.run_shell('touch /etc/sysconfig/iptables')
+      LitmusHelper.instance.run_shell('touch /etc/sysconfig/ip6tables')
+    end
+    if os[:family] == 'debian'
+      LitmusHelper.instance.run_shell('apt-get update -y')
+      LitmusHelper.instance.run_shell('apt-get install kmod') if os[:release].to_i == 10
+    end
     if fetch_os_name == 'centos' && os[:release].to_i == 8
       pp = <<-PUPPETCODE
         package { 'iptables-services':
