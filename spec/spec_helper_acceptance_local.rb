@@ -36,10 +36,8 @@ def iptables_version
 end
 
 def pre_setup
-  step_one = LitmusHelper.instance.run_shell('mkdir -p /lib/modules/`uname -r`')
-  unless step_one.exit_status == 0; exit 1; end
-  step_two = LitmusHelper.instance.run_shell('depmod -a')
-  unless step_two.exit_status == 0; exit 1; end
+  LitmusHelper.instance.run_shell('mkdir -p /lib/modules/`uname -r`')
+  LitmusHelper.instance.run_shell('depmod -a')
 end
 
 def update_profile_file
