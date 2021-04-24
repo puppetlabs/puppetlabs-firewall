@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v3.0.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.0.1) (2021-04-24)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.0.0...v3.0.1)
+
+### Fixed
+
+- Update README.md [\#986](https://github.com/puppetlabs/puppetlabs-firewall/pull/986) ([arjenz](https://github.com/arjenz))
+
+### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
+
+- \(GH-380\) - Litmus, move inventory location [\#985](https://github.com/puppetlabs/puppetlabs-firewall/pull/985) ([pmcmaw](https://github.com/pmcmaw))
+
 ## [v3.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.0.0) (2021-03-01)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.8.1...v3.0.0)
@@ -39,11 +51,15 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Added
 
-- \(IAC-1190\) add `ignore\_foreign` when purging firewallchains [\#948](https://github.com/puppetlabs/puppetlabs-firewall/pull/948) ([DavidS](https://github.com/DavidS))
+- \(IAC-1190\) add `ignore_foreign` when purging firewallchains [\#948](https://github.com/puppetlabs/puppetlabs-firewall/pull/948) ([DavidS](https://github.com/DavidS))
 
 ## [v2.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v2.6.0) (2020-10-01)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.5.0...v2.6.0)
+
+### Added
+
+- pdksync - \(IAC-973\) - Update travis/appveyor to run on new default branch main [\#933](https://github.com/puppetlabs/puppetlabs-firewall/pull/933) ([david22swan](https://github.com/david22swan))
 
 ### Fixed
 
@@ -66,7 +82,6 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Added
 
-- pdksync - \(IAC-973\) - Update travis/appveyor to run on new default branch main [\#933](https://github.com/puppetlabs/puppetlabs-firewall/pull/933) ([david22swan](https://github.com/david22swan))
 - Add support for u32 module in iptables [\#917](https://github.com/puppetlabs/puppetlabs-firewall/pull/917) ([sanfrancrisko](https://github.com/sanfrancrisko))
 - Add support for cgroup arg [\#916](https://github.com/puppetlabs/puppetlabs-firewall/pull/916) ([akerl-unpriv](https://github.com/akerl-unpriv))
 - Extend LOG options [\#914](https://github.com/puppetlabs/puppetlabs-firewall/pull/914) ([martialblog](https://github.com/martialblog))
