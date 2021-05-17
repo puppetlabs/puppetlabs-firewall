@@ -400,7 +400,7 @@ Or
 
 ## Reference
 
-For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-firewall/blob//REFERENCE.md). For information on the facts, see below.
+For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-firewall/blob/main/REFERENCE.md). For information on the facts, see below.
 
 Facts:
 
