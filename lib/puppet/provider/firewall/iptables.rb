@@ -575,6 +575,11 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       keys << :table
     end
 
+    # manually remove comments if they made it this far
+    if %r{-m comment --comment}.match?(values)
+      values = values.sub(%r{-m comment --comment "((?:\\"|[^"])*)"}, {})
+    end
+
     valrev = values.scan(%r{("([^"\\]|\\.)*"|\S+)}).transpose[0].reverse
 
     if keys.length != valrev.length
