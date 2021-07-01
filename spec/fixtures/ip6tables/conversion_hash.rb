@@ -41,6 +41,14 @@ ARGS_TO_HASH6 = {
       string_hex: '|0000FF0001|',
       string_algo: 'bm',
     },
+  },
+  'random-fully' => {
+    line: '-A KUBE-POSTROUTING -m comment --comment "kubernetes service traffic requiring SNAT" -j MASQUERADE --random-fully',
+    table: 'filter',
+    provider: 'ip6tables',
+    params: {
+      random_fully: 'true',
+    }
   }
 }.freeze
 
