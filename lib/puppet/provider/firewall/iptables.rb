@@ -29,6 +29,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   has_feature :log_tcp_options
   has_feature :log_ip_options
   has_feature :mark
+  has_feature :hmark
   has_feature :mss
   has_feature :nflog_group
   has_feature :nflog_prefix
@@ -209,6 +210,16 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     helper: '--helper',
     cgroup: '-m cgroup --cgroup',
     notrack: '--notrack',
+    hmark_tuple: '--hmark-tuple',
+    hmark_mod: '--hmark-mod',
+    hmark_offset: '--hmark-offset',
+    hmark_src_prefix: '--hmark-src-prefix',
+    hmark_dst_prefix: '--hmark-dst-prefix',
+    hmark_sport_mask: '--hmark-sport-mask',
+    hmark_dport_mask: '--hmark-dport-mask',
+    hmark_spi_mask: '--hmark-spi-mask',
+    hmark_proto_mask: '--hmark-proto-mask',
+    hmark_rnd: '--hmark-rnd',
   }
 
   # These are known booleans that do not take a value, but we want to munge
@@ -353,7 +364,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :condition, :name, :notrack
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :condition, :name, :notrack,
+    :hmark_tuple, :hmark_mod, :hmark_offset, :hmark_src_prefix, :hmark_dst_prefix, :hmark_sport_mask,
+    :hmark_dport_mask, :hmark_spi_mask, :hmark_proto_mask, :hmark_rnd
   ]
 
   def insert
