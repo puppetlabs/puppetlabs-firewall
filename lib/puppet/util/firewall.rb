@@ -172,7 +172,7 @@ module Puppet::Util::Firewall
     # Basic normalisation for older Facter
     os_key = Facter.value(:osfamily)
     os_key ||= case Facter.value(:operatingsystem)
-               when 'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos', 'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer', 'VirtuozzoLinux'
+               when 'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos', 'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer', 'VirtuozzoLinux', 'Rocky'
                  'RedHat'
                when 'Debian', 'Ubuntu'
                  'Debian'
@@ -198,7 +198,7 @@ module Puppet::Util::Firewall
     end
 
     # RHEL 7 and newer also use systemd to persist iptable rules
-    if os_key == 'RedHat' && ['RedHat', 'CentOS', 'Scientific', 'SL', 'SLC', 'Ascendos', 'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'XenServer', 'VirtuozzoLinux']
+    if os_key == 'RedHat' && ['RedHat', 'CentOS', 'Scientific', 'SL', 'SLC', 'Ascendos', 'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'XenServer', 'VirtuozzoLinux', 'Rocky']
        .include?(Facter.value(:operatingsystem)) && Facter.value(:operatingsystemrelease).to_i >= 7
       os_key = 'Fedora'
     end
