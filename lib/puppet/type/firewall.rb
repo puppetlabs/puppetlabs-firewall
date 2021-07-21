@@ -1850,8 +1850,8 @@ Puppet::Type.newtype(:firewall) do
       MAC Source
     PUPPETCODE
     newvalues(%r{^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$}i)
-    facter_os_name = Facter.fact(:os).value['name'].downcase
-    facter_os_release = Facter.fact(:os).value['release']['major'].to_i
+    facter_os_name = Facter.value(:operatingsystem).downcase
+    facter_os_release = Facter.value(:operatingsystemrelease).to_i
     if facter_os_name == 'sles' && facter_os_release == 15
       munge do |value|
         _value = value.downcase
