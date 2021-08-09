@@ -1852,7 +1852,7 @@ Puppet::Type.newtype(:firewall) do
     newvalues(%r{^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$}i)
     facter_os_name = Facter.value(:os)['name'].downcase
     facter_os_release = Facter.value(:os)['release']['major'].to_i
-    if facter_os_name == 'sles' && facter_os_release == 15
+    if ['debian-11', 'sles-15'].include?("#{facter_os_name}-#{facter_os_release}")
       munge do |value|
         _value = value.downcase
       end
