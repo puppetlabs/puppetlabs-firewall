@@ -57,7 +57,7 @@ class firewall::linux (
   case $::operatingsystem {
     'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos',
     'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer',
-    'VirtuozzoLinux', 'Rocky': {
+    'VirtuozzoLinux', 'Rocky', 'AlmaLinux': {
       class { "${title}::redhat":
         ensure          => $ensure,
         ensure_v6       => $_ensure_v6,
