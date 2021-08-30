@@ -7,7 +7,7 @@
 #   Controls the state of the ipv6 iptables service on your system. Valid options: 'running' or 'stopped'. Defaults to 'running'.
 #
 # @param pkg_ensure
-#   Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'. Defaults to 'latest'.
+#   Controls the state of the iptables package on your system. Valid options: 'installed' or 'latest'. Defaults to 'latest'.
 #
 # @param service_name
 #   Specify the name of the IPv4 iptables service. Defaults defined in firewall::params.
@@ -26,7 +26,7 @@
 class firewall::linux (
   $ensure          = running,
   $ensure_v6       = undef,
-  $pkg_ensure      = present,
+  $pkg_ensure      = installed,
   $service_name    = $firewall::params::service_name,
   $service_name_v6 = $firewall::params::service_name_v6,
   $package_name    = $firewall::params::package_name,

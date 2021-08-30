@@ -20,7 +20,7 @@ describe 'firewall::linux', type: :class do
           end
 
           it { is_expected.to contain_class('firewall::linux::redhat').with_require('Package[iptables]') }
-          it { is_expected.to contain_package('iptables').with_ensure('present') }
+          it { is_expected.to contain_package('iptables').with_ensure('installed') }
         end
       end
     end
@@ -42,7 +42,7 @@ describe 'firewall::linux', type: :class do
         end
 
         it { is_expected.to contain_class('firewall::linux::debian').with_require('Package[iptables]') }
-        it { is_expected.to contain_package('iptables').with_ensure('present') }
+        it { is_expected.to contain_package('iptables').with_ensure('installed') }
       end
     end
   end

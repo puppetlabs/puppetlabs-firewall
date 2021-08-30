@@ -23,7 +23,11 @@ def install_iptables
   LitmusHelper.instance.run_shell('iptables -V')
 rescue
   if os[:family] == 'redhat'
-    LitmusHelper.instance.run_shell('yum install iptables-services -y')
+    if fetch_os_name == 'oraclelinux' && os[:release].to_i == 7
+      LitmusHelper.instance.run_shell('yum install iptables -y')
+    else
+      LitmusHelper.instance.run_shell('yum install iptables-services -y')
+    end
   else
     LitmusHelper.instance.run_shell('apt-get install iptables -y')
   end
@@ -55,7 +59,7 @@ RSpec.configure do |c|
   # To enable tests on abs/vmpooler machines just set to `true` this flag
   c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
-    if ['centos', 'oraclelinux', 'scientific'].include?(fetch_os_name) && [6, 7].include?(os[:release].to_i)
+    if ['centos-6', 'centos-7', 'oraclelinux-6', 'scientific-6', 'scientific-7'].include?("#{fetch_os_name}-#{os[:release].to_i}")
       LitmusHelper.instance.run_shell('yum update -y')
       LitmusHelper.instance.run_shell('depmod -a')
       ['filter', 'nat', 'mangle', 'raw'].each do |t|
