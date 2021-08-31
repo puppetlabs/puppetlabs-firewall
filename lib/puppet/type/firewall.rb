@@ -1366,6 +1366,8 @@ Puppet::Type.newtype(:firewall) do
       statement.
     PUPPETCODE
     def insync?(is)
+      return false unless is
+
       require 'etc'
 
       # The following code allow us to take into consideration unix mappings
@@ -1413,6 +1415,8 @@ Puppet::Type.newtype(:firewall) do
       statement.
     PUPPETCODE
     def insync?(is)
+      return false unless is
+
       require 'etc'
 
       # The following code allow us to take into consideration unix mappings
