@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v3.2.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.2.0) (2021-09-06)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.1.0...v3.2.0)
+
+### Added
+
+- pdksync - \(IAC-1709\) - Add Support for Debian 11 [\#1005](https://github.com/puppetlabs/puppetlabs-firewall/pull/1005) ([david22swan](https://github.com/david22swan))
+
+### Fixed
+
+- Fix "undefined method `gsub' for nil:NilClass" when changing existing rule UID from absent to any present [\#1010](https://github.com/puppetlabs/puppetlabs-firewall/pull/1010) ([onyxmaster](https://github.com/onyxmaster))
+
 ## [v3.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.1.0) (2021-07-26)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.0.2...v3.1.0)
