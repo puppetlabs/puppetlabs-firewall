@@ -1,6 +1,6 @@
 # firewall
 
-[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-firewall.png?branch=main)](https://travis-ci.org/puppetlabs/puppetlabs-firewall)
+[![PR Testing](https://github.com/puppetlabs/puppetlabs-firewall/actions/workflows/pr_test.yml/badge.svg)](https://github.com/puppetlabs/puppetlabs-firewall/actions/workflows/pr_test.yml)
 
 #### Table of Contents
 
