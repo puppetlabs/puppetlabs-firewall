@@ -44,7 +44,13 @@ class firewall::linux (
     'stopped' => false,
   }
 
-  package { 'iptables':
+  if $::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '34') >= 0 {
+    $_iptables_pkg = 'iptables-compat'
+  } else{
+    $_iptables_pkg = 'iptables'
+  }
+
+  package { $_iptables_pkg:
     ensure => $pkg_ensure,
   }
 
@@ -66,7 +72,7 @@ class firewall::linux (
         package_name    => $package_name,
         service_name    => $service_name,
         service_name_v6 => $service_name_v6,
-        require         => Package['iptables'],
+        require         => Package[$_iptables_pkg],
       }
     }
     'Debian', 'Ubuntu': {
@@ -75,7 +81,7 @@ class firewall::linux (
         enable       => $enable,
         package_name => $package_name,
         service_name => $service_name,
-        require      => Package['iptables'],
+        require      => Package[$_iptables_pkg],
       }
     }
     'Archlinux': {
@@ -84,7 +90,7 @@ class firewall::linux (
         enable       => $enable,
         package_name => $package_name,
         service_name => $service_name,
-        require      => Package['iptables'],
+        require      => Package[$_iptables_pkg],
       }
     }
     'Gentoo': {
@@ -93,7 +99,7 @@ class firewall::linux (
         enable       => $enable,
         package_name => $package_name,
         service_name => $service_name,
-        require      => Package['iptables'],
+        require      => Package[$_iptables_pkg],
       }
     }
     default: {}
