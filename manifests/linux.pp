@@ -44,7 +44,7 @@ class firewall::linux (
     'stopped' => false,
   }
 
-  if $::facts['os']['name'] == 'Fedora' and versioncmp($::facts['os']['release']['full'], '34') >= 0 {
+  if $facts['os']['name'] == 'Fedora' and versioncmp($facts['os']['release']['full'], '34') >= 0 {
     $_iptables_pkg = 'iptables-compat'
   } else{
     $_iptables_pkg = 'iptables'
@@ -60,7 +60,7 @@ class firewall::linux (
     }
   }
 
-  case $::facts['os']['name'] {
+  case $facts['os']['name'] {
     'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos',
     'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer',
     'VirtuozzoLinux', 'Rocky': {
