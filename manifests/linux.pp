@@ -45,6 +45,7 @@ class firewall::linux (
   }
 
   package { 'iptables':
+    name   => $package_name,
     ensure => $pkg_ensure,
   }
 

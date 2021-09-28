@@ -16,7 +16,9 @@ class firewall::params {
         'Fedora': {
           $service_name = 'iptables'
           $service_name_v6 = 'ip6tables'
-          if versioncmp($::operatingsystemrelease, '15') >= 0 {
+          if versioncmp($::operatingsystemrelease, '34') >= 0 {
+            $package_name = 'iptables-compat'
+          } elsif versioncmp($::operatingsystemrelease, '15') >= 0 {
             $package_name = 'iptables-services'
           } else {
             $package_name = undef
