@@ -1442,14 +1442,14 @@ Puppet::Type.newtype(:firewall) do
       # If 'should' contains anything other than digits,
       # we assume that we have to do a lookup to convert
       # to UID
-      unless should[%r{[0-9]+}] == should
+      unless should[%r{[0-9]+(-[0-9]+)?}] == should
         should = Etc.getgrnam(should).gid
       end
 
       # If 'is' contains anything other than digits,
       # we assume that we have to do a lookup to convert
       # to UID
-      unless is[%r{[0-9]+}] == is
+      unless is[%r{[0-9]+(-[0-9]+)?}] == is
         is = Etc.getgrnam(is).gid
       end
 
