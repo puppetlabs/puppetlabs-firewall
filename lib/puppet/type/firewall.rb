@@ -1390,14 +1390,14 @@ Puppet::Type.newtype(:firewall) do
         should_negate = '!'
       end
 
-      # If 'should' contains anything other than digits,
+      # If 'should' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
       # to UID
       unless should[%r{[0-9]+(-[0-9]+)?}] == should
         should = Etc.getpwnam(should).uid
       end
 
-      # If 'is' contains anything other than digits,
+      # If 'is' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
       # to UID
       unless is[%r{[0-9]+(-[0-9]+)?}] == is
@@ -1439,16 +1439,16 @@ Puppet::Type.newtype(:firewall) do
         should_negate = '!'
       end
 
-      # If 'should' contains anything other than digits,
+      # If 'should' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
-      # to UID
+      # to GID
       unless should[%r{[0-9]+(-[0-9]+)?}] == should
         should = Etc.getgrnam(should).gid
       end
 
-      # If 'is' contains anything other than digits,
+      # If 'is' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
-      # to UID
+      # to GID
       unless is[%r{[0-9]+(-[0-9]+)?}] == is
         is = Etc.getgrnam(is).gid
       end
