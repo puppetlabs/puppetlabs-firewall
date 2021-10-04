@@ -11,16 +11,20 @@ class firewall::params {
           $service_name = 'iptables'
           $service_name_v6 = 'ip6tables'
           $package_name = undef
+          $iptables_name = 'iptables'
           $sysconfig_manage = true
         }
         'Fedora': {
           $service_name = 'iptables'
           $service_name_v6 = 'ip6tables'
           if versioncmp($::operatingsystemrelease, '34') >= 0 {
-            $package_name = 'iptables-compat'
+            $package_name = 'iptables-services'
+            $iptables_name = 'iptables-compat'
           } elsif versioncmp($::operatingsystemrelease, '15') >= 0 {
             $package_name = 'iptables-services'
+            $iptables_name = 'iptables'
           } else {
+            $iptables_name = 'iptables'
             $package_name = undef
           }
           $sysconfig_manage = true
@@ -30,16 +34,19 @@ class firewall::params {
             $service_name = ['iptables', 'nftables']
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables']
+            $iptables_name = 'iptables'
             $sysconfig_manage = false
           } elsif versioncmp($::operatingsystemrelease, '7.0') >= 0 {
             $service_name = 'iptables'
             $service_name_v6 = 'ip6tables'
             $package_name = 'iptables-services'
+            $iptables_name = 'iptables'
             $sysconfig_manage = true
           } else {
             $service_name = 'iptables'
             $service_name_v6 = 'ip6tables'
             $package_name = 'iptables-ipv6'
+            $iptables_name = 'iptables'
             $sysconfig_manage = true
           }
         }
@@ -47,6 +54,7 @@ class firewall::params {
     }
     'Debian': {
       $service_name_v6 = undef
+      $iptables_name = 'iptables'
       case $::operatingsystem {
         'Debian': {
           if versioncmp($::operatingsystemrelease, 'unstable') >= 0 {
@@ -81,6 +89,7 @@ class firewall::params {
       $package_name = 'net-firewall/iptables'
     }
     default: {
+      $iptables_name = 'iptables'
       $service_name_v6 = undef
       case $::operatingsystem {
         'Archlinux': {
