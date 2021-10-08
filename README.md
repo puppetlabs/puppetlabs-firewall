@@ -1,6 +1,6 @@
 # firewall
 
-[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-firewall.png?branch=main)](https://travis-ci.org/puppetlabs/puppetlabs-firewall)
+[![PR Testing](https://github.com/puppetlabs/puppetlabs-firewall/actions/workflows/pr_test.yml/badge.svg)](https://github.com/puppetlabs/puppetlabs-firewall/actions/workflows/pr_test.yml)
 
 #### Table of Contents
 
@@ -279,7 +279,7 @@ class profile::apache {
 
 Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
 
-Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, iniface, outiface, port, proto, source, sport, src\_range, src\_type, and state.
+Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, iniface, outiface, port, proto, source, sport, src\_range and src\_type.
 
 Examples:
 
@@ -400,7 +400,7 @@ Or
 
 ## Reference
 
-For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-firewall/blob//REFERENCE.md). For information on the facts, see below.
+For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-firewall/blob/main/REFERENCE.md). For information on the facts, see below.
 
 Facts:
 

@@ -14,7 +14,7 @@ describe 'firewall::linux::debian', type: :class do
 
     it {
       is_expected.to contain_package('iptables-persistent').with(
-        ensure: 'present',
+        ensure: 'installed',
       )
     }
     it {
@@ -54,7 +54,7 @@ describe 'firewall::linux::debian', type: :class do
 
     it {
       is_expected.to contain_package('iptables-persistent').with(
-        ensure: 'present',
+        ensure: 'installed',
       )
     }
     it {
@@ -94,7 +94,7 @@ describe 'firewall::linux::debian', type: :class do
 
     it {
       is_expected.to contain_package('iptables-persistent').with(
-        ensure: 'present',
+        ensure: 'installed',
       )
     }
     it {
@@ -134,7 +134,7 @@ describe 'firewall::linux::debian', type: :class do
 
     it {
       is_expected.to contain_package('netfilter-persistent').with(
-        ensure: 'present',
+        ensure: 'installed',
       )
     }
     it {

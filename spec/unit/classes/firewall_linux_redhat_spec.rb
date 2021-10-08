@@ -141,7 +141,7 @@ describe 'firewall::linux::redhat', type: :class do
 
         it {
           is_expected.to contain_package('iptables-services').with(
-            ensure: 'present',
+            ensure: 'installed',
             before: 'Service[iptables]',
           )
         }
@@ -209,14 +209,14 @@ describe 'firewall::linux::redhat', type: :class do
 
         it {
           is_expected.to contain_package('iptables-services').with(
-            ensure: 'present',
+            ensure: 'installed',
             before: ['Service[iptables]', 'Service[nftables]'],
           )
         }
 
         it {
           is_expected.to contain_package('nftables').with(
-            ensure: 'present',
+            ensure: 'installed',
             before: ['Service[iptables]', 'Service[nftables]'],
           )
         }

@@ -337,14 +337,14 @@ describe 'firewall basics', docker: true do
           }
       PUPPETCODE
       it 'applies' do
-        apply_manifest(pp88, catch_failures: true)
+        idempotent_apply(pp88)
       end
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
           if os[:family] == 'redhat' && os[:release].start_with?('5')
             expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28 -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})
           else
-            expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "610 - test"})
+            expect(r.stdout).to match(%r{-A INPUT -s 10.1.5.28\/(32|255\.255\.255\.255) -p tcp -m mac --mac-source 0(a|A):1(b|B):3(c|C):4(d|D):5(e|E):6(f|F) -m comment --comment "610 - test"})
           end
         end
       end

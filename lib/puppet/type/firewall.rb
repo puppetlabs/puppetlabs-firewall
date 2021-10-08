@@ -554,7 +554,7 @@ Puppet::Type.newtype(:firewall) do
       The specific protocol to match for this rule.
     PUPPETCODE
 
-    newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
+    newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :carp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
       [proto, "! #{proto}".to_sym]
     }.flatten)
     defaultto 'tcp'
@@ -1366,6 +1366,8 @@ Puppet::Type.newtype(:firewall) do
       statement.
     PUPPETCODE
     def insync?(is)
+      return false unless is
+
       require 'etc'
 
       # The following code allow us to take into consideration unix mappings
@@ -1388,17 +1390,17 @@ Puppet::Type.newtype(:firewall) do
         should_negate = '!'
       end
 
-      # If 'should' contains anything other than digits,
+      # If 'should' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
       # to UID
-      unless should[%r{[0-9]+}] == should
+      unless should[%r{[0-9]+(-[0-9]+)?}] == should
         should = Etc.getpwnam(should).uid
       end
 
-      # If 'is' contains anything other than digits,
+      # If 'is' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
       # to UID
-      unless is[%r{[0-9]+}] == is
+      unless is[%r{[0-9]+(-[0-9]+)?}] == is
         is = Etc.getpwnam(is).uid
       end
 
@@ -1413,6 +1415,8 @@ Puppet::Type.newtype(:firewall) do
       statement.
     PUPPETCODE
     def insync?(is)
+      return false unless is
+
       require 'etc'
 
       # The following code allow us to take into consideration unix mappings
@@ -1435,17 +1439,17 @@ Puppet::Type.newtype(:firewall) do
         should_negate = '!'
       end
 
-      # If 'should' contains anything other than digits,
+      # If 'should' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
-      # to UID
-      unless should[%r{[0-9]+}] == should
+      # to GID
+      unless should[%r{[0-9]+(-[0-9]+)?}] == should
         should = Etc.getgrnam(should).gid
       end
 
-      # If 'is' contains anything other than digits,
+      # If 'is' contains anything other than digits or digit range,
       # we assume that we have to do a lookup to convert
-      # to UID
-      unless is[%r{[0-9]+}] == is
+      # to GID
+      unless is[%r{[0-9]+(-[0-9]+)?}] == is
         is = Etc.getgrnam(is).gid
       end
 
@@ -1850,6 +1854,13 @@ Puppet::Type.newtype(:firewall) do
       MAC Source
     PUPPETCODE
     newvalues(%r{^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$}i)
+    facter_os_name = Facter.value(:os)['name'].downcase
+    facter_os_release = Facter.value(:os)['release']['major'].to_i
+    if ['debian-11', 'sles-15'].include?("#{facter_os_name}-#{facter_os_release}")
+      munge do |value|
+        _value = value.downcase
+      end
+    end
   end
 
   newproperty(:physdev_in, required_features: :iptables) do

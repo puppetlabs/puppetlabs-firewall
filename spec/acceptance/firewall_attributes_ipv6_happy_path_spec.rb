@@ -321,7 +321,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m iprange --dst-range 2001:db8::1-2001:db8::ff -m multiport --dports 602 -m comment --comment "602 - dst_range" -j ACCEPT})
     end
     it 'mac_source is set' do
-      expect(result.stdout).to match(%r{-A INPUT -s 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -p tcp -m mac --mac-source 0A:1B:3C:4D:5E:6F -m comment --comment "604 - mac_source"})
+      expect(result.stdout).to match(%r{-A INPUT -s 2001:db8::1\/(128|ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff) -p tcp -m mac --mac-source 0(a|A):1(b|B):3(c|C):4(d|D):5(e|E):6(f|F) -m comment --comment "604 - mac_source"}) # rubocop:disable Layout/LineLength
     end
     it 'socket when true' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 605 -m socket -m comment --comment "605 - socket true" -j ACCEPT})

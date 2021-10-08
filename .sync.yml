@@ -1,42 +1,15 @@
 ---
 ".gitlab-ci.yml":
   delete: true
-".travis.yml":
-  dist: trusty # acceptance tests have stopped working on newer versions - probably related to docker behaviour
-  global_env:
-    - HONEYCOMB_WRITEKEY="7f3c63a70eecc61d635917de46bea4e6",HONEYCOMB_DATASET="litmus tests"
-  deploy_to_forge:
-    enabled: false
-  branches:
-    - release
-  use_litmus: true
-  litmus:
-    provision_list:
-      - ---travis_el
-      - travis_deb
-      - travis_el7
-    complex:
-      - collection:
-          puppet_collection:
-            - puppet6
-          provision_list:
-            - travis_ub_6
-      - collection:
-          puppet_collection:
-            - puppet6
-          provision_list:
-            - travis_el8
-          dist: xenial
-  simplecov: true
-  notifications:
-    slack:
-      secure: Ohw1KtRtFAeTQNL/8slgJ7lZ8PYCiooE6i9NWR+fCGNcAzU1LGhacnXqgXD6JCX53zdv8mkkd31AsrGWmx+iFueZkSYdAz+pEXduyRI9Rm6cTotlaGAB7NK+KgjEky7gmRao3EuogYbX7qIpzNaZ4rGUrjWSSeSDCSgGCEwblXk=
 appveyor.yml:
   delete: true
 Gemfile:
   optional:
     ":development":
       - gem: github_changelog_generator
+Rakefile:
+  changelog_user: puppetlabs
+  changelog_max_issues: 500
 spec/spec_helper.rb:
   mock_with: ":rspec"
   coverage_report: true
@@ -45,8 +18,16 @@ spec/spec_helper.rb:
 .gitpod.yml:
   unmanaged: false
 .github/workflows/nightly.yml:
-  unmanaged: false
+  unmanaged: true
 .github/workflows/pr_test.yml:
-  unmanaged: false
+  unmanaged: true
 .github/workflows/auto_release.yml:
   unmanaged: false
+.github/workflows/spec.yml:
+  checks: 'syntax lint metadata_lint check:symlinks check:git_ignore check:dot_underscore check:test_file rubocop'
+  unmanaged: false
+.github/workflows/release.yml:
+  unmanaged: false
+.travis.yml:
+  delete: true
+changelog_since_tag: 'v3.0.0'

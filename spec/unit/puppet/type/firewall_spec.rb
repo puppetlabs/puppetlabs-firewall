@@ -83,7 +83,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
   end
 
   describe ':proto' do
-    [:ip, :tcp, :udp, :icmp, :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :pim, :all].each do |proto|
+    [:ip, :tcp, :udp, :icmp, :esp, :ah, :vrrp, :carp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :pim, :all].each do |proto|
       it "accepts proto value #{proto}" do
         resource[:proto] = proto
         expect(resource[:proto]).to eql proto

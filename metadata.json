@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-firewall",
-  "version": "3.0.0",
+  "version": "3.2.0",
   "author": "puppetlabs",
   "summary": "Manages Firewalls such as iptables",
   "license": "Apache-2.0",
@@ -10,7 +10,7 @@
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 4.0.0 < 8.0.0"
+      "version_requirement": ">= 4.0.0 < 9.0.0"
     }
   ],
   "operatingsystem_support": [
@@ -54,9 +54,9 @@
     {
       "operatingsystem": "Debian",
       "operatingsystemrelease": [
-        "8",
         "9",
-        "10"
+        "10",
+        "11"
       ]
     },
     {
@@ -67,6 +67,12 @@
         "18.04",
         "20.04"
       ]
+    },
+    {
+      "operatingsystem": "Rocky",
+      "operatingsystemrelease": [
+        "8"
+      ]
     }
   ],
   "requirements": [
@@ -76,6 +82,6 @@
     }
   ],
   "template-url": "https://github.com/puppetlabs/pdk-templates.git#main",
-  "template-ref": "heads/main-0-g44cc7ed",
-  "pdk-version": "1.18.1"
+  "template-ref": "heads/main-0-gfe51af3",
+  "pdk-version": "2.1.1"
 }
