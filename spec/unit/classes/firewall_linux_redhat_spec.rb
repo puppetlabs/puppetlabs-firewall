@@ -34,7 +34,7 @@ RSpec.shared_examples 'ensures iptables service' do
 end
 
 describe 'firewall::linux::redhat', type: :class do
-  ['RedHat', 'CentOS', 'Fedora'].each do |os|
+  ['RedHat', 'CentOS', 'Fedora', 'AlmaLinux'].each do |os|
     oldreleases = ((os == 'Fedora') ? ['14'] : ['6.5'])
     newreleases = ((os == 'Fedora') ? ['15', 'Rawhide'] : ['7.0.1406'])
     nftablesreleases = ((os == 'Fedora') ? [] : ['8.0'])
