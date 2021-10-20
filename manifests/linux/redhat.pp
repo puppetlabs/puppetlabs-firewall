@@ -138,13 +138,13 @@ class firewall::linux::redhat (
       File<| title == "/etc/sysconfig/${service_name_v6}" |> -> Service<| title == $service_name_v6 |>
     }
 
-    # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to system_u
-    # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to system_conf_t
+    # Redhat 7 and 8 selinux user context for /etc/sysconfig/iptables is set to system_u
+    # Redhat 7 and 8 selinux type context for /etc/sysconfig/iptables is set to system_conf_t
     case $::selinux {
       #lint:ignore:quoted_booleans
       'true',true: {
         case $::operatingsystem {
-          'CentOS': {
+          'CentOS', 'RedHat': {
             case $::operatingsystemrelease {
               /^5\..*/: {
                 $seluser = 'system_u'
@@ -156,7 +156,7 @@ class firewall::linux::redhat (
                 $seltype = 'system_conf_t'
               }
 
-              /^7\..*/: {
+              /^[78].*/: {
                 $seluser = 'system_u'
                 $seltype = 'system_conf_t'
               }
