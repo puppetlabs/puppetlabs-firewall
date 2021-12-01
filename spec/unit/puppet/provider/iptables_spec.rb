@@ -331,14 +331,14 @@ describe 'iptables provider' do
                                        chain: 'nova-compute-FORWARD',
                                        source: '0.0.0.0/32',
                                        destination: '255.255.255.255/32',
-                                       sport: ['! 78', '79', 'http'],
+                                       sport: ['! 78', '79', 'talk'],
                                        dport: ['77', '! 76'],
                                        proto: 'udp')
     end
     let(:instance) { provider.new(resource) }
 
     it 'fails when not all array items are inverted' do
-      expect { instance.insert }.to raise_error RuntimeError, %r{but '79', '80' are not prefixed}
+      expect { instance.insert }.to raise_error RuntimeError, %r{but '79', '517' are not prefixed}
     end
   end
 
