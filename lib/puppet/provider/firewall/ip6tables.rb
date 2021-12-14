@@ -66,7 +66,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   end
 
   if (kernelversion && Puppet::Util::Package.versioncmp(kernelversion, '3.3') >= 0) &&
-    (ip6tables_version && Puppet::Util::Package.versioncmp(ip6tables_version, '1.4.13') >= 0)
+     (ip6tables_version && Puppet::Util::Package.versioncmp(ip6tables_version, '1.4.13') >= 0)
     has_feature :rpfilter
   end
 
