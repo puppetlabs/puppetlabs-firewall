@@ -76,7 +76,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     has_feature :rpfilter
   end
 
-
   @protocol = 'IPv4'
 
   @resource_map = {
