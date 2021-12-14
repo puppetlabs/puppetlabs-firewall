@@ -41,6 +41,7 @@ end
 
 def pre_setup
   LitmusHelper.instance.run_shell('mkdir -p /lib/modules/`uname -r`')
+  LitmusHelper.instance.run_shell('yum install module-init-tools -y') if fetch_os_name == 'rocky'
   LitmusHelper.instance.run_shell('depmod -a')
 end
 
