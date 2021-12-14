@@ -46,7 +46,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :queue_num
   has_feature :queue_bypass
   has_feature :ct_target
-  has_feature :rpfilter
 
   optional_commands(ip6tables: 'ip6tables',
                     ip6tables_save: 'ip6tables-save')
@@ -64,6 +63,11 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   if (kernelversion && Puppet::Util::Package.versioncmp(kernelversion, '3.13') >= 0) &&
      (ip6tables_version && Puppet::Util::Package.versioncmp(ip6tables_version, '1.6.2') >= 0)
     has_feature :random_fully
+  end
+
+  if (kernelversion && Puppet::Util::Package.versioncmp(kernelversion, '3.3') >= 0) &&
+    (ip6tables_version && Puppet::Util::Package.versioncmp(ip6tables_version, '1.4.13') >= 0)
+    has_feature :rpfilter
   end
 
   def initialize(*args)

@@ -51,7 +51,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   has_feature :queue_bypass
   has_feature :ipvs
   has_feature :ct_target
-  has_feature :rpfilter
 
   optional_commands(iptables: 'iptables',
                     iptables_save: 'iptables-save')
@@ -71,6 +70,12 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
      (iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.6.2') >= 0)
     has_feature :random_fully
   end
+
+  if (kernelversion && Puppet::Util::Package.versioncmp(kernelversion, '3.3') >= 0) &&
+     (iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.4.13') >= 0)
+    has_feature :rpfilter
+  end
+
 
   @protocol = 'IPv4'
 
