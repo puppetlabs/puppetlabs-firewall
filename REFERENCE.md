@@ -996,7 +996,7 @@ This would cover ports 1 to 1024.
 
 ##### `proto`
 
-Valid values: `[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
+Valid values: `[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :carp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
       [proto, "! #{proto}".to_sym]
     }.flatten`
 
