@@ -120,6 +120,13 @@ jobs:
         echo STEP_ID=${{ matrix.platforms.image }}-${{ matrix.collection }}-2 >> $GITHUB_ENV
         echo STEP_START=$(date +%s) >> $GITHUB_ENV
 
+    - name: Start SSH session
+      if: ${{ matrix.platforms.image == "litmusimage/centos:6" }}
+      uses: luchihoratiu/debug-via-ssh@main
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
+        
     - name: Provision test environment
       run: |
         if [[ "${{matrix.platforms.provider}}" == "provision::docker" ]]; then
