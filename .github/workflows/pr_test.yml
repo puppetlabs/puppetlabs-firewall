@@ -121,7 +121,7 @@ jobs:
         echo STEP_START=$(date +%s) >> $GITHUB_ENV
 
     - name: Start SSH session
-      if: ${{ matrix.platforms.image == 'litmusimage/centos:6' }}
+      if: ${{ matrix.platforms.image == 'litmusimage/centos:6' && matrix.collecion == 'puppet7-nightly' }}
       uses: luchihoratiu/debug-via-ssh@main
       with:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
