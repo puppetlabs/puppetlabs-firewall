@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## Uncommitted
+
+- Initial CentOS Stream 9/RHEL9 Support
+- Added a hook (not good enough yet) for deciding whether we try to remove
+  the firewalld package (we were removing it before, but it's necessary
+  on CS9/RHEL9 hosts)
+
 ## [v3.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.3.0) (2021-12-15)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.2.0...v3.3.0)

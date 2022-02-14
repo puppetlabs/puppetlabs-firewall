@@ -1,5 +1,5 @@
-# @summary Provides defaults for the Apt module parameters.
-# 
+# @summary Provides defaults for the Apt module parameters
+#
 # @api private
 #
 class firewall::params {
@@ -30,7 +30,13 @@ class firewall::params {
           $sysconfig_manage = true
         }
         default: {
-          if versioncmp($::operatingsystemrelease, '8.0') >= 0 {
+          if versioncmp($::operatingsystemrelease, '9') >= 0 {
+            $service_name = 'nftables'
+            $service_name_v6 = undef
+            $package_name = ['iptables-services', 'nftables', 'iptables-nft-services']
+            $iptables_name = 'iptables'
+            $sysconfig_manage = false
+          } elsif versioncmp($::operatingsystemrelease, '8.0') >= 0 {
             $service_name = ['iptables', 'nftables']
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables']

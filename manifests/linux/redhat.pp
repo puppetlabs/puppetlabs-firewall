@@ -41,6 +41,7 @@ class firewall::linux::redhat (
   $package_name     = $firewall::params::package_name,
   $package_ensure   = $firewall::params::package_ensure,
   $sysconfig_manage = $firewall::params::sysconfig_manage,
+  $firewalld_manage = true,
 ) inherits ::firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
   $_enable_v6 = pick($enable_v6, $enable)
@@ -51,10 +52,12 @@ class firewall::linux::redhat (
   if ($::operatingsystem != 'Amazon')
   and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
   or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
-    service { 'firewalld':
-      ensure => stopped,
-      enable => false,
-      before => [Package[$package_name], Service[$service_name]],
+    if $firewalld_manage {
+      service { 'firewalld':
+        ensure => stopped,
+        enable => false,
+        before => [Package[$package_name], Service[$service_name]],
+      }
     }
   }
 
