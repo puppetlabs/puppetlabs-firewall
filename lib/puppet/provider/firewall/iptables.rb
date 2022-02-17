@@ -421,6 +421,10 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     rules = []
     counter = 1
 
+    # Create a new hash with a default value of 0. We will store rule counts here
+    # and use it to fish out duplicates.
+    provider_rule_count = Hash.new(0)
+
     # String#lines would be nice, but we need to support Ruby 1.8.5
     nf_warning_msg = "# Warning: ip6?tables-legacy tables present, use ip6?tables-legacy-save to see them\n"
     iptables_save.gsub(%r{#{nf_warning_msg}}, '').split("\n").each do |line|
@@ -430,13 +434,24 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         else
           hash = rule_to_hash(line, table, counter)
           if hash
-            rules << new(hash)
+            rules << hash
             counter += 1
+            provider_rule_count[hash[:name]] += 1
           end
         end
       end
     end
-    rules
+
+    rules.each_with_index do |rule, idx|
+      next if provider_rule_count[rule[:name]] <= 1
+
+      warning "Rule '#{rules[idx][:name]}' appears to be a duplicate. If purge is enabled puppet will resolve this with a corrective action."
+      prefix = 8000 + idx
+      rules[idx][:name] = "#{prefix} #{rule[:name]} (duplicate)"
+    end
+
+    # map the rules in to ipt provider instances
+    rules.map { |rule| new(rule) }
   end
 
   def self.rule_to_hash(line, table, counter)
@@ -924,7 +939,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     my_rule = resource[:name].to_s
     rules << my_rule
 
-    unmanaged_rule_regex = %r{^9[0-9]{3}\s.*$}
+    unmanaged_rule_regex = %r{^(?:8|9)[0-9]{3}\s.*$}
     # Find if this is a new rule or an existing rule, then find how many
     # unmanaged rules preceed it.
     if rules.length == rules.uniq.length
@@ -960,7 +975,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # Insert our new or updated rule in the correct order of named rules, but
     # offset for unnamed rules.
     sorted_rules = rules.reject { |r| r.match(unmanaged_rule_regex) }.sort
-    raise 'Rule sorting error. Make sure that the title of your rule does not start with 9000-9999, as this range is reserved.' if sorted_rules.index(my_rule).nil?
+    raise 'Rule sorting error. Make sure that the title of your rule does not start with 8000-9999, as this range is reserved.' if sorted_rules.index(my_rule).nil?
     sorted_rules.index(my_rule) + 1 + unnamed_offset
   end
 end
