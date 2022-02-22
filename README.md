@@ -392,15 +392,18 @@ firewall {'666 for NFLOG':
 
 ### Duplicate rule behaviour
 
-In certain situations it is possible for an unmanaged rule to exist on the target system that has the same comment as the rule specified in the manifest. This configuration is not supported by the firewall module.
+It is possible for an unmanaged rule to exist on the target system that has the same comment as the rule specified in the manifest. This configuration is not supported by the firewall module.
 
-In the event of a duplicate rule, the module will display a warning message notifying the user that it has found a duplicate but will continue to update the resource.
+In the event of a duplicate rule, the module will by default display a warning message notifying the user that it has found a duplicate but will continue to update the resource.
 
-This behaviour is configurable via the `onduplicaterulebehaviour` parameter. Users can choose from the following actions:
+This behaviour is configurable via the `onduplicaterulebehaviour` parameter. Users can choose from the following behaviours:
 
 * `ignore` - The duplicate rule is ignored and any updates to the resource will continue unaffected.
 * `warn` - The duplicate rule is logged as a warning and any updates to the resource will continue unaffected.
 * `error` - The duplicate rule is logged as an error and any updates to the resource will be skipped.
+
+With either the `ignore` or `warn` (default) behaviour, Puppet may create another duplicate rule.
+To prevent this behavior and report the resource as failing during the Puppet run, specify the `error` behaviour.
 
 ### Additional information
 
