@@ -111,5 +111,12 @@ RSpec.configure do |c|
       }
     PUPPETCODE
     LitmusHelper.instance.apply_manifest(pp)
+
+    # Ensure that policycoreutils is present. In the future we could probably refactor
+    # this so that policycoreutils is installed on platform where the os.family fact
+    # is set to 'redhat'
+    if ['almalinux-8', 'rocky-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
+      LitmusHelper.instance.run_shell('yum install policycoreutils -y')
+    end
   end
 end
