@@ -14,7 +14,10 @@
 4. [Usage - Configuration and customization options](#usage)
     * [Default rules - Setting up general configurations for all firewalls](#default-rules)
     * [Application-specific rules - Options for configuring and managing firewalls across applications](#application-specific-rules)
-    * [Additional ses for the firewall module](#other-rules)
+    * [Rule inversion](#rule-inversion)
+    * [Additional uses for the firewall module](#additional-uses-for-the-firewal-module)
+    * [Duplicate rule behaviour](#duplicate-rule-behaviour)
+    * [Additional information](#additional-information)
 5. [Reference - An under-the-hood peek at what the module is doing](#reference)
 6. [Limitations - OS compatibility, etc.](#limitations)
 7. [Firewall_multi - Arrays for certain parameters](#firewall_multi)
@@ -386,6 +389,21 @@ firewall {'666 for NFLOG':
   nflog_threshold => 1,
 }
 ```
+
+### Duplicate rule behaviour
+
+It is possible for an unmanaged rule to exist on the target system that has the same comment as the rule specified in the manifest. This configuration is not supported by the firewall module.
+
+In the event of a duplicate rule, the module will by default display a warning message notifying the user that it has found a duplicate but will continue to update the resource.
+
+This behaviour is configurable via the `onduplicaterulebehaviour` parameter. Users can choose from the following behaviours:
+
+* `ignore` - The duplicate rule is ignored and any updates to the resource will continue unaffected.
+* `warn` - The duplicate rule is logged as a warning and any updates to the resource will continue unaffected.
+* `error` - The duplicate rule is logged as an error and any updates to the resource will be skipped.
+
+With either the `ignore` or `warn` (default) behaviour, Puppet may create another duplicate rule.
+To prevent this behavior and report the resource as failing during the Puppet run, specify the `error` behaviour.
 
 ### Additional information
 

@@ -234,6 +234,24 @@ Puppet::Type.newtype(:firewall) do
     newvalues(%r{^\d+[[:graph:][:space:]]+$})
   end
 
+  newparam(:onduplicaterulebehaviour) do
+    desc <<-PUPPETCODE
+      In certain situations it is possible for an unmanaged rule to exist
+      on the target system that has the same comment as the rule
+      specified in the manifest.
+
+      This setting determines what happens when such a duplicate is found.
+
+      It offers three options:
+
+        * ignore - The duplicate rule is ignored and any updates to the resource will continue unaffected.
+        * warn - The duplicate rule is logged as a warning and any updates to the resource will continue unaffected.
+        * error - The duplicate rule is logged as an error and any updates to the resource will be skipped.
+    PUPPETCODE
+    newvalues(:ignore, :warn, :error)
+    defaultto :warn
+  end
+
   newproperty(:action) do
     desc <<-PUPPETCODE
       This is the action to perform on a match. Can be one of:
