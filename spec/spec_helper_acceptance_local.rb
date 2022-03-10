@@ -60,8 +60,8 @@ RSpec.configure do |c|
   # To enable tests on abs/vmpooler machines just set to `true` this flag
   c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
-    # Depmod is not availible by default on our AlmaLinux 8 docker image
-    if ['almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
+    # Depmod is not availible by default on our AlmaLinux/CentOS 8 docker image
+    if ['almalinux-8', 'centos-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
       LitmusHelper.instance.run_shell('yum install kmod -y')
     end
     if ['centos-6', 'centos-7', 'oraclelinux-6', 'scientific-6', 'scientific-7'].include?("#{fetch_os_name}-#{os[:release].to_i}")
