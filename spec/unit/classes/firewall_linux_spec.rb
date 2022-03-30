@@ -28,7 +28,7 @@ describe 'firewall::linux', type: :class do
 
   ['Debian', 'Ubuntu'].each do |os|
     context "Debian Like: operatingsystem => #{os}" do
-      releases = ((os == 'Debian') ? ['8'] : ['14.04'])
+      releases = ((os == 'Debian') ? ['10'] : ['20.04'])
       releases.each do |osrel|
         let(:facts) do
           {

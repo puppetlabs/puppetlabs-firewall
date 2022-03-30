@@ -16,7 +16,6 @@ travis_deb:
 travis_ub_6:
   provisioner: docker
   images:
-  - litmusimage/ubuntu:14.04
   - litmusimage/ubuntu:16.04
   - litmusimage/ubuntu:18.04
   - litmusimage/ubuntu:20.04
