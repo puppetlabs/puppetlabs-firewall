@@ -627,9 +627,10 @@ Puppet::Type.newtype(:firewall) do
       * filter
       * raw
       * rawpost
+      * security
     PUPPETCODE
 
-    newvalues(:nat, :mangle, :filter, :raw, :rawpost)
+    newvalues(:nat, :mangle, :filter, :raw, :rawpost, :security)
     defaultto 'filter'
   end
 
