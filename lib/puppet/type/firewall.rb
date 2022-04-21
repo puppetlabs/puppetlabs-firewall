@@ -315,7 +315,7 @@ Puppet::Type.newtype(:firewall) do
       end_addr = matches[2]
 
       [start_addr, end_addr].each do |addr|
-        begin
+        begin # rubocop:disable Style/RedundantBegin
           @resource.host_to_ip(addr)
         rescue StandardError
           raise("Invalid IP address \"#{addr}\" in range \"#{value}\"")
@@ -372,7 +372,7 @@ Puppet::Type.newtype(:firewall) do
       end_addr = matches[2]
 
       [start_addr, end_addr].each do |addr|
-        begin
+        begin # rubocop:disable Style/RedundantBegin
           @resource.host_to_ip(addr)
         rescue StandardError
           raise("Invalid IP address \"#{addr}\" in range \"#{value}\"")

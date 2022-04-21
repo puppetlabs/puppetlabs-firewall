@@ -46,8 +46,8 @@ class firewall::linux (
   }
 
   package { 'iptables':
-    name   => $iptables_name,
     ensure => $pkg_ensure,
+    name   => $iptables_name,
   }
 
   if $ebtables_manage {

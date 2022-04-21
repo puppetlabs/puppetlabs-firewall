@@ -143,7 +143,7 @@ Puppet::Type.type(:firewallchain).provide :iptables_chain do
     chains = []
 
     MAPPING.each do |p, c|
-      begin
+      begin # rubocop:disable Style/RedundantBegin
         c[:save].call.each_line do |line|
           if line =~ c[:re]
             name = Regexp.last_match(1) + ':' + ((table == 'filter') ? 'filter' : table) + ':' + p.to_s
