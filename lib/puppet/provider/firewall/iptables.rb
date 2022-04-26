@@ -141,6 +141,10 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     rhitcount: '--hitcount',
     rname: '--name',
     rpfilter: '-m rpfilter',
+    loose: '--loose',
+    validmark: '--validmark',
+    accept_local: '--accept-local',
+    invert: '--invert',
     rseconds: '--seconds',
     rsource: '--rsource',
     rttl: '--rttl',
@@ -237,6 +241,10 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :queue_bypass,
     :ipvs,
     :notrack,
+    :loose,
+    :validmark,
+    :invert,
+    :accept_local,
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
@@ -263,6 +271,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     geoip: [:src_cc, :dst_cc],
     hashlimit: [:hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst, :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask,
                 :hashlimit_htable_size, :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval],
+    rpfilter: [:loose, :validmark, :accept_local, :invert],
   }
 
   def self.munge_resource_map_from_existing_values(resource_map_original, compare)
