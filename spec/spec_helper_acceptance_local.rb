@@ -60,8 +60,8 @@ RSpec.configure do |c|
   # To enable tests on abs/vmpooler machines just set to `true` this flag
   c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
-    # Depmod is not availible by default on our AlmaLinux 8 docker image
-    if ['almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
+    # Depmod is not availible by default on our AlmaLinux/CentOS 8 docker image
+    if ['almalinux-8', 'centos-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
       LitmusHelper.instance.run_shell('yum install kmod -y')
     end
     if ['centos-6', 'centos-7', 'oraclelinux-6', 'scientific-6', 'scientific-7'].include?("#{fetch_os_name}-#{os[:release].to_i}")
@@ -99,6 +99,10 @@ RSpec.configure do |c|
       LitmusHelper.instance.run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
       LitmusHelper.instance.run_shell('update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
     end
+    if ['oraclelinux-6', 'scientific-6'].include?("#{fetch_os_name}-#{os[:release].to_i}")
+      pp = "class { 'firewall': ensure => stopped }"
+      LitmusHelper.instance.apply_manifest(pp)
+    end
     pp = <<-PUPPETCODE
       package { 'conntrack-tools':
         ensure => 'latest',
@@ -111,5 +115,12 @@ RSpec.configure do |c|
       }
     PUPPETCODE
     LitmusHelper.instance.apply_manifest(pp)
+
+    # Ensure that policycoreutils is present. In the future we could probably refactor
+    # this so that policycoreutils is installed on platform where the os.family fact
+    # is set to 'redhat'
+    if ['almalinux-8', 'rocky-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
+      LitmusHelper.instance.run_shell('yum install policycoreutils -y')
+    end
   end
 end

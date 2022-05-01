@@ -1375,7 +1375,7 @@ describe 'firewall basics', docker: true do
   describe 'condition', condition_parameter_test: false do
     context 'is set' do
       pp = <<-PUPPETCODE
-        if $facts['os']['name'] == 'Ubuntu' and versioncmp($facts['os']['release']['full'], '14.04') > 0 {
+        if $facts['os']['name'] == 'Ubuntu' {
           firewall { '010 isblue ipv4':
             ensure    => 'present',
             condition => '! isblue',
@@ -1389,7 +1389,7 @@ describe 'firewall basics', docker: true do
       it 'applies' do
         apply_manifest(pp)
       end
-      if fetch_os_name == 'ubuntu' && os[:release].to_i > 14
+      if fetch_os_name == 'ubuntu'
         it 'contains the rule' do
           run_shell('iptables-save') do |r|
             expect(r.stdout).to match(%r{-A INPUT -i enp0s8 -p icmp -m condition ! --condition "isblue"  -m comment --comment "010 isblue ipv4" -j DROP})

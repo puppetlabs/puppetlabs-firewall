@@ -122,7 +122,7 @@ module Puppet::Util::Firewall
 
       new_value = nil
       Resolv.each_address(value) do |addr|
-        begin
+        begin # rubocop:disable Style/RedundantBegin
           new_value = Puppet::Util::IPCidr.new(addr, family)
           break
         rescue # looking for the one that works # rubocop:disable Lint/SuppressedException

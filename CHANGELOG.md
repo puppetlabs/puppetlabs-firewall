@@ -9,6 +9,18 @@ All notable changes to this project will be documented in this file. The format 
   the firewalld package (we were removing it before, but it's necessary
   on CS9/RHEL9 hosts)
 
+## [v3.4.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.4.0) (2022-02-28)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.3.0...v3.4.0)
+
+### Added
+
+- \(SEC-944\) Handle duplicate system rules [\#1030](https://github.com/puppetlabs/puppetlabs-firewall/pull/1030) ([chelnak](https://github.com/chelnak))
+
+### Fixed
+
+- pdksync - \(IAC-1787\) - Remove Support for CentOS 6 [\#1027](https://github.com/puppetlabs/puppetlabs-firewall/pull/1027) ([david22swan](https://github.com/david22swan))
+
 ## [v3.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.3.0) (2021-12-15)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.2.0...v3.3.0)

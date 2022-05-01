@@ -6,12 +6,12 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
   context 'when iptables-persistent applicable' do
     before(:each) { Facter.clear }
 
-    let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' iptables-persistent 2>/dev/null" }
+    let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' netfilter-persistent 2>/dev/null" }
 
     {
       'Ubuntu' => '0.5.3ubuntu2',
     }.each do |os, ver|
-      os_release = '14.04'
+      os_release = '20.04'
 
       describe "#{os} package installed" do
         before(:each) do
@@ -27,7 +27,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
     describe 'Ubuntu package not installed' do
       before(:each) do
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
-        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('14.04')
+        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('20.04')
         allow(Facter::Util::Resolution).to receive(:exec).with(dpkg_cmd)
                                                          .and_return(nil)
       end

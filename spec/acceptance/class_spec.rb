@@ -14,7 +14,7 @@ describe 'firewall class' do
     idempotent_apply(pp)
   end
 
-  it 'ensure => stopped:' do
+  it 'ensure => stopped:', unless: os[:family] == 'redhat' && os[:release].to_i == 6 do
     pp = "class { 'firewall': ensure => stopped }"
     idempotent_apply(pp)
   end

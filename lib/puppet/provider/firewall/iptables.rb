@@ -401,7 +401,27 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   end
 
   def exists?
+    if duplicate_rule?(@property_hash[:name])
+      core_message = "Duplicate rule found for #{@property_hash[:name]}."
+      case @resource.parameters[:onduplicaterulebehaviour].value
+      when :error
+        raise   "#{core_message} Skipping update."
+      when :warn
+        warning "#{core_message}. This may add an additional rule to the system."
+      when :ignore
+        debug "#{core_message}. This may add an additional rule to the system."
+      end
+    end
+
     properties[:ensure] != :absent
+  end
+
+  def duplicate_rule?(rule)
+    rules = self.class.instances
+    system_rule_count = Hash.new(0)
+    rules.each { |r| system_rule_count[r.name] += 1 }
+    duplicate_rules = rules.select { |r| system_rule_count[r.name] > 1 }
+    duplicate_rules.select { |r| r.name == rule }.any?
   end
 
   # Flush the property hash once done.
