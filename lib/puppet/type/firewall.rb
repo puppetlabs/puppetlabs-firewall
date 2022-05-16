@@ -173,6 +173,7 @@ Puppet::Type.newtype(:firewall) do
   feature :mss, 'Match a given TCP MSS value or range.'
   feature :tcp_flags, 'The ability to match on particular TCP flag settings'
   feature :pkttype, 'Match a packet type'
+  feature :rpfilter, 'Perform reverse-path filtering'
   feature :socket, 'Match open sockets'
   feature :isfragment, 'Match fragments'
   feature :address_type, 'The ability match on source or destination address type'
