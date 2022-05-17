@@ -2,12 +2,19 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## Uncommitted
+## [v3.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.5.0) - 2022-05-17
 
-- Initial CentOS Stream 9/RHEL9 Support
-- Added a hook (not good enough yet) for deciding whether we try to remove
-  the firewalld package (we were removing it before, but it's necessary
-  on CS9/RHEL9 hosts)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.4.0...v3.5.0)
+
+### Added
+
+- CentOS Stream 9 Support (should include RHEL9 when that releases) [#1028](https://github.com/puppetlabs/puppetlabs-firewall/pull/1028) ([tskirvin](https://github.com/tskirvin))
+
+### Fixed
+
+- pdksync - (GH-iac-334) Remove Support for Ubuntu 14.04/16.04 [#1038](https://github.com/puppetlabs/puppetlabs-firewall/pull/1038) ([david22swan](https://github.com/david22swan))
+
+- Fix rpfilter parameter [#1013](https://github.com/puppetlabs/puppetlabs-firewall/pull/1013) ([onyxmaster](https://github.com/onyxmaster))
 
 ## [v3.4.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.4.0) (2022-02-28)
 
