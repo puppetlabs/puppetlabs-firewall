@@ -41,7 +41,7 @@ class firewall::linux::redhat (
   $package_name     = $firewall::params::package_name,
   $package_ensure   = $firewall::params::package_ensure,
   $sysconfig_manage = $firewall::params::sysconfig_manage,
-  $firewalld_manage = true,
+  $firewalld_manage = $firewall::params::firewalld_manage,
 ) inherits ::firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
   $_enable_v6 = pick($enable_v6, $enable)

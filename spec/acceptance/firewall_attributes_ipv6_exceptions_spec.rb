@@ -220,7 +220,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
       end
     end
 
-    unless os[:family] == 'redhat' && os[:release].start_with?('8')
+    unless os[:family] == 'redhat' && os[:release].start_with?('8', '9')
       describe 'time tests' do
         context 'when set all time parameters' do
           pp1 = <<-PUPPETCODE
