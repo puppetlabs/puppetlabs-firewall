@@ -13,6 +13,7 @@ class firewall::params {
           $package_name = undef
           $iptables_name = 'iptables'
           $sysconfig_manage = true
+          $firewalld_manage = true
         }
         'Fedora': {
           $service_name = 'iptables'
@@ -28,32 +29,37 @@ class firewall::params {
             $package_name = undef
           }
           $sysconfig_manage = true
+          $firewalld_manage = true
         }
         default: {
           if versioncmp($::operatingsystemrelease, '9') >= 0 {
             $service_name = 'nftables'
-            $service_name_v6 = undef
+            $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables', 'iptables-nft-services']
             $iptables_name = 'iptables'
             $sysconfig_manage = false
+            $firewalld_manage = false
           } elsif versioncmp($::operatingsystemrelease, '8.0') >= 0 {
             $service_name = ['iptables', 'nftables']
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables']
             $iptables_name = 'iptables'
             $sysconfig_manage = false
+            $firewalld_manage = true
           } elsif versioncmp($::operatingsystemrelease, '7.0') >= 0 {
             $service_name = 'iptables'
             $service_name_v6 = 'ip6tables'
             $package_name = 'iptables-services'
             $iptables_name = 'iptables'
             $sysconfig_manage = true
+            $firewalld_manage = true
           } else {
             $service_name = 'iptables'
             $service_name_v6 = 'ip6tables'
             $package_name = 'iptables-ipv6'
             $iptables_name = 'iptables'
             $sysconfig_manage = true
+            $firewalld_manage = true
           }
         }
       }

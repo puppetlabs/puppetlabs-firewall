@@ -327,12 +327,18 @@ describe 'firewall basics', docker: true do
 
   describe 'mac_source' do
     context 'when 0A:1B:3C:4D:5E:6F' do
+      # On RHEL 9 this must be lower case, on all others it must be upper case
+      mac_source = if os[:family] == 'redhat' && os[:release].start_with?('9')
+                     '0a:1b:3c:4d:5e:6f'
+                   else
+                     '0A:1B:3C:4D:5E:6F'
+                   end
       pp88 = <<-PUPPETCODE
           class { '::firewall': }
           firewall { '610 - test':
             ensure      => present,
             source      => '10.1.5.28/32',
-            mac_source  => '0A:1B:3C:4D:5E:6F',
+            mac_source  => '#{mac_source}',
             chain       => 'INPUT',
           }
       PUPPETCODE
@@ -1015,7 +1021,7 @@ describe 'firewall basics', docker: true do
     end
   end
 
-  unless (os[:family] == 'redhat' && os[:release].start_with?('5', '6', '8')) || (os[:family] == 'sles')
+  unless (os[:family] == 'redhat' && os[:release].start_with?('5', '6', '8', '9')) || (os[:family] == 'sles')
     describe 'time tests' do
       context 'when set all time parameters' do
         pp1 = <<-PUPPETCODE

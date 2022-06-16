@@ -10,6 +10,13 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
 
   describe 'attributes test' do
     before(:all) do
+      # On RHEL 9 this must be lower case, on all others it must be upper case
+      mac_source = if os[:family] == 'redhat' && os[:release].start_with?('9')
+                     '0a:1b:3c:4d:5e:6f'
+                   else
+                     '0A:1B:3C:4D:5E:6F'
+                   end
+
       pp = <<-PUPPETCODE
         class { '::firewall': }
         firewall { '571 - hop_limit':
@@ -101,7 +108,7 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redh
         firewall { '604 - mac_source':
           ensure      => present,
           source      => '2001:db8::1/128',
-          mac_source  => '0A:1B:3C:4D:5E:6F',
+          mac_source  => '#{mac_source}',
           chain       => 'INPUT',
           provider    => 'ip6tables',
         }
