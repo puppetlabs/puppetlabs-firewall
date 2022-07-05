@@ -1348,7 +1348,7 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'random-fully' do
-    supports_random_fully = if os[:family] == 'redhat' && os[:release].start_with?('8')
+    supports_random_fully = if os[:family] == 'redhat' && os[:release].start_with?('8', '9')
                               true
                             elsif os[:family] == 'debian' && os[:release].start_with?('10')
                               true
