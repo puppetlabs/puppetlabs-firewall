@@ -334,6 +334,12 @@ describe 'firewall attribute testing, happy path' do
             table    => 'raw',
             chain    => 'PREROUTING',
             action   => 'accept',
+            rpfilter => [ 'invert', 'validmark', 'loose', 'accept-local' ],
+          }
+          firewall { '901 - set rpfilter':
+            table    => 'raw',
+            chain    => 'PREROUTING',
+            action   => 'accept',
             rpfilter => 'invert',
           }
           firewall { '1000 - set_dscp':
@@ -420,6 +426,12 @@ describe 'firewall attribute testing, happy path' do
     end
     it 'toports is set' do
       expect(result.stdout).to match(%r{-A PREROUTING -p icmp -m comment --comment "574 - toports" -j REDIRECT --to-ports 2222})
+    end
+    it 'rpfilter is set' do
+      expect(result.stdout).to match(%r{-A PREROUTING -p tcp -m rpfilter --loose --validmark --accept-local --invert -m comment --comment "900 - set rpfilter" -j ACCEPT})
+    end
+    it 'single rpfilter is set' do
+      expect(result.stdout).to match(%r{-A PREROUTING -p tcp -m rpfilter --invert -m comment --comment "901 - set rpfilter" -j ACCEPT})
     end
     it 'limit is set' do
       expect(result.stdout).to match(%r{-A INPUT -p tcp -m multiport --dports 572 -m limit --limit 500\/sec -m comment --comment "572 - limit" -j ACCEPT})

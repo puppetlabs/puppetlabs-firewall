@@ -534,6 +534,17 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         (\s--tunnel-src\s\S+)?
         (\s--next)?}x,
                         '--pol "ipsec\1\2\3\4\5\6\7\8" ')
+
+    # rpfilter also takes multiple parameters; use quote trick again
+    rpfilter_opts = values.scan(%r{-m\srpfilter(\s(--loose)|\s(--validmark)|\s(--accept-local)|\s(--invert))+})
+    if rpfilter_opts && rpfilter_opts.length == 1 && rpfilter_opts[0]
+      rpfilter_opts = rpfilter_opts[0][1..-1].reject { |x| x.nil? }
+      values = values.sub(
+        %r{-m\srpfilter(\s(--loose)|\s(--validmark)|\s(--accept-local)|\s(--invert))+},
+        "-m rpfilter \"#{rpfilter_opts.join(' ')}\"",
+      )
+    end
+
     # on some iptables versions, --connlimit-saddr switch is added after the rule is applied
     values = values.gsub(%r{--connlimit-saddr}, '')
 
@@ -631,6 +642,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     [:ipset, :dst_type, :src_type].each do |prop|
       hash[prop] = hash[prop].split(';') unless hash[prop].nil?
     end
+
+    hash[:rpfilter] = hash[:rpfilter].split(' ') unless hash[:rpfilter].nil?
 
     ## clean up DSCP class to HEX mappings
     valid_dscp_classes = {
@@ -918,6 +931,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         one, two = resource_value.split(' ')
         args << one
         args << two
+      elsif res == :rpfilter
+        args << resource_value
       elsif resource_value.is_a?(Array)
         args << resource_value.join(',')
       elsif !resource_value.nil?

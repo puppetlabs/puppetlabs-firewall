@@ -1705,7 +1705,7 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:true, :false)
   end
 
-  newproperty(:rpfilter, required_features: :rpfilter) do
+  newproperty(:rpfilter, required_features: :rpfilter, array_matching: :all) do
     desc <<-PUPPETCODE
       Enable the rpfilter module.
     PUPPETCODE
@@ -1713,6 +1713,10 @@ Puppet::Type.newtype(:firewall) do
     newvalues(:loose, :validmark, :'accept-local', :invert)
     munge do |value|
       _value = '--' + value
+    end
+
+    def insync?(is)
+      is.to_set == should.to_set
     end
   end
 
