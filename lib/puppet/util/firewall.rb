@@ -203,7 +203,7 @@ module Puppet::Util::Firewall
        .include?(Facter.value(:operatingsystem)) && Facter.value(:operatingsystemrelease).to_i >= 7
       os_key = 'Fedora'
     end
-    
+
     if os_key == 'RedHat' && Facter.value(:operatingsystem) == 'Amazon' && Facter.value(:operatingsystemrelease).to_i == 2
       os_key = 'Amazon'
     end
@@ -244,7 +244,6 @@ module Puppet::Util::Firewall
             when :IPv6
               ['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/iptables/ip6tables.rules']
             end
-          end
           when :Amazon
             case proto.to_sym
             when :IPv4
@@ -253,7 +252,7 @@ module Puppet::Util::Firewall
               ['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables.rules']
             end
           end
-    
+
 
     # Catch unsupported OSs from the case statement above.
     if cmd.nil?
