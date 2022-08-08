@@ -253,7 +253,6 @@ module Puppet::Util::Firewall
             end
           end
 
-
     # Catch unsupported OSs from the case statement above.
     if cmd.nil?
       debug('firewall: Rule persistence is not supported for this type/OS')
