@@ -251,6 +251,11 @@ module Puppet::Util::Firewall
             when :IPv6
               ['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables.rules']
             end
+          when :Suse
+            case proto.to_sym
+            when :IPv4
+              ['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/sysconfig/iptables']
+            end
           end
 
     # Catch unsupported OSs from the case statement above.
