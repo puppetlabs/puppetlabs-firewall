@@ -421,11 +421,11 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   end
 
   def duplicate_rule?(rule)
-    rules = self.class.instances
-    system_rule_count = Hash.new(0)
-    rules.each { |r| system_rule_count[r.name] += 1 }
-    duplicate_rules = rules.select { |r| system_rule_count[r.name] > 1 }
-    duplicate_rules.select { |r| r.name == rule }.any?
+    self.class.instances.each_with_object({ count: 0 }) do |r, obj|
+      obj[:count] += 1 if r.name == rule
+      return true if obj[:count] > 1
+    end
+    false
   end
 
   # Flush the property hash once done.
