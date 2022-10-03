@@ -549,11 +549,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
                  values.sub(%r{\s-f(?!l)(?=.*--comment)}, ' -f true')
                elsif resource_map[bool].eql?(%r{'--physdev-is-\S+'})
                  values.sub(%r{'#{resource_map[bool]} "! "'}, "#{resource_map[bool]} true")
-               elsif bool == :random
-                 values.sub(%r{#{resource_map[bool]}(\s|$)(?!"!")}, "#{resource_map[bool]} true")
                else
                  # append `true` to booleans that are not already negated (followed by "!")
-                 values.sub(%r{#{resource_map[bool]}(?! "!")}, "#{resource_map[bool]} true")
+                 values.sub(%r{#{resource_map[bool]}(?=\s|$)(?!\s?"!")}, "#{resource_map[bool]} true")
                end
     end
 
