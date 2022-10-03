@@ -1,6 +1,23 @@
 # Change log
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
+## [v3.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.6.0) - 2022-10-03
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.5.0...v3.6.0)
+
+### Added
+
+- pdksync - (GH-cat-11) Certify Support for Ubuntu 22.04 [#1063](https://github.com/puppetlabs/puppetlabs-firewall/pull/1063) ([david22swan](https://github.com/david22swan))
+
+- pdksync - (GH-cat-12) Add Support for Redhat 9 [#1054](https://github.com/puppetlabs/puppetlabs-firewall/pull/1054) ([david22swan](https://github.com/david22swan))
+
+### Fixed
+
+- (GH-1055) Fix for `--random-fully` [#1058](https://github.com/puppetlabs/puppetlabs-firewall/pull/1058) ([david22swan](https://github.com/david22swan))
+
+### Other
+
+- allow persistence of firewall rules for Suse [#1061](https://github.com/puppetlabs/puppetlabs-firewall/pull/1061) ([corporate-gadfly](https://github.com/corporate-gadfly))
 
 ## [v3.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.5.0) - 2022-05-17
 
