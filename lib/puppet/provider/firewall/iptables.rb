@@ -130,8 +130,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     nflog_prefix: '--nflog-prefix',
     nflog_range: '--nflog-range',
     nflog_threshold: '--nflog-threshold',
-    on_port: '--on-port',
-    on_ip: '--on-ip',
     outiface: '-o',
     pkttype: '-m pkttype --pkt-type',
     port: '-m multiport --ports',
@@ -175,8 +173,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     toports: '--to-ports',
     tosource: '--to-source',
     to: '--to',
-    transparent: '--transparent',
-    tproxy_mark: '--tproxy-mark',
     uid: '--uid-owner',
     u32: ['-m u32 --u32', '--u32'],
     physdev_in: '--physdev-in',
@@ -236,7 +232,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :rsource,
     :rttl,
     :socket,
-    :transparent,
     :physdev_is_bridged,
     :physdev_is_in,
     :physdev_is_out,
@@ -362,8 +357,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :condition, :name, :notrack,
-    :on_port, :on_ip, :tproxy_mark
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :condition, :name, :notrack
   ]
 
   def insert
