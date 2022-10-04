@@ -382,6 +382,17 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:proto) do
+    desc <<-PUPPETCODE
+      The specific protocol to match for this rule.
+    PUPPETCODE
+
+    newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :carp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
+      [proto, "! #{proto}".to_sym]
+    }.flatten)
+    defaultto 'tcp'
+  end
+
   newproperty(:sport, array_matching: :all) do
     desc <<-PUPPETCODE
       The source port to match for this filter (if the protocol supports
@@ -399,7 +410,7 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
 
     munge do |value|
-      @resource.string_to_port(value, :proto)
+      @resource.string_to_port(value, @resource[:proto])
     end
 
     def to_s?(value)
@@ -429,7 +440,7 @@ Puppet::Type.newtype(:firewall) do
     PUPPETCODE
 
     munge do |value|
-      @resource.string_to_port(value, :proto)
+      @resource.string_to_port(value, @resource[:proto])
     end
 
     def to_s?(value)
@@ -465,7 +476,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     munge do |value|
-      @resource.string_to_port(value, :proto)
+      @resource.string_to_port(value, @resource[:proto])
     end
 
     def to_s?(value)
@@ -566,17 +577,6 @@ Puppet::Type.newtype(:firewall) do
                   "! #{address_type} --limit-iface-out".to_sym,
                 ]
               }.flatten)
-  end
-
-  newproperty(:proto) do
-    desc <<-PUPPETCODE
-      The specific protocol to match for this rule.
-    PUPPETCODE
-
-    newvalues(*[:ip, :tcp, :udp, :icmp, :"ipv6-icmp", :esp, :ah, :vrrp, :carp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :cbt, :sctp, :pim, :all].map { |proto|
-      [proto, "! #{proto}".to_sym]
-    }.flatten)
-    defaultto 'tcp'
   end
 
   # tcp-specific
