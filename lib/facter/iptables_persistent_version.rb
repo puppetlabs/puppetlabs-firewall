@@ -14,7 +14,7 @@ Facter.add(:iptables_persistent_version) do
           else
             "dpkg-query -Wf '${Version}' iptables-persistent 2>/dev/null"
           end
-    version = Facter::Util::Resolution.exec(cmd)
+    version = Facter::Core::Execution.execute(cmd)
 
     if version.nil? || !version.match(%r{\d+\.\d+})
       nil

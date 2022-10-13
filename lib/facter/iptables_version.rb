@@ -3,7 +3,7 @@
 Facter.add(:iptables_version) do
   confine kernel: :Linux
   setcode do
-    version = Facter::Util::Resolution.exec('iptables --version')
+    version = Facter::Core::Execution.execute('iptables --version')
     if version
       version.match(%r{\d+\.\d+\.\d+}).to_s
     else
