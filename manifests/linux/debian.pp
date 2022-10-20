@@ -34,7 +34,7 @@ class firewall::linux::debian (
 
       refreshonly => true,
     }
-    ensure_packages([$package_name],{
+    ensure_packages([$package_name], {
         ensure  => $package_ensure,
         require => Exec['iptables-persistent-debconf']
     })
