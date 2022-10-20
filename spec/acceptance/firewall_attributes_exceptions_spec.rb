@@ -1270,6 +1270,7 @@ describe 'firewall basics', docker: true do
               expect(r.stdout).to match(%r{-A INPUT -m mark --mark ! 0x1 -m comment --comment "504 match_mark - negate test" -j REJECT --reject-with icmp-port-unreachable})
             end
           end
+        end
       end
     end
 
