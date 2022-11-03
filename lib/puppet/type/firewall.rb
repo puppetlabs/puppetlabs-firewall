@@ -2342,12 +2342,9 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
-  # autobefore is only provided since puppet 4.0
-  if Puppet::Util::Package.versioncmp(Puppet.version, '4.0') >= 0
-    # On RHEL 7 this needs to be threaded correctly to manage SE Linux permissions after persisting the rules
-    autobefore(:file) do
-      ['/etc/sysconfig/iptables', '/etc/sysconfig/ip6tables']
-    end
+  # On RHEL 7 this needs to be threaded correctly to manage SE Linux permissions after persisting the rules
+  autobefore(:file) do
+    ['/etc/sysconfig/iptables', '/etc/sysconfig/ip6tables']
   end
 
   validate do
