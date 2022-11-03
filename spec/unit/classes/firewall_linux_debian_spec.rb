@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe 'firewall::linux::debian', type: :class do
-
   context 'with Debian 10' do
     let(:facts) do
       {

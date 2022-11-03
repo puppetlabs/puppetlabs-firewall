@@ -5,7 +5,6 @@ require 'spec_helper'
 require 'puppet/confine/exists'
 
 describe 'iptables provider detection' do # rubocop:disable RSpec/MultipleDescribes
-  
   let(:exists) do
     Puppet::Confine::Exists
   end
