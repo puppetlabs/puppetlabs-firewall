@@ -25,9 +25,11 @@ class firewall::linux::debian (
   $package_name   = $firewall::params::package_name,
   $package_ensure = $firewall::params::package_ensure,
 ) inherits ::firewall::params {
-  ensure_packages([$package_name], {
-      ensure  => $package_ensure
-  })
+  if $package_name {
+    ensure_packages([$package_name], {
+        ensure  => $package_ensure
+    })
+  }
 
   # This isn't a real service/daemon. The start action loads rules, so just
   # needs to be called on system boot.
