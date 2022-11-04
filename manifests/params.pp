@@ -21,9 +21,6 @@ class firewall::params {
           if versioncmp($::operatingsystemrelease, '34') >= 0 {
             $package_name = 'iptables-services'
             $iptables_name = 'iptables-compat'
-          } elsif versioncmp($::operatingsystemrelease, '15') >= 0 {
-            $package_name = 'iptables-services'
-            $iptables_name = 'iptables'
           } else {
             $iptables_name = 'iptables'
             $package_name = undef

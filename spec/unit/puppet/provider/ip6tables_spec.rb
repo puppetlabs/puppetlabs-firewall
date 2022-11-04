@@ -2,11 +2,8 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-if Puppet::Util::Package.versioncmp(Puppet.version, '3.4.0') < 0
-  require 'puppet/provider/confine/exists'
-else
-  require 'puppet/confine/exists'
-end
+require 'puppet/confine/exists'
+
 provider_class = Puppet::Type.type(:firewall).provider(:ip6tables)
 describe 'ip6tables' do
   let(:params) { { name: '000 test foo', action: 'accept' } }

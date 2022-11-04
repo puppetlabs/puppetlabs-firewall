@@ -2,21 +2,11 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-if Puppet::Util::Package.versioncmp(Puppet.version, '3.4.0') < 0
-  require 'puppet/provider/confine/exists'
-else
-  require 'puppet/confine/exists'
-end
+require 'puppet/confine/exists'
 
 describe 'iptables provider detection' do # rubocop:disable RSpec/MultipleDescribes
-  if Puppet::Util::Package.versioncmp(Puppet.version, '3.4.0') < 0
-    let(:exists) do
-      Puppet::Provider::Confine::Exists
-    end
-  else
-    let(:exists) do
-      Puppet::Confine::Exists
-    end
+  let(:exists) do
+    Puppet::Confine::Exists
   end
 
   before :each do

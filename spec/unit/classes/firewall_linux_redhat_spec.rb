@@ -35,34 +35,10 @@ end
 
 describe 'firewall::linux::redhat', type: :class do
   ['RedHat', 'CentOS', 'Fedora', 'AlmaLinux'].each do |os|
-    oldreleases = ((os == 'Fedora') ? ['14'] : ['6.5'])
-    newreleases = ((os == 'Fedora') ? ['15', 'Rawhide'] : ['7.0.1406'])
+    releases = ((os == 'Fedora') ? ['36'] : ['7.0.1406'])
     nftablesreleases = ((os == 'Fedora') ? [] : ['8.0'])
 
-    oldreleases.each do |osrel|
-      context "os #{os} and osrel #{osrel}" do
-        let(:facts) do
-          {
-            operatingsystem: os,
-            operatingsystemrelease: osrel,
-            osfamily: 'RedHat',
-            selinux: false,
-            puppetversion: Puppet.version,
-          }
-        end
-
-        it { is_expected.not_to contain_service('firewalld') }
-        it { is_expected.not_to contain_package('iptables-services') }
-        it {
-          is_expected.to contain_file('/etc/sysconfig/iptables')
-          is_expected.to contain_file('/etc/sysconfig/ip6tables')
-        }
-
-        it_behaves_like 'ensures iptables service'
-      end
-    end
-
-    newreleases.each do |osrel|
+    releases.each do |osrel|
       context "os #{os} and osrel #{osrel}" do
         let(:facts) do
           {

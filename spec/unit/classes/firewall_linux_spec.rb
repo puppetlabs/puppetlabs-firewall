@@ -5,7 +5,7 @@ require 'spec_helper'
 describe 'firewall::linux', type: :class do
   ['RedHat', 'CentOS'].each do |os|
     context "Redhat Like: operatingsystem => #{os}" do
-      releases = ['6', '7']
+      releases = ['6', '7', '8']
       releases.each do |osrel|
         context "operatingsystemrelease => #{osrel}" do
           let(:facts) do
@@ -28,7 +28,7 @@ describe 'firewall::linux', type: :class do
 
   ['Debian', 'Ubuntu'].each do |os|
     context "Debian Like: operatingsystem => #{os}" do
-      releases = ((os == 'Debian') ? ['10'] : ['20.04'])
+      releases = ((os == 'Debian') ? ['10', '11'] : ['20.04', '22.04'])
       releases.each do |osrel|
         let(:facts) do
           {

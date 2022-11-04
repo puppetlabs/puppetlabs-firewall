@@ -49,9 +49,7 @@ class firewall::linux::redhat (
   # RHEL 7 / CentOS 7 and later and Fedora 15 and later require the iptables-services
   # package, which provides the /usr/libexec/iptables/iptables.init used by
   # lib/puppet/util/firewall.rb.
-  if ($::operatingsystem != 'Amazon')
-  and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
-  or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
+  if ($::operatingsystem != 'Amazon') {
     if $firewalld_manage {
       service { 'firewalld':
         ensure => stopped,
@@ -74,9 +72,7 @@ class firewall::linux::redhat (
     )
   }
 
-  if ($::operatingsystem != 'Amazon')
-  and (($::operatingsystem != 'Fedora' and versioncmp($::operatingsystemrelease, '7.0') >= 0)
-  or  ($::operatingsystem == 'Fedora' and versioncmp($::operatingsystemrelease, '15') >= 0)) {
+  if ($::operatingsystem != 'Amazon') {
     if $ensure == 'running' {
       exec { '/usr/bin/systemctl daemon-reload':
         require     => Package[$package_name],
@@ -134,13 +130,6 @@ class firewall::linux::redhat (
       }
     }
 
-    # Before puppet 4, the autobefore on the firewall type does not work - therefore
-    # we need to keep this workaround here
-    if versioncmp($::puppetversion, '4.0') <= 0 {
-      File<| title == "/etc/sysconfig/${service_name}" |> -> Service<| title == $service_name |>
-      File<| title == "/etc/sysconfig/${service_name_v6}" |> -> Service<| title == $service_name_v6 |>
-    }
-
     # Redhat 7 selinux user context for /etc/sysconfig/iptables is set to system_u
     # Redhat 7 selinux type context for /etc/sysconfig/iptables is set to system_conf_t
     case $::selinux {
@@ -149,11 +138,6 @@ class firewall::linux::redhat (
         case $::operatingsystem {
           'CentOS': {
             case $::operatingsystemrelease {
-              /^5\..*/: {
-                $seluser = 'system_u'
-                $seltype = 'etc_t'
-              }
-
               /^6\..*/: {
                 $seluser = 'unconfined_u'
                 $seltype = 'system_conf_t'
