@@ -74,7 +74,10 @@ class firewall::linux::redhat (
 
   if ($::operatingsystem != 'Amazon') {
     if $ensure == 'running' {
+      $running_command = ['/usr/bin/systemctl', 'daemon-reload']
+
       exec { '/usr/bin/systemctl daemon-reload':
+        command     => $running_command,
         require     => Package[$package_name],
         before      => Service[$service_name, $service_name_v6],
         subscribe   => Package[$package_name],
