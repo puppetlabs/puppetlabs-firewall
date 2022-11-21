@@ -17,7 +17,7 @@
 * `firewall::linux::debian`: Installs the `iptables-persistent` package for Debian-alike systems. This allows rules to be stored to file and restored on boot.
 * `firewall::linux::gentoo`: Manages `iptables` and `ip6tables` services, and creates files used for persistence, on Gentoo Linux systems.
 * `firewall::linux::redhat`: Manages the `iptables` service on RedHat-alike systems.
-* `firewall::params`: Provides defaults for the Apt module parameters.
+* `firewall::params`: Provides defaults for the Apt module parameters
 
 ### Resource types
 
@@ -47,15 +47,15 @@ class { 'firewall': }
 
 The following parameters are available in the `firewall` class:
 
-* [`ensure`](#ensure)
-* [`ensure_v6`](#ensure_v6)
-* [`pkg_ensure`](#pkg_ensure)
-* [`service_name`](#service_name)
-* [`service_name_v6`](#service_name_v6)
-* [`package_name`](#package_name)
-* [`ebtables_manage`](#ebtables_manage)
+* [`ensure`](#-firewall--ensure)
+* [`ensure_v6`](#-firewall--ensure_v6)
+* [`pkg_ensure`](#-firewall--pkg_ensure)
+* [`service_name`](#-firewall--service_name)
+* [`service_name_v6`](#-firewall--service_name_v6)
+* [`package_name`](#-firewall--package_name)
+* [`ebtables_manage`](#-firewall--ebtables_manage)
 
-##### <a name="ensure"></a>`ensure`
+##### <a name="-firewall--ensure"></a>`ensure`
 
 Data type: `Any`
 
@@ -63,15 +63,15 @@ Controls the state of the ipv4 iptables service on your system. Valid options: '
 
 Default value: `running`
 
-##### <a name="ensure_v6"></a>`ensure_v6`
+##### <a name="-firewall--ensure_v6"></a>`ensure_v6`
 
 Data type: `Any`
 
 Controls the state of the ipv6 iptables service on your system. Valid options: 'running' or 'stopped'.
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="pkg_ensure"></a>`pkg_ensure`
+##### <a name="-firewall--pkg_ensure"></a>`pkg_ensure`
 
 Data type: `Any`
 
@@ -79,7 +79,7 @@ Controls the state of the iptables package on your system. Valid options: 'prese
 
 Default value: `present`
 
-##### <a name="service_name"></a>`service_name`
+##### <a name="-firewall--service_name"></a>`service_name`
 
 Data type: `Any`
 
@@ -87,7 +87,7 @@ Specify the name of the IPv4 iptables service.
 
 Default value: `$firewall::params::service_name`
 
-##### <a name="service_name_v6"></a>`service_name_v6`
+##### <a name="-firewall--service_name_v6"></a>`service_name_v6`
 
 Data type: `Any`
 
@@ -95,7 +95,7 @@ Specify the name of the IPv6 iptables service.
 
 Default value: `$firewall::params::service_name_v6`
 
-##### <a name="package_name"></a>`package_name`
+##### <a name="-firewall--package_name"></a>`package_name`
 
 Data type: `Any`
 
@@ -103,13 +103,13 @@ Specify the platform-specific package(s) to install.
 
 Default value: `$firewall::params::package_name`
 
-##### <a name="ebtables_manage"></a>`ebtables_manage`
+##### <a name="-firewall--ebtables_manage"></a>`ebtables_manage`
 
 Data type: `Any`
 
 Controls whether puppet manages the ebtables package or not. If managed, the package will use the value of pkg_ensure.
 
-Default value: ``false``
+Default value: `false`
 
 ## Resource types
 
@@ -295,13 +295,13 @@ Default value: `INPUT`
 
 ##### `checksum_fill`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Compute and fill missing packet checksums.
 
 ##### `clamp_mss_to_pmtu`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Sets the clamp mss to pmtu flag.
 
@@ -333,7 +333,7 @@ Specify the random seed used for hash initialization.
 
 ##### `clusterip_new`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Used with the CLUSTERIP jump target.
 Create a new ClusterIP. You always have to set this on the first rule for a given ClusterIP.
@@ -767,32 +767,32 @@ For example: 'blacklist src,dst'
 
 ##### `ipvs`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Indicates that the current packet belongs to an IPVS connection.
 
 ##### `isfirstfrag`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If true, matches if the packet is the first fragment.
 Sadly cannot be negated. ipv6.
 
 ##### `isfragment`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Set to true to match tcp fragments (requires type to be set to tcp)
 
 ##### `ishasmorefrags`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If true, matches if the packet has it's 'more fragments' bit set. ipv6.
 
 ##### `islastfrag`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If true, matches if the packet is the last fragment. ipv6.
 
@@ -822,7 +822,7 @@ only one of the options should be set.
 
 ##### `kernel_timezone`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Use the kernel timezone instead of UTC to determine whether a packet meets the time regulations.
 
@@ -839,7 +839,7 @@ Example values are: '50/sec', '40/min', '30/hour', '10/day'."
 
 ##### `log_ip_options`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 When combined with jump => "LOG" logging of the TCP IP/IPv6
 packet header.
@@ -856,21 +856,21 @@ logging.
 
 ##### `log_tcp_options`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 When combined with jump => "LOG" logging of the TCP packet
 header.
 
 ##### `log_tcp_sequence`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 When combined with jump => "LOG" enables logging of the TCP sequence
 numbers.
 
 ##### `log_uid`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 When combined with jump => "LOG" specifies the uid of the process making
 the connection.
@@ -927,7 +927,7 @@ per packet, but increase delay until the packets reach userspace. Defaults to 1.
 
 ##### `notrack`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Invoke the disable connection tracking for this packet.
 This parameter can be used with iptables version >= 1.8.3
@@ -949,19 +949,19 @@ Match if the packet is entering a bridge from the given interface.
 
 ##### `physdev_is_bridged`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Match if the packet is transversing a bridge.
 
 ##### `physdev_is_in`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Matches if the packet has entered through a bridge interface.
 
 ##### `physdev_is_out`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Matches if the packet will leave through a bridge interface.
 
@@ -1006,7 +1006,7 @@ Default value: `tcp`
 
 ##### `queue_bypass`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Used with NFQUEUE jump target
 Allow packets to bypass :queue_num if userspace process is not listening
@@ -1018,14 +1018,14 @@ What queue number to send packets to
 
 ##### `random`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT"
 this boolean will enable randomized port mapping.
 
 ##### `random_fully`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT"
 this boolean will enable fully randomized port mapping.
@@ -1034,14 +1034,14 @@ this boolean will enable fully randomized port mapping.
 
 ##### `rdest`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Recent module; add the destination IP address to the list.
 Must be boolean true.
 
 ##### `reap`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Recent module; can only be used in conjunction with the `rseconds`
 attribute. When used, this will cause entries older than 'seconds' to be
@@ -1113,14 +1113,14 @@ number of seconds.
 
 ##### `rsource`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Recent module; add the source IP address to the list.
 Must be boolean true.
 
 ##### `rttl`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Recent module; may only be used in conjunction with one of `recent =>
 'rcheck'` or `recent => 'update'`. When used, this will narrow the match
@@ -1149,7 +1149,7 @@ Sets the TCP MSS value for packets.
 
 ##### `socket`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If true, matches if an open socket can be found by doing a coket lookup
 on the packet.
@@ -1323,7 +1323,7 @@ TCP  connection initiation.
 
 ##### `time_contiguous`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 When time_stop is smaller than time_start value, match this as a single time period instead distinct intervals.
 
@@ -1375,15 +1375,16 @@ Assign this packet to zone id and only have lookups done in that zone.
 
 The following parameters are available in the `firewall` type.
 
-* [`line`](#line)
-* [`name`](#name)
-* [`provider`](#provider)
+* [`line`](#-firewall--line)
+* [`name`](#-firewall--name)
+* [`onduplicaterulebehaviour`](#-firewall--onduplicaterulebehaviour)
+* [`provider`](#-firewall--provider)
 
-##### <a name="line"></a>`line`
+##### <a name="-firewall--line"></a>`line`
 
 Read-only property for caching the rule line.
 
-##### <a name="name"></a>`name`
+##### <a name="-firewall--name"></a>`name`
 
 Valid values: `%r{^\d+[[:graph:][:space:]]+$}`
 
@@ -1398,7 +1399,25 @@ so make sure you prefix the rule with a number:
 Depending on the provider, the name of the rule can be stored using
 the comment feature of the underlying firewall subsystem.
 
-##### <a name="provider"></a>`provider`
+##### <a name="-firewall--onduplicaterulebehaviour"></a>`onduplicaterulebehaviour`
+
+Valid values: `ignore`, `warn`, `error`
+
+In certain situations it is possible for an unmanaged rule to exist
+on the target system that has the same comment as the rule
+specified in the manifest.
+
+This setting determines what happens when such a duplicate is found.
+
+It offers three options:
+
+  * ignore - The duplicate rule is ignored and any updates to the resource will continue unaffected.
+  * warn - The duplicate rule is logged as a warning and any updates to the resource will continue unaffected.
+  * error - The duplicate rule is logged as an error and any updates to the resource will be skipped.
+
+Default value: `warn`
+
+##### <a name="-firewall--provider"></a>`provider`
 
 The specific backend to use for this `firewall` resource. You will seldom need to specify this --- Puppet will usually
 discover the appropriate provider for your platform.
@@ -1451,13 +1470,13 @@ PREROUTING, POSTROUTING) and can be one of:
 
 The following parameters are available in the `firewallchain` type.
 
-* [`ignore`](#ignore)
-* [`ignore_foreign`](#ignore_foreign)
-* [`name`](#name)
-* [`provider`](#provider)
-* [`purge`](#purge)
+* [`ignore`](#-firewallchain--ignore)
+* [`ignore_foreign`](#-firewallchain--ignore_foreign)
+* [`name`](#-firewallchain--name)
+* [`provider`](#-firewallchain--provider)
+* [`purge`](#-firewallchain--purge)
 
-##### <a name="ignore"></a>`ignore`
+##### <a name="-firewallchain--ignore"></a>`ignore`
 
 Regex to perform on firewall rules to exempt unmanaged rules from purging (when enabled).
 This is matched against the output of `iptables-save`.
@@ -1480,9 +1499,9 @@ firewallchain { 'INPUT:filter:IPv4':
 }
 ```
 
-##### <a name="ignore_foreign"></a>`ignore_foreign`
+##### <a name="-firewallchain--ignore_foreign"></a>`ignore_foreign`
 
-Valid values: ``false``, ``true``
+Valid values: `false`, `true`
 
 Ignore rules that do not match the puppet title pattern "^\d+[[:graph:][:space:]]" when purging unmanaged firewall rules
 in this chain.
@@ -1490,9 +1509,9 @@ This can be used to ignore rules that were not put in by puppet. Beware that not
 configuring firewall rules with a comment that starts with digits, and is indistinguishable from puppet-configured
 rules.
 
-Default value: ``false``
+Default value: `false`
 
-##### <a name="name"></a>`name`
+##### <a name="-firewallchain--name"></a>`name`
 
 namevar
 
@@ -1500,16 +1519,16 @@ The canonical name of the chain.
 
 For iptables the format must be {chain}:{table}:{protocol}.
 
-##### <a name="provider"></a>`provider`
+##### <a name="-firewallchain--provider"></a>`provider`
 
 The specific backend to use for this `firewallchain` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
 
-##### <a name="purge"></a>`purge`
+##### <a name="-firewallchain--purge"></a>`purge`
 
-Valid values: ``false``, ``true``
+Valid values: `false`, `true`
 
 Purge unmanaged firewall rules in this chain
 
-Default value: ``false``
+Default value: `false`
 

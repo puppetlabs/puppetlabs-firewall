@@ -1,37 +1,55 @@
 # Change log
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
-## [v3.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.6.0) - 2022-10-03
+
+## [v4.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v4.0.0) (2022-11-21)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.6.0...v4.0.0)
+
+### Changed
+
+- \(CONT-5\) Raising minimum required puppet version [\#1088](https://github.com/puppetlabs/puppetlabs-firewall/pull/1088) ([LukasAud](https://github.com/LukasAud))
+- \(CONT-256\) Removing outdated code [\#1084](https://github.com/puppetlabs/puppetlabs-firewall/pull/1084) ([LukasAud](https://github.com/LukasAud))
+
+### Fixed
+
+- Revert "Add negate to match\_mark" [\#1081](https://github.com/puppetlabs/puppetlabs-firewall/pull/1081) ([pmcmaw](https://github.com/pmcmaw))
+- \(CONT-173\) - Updating deprecated facter instances [\#1079](https://github.com/puppetlabs/puppetlabs-firewall/pull/1079) ([jordanbreen28](https://github.com/jordanbreen28))
+- pdksync - \(CONT-189\) Remove support for RedHat6 / OracleLinux6 / Scientific6 [\#1078](https://github.com/puppetlabs/puppetlabs-firewall/pull/1078) ([david22swan](https://github.com/david22swan))
+- pdksync - \(CONT-130\) - Dropping Support for Debian 9 [\#1075](https://github.com/puppetlabs/puppetlabs-firewall/pull/1075) ([jordanbreen28](https://github.com/jordanbreen28))
+- Add negate to match\_mark [\#1066](https://github.com/puppetlabs/puppetlabs-firewall/pull/1066) ([Antiarchitect](https://github.com/Antiarchitect))
+- fix service port number lookup to use protocol [\#1023](https://github.com/puppetlabs/puppetlabs-firewall/pull/1023) ([kjetilho](https://github.com/kjetilho))
+
+## [v3.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.6.0) (2022-10-03)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.5.0...v3.6.0)
 
 ### Added
 
-- pdksync - (GH-cat-11) Certify Support for Ubuntu 22.04 [#1063](https://github.com/puppetlabs/puppetlabs-firewall/pull/1063) ([david22swan](https://github.com/david22swan))
-
-- pdksync - (GH-cat-12) Add Support for Redhat 9 [#1054](https://github.com/puppetlabs/puppetlabs-firewall/pull/1054) ([david22swan](https://github.com/david22swan))
+- pdksync - \(GH-cat-11\) Certify Support for Ubuntu 22.04 [\#1063](https://github.com/puppetlabs/puppetlabs-firewall/pull/1063) ([david22swan](https://github.com/david22swan))
+- pdksync - \(GH-cat-12\) Add Support for Redhat 9 [\#1054](https://github.com/puppetlabs/puppetlabs-firewall/pull/1054) ([david22swan](https://github.com/david22swan))
 
 ### Fixed
 
-- (GH-1055) Fix for `--random-fully` [#1058](https://github.com/puppetlabs/puppetlabs-firewall/pull/1058) ([david22swan](https://github.com/david22swan))
+- \(GH-1055\) Fix for `--random-fully` [\#1058](https://github.com/puppetlabs/puppetlabs-firewall/pull/1058) ([david22swan](https://github.com/david22swan))
 
-### Other
+### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
 
-- allow persistence of firewall rules for Suse [#1061](https://github.com/puppetlabs/puppetlabs-firewall/pull/1061) ([corporate-gadfly](https://github.com/corporate-gadfly))
+- Release prep v3.6.0 [\#1074](https://github.com/puppetlabs/puppetlabs-firewall/pull/1074) ([jordanbreen28](https://github.com/jordanbreen28))
+- allow persistence of firewall rules for Suse [\#1061](https://github.com/puppetlabs/puppetlabs-firewall/pull/1061) ([corporate-gadfly](https://github.com/corporate-gadfly))
 
-## [v3.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.5.0) - 2022-05-17
+## [v3.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.5.0) (2022-05-17)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.4.0...v3.5.0)
 
 ### Added
 
-- CentOS Stream 9 Support (should include RHEL9 when that releases) [#1028](https://github.com/puppetlabs/puppetlabs-firewall/pull/1028) ([tskirvin](https://github.com/tskirvin))
+- CentOS Stream 9 Support \(should include RHEL9 when that releases\) [\#1028](https://github.com/puppetlabs/puppetlabs-firewall/pull/1028) ([tskirvin](https://github.com/tskirvin))
 
 ### Fixed
 
-- pdksync - (GH-iac-334) Remove Support for Ubuntu 14.04/16.04 [#1038](https://github.com/puppetlabs/puppetlabs-firewall/pull/1038) ([david22swan](https://github.com/david22swan))
-
-- Fix rpfilter parameter [#1013](https://github.com/puppetlabs/puppetlabs-firewall/pull/1013) ([onyxmaster](https://github.com/onyxmaster))
+- pdksync - \(GH-iac-334\) Remove Support for Ubuntu 14.04/16.04 [\#1038](https://github.com/puppetlabs/puppetlabs-firewall/pull/1038) ([david22swan](https://github.com/david22swan))
+- Fix rpfilter parameter [\#1013](https://github.com/puppetlabs/puppetlabs-firewall/pull/1013) ([onyxmaster](https://github.com/onyxmaster))
 
 ## [v3.4.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.4.0) (2022-02-28)
 
@@ -43,7 +61,7 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Fixed
 
-- pdksync - \(IAC-1787\) - Remove Support for CentOS 6 [\#1027](https://github.com/puppetlabs/puppetlabs-firewall/pull/1027) ([david22swan](https://github.com/david22swan))
+- pdksync - \(IAC-1787\) Remove Support for CentOS 6 [\#1027](https://github.com/puppetlabs/puppetlabs-firewall/pull/1027) ([david22swan](https://github.com/david22swan))
 
 ## [v3.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.3.0) (2021-12-15)
 
