@@ -406,7 +406,8 @@ describe 'firewall basics', docker: true do
       end
     end
 
-    describe 'nflog_range' do
+    # --nflog-range was deprecated and replaced by --nflog-size in iptables 1.6.1
+    describe 'nflog_range', unless: iptables_version > '1.6.0' do
       it 'applies' do
         pp4 = <<-PUPPETCODE
           class {'::firewall': }
@@ -418,6 +419,22 @@ describe 'firewall basics', docker: true do
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{NFLOG --nflog-range 16})
+        end
+      end
+    end
+
+    describe 'nflog_size', unless: iptables_version < '1.6.1' do
+      it 'applies' do
+        pp4 = <<-PUPPETCODE
+          class {'::firewall': }
+          firewall { '503 - test': jump  => 'NFLOG', proto => 'all', nflog_size => 16}
+        PUPPETCODE
+        apply_manifest(pp4, catch_failures: true)
+      end
+
+      it 'contains the rule' do
+        run_shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{NFLOG --nflog-size 16})
         end
       end
     end
