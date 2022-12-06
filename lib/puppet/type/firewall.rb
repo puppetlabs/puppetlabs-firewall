@@ -110,7 +110,7 @@ Puppet::Type.newtype(:firewall) do
 
       * nflog_prefix: The ability to set a prefix for nflog messages.
 
-      * nflog_range: The ability to set nflog_range.
+      * nflog_size: Set the max size of a message to send to nflog.
 
       * nflog_threshold: The ability to set nflog_threshold.
 
@@ -187,6 +187,7 @@ Puppet::Type.newtype(:firewall) do
   feature :nflog_group, 'netlink group to subscribe to for logging'
   feature :nflog_prefix, ''
   feature :nflog_range, ''
+  feature :nflog_size, ''
   feature :nflog_threshold, ''
   feature :ipset, 'Match against specified ipset list'
   feature :clusterip, 'Configure a simple cluster of nodes that share a certain IP and MAC address without an explicit load balancer in front of them.'
@@ -897,8 +898,15 @@ Puppet::Type.newtype(:firewall) do
   newproperty(:nflog_range, required_features: :nflog_range) do
     desc <<-PUPPETCODE
       Used with the jump target NFLOG.
+      This has never worked, use nflog_size instead.
+    PUPPETCODE
+  end
+
+  newproperty(:nflog_size, required_features: :nflog_size) do
+    desc <<-PUPPETCODE
+      Used with the jump target NFLOG.
       The number of bytes to be copied to userspace (only applicable for nfnetlink_log).
-      nfnetlink_log instances may specify their own range, this option overrides it.
+      nfnetlink_log instances may specify their own size, this option overrides it.
     PUPPETCODE
   end
 

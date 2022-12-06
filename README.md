@@ -385,7 +385,7 @@ firewall {'666 for NFLOG':
   jump            => 'NFLOG',
   nflog_group     => 3,
   nflog_prefix    => 'nflog-test',
-  nflog_range     => 256,
+  nflog_size      => 256,
   nflog_threshold => 1,
 }
 ```

@@ -70,6 +70,10 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     has_feature :rpfilter
   end
 
+  if ip6tables_version && Puppet::Util::Package.versioncmp(ip6tables_version, '1.6.1') >= 0
+    has_feature :nflog_size
+  end
+
   def initialize(*args)
     ip6tables_version = Facter.value('ip6tables_version')
     raise ArgumentError, 'The ip6tables provider is not supported on version 1.3 of iptables' if ip6tables_version&.match(%r{1\.3\.\d})
@@ -140,6 +144,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     nflog_group: '--nflog-group',
     nflog_prefix: '--nflog-prefix',
     nflog_range: '--nflog-range',
+    nflog_size: '--nflog-size',
     nflog_threshold: '--nflog-threshold',
     outiface: '-o',
     pkttype: '-m pkttype --pkt-type',
@@ -313,7 +318,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
                     :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
                     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_hex, :string_algo,
-                    :string_from, :string_to, :jump, :nflog_group, :nflog_prefix, :nflog_range, :nflog_threshold, :clamp_mss_to_pmtu, :gateway, :todest,
+                    :string_from, :string_to, :jump,
+                    :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold,
+                    :clamp_mss_to_pmtu, :gateway, :todest,
                     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :random_fully,
                     :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
                     :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,

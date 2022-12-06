@@ -76,6 +76,10 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     has_feature :rpfilter
   end
 
+  if iptables_version && Puppet::Util::Package.versioncmp(iptables_version, '1.6.1') >= 0
+    has_feature :nflog_size
+  end
+
   @protocol = 'IPv4'
 
   @resource_map = {
@@ -129,6 +133,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     nflog_group: '--nflog-group',
     nflog_prefix: '--nflog-prefix',
     nflog_range: '--nflog-range',
+    nflog_size: '--nflog-size',
     nflog_threshold: '--nflog-threshold',
     outiface: '-o',
     pkttype: '-m pkttype --pkt-type',
@@ -351,7 +356,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_hex, :string_algo,
     :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
-    :nflog_group, :nflog_prefix, :nflog_range, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
+    :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
     :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random_fully, :random, :log_prefix,
     :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
