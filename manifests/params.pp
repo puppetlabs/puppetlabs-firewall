@@ -30,14 +30,14 @@ class firewall::params {
         }
         default: {
           if versioncmp($facts['os']['release']['full'], '9') >= 0 {
-            $service_name = ['nftables','iptables']
+            $service_name = 'iptables'
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables', 'iptables-nft-services']
             $iptables_name = 'iptables-nft'
             $sysconfig_manage = false
             $firewalld_manage = true
           } elsif versioncmp($facts['os']['release']['full'], '8.0') >= 0 {
-            $service_name = ['iptables', 'nftables']
+            $service_name = ['iptables']
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables']
             $iptables_name = 'iptables'
