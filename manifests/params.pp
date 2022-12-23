@@ -30,7 +30,7 @@ class firewall::params {
         }
         default: {
           if versioncmp($::operatingsystemrelease, '9') >= 0 {
-            $service_name = 'nftables'
+            $service_name = ['nftables','iptables']
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables', 'iptables-nft-services']
             $iptables_name = 'iptables-nft'
