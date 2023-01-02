@@ -192,9 +192,9 @@ resources { 'firewallchain':
 }
 ```
 
-> **Note:** If there are unmanaged rules in unmanaged chains, it will take a second Puppet run for the firewall chain to be purged.
-
 > **Note:** If you need more fine-grained control about which unmananged rules get removed, investigate the `purge` and `ignore_foreign` parameters available in `firewallchain`.
+
+> **Note:** `ignore_foreign` of `firewallchain` does not work as expected with a resources purge of `firewall`.
 
 ### Upgrading
 
