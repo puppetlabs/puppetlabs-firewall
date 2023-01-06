@@ -19,7 +19,7 @@ describe 'firewall::linux::debian', type: :class do
     }
     it {
       is_expected.to contain_service('netfilter-persistent').with(
-        ensure: nil,
+        ensure: 'running',
         enable: 'true',
         require: 'Package[iptables-persistent]',
       )
@@ -59,7 +59,7 @@ describe 'firewall::linux::debian', type: :class do
     }
     it {
       is_expected.to contain_service('netfilter-persistent').with(
-        ensure: nil,
+        ensure: 'running',
         enable: 'true',
         require: 'Package[iptables-persistent]',
       )
@@ -99,7 +99,7 @@ describe 'firewall::linux::debian', type: :class do
     }
     it {
       is_expected.to contain_service('netfilter-persistent').with(
-        ensure: nil,
+        ensure: 'running',
         enable: 'true',
         require: 'Package[netfilter-persistent]',
       )
