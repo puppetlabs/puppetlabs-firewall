@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.0.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v4.0.1) (2022-12-06)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v4.0.0...v4.0.1)
+
+### Fixed
+
+- \(GH-1097\) Bumping back required puppet version [\#1098](https://github.com/puppetlabs/puppetlabs-firewall/pull/1098) ([LukasAud](https://github.com/LukasAud))
+- support --nflog-size as replacement for --nflog-range [\#1096](https://github.com/puppetlabs/puppetlabs-firewall/pull/1096) ([kjetilho](https://github.com/kjetilho))
+- \(1093\) - Fix unresolved fact error [\#1094](https://github.com/puppetlabs/puppetlabs-firewall/pull/1094) ([jordanbreen28](https://github.com/jordanbreen28))
+- package "iptables" has been replaced by "iptables-nft" on EL9 [\#1085](https://github.com/puppetlabs/puppetlabs-firewall/pull/1085) ([kjetilho](https://github.com/kjetilho))
+
 ## [v4.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v4.0.0) (2022-11-22)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.6.0...v4.0.0)

@@ -207,7 +207,7 @@ installed.
 
   * nflog_prefix: The ability to set a prefix for nflog messages.
 
-  * nflog_range: The ability to set nflog_range.
+  * nflog_size: Set the max size of a message to send to nflog.
 
   * nflog_threshold: The ability to set nflog_threshold.
 
@@ -915,8 +915,13 @@ useful for distinguishing messages in the logs.
 ##### `nflog_range`
 
 Used with the jump target NFLOG.
+This has never worked, use nflog_size instead.
+
+##### `nflog_size`
+
+Used with the jump target NFLOG.
 The number of bytes to be copied to userspace (only applicable for nfnetlink_log).
-nfnetlink_log instances may specify their own range, this option overrides it.
+nfnetlink_log instances may specify their own size, this option overrides it.
 
 ##### `nflog_threshold`
 

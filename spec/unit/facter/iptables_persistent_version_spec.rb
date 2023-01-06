@@ -17,7 +17,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
         before(:each) do
           allow(Facter.fact(:operatingsystem)).to receive(:value).and_return(os)
           allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return(os_release)
-          allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd)
+          allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                              .and_return(ver)
         end
         it { expect(Facter.fact(:iptables_persistent_version).value).to eql ver }
@@ -28,7 +28,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
       before(:each) do
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('20.04')
-        allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd)
+        allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                            .and_return(nil)
       end
       it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
@@ -62,7 +62,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
         before(:each) do
           allow(Facter.fact(:operatingsystem)).to receive(:value).and_return(os)
           allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return(os_release)
-          allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd)
+          allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                              .and_return(ver)
         end
         it { expect(Facter.fact(:iptables_persistent_version).value).to eql ver }
@@ -74,7 +74,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
       before(:each) do
         allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
         allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return(os_release)
-        allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd)
+        allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                            .and_return(nil)
       end
       it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
