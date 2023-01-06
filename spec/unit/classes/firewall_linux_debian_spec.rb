@@ -43,6 +43,16 @@ describe 'firewall::linux::debian', type: :class do
     }
   end
 
+  context 'with Debian 10, ensure => stopped' do
+    let(:params) { { ensure: 'stopped' } }
+
+    it {
+      is_expected.to contain_service('netfilter-persistent').with(
+        ensure: 'stopped',
+      )
+    }
+  end
+
   context 'with Debian 11' do
     let(:facts) do
       {
@@ -83,6 +93,16 @@ describe 'firewall::linux::debian', type: :class do
     }
   end
 
+  context 'with Debian 11, ensure => stopped' do
+    let(:params) { { ensure: 'stopped' } }
+
+    it {
+      is_expected.to contain_service('netfilter-persistent').with(
+        ensure: 'stopped',
+      )
+    }
+  end
+
   context 'with Debian unstable' do
     let(:facts) do
       {
@@ -102,6 +122,33 @@ describe 'firewall::linux::debian', type: :class do
         ensure: 'running',
         enable: 'true',
         require: 'Package[netfilter-persistent]',
+      )
+    }
+  end
+
+  context 'with Debian unstable, enable => false' do
+    let(:facts) do
+      {
+        osfamily: 'Debian',
+        operatingsystem: 'Debian',
+        operatingsystemrelease: 'unstable',
+      }
+    end
+    let(:params) { { enable: 'false' } }
+
+    it {
+      is_expected.to contain_service('netfilter-persistent').with(
+        enable: 'false',
+      )
+    }
+  end
+
+  context 'with Debian unstable, ensure => stopped' do
+    let(:params) { { ensure: 'stopped' } }
+
+    it {
+      is_expected.to contain_service('netfilter-persistent').with(
+        ensure: 'stopped',
       )
     }
   end
