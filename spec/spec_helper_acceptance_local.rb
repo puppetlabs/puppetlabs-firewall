@@ -99,10 +99,6 @@ RSpec.configure do |c|
       LitmusHelper.instance.run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
       LitmusHelper.instance.run_shell('update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
     end
-    if ['oraclelinux-6', 'scientific-6'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      pp = "class { 'firewall': ensure => stopped }"
-      LitmusHelper.instance.apply_manifest(pp)
-    end
     pp = <<-PUPPETCODE
       package { 'conntrack-tools':
         ensure => 'latest',
