@@ -6,6 +6,7 @@ appveyor.yml:
 Gemfile:
   optional:
     ":development":
+      - gem: 'puppet-resource_api'
       - gem: github_changelog_generator
         version: '= 1.15.2'
 Rakefile:
