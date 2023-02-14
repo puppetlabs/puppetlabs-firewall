@@ -32,16 +32,16 @@
 # @api private
 #
 class firewall::linux::redhat (
-  $ensure           = running,
-  $ensure_v6        = undef,
-  $enable           = true,
-  $enable_v6        = undef,
-  $service_name     = $firewall::params::service_name,
-  $service_name_v6  = $firewall::params::service_name_v6,
-  $package_name     = $firewall::params::package_name,
-  $package_ensure   = $firewall::params::package_ensure,
-  $sysconfig_manage = $firewall::params::sysconfig_manage,
-  $firewalld_manage = $firewall::params::firewalld_manage,
+  Enum[running, stopped, 'running', 'stopped']           $ensure           = running,
+  Optional[Enum[running, stopped, 'running', 'stopped']] $ensure_v6        = undef,
+  Boolean                                                $enable           = true,
+  Optional[Boolean]                                      $enable_v6        = undef,
+  Variant[String[1], Array[String[1]]]                   $service_name     = $firewall::params::service_name,
+  Optional[String[1]]                                    $service_name_v6  = $firewall::params::service_name_v6,
+  Optional[Variant[String[1], Array[String[1]]]]         $package_name     = $firewall::params::package_name,
+  Enum[present, latest, 'present', 'latest']             $package_ensure   = $firewall::params::package_ensure,
+  Boolean                                                $sysconfig_manage = $firewall::params::sysconfig_manage,
+  Boolean                                                $firewalld_manage = $firewall::params::firewalld_manage,
 ) inherits firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
   $_enable_v6 = pick($enable_v6, $enable)

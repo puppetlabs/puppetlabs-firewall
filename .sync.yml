@@ -32,6 +32,3 @@ spec/spec_helper.rb:
 .travis.yml:
   delete: true
 changelog_since_tag: 'v3.0.0'
-Rakefile:
-  extra_disabled_lint_checks:
-    - parameter_types

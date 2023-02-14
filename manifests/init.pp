@@ -31,13 +31,13 @@
 #   Controls whether puppet manages the ebtables package or not. If managed, the package will use the value of pkg_ensure.
 #
 class firewall (
-  $ensure          = running,
-  $ensure_v6       = undef,
-  $pkg_ensure      = present,
-  $service_name    = $firewall::params::service_name,
-  $service_name_v6 = $firewall::params::service_name_v6,
-  $package_name    = $firewall::params::package_name,
-  $ebtables_manage = false,
+  Enum[running, stopped, 'running', 'stopped']           $ensure          = running,
+  Optional[Enum[running, stopped, 'running', 'stopped']] $ensure_v6       = undef,
+  Enum[present, latest, 'present', 'latest']             $pkg_ensure      = present,
+  Variant[String[1], Array[String[1]]]                   $service_name    = $firewall::params::service_name,
+  Optional[String[1]]                                    $service_name_v6 = $firewall::params::service_name_v6,
+  Optional[Variant[String[1], Array[String[1]]]]         $package_name    = $firewall::params::package_name,
+  Boolean                                                $ebtables_manage = false,
 ) inherits firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
 
