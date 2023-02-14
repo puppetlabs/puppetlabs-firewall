@@ -43,7 +43,6 @@ end
 
 PuppetLint.configuration.send('disable_relative')
 PuppetLint.configuration.send('disable_parameter_types')
-PuppetLint.configuration.send('disable_top_scope_facts')
 
 
 if Bundler.rubygems.find_name('github_changelog_generator').any?

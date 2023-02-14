@@ -61,7 +61,7 @@ class firewall (
     }
   }
 
-  case $::kernel {
+  case $facts['kernel'] {
     'Linux': {
       class { "${title}::linux":
         ensure          => $ensure,
@@ -77,7 +77,7 @@ class firewall (
     'FreeBSD', 'windows': {
     }
     default: {
-      fail("${title}: Kernel '${::kernel}' is not currently supported")
+      fail("${title}: Kernel '${facts['kernel']}' is not currently supported")
     }
   }
 }
