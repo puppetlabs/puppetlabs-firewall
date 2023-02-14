@@ -38,7 +38,7 @@ class firewall (
   $service_name_v6 = $firewall::params::service_name_v6,
   $package_name    = $firewall::params::package_name,
   $ebtables_manage = false,
-) inherits ::firewall::params {
+) inherits firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
 
   case $ensure {

@@ -32,7 +32,7 @@ class firewall::linux (
   $package_name    = $firewall::params::package_name,
   $ebtables_manage = false,
   $iptables_name   = $firewall::params::iptables_name,
-) inherits ::firewall::params {
+) inherits firewall::params {
   $enable = $ensure ? {
     'running' => true,
     'stopped' => false,
