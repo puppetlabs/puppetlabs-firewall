@@ -37,4 +37,3 @@ Rakefile:
     - relative_classname_inclusion
     - parameter_types
     - top_scope_facts
-    - legacy_facts

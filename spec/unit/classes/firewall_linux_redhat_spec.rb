@@ -42,10 +42,12 @@ describe 'firewall::linux::redhat', type: :class do
       context "os #{os} and osrel #{osrel}" do
         let(:facts) do
           {
-            operatingsystem: os,
-            operatingsystemrelease: osrel,
-            osfamily: 'RedHat',
-            selinux: false,
+            os: {
+              name: os,
+              release: { full: osrel },
+              family: 'RedHat',
+              selinux: { enabled: false },
+            },
             puppetversion: Puppet.version,
           }
         end
@@ -130,10 +132,12 @@ describe 'firewall::linux::redhat', type: :class do
       context "os #{os} and osrel #{osrel}" do
         let(:facts) do
           {
-            operatingsystem: os,
-            operatingsystemrelease: osrel,
-            osfamily: 'RedHat',
-            selinux: false,
+            os: {
+              name: os,
+              release: { full: osrel },
+              family: 'RedHat',
+              selinux: { enabled: false },
+            },
             puppetversion: Puppet.version,
           }
         end

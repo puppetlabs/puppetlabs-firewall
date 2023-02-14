@@ -6,9 +6,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian 10' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: '10.0',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: '10.0' },
+        },
       }
     end
 
@@ -29,9 +31,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian 10, enable => false' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: '10',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: '10' },
+        },
       }
     end
     let(:params) { { enable: 'false' } }
@@ -46,9 +50,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian 10, ensure => stopped' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: '10.0',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: '10.0' },
+        },
       }
     end
     let(:params) { { ensure: 'stopped' } }
@@ -63,9 +69,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian 11' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: '11.0',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: '11.0' },
+        },
       }
     end
 
@@ -86,9 +94,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian 11, enable => false' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: '11',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: '11' },
+        },
       }
     end
     let(:params) { { enable: 'false' } }
@@ -103,9 +113,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian 11, ensure => stopped' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: '10.0',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: '10.0' },
+        },
       }
     end
     let(:params) { { ensure: 'stopped' } }
@@ -120,9 +132,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian unstable' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: 'unstable',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: 'unstable' },
+        },
       }
     end
 
@@ -143,9 +157,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian unstable, enable => false' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: 'unstable',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: 'unstable' },
+        },
       }
     end
     let(:params) { { enable: 'false' } }
@@ -160,9 +176,11 @@ describe 'firewall::linux::debian', type: :class do
   context 'with Debian unstable, ensure => stopped' do
     let(:facts) do
       {
-        osfamily: 'Debian',
-        operatingsystem: 'Debian',
-        operatingsystemrelease: '10.0',
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { full: '10.0' },
+        },
       }
     end
     let(:params) { { ensure: 'stopped' } }

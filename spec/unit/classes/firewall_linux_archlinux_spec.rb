@@ -5,8 +5,10 @@ require 'spec_helper'
 describe 'firewall::linux::archlinux', type: :class do
   let(:facts) do
     {
-      osfamily: 'Archlinux',
-      operatingsystem: 'Archlinux',
+      os: {
+        family: 'ArchLinux',
+        name: 'ArchLinux',
+      },
     }
   end
 

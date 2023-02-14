@@ -4,9 +4,9 @@
 #
 class firewall::params {
   $package_ensure = 'present'
-  case $::osfamily {
+  case $facts['os']['family'] {
     'RedHat': {
-      case $::operatingsystem {
+      case $facts['os']['name'] {
         'Amazon': {
           $service_name = 'iptables'
           $service_name_v6 = 'ip6tables'
@@ -18,7 +18,7 @@ class firewall::params {
         'Fedora': {
           $service_name = 'iptables'
           $service_name_v6 = 'ip6tables'
-          if versioncmp($::operatingsystemrelease, '34') >= 0 {
+          if versioncmp($facts['os']['release']['full'], '34') >= 0 {
             $package_name = 'iptables-services'
             $iptables_name = 'iptables-compat'
           } else {
@@ -29,21 +29,21 @@ class firewall::params {
           $firewalld_manage = true
         }
         default: {
-          if versioncmp($::operatingsystemrelease, '9') >= 0 {
+          if versioncmp($facts['os']['release']['full'], '9') >= 0 {
             $service_name = ['nftables','iptables']
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables', 'iptables-nft-services']
             $iptables_name = 'iptables-nft'
             $sysconfig_manage = false
             $firewalld_manage = false
-          } elsif versioncmp($::operatingsystemrelease, '8.0') >= 0 {
+          } elsif versioncmp($facts['os']['release']['full'], '8.0') >= 0 {
             $service_name = ['iptables', 'nftables']
             $service_name_v6 = 'ip6tables'
             $package_name = ['iptables-services', 'nftables']
             $iptables_name = 'iptables'
             $sysconfig_manage = false
             $firewalld_manage = true
-          } elsif versioncmp($::operatingsystemrelease, '7.0') >= 0 {
+          } elsif versioncmp($facts['os']['release']['full'], '7.0') >= 0 {
             $service_name = 'iptables'
             $service_name_v6 = 'ip6tables'
             $package_name = 'iptables-services'
@@ -64,12 +64,12 @@ class firewall::params {
     'Debian': {
       $service_name_v6 = undef
       $iptables_name = 'iptables'
-      case $::operatingsystem {
+      case $facts['os']['name'] {
         'Debian': {
-          if versioncmp($::operatingsystemrelease, 'unstable') >= 0 {
+          if versioncmp($facts['os']['release']['full'], 'unstable') >= 0 {
             $service_name = 'netfilter-persistent'
             $package_name = 'netfilter-persistent'
-          } elsif versioncmp($::operatingsystemrelease, '8.0') >= 0 {
+          } elsif versioncmp($facts['os']['release']['full'], '8.0') >= 0 {
             $service_name = 'netfilter-persistent'
             $package_name = 'iptables-persistent'
           } else {
@@ -78,7 +78,7 @@ class firewall::params {
           }
         }
         'Ubuntu': {
-          if versioncmp($::operatingsystemrelease, '14.10') >= 0 {
+          if versioncmp($facts['os']['release']['full'], '14.10') >= 0 {
             $service_name = 'netfilter-persistent'
             $package_name = 'iptables-persistent'
           } else {
@@ -100,7 +100,7 @@ class firewall::params {
     default: {
       $iptables_name = 'iptables'
       $service_name_v6 = undef
-      case $::operatingsystem {
+      case $facts['os']['name'] {
         'Archlinux': {
           $service_name = ['iptables','ip6tables']
           $package_name = undef

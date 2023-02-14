@@ -56,7 +56,7 @@ class firewall::linux (
     }
   }
 
-  case $::operatingsystem {
+  case $facts['os']['name'] {
     'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos',
     'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer',
     'VirtuozzoLinux', 'Rocky', 'AlmaLinux': {
