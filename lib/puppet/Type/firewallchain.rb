@@ -25,17 +25,21 @@ Puppet::ResourceApi.register_type(
   attributes: {
     ensure: {
       type:    'Enum[present, absent]',
-      desc:    'Whether this chain should be present or absent on the target system.',
       default: 'present',
+      desc:    <<-EOS
+      Whether this chain should be present or absent on the target system.
+      Setting this to absent will first remove all rules associated with this chain and then delete the chain itself.
+      Inbuilt chains however will merely remove any added rules and, if it has been changed, return their policy to the default.
+      EOS
     },
     name: {
-      type:      'Pattern[/^(.+):(nat|mangle|filter|raw|rawpost|broute|security):(IP(v[46])?|ethernet)$/]',
+      type:      'Pattern[/(^(.+):(nat|mangle|filter|raw|rawpost|broute|security):(IP(v[46])?|ethernet))|INPUT|OUTPUT|FORWARD$/]',
       desc:      'The canonical name of the chain. The format for this must be {chain}:{table}:{protocol}.',
       behaviour: :namevar,
     },
     policy: {
-      type:      "Optional[Enum['accept', 'drop', 'queue', 'return']]",
-      desc:      <<-EOS,
+      type: "Optional[Enum['accept', 'drop', 'queue', 'return']]",
+      desc: <<-EOS,
       This action to take when the end of the chain is reached.
       It can only be set on inbuilt chains (INPUT, FORWARD, OUTPUT,
       PREROUTING, POSTROUTING) and can be one of:
@@ -49,9 +53,14 @@ Puppet::ResourceApi.register_type(
       Will default to `accept` when an `ethernet` protocol is given.
       EOS
     },
+    purge: {
+      type:     'Boolean',
+      default:  false,
+      desc:     'Whether or not to purge unmanaged rules in this chain'
+    },
     ignore: {
-      type:      'Optional[Variant[String[1], Array[String[1]]]',
-      desc:      <<-EOS
+      type: 'Optional[Variant[String[1], Array[String[1]]]]',
+      desc: <<-EOS
       Regex to perform on firewall rules to exempt unmanaged rules from purging.
       This is matched against the output of `iptables-save`.
 
@@ -75,12 +84,12 @@ Puppet::ResourceApi.register_type(
       EOS
     },
     ignore_foreign: {
-      type:      'Bolean',
-      desc:      <<-EOS
+      type:     'Boolean',
+      default:  false,
+      desc:     <<-EOS
       Ignore rules that do not match the puppet title pattern "^\d+[[:graph:][:space:]]" when purging unmanaged firewall rules in this chain.
       This can be used to ignore rules that were not put in by puppet. Beware that nothing keeps other systems from configuring firewall rules with a comment that starts with digits, and is indistinguishable from puppet-configured rules.
       EOS
-      default: false,
     },
   },
 )

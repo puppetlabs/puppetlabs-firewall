@@ -49,7 +49,7 @@ Puppet::Type.newtype(:firewallchain) do
     PUPPETCODE
     isnamevar
 
-    validate do |value|
+    validate do |value| ## CONT-377 Move validation to provider
       if value !~ NAME_FORMAT
         raise ArgumentError, 'Inbuilt chains must be in the form {chain}:{table}:{protocol} where {table} is one of filter,' \
             ' nat, mangle, raw, rawpost, broute, security or empty (alias for filter), chain can be anything without colons' \
