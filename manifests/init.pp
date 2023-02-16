@@ -16,7 +16,7 @@
 #   Controls the state of the ipv6 iptables service on your system. Valid options: 'running' or 'stopped'.
 #
 # @param pkg_ensure
-#   Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'.
+#   Controls the state of the iptables package on your system. Valid options: 'present', 'installed' or 'latest'.
 #
 # @param service_name
 #   Specify the name of the IPv4 iptables service.
@@ -31,13 +31,13 @@
 #   Controls whether puppet manages the ebtables package or not. If managed, the package will use the value of pkg_ensure.
 #
 class firewall (
-  Enum[running, stopped, 'running', 'stopped']           $ensure          = running,
-  Optional[Enum[running, stopped, 'running', 'stopped']] $ensure_v6       = undef,
-  Enum[present, latest, 'present', 'latest']             $pkg_ensure      = present,
-  Variant[String[1], Array[String[1]]]                   $service_name    = $firewall::params::service_name,
-  Optional[String[1]]                                    $service_name_v6 = $firewall::params::service_name_v6,
-  Optional[Variant[String[1], Array[String[1]]]]         $package_name    = $firewall::params::package_name,
-  Boolean                                                $ebtables_manage = false,
+  Enum[running, stopped, 'running', 'stopped']                       $ensure          = running,
+  Optional[Enum[running, stopped, 'running', 'stopped']]             $ensure_v6       = undef,
+  Enum[present, installed, latest, 'present', 'installed', 'latest'] $pkg_ensure      = present,
+  Variant[String[1], Array[String[1]]]                               $service_name    = $firewall::params::service_name,
+  Optional[String[1]]                                                $service_name_v6 = $firewall::params::service_name_v6,
+  Optional[Variant[String[1], Array[String[1]]]]                     $package_name    = $firewall::params::package_name,
+  Boolean                                                            $ebtables_manage = false,
 ) inherits firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
 

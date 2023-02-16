@@ -20,7 +20,7 @@
 #
 class firewall::linux::archlinux (
   Enum[running, stopped, 'running', 'stopped']   $ensure         = 'running',
-  Boolean                                        $enable         = true,
+  Variant[Boolean, String[1]]                    $enable         = true,
   Variant[String[1], Array[String[1]]]           $service_name   = $firewall::params::service_name,
   Optional[Variant[String[1], Array[String[1]]]] $package_name   = $firewall::params::package_name,
   Enum[present, latest, 'present', 'latest']     $package_ensure = $firewall::params::package_ensure,
