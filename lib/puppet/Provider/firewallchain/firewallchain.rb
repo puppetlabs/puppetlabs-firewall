@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require_relative '../../../puppet_x/puppetlabs/firewall/utility'
 
 # Implementation for the firewallchain type using the Resource API.
 class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::SimpleProvider
@@ -70,6 +71,7 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
     # require 'pry'; binding.pry;
     context.notice("Creating '#{name}' with #{should.inspect}")
     Puppet::Provider.execute([$create_command, name].join(' '))
+    PuppetX::Firewall::Utility.persist_iptables(context, name, 'IPv4')
     # TODO: Add code to handle Purge/Ignore/Ignore_Foreign
   end
 
@@ -80,6 +82,7 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
       context.notice("Updating '#{name}' with #{should.inspect}")
       Puppet::Provider.execute([$policy_command, name, should[:policy]].join(' '))
     end
+    PuppetX::Firewall::Utility.persist_iptables(context, name, 'IPv4')
     # TODO: Add code to handle Purge/Ignore/Ignore_Foreign
   end
 
@@ -98,6 +101,7 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
       context.notice("Deleting Chain '#{name}'")
       Puppet::Provider.execute([$delete_command, name].join(' '))
     end
+    PuppetX::Firewall::Utility.persist_iptables(context, name, 'IPv4')
     # TODO: Add code to handle Purge/Ignore/Ignore_Foreign
   end
 
