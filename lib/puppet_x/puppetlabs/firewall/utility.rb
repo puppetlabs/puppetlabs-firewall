@@ -2,10 +2,10 @@ require 'puppet_x'
 
 module PuppetX::Firewall
   class Utility
-    def self.persist_iptables(context, name, protocol)
-      os_key = Facter.value(:osfamily)
-    #   require 'pry'; binding.pry;
 
+    # Save any current iptables changes so they are retained upon restart
+    def self.persist_iptables(context, name, protocol)
+      os_key = Facter.value('os')['family']
       cmd = case os_key
             when 'RedHat'
               case protocol
@@ -53,6 +53,17 @@ module PuppetX::Firewall
       rescue Puppet::ExecutionFailure => detail
         warning("Unable to persist firewall rules: #{detail}")
       end
+    end
+
+    # @api private
+    def self.create_absent(namevar, title)
+      result = if title.is_a? Hash
+                  title.dup
+                else
+                  { namevar => title }
+                end
+      result[:ensure] = 'absent'
+      result
     end
   end
 end

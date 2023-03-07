@@ -5,9 +5,9 @@ require_relative '../../../puppet_x/puppetlabs/firewall/utility'
 class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::SimpleProvider
 
   # Command to list all chains and rules
-  $list_command = 'iptables -L'
+  $list_command = 'iptables-save'
   # Regex used to retrieve Chains
-  $chain_regex = %r{Chain\s(INPUT|FORWARD|OUTPUT|(?:\S+))(?:\s\(policy\s(ACCEPT|DROP|QEUE|RETURN)\))?}
+  $chain_regex = %r{\n:(INPUT|FORWARD|OUTPUT|(?:\S+))(?:\s(ACCEPT|DROP|QEUE|RETURN|PREROUTING|POSTROUTING))?}
   # Command to create a chain
   $create_command = 'iptables -N'
   # Command to flush all rules from a chain, must be used before deleting
@@ -20,16 +20,14 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
   def set(context, changes)
     # require 'pry'; binding.pry;
     changes.each do |name, change|
-      # require 'pry'; binding.pry;
       is = change[:is]
       should = change[:should]
 
-      is = Puppet::Provider::Firewallchain::Firewallchain.create_absent(:name, name) if is.nil?
-      should = Puppet::Provider::Firewallchain::Firewallchain.create_absent(:name, name) if should.nil?
+      is = PuppetX::Firewall::Utility.create_absent(:name, name) if is.nil?
+      should = PuppetX::Firewall::Utility.create_absent(:name, name) if should.nil?
 
       # Run static verification against both sets of values
       Puppet::Provider::Firewallchain::Firewallchain.verify(is, should)
-      # require 'pry'; binding.pry;
 
       if is[:ensure].to_s == 'absent' && should[:ensure].to_s == 'present'
         context.creating(name) do
@@ -49,7 +47,7 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
 
   # Raw data is retrieved via `iptables -L` and then regexed to retrieve the different Chains and whether they have a set Policy
   def get(context)
-    # Retriece String containing all information
+    # Retrieve String containing all information
     iptables_list = Puppet::Provider.execute($list_command)
     # Create empty return array
     chains = []
@@ -68,7 +66,6 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
   end
 
   def create(context, name, should)
-    # require 'pry'; binding.pry;
     context.notice("Creating '#{name}' with #{should.inspect}")
     Puppet::Provider.execute([$create_command, name].join(' '))
     PuppetX::Firewall::Utility.persist_iptables(context, name, 'IPv4')
@@ -76,7 +73,6 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
   end
 
   def update(context, name, should)
-    # require 'pry'; binding.pry;
     # If an Inbuilt Chain, a policy is set in should and it differs from the current policy
     if ['INPUT', 'FORWARD', 'OUTPUT'].include?(should[:name]) && should.key?(:policy) && should[:policy] != is[:policy]
       context.notice("Updating '#{name}' with #{should.inspect}")
@@ -87,8 +83,6 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
   end
 
   def delete(context, name)
-    # require 'pry'; binding.pry;
-
     # Before we can delete a chain we must first flush it of any active rules
     context.notice("Flushing Chain '#{name}'")
     Puppet::Provider.execute([$flush_command, name].join(' '))
@@ -105,22 +99,10 @@ class Puppet::Provider::Firewallchain::Firewallchain #< Puppet::ResourceApi::Sim
     # TODO: Add code to handle Purge/Ignore/Ignore_Foreign
   end
 
-  # @api private
-  def self.create_absent(namevar, title)
-    result = if title.is_a? Hash
-                title.dup
-              else
-                { namevar => title }
-              end
-    result[:ensure] = 'absent'
-    result
-  end
-
   # Verify that the information is correct
   # @api.private
   def self.verify(is, should)
     # Verify that Policy is only passed for the inbuilt chains
-    # require 'pry'; binding.pry;
     if !['INPUT', 'FORWARD', 'OUTPUT'].include?(should[:name]) && should.key?(:policy)
       fail "`policy` can only be set on Internal Chains. Setting for `#{should[:name]}` is invalid"
     end

@@ -33,7 +33,7 @@ Puppet::ResourceApi.register_type(
       EOS
     },
     name: {
-      type:      'Pattern[/(^(.+):(nat|mangle|filter|raw|rawpost|broute|security):(IP(v[46])?|ethernet))|INPUT|OUTPUT|FORWARD$/]',
+      type:      'Pattern[/(^(.+):(nat|mangle|filter|raw|rawpost|broute|security):(IP(v[46])?|ethernet))|INPUT|OUTPUT|FORWARD|PREROUTING|POSTROUTING$/]',
       desc:      'The canonical name of the chain. The format for this must be {chain}:{table}:{protocol}.',
       behaviour: :namevar,
     },
