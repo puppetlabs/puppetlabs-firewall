@@ -33,9 +33,11 @@ def with_debian_facts
   let :facts do
     {
       kernel: 'Linux',
-      operatingsystem: 'Debian',
-      operatingsystemrelease: '8.0',
-      osfamily: 'Debian',
+      os: {
+        name: 'Debian',
+        release: { full: '8.0' },
+        family: 'Debian',
+      },
     }
   end
 end

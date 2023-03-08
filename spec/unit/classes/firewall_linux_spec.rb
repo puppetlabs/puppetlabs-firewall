@@ -11,10 +11,12 @@ describe 'firewall::linux', type: :class do
           let(:facts) do
             {
               kernel: 'Linux',
-              operatingsystem: os,
-              operatingsystemrelease: osrel,
-              osfamily: 'RedHat',
-              selinux: false,
+              os: {
+                name: os,
+                release: { full: osrel },
+                family: 'RedHat',
+                selinux: { enabled: false },
+              },
               puppetversion: Puppet.version,
             }
           end
@@ -33,10 +35,12 @@ describe 'firewall::linux', type: :class do
         let(:facts) do
           {
             kernel: 'Linux',
-            operatingsystem: os,
-            operatingsystemrelease: osrel,
-            osfamily: 'Debian',
-            selinux: false,
+            os: {
+              name: os,
+              release: { full: osrel },
+              family: 'Debian',
+              selinux: { enabled: false },
+            },
             puppetversion: Puppet.version,
           }
         end

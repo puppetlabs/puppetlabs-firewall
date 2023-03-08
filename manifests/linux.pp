@@ -7,7 +7,7 @@
 #   Controls the state of the ipv6 iptables service on your system. Valid options: 'running' or 'stopped'. Defaults to 'running'.
 #
 # @param pkg_ensure
-#   Controls the state of the iptables package on your system. Valid options: 'installed' or 'latest'. Defaults to 'latest'.
+#   Controls the state of the iptables package on your system. Valid options: 'present', 'installed' or 'latest'. Defaults to 'latest'.
 #
 # @param service_name
 #   Specify the name of the IPv4 iptables service. Defaults defined in firewall::params.
@@ -24,15 +24,15 @@
 # @api private
 #
 class firewall::linux (
-  $ensure          = running,
-  $ensure_v6       = undef,
-  $pkg_ensure      = installed,
-  $service_name    = $firewall::params::service_name,
-  $service_name_v6 = $firewall::params::service_name_v6,
-  $package_name    = $firewall::params::package_name,
-  $ebtables_manage = false,
-  $iptables_name   = $firewall::params::iptables_name,
-) inherits ::firewall::params {
+  Enum[running, stopped, 'running', 'stopped']                       $ensure          = running,
+  Optional[Enum[running, stopped, 'running', 'stopped']]             $ensure_v6       = undef,
+  Enum[present, installed, latest, 'present', 'installed', 'latest'] $pkg_ensure      = installed,
+  Variant[String[1], Array[String[1]]]                               $service_name    = $firewall::params::service_name,
+  Optional[String[1]]                                                $service_name_v6 = $firewall::params::service_name_v6,
+  Optional[Variant[String[1], Array[String[1]]]]                     $package_name    = $firewall::params::package_name,
+  Boolean                                                            $ebtables_manage = false,
+  String[1]                                                          $iptables_name   = $firewall::params::iptables_name,
+) inherits firewall::params {
   $enable = $ensure ? {
     'running' => true,
     'stopped' => false,
@@ -56,7 +56,7 @@ class firewall::linux (
     }
   }
 
-  case $::operatingsystem {
+  case $facts['os']['name'] {
     'RedHat', 'CentOS', 'Fedora', 'Scientific', 'SL', 'SLC', 'Ascendos',
     'CloudLinux', 'PSBM', 'OracleLinux', 'OVS', 'OEL', 'Amazon', 'XenServer',
     'VirtuozzoLinux', 'Rocky', 'AlmaLinux': {

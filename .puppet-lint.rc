@@ -1,5 +1,1 @@
 --relative
---no-relative_classname_inclusion-check
---no-parameter_types-check
---no-top_scope_facts-check
---no-legacy_facts-check

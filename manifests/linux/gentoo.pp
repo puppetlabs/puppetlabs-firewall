@@ -19,12 +19,12 @@
 # @api private
 #
 class firewall::linux::gentoo (
-  $ensure         = 'running',
-  $enable         = true,
-  $service_name   = $firewall::params::service_name,
-  $package_name   = $firewall::params::package_name,
-  $package_ensure = $firewall::params::package_ensure,
-) inherits ::firewall::params {
+  Enum[running, stopped, 'running', 'stopped']   $ensure         = running,
+  Variant[Boolean, String[1]]                    $enable         = true,
+  Variant[String[1], Array[String[1]]]           $service_name   = $firewall::params::service_name,
+  Optional[Variant[String[1], Array[String[1]]]] $package_name   = $firewall::params::package_name,
+  Enum[present, latest, 'present', 'latest']     $package_ensure = $firewall::params::package_ensure,
+) inherits firewall::params {
   if $package_name {
     package { $package_name:
       ensure => $package_ensure,
