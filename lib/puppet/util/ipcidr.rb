@@ -2,13 +2,13 @@
 
 require 'ipaddr'
 
-module Puppet::Util
+module Puppet::Util # rubocop:disable Style/ClassAndModuleChildren
   # IPCidr object wrapper for IPAddr
   class IPCidr < IPAddr
     def initialize(ipaddr, family = Socket::AF_UNSPEC)
       super(ipaddr, family)
     rescue ArgumentError => e
-      raise ArgumentError, "Invalid address from IPAddr.new: #{ipaddr}" if %r{invalid address}.match?(e.message)
+      raise ArgumentError, "Invalid address from IPAddr.new: #{ipaddr}" if e.message.include?('invalid address')
       raise e
     end
 

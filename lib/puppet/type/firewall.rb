@@ -2438,7 +2438,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'DNAT'
-      unless %r{nat}.match?(value(:table).to_s)
+      unless value(:table).to_s.include?('nat')
         raise 'Parameter jump => DNAT only applies to table => nat'
       end
 
@@ -2448,7 +2448,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'SNAT'
-      unless %r{nat}.match?(value(:table).to_s)
+      unless value(:table).to_s.include?('nat')
         raise 'Parameter jump => SNAT only applies to table => nat'
       end
 
@@ -2458,7 +2458,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'MASQUERADE'
-      unless %r{nat}.match?(value(:table).to_s)
+      unless value(:table).to_s.include?('nat')
         raise 'Parameter jump => MASQUERADE only applies to table => nat'
       end
     end
@@ -2541,7 +2541,7 @@ Puppet::Type.newtype(:firewall) do
     end
 
     if value(:jump).to_s == 'CT'
-      unless %r{raw}.match?(value(:table).to_s)
+      unless value(:table).to_s.include?('raw')
         raise 'Parameter jump => CT only applies to table => raw'
       end
     end

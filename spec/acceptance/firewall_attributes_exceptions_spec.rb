@@ -561,6 +561,7 @@ describe 'firewall basics', docker: true do
             purge => true,
           }
       PUPPETCODE
+      # rubocop:disable RSpec/ExampleLength
       it 'purges only the specified chain' do
         apply_manifest(pp2, expect_changes: true)
 

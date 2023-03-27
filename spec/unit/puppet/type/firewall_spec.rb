@@ -831,6 +831,8 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
   end
 
   describe 'autorequire packages' do
+    # rubocop:disable RSpec/ExampleLength
+    # rubocop:disable RSpec/MultipleExpectations
     [:iptables, :ip6tables].each do |provider|
       it "provider #{provider} should autorequire package iptables" do
         resource[:provider] = provider
@@ -872,6 +874,8 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 end
 
 describe 'firewall on unsupported platforms' do
+  let(:resource) { firewall.new(name: '000 test foo', ensure: :present) }
+
   it 'is not suitable' do
     # Stub iptables version
     allow(Facter.fact(:iptables_version)).to receive(:value).and_return(nil)
@@ -880,7 +884,6 @@ describe 'firewall on unsupported platforms' do
     # Stub confine facts
     allow(Facter.fact(:kernel)).to receive(:value).and_return('Darwin')
     allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Darwin')
-    resource = firewall.new(name: '000 test foo', ensure: :present)
 
     # If our provider list is nil, then the Puppet::Transaction#evaluate will
     # say 'Error: Could not find a suitable provider for firewall' but there

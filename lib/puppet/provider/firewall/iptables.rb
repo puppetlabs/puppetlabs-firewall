@@ -495,7 +495,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       values.insert(ind, "-m set --match-set \"#{sets.join(';')}\" ")
     end
     # --comment can have multiple values, the same as --match-set
-    if %r{-m comment --comment}.match?(values)
+    if values.include?('-m comment --comment')
       ind = values.index('-m comment --comment')
       comments = values.scan(%r{-m comment --comment "((?:\\"|[^"])*)"})
       comments += values.scan(%r{-m comment --comment ([^"\s]+)\b})
@@ -614,7 +614,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     end
 
     # manually remove comments if they made it this far
-    if %r{-m comment --comment}.match?(values)
+    if values.match?('-m comment --comment')
       values = values.sub(%r{-m comment --comment "((?:\\"|[^"])*)"}, {})
     end
 
