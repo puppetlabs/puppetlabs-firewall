@@ -2,7 +2,21 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## [v4.0.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v4.0.1) (2022-12-06)
+## [v4.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v4.1.0) (2023-03-31)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v4.0.1...v4.1.0)
+
+### Added
+
+- \(CONT-352\) Syntax update [\#1110](https://github.com/puppetlabs/puppetlabs-firewall/pull/1110) ([LukasAud](https://github.com/LukasAud))
+
+### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
+
+- Ignore OpenBSD, similarly to FreeBSD [\#1107](https://github.com/puppetlabs/puppetlabs-firewall/pull/1107) ([buzzdeee](https://github.com/buzzdeee))
+- redhat9 needs iptables service [\#1103](https://github.com/puppetlabs/puppetlabs-firewall/pull/1103) ([robertc99](https://github.com/robertc99))
+- debian: service: fix `ensure` parameter usage [\#1095](https://github.com/puppetlabs/puppetlabs-firewall/pull/1095) ([damonbreeden](https://github.com/damonbreeden))
+
+## [v4.0.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v4.0.1) (2022-12-07)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v4.0.0...v4.0.1)
 
