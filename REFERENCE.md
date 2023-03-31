@@ -57,7 +57,7 @@ The following parameters are available in the `firewall` class:
 
 ##### <a name="-firewall--ensure"></a>`ensure`
 
-Data type: `Any`
+Data type: `Enum[running, stopped, 'running', 'stopped']`
 
 Controls the state of the ipv4 iptables service on your system. Valid options: 'running' or 'stopped'.
 
@@ -65,7 +65,7 @@ Default value: `running`
 
 ##### <a name="-firewall--ensure_v6"></a>`ensure_v6`
 
-Data type: `Any`
+Data type: `Optional[Enum[running, stopped, 'running', 'stopped']]`
 
 Controls the state of the ipv6 iptables service on your system. Valid options: 'running' or 'stopped'.
 
@@ -73,15 +73,15 @@ Default value: `undef`
 
 ##### <a name="-firewall--pkg_ensure"></a>`pkg_ensure`
 
-Data type: `Any`
+Data type: `Enum[present, installed, latest, 'present', 'installed', 'latest']`
 
-Controls the state of the iptables package on your system. Valid options: 'present' or 'latest'.
+Controls the state of the iptables package on your system. Valid options: 'present', 'installed' or 'latest'.
 
 Default value: `present`
 
 ##### <a name="-firewall--service_name"></a>`service_name`
 
-Data type: `Any`
+Data type: `Variant[String[1], Array[String[1]]]`
 
 Specify the name of the IPv4 iptables service.
 
@@ -89,7 +89,7 @@ Default value: `$firewall::params::service_name`
 
 ##### <a name="-firewall--service_name_v6"></a>`service_name_v6`
 
-Data type: `Any`
+Data type: `Optional[String[1]]`
 
 Specify the name of the IPv6 iptables service.
 
@@ -97,7 +97,7 @@ Default value: `$firewall::params::service_name_v6`
 
 ##### <a name="-firewall--package_name"></a>`package_name`
 
-Data type: `Any`
+Data type: `Optional[Variant[String[1], Array[String[1]]]]`
 
 Specify the platform-specific package(s) to install.
 
@@ -105,7 +105,7 @@ Default value: `$firewall::params::package_name`
 
 ##### <a name="-firewall--ebtables_manage"></a>`ebtables_manage`
 
-Data type: `Any`
+Data type: `Boolean`
 
 Controls whether puppet manages the ebtables package or not. If managed, the package will use the value of pkg_ensure.
 
