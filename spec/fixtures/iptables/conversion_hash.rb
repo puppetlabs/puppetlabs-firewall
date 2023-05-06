@@ -794,6 +794,27 @@ ARGS_TO_HASH = {
       notrack: true
     }
   },
+  'parses_synproxy_rule' => {
+    line: '-A INPUT -p tcp -m tcp --dport 80 -m comment --comment "001 parses rule with synproxy target" -j SYNPROXY --sack-perm --timestamp --wscale 9 --mss 1460 --ecn',
+    table: 'filter',
+    compare_all: true,
+    params: {
+      chain: 'INPUT',
+      dport: ['80'],
+      ensure: :present,
+      jump: 'SYNPROXY',
+      line: '-A INPUT -p tcp -m tcp --dport 80 -m comment --comment "001 parses rule with synproxy target" -j SYNPROXY --sack-perm --timestamp --wscale 9 --mss 1460 --ecn',
+      name: '001 parses rule with synproxy target',
+      proto: 'tcp',
+      provider: 'iptables',
+      synproxy_ecn: true,
+      synproxy_mss: '1460',
+      synproxy_sack_perm: true,
+      synproxy_timestamp: true,
+      synproxy_wscale: '9',
+      table: 'filter',
+    },
+  },
 }.freeze
 
 # This hash is for testing converting a hash to an argument line.
