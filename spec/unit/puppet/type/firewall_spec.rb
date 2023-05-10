@@ -101,7 +101,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       expect(res.parameters[:jump]).to be nil
     end
 
-    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'NFLOG', 'MASQUERADE', 'REDIRECT', 'MARK'].each do |jump|
+    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'NFLOG', 'MASQUERADE', 'REDIRECT', 'MARK', 'SYNPROXY'].each do |jump|
       it "accepts jump value #{jump}" do
         resource[:jump] = jump
         expect(resource[:jump]).to eql jump
@@ -535,6 +535,64 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     it 'accepts value as a string - ORIGINAL' do
       resource[:ctdir] = :ORIGINAL
       expect(resource[:ctdir]).to be :ORIGINAL
+    end
+  end
+
+  describe 'individual SYNPROXY options' do
+    describe ':synproxy_mss' do
+      ['1', 1, '65535', 65_535].each do |v|
+        it 'resolves correctly when given valid values' do
+          resource[:synproxy_mss] = v
+          expect(resource[:synproxy_mss]).to eq v.to_s
+        end
+      end
+
+      ['0', 0, '65536', 65_536].each do |v|
+        it 'produces the expected error when given invalid values' do
+          expect { resource[:synproxy_mss] = v }.to raise_error(Puppet::Error, %r{Segment size must fit within an unsigned 16-bit integer})
+        end
+      end
+    end
+
+    describe ':synproxy_wscale' do
+      ['1', 1, '14', 14].each do |v|
+        it 'resolves correctly when given valid values' do
+          resource[:synproxy_wscale] = v
+          expect(resource[:synproxy_wscale]).to eq v.to_s
+        end
+      end
+
+      ['0', 0, '15', 15].each do |v|
+        it 'produces the expected error when given invalid values' do
+          expect { resource[:synproxy_wscale] = v }.to raise_error(Puppet::Error, %r{Window scale exponent must be between 1 and 14})
+        end
+      end
+    end
+  end
+
+  describe 'SYNPROXY option combinatorics' do
+    it 'does not allow any SYNPROXY-related options to be set if :jump is not SYNPROXY' do
+      {
+        synproxy_ecn: true,
+        synproxy_mss: 1024,
+        synproxy_sack_perm: true,
+        synproxy_timestamp: true,
+        synproxy_wscale: 10,
+      }.each do |syn_param, syn_value|
+        expect {
+          firewall_class.new(:name => '001-test', :jump => 'custom_chain', syn_param => syn_value)
+        }.to raise_error(RuntimeError, %r{Options for SYNPROXY jump target are only valid when the SYNPROXY target is used})
+      end
+    end
+    it 'does not allow either synproxy_sack_perm or synproxy_wscale to be set if synproxy_timestamp is omitted' do
+      {
+        synproxy_sack_perm: true,
+        synproxy_wscale: 10,
+      }.each do |syn_param, syn_value|
+        expect {
+          firewall_class.new(:name => '001-test', :jump => 'SYNPROXY', syn_param => syn_value)
+        }.to raise_error(RuntimeError, %r{SYNPROXY.*Selective Acknowledgements or TCP Window Scaliing.*enable timestamps})
+      end
     end
   end
 
