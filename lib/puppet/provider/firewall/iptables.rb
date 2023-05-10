@@ -34,6 +34,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   has_feature :nflog_prefix
   has_feature :nflog_range
   has_feature :nflog_threshold
+  has_feature :tcp_option
   has_feature :tcp_flags
   has_feature :pkttype
   has_feature :isfragment
@@ -174,7 +175,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     string_to: '--to',
     table: '-t',
     tcp_option: '--tcp-option',
-    tcp_flags: ['-m tcp --tcp-flags', '--tcp-flags'],
+    tcp_flags: '--tcp-flags',
     todest: '--to-destination',
     toports: '--to-ports',
     tosource: '--to-source',
@@ -297,7 +298,13 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
   def munge_resource_map_from_resource(resource_map_original, compare)
     resource_map_new = resource_map_original.clone
-    module_to_argument_mapping = self.class.instance_variable_get('@module_to_argument_mapping')
+    # We ignore the 'tcp' match module on rule parse, but it needs to be included to generate
+    # arguments, since both '--tcp-option' and '--tcp-flags' should be prefixed with the match
+    # module spec.  '--dport' and '--sport' are ignored because we only produce multiport-style
+    # portspecs, which do not require '-m tcp', and for which iptables-save does not include
+    # '-m tcp' in its output.
+    tcp_module_arguments = { tcp: [:tcp_option, :tcp_flags] }
+    module_to_argument_mapping = self.class.instance_variable_get('@module_to_argument_mapping').merge(tcp_module_arguments)
 
     module_to_argument_mapping.each do |ipt_module, arg_array|
       arg_array.each do |argument|
@@ -349,7 +356,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :table, :source, :destination, :iniface, :outiface,
     :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
     :proto, :isfragment, :stat_mode, :stat_every, :stat_packet, :stat_probability,
-    :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
+    :src_range, :dst_range, :tcp_option, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
     :src_type, :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy,
     :state, :ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
     :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
@@ -524,8 +531,12 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     values = values.gsub(%r{(?<=\s)(-\S+) (!)\s?(\S*)}, '\1 "\2 \3"')
     # fix negated physdev rules
     values = values.gsub(%r{-m physdev ! (--physdev-is-\S+)}, '-m physdev \1 "!"')
-    # The match extension for tcp & udp are optional and throws off the @resource_map.
-    values = values.gsub(%r{(?!-m tcp --tcp-flags)-m (tcp|udp) }, '')
+    # The match extensions for tcp & udp are implied by the protocol, cannot be
+    # given unless the protocol matches the extension name, are never required,
+    # and if multiport matches are used, may not even be in the iptables-save
+    # output in predictable locations.  They need to be removed to preserve
+    # parse sanity.
+    values = values.gsub(%r{-m (tcp|udp) }, '')
     # There is a bug in EL5 which puts 2 spaces before physdev, so we fix it
     values = values.gsub(%r{\s{2}--physdev}, ' --physdev')
     # '--pol ipsec' takes many optional arguments; we cheat again by adding " around them

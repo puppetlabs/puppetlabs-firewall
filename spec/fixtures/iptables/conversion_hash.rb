@@ -1071,6 +1071,48 @@ HASH_TO_ARGS = {
 
     args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '--tcp-flags', 'SYN,RST,ACK,FIN', 'SYN', '-m', 'comment', '--comment', '000 initiation'],
   },
+  'tcp_option_1' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_option: '8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '--tcp-option', '8', '-m', 'comment', '--comment', '000 initiation'],
+  },
+  'tcp_option_2' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_option: '! 8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '!', '--tcp-option', '8', '-m', 'comment', '--comment', '000 initiation'],
+  },
+  'tcp_option_with_tcp_flags_1' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_flags: 'FIN,SYN,RST,ACK SYN',
+      tcp_option: '8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '--tcp-option', '8', '--tcp-flags', 'FIN,SYN,RST,ACK', 'SYN', '-m', 'comment', '--comment', '000 initiation'],
+  },
+  'tcp_option_with_tcp_flags_2' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_flags: 'FIN,SYN,RST,ACK SYN',
+      tcp_option: '! 8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '!', '--tcp-option', '8', '--tcp-flags', 'FIN,SYN,RST,ACK', 'SYN', '-m', 'comment', '--comment', '000 initiation'],
+  },
   'states_set_from_array' => {
     params: {
       name: '100 states_set_from_array',
