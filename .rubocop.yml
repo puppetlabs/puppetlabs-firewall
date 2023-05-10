@@ -26,6 +26,10 @@ AllCops:
 Layout/LineLength:
   Description: People have wide screens, use them.
   Max: 200
+Metrics/BlockLength:
+  AllowedMethods:
+    - provide
+    - newtype
 RSpec/BeforeAfterAll:
   Description: Beware of using after(:all) as it may cause state to leak between tests.
     A necessary evil in acceptance testing.
