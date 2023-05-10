@@ -2359,7 +2359,7 @@ Puppet::Type.newtype(:firewall) do
     ['/etc/sysconfig/iptables', '/etc/sysconfig/ip6tables']
   end
 
-  validate do
+  validate do # rubocop:disable Metrics/BlockLength
     debug('[validate]')
 
     # TODO: this is put here to skip validation if ensure is not set. This

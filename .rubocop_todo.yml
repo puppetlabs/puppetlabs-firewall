@@ -114,11 +114,11 @@ Lint/RedundantSafeNavigation:
 Metrics/AbcSize:
   Max: 235
 
-# Offense count: 23
+# Offense count: 17
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns, inherit_mode.
 # AllowedMethods: refine
 Metrics/BlockLength:
-  Max: 1961
+  Max: 64
 
 # Offense count: 2
 # Configuration parameters: CountBlocks.
