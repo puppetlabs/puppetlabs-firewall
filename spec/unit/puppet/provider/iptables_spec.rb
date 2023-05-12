@@ -219,6 +219,7 @@ describe 'iptables provider' do
         # If this option is enabled, make sure the parameters exactly match
         if data[:compare_all]
           it 'the parameter hash keys should be the same as returned by rules_to_hash' do
+            expect(provider).not_to receive(:warning)
             expect(resource.keys).to match_array(data[:params].keys)
           end
         end
@@ -226,6 +227,7 @@ describe 'iptables provider' do
         # Iterate across each parameter, creating an example for comparison
         data[:params].each do |param_name, param_value|
           it "the parameter '#{param_name}' should match #{param_value.inspect}" do
+            expect(provider).not_to receive(:warning)
             # booleans get cludged to string "true"
             if param_value == true
               expect(resource[param_name]).to be_truthy
