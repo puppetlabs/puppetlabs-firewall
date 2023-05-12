@@ -29,6 +29,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :nflog_prefix
   has_feature :nflog_range
   has_feature :nflog_threshold
+  has_feature :tcp_option
   has_feature :tcp_flags
   has_feature :pkttype
   has_feature :ishasmorefrags
@@ -183,7 +184,8 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     string_from: '--from',
     string_to: '--to',
     table: '-t',
-    tcp_flags: '-m tcp --tcp-flags',
+    tcp_option: '--tcp-option',
+    tcp_flags: '--tcp-flags',
     todest: '--to-destination',
     toports: '--to-ports',
     tosource: '--to-source',
@@ -312,7 +314,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   @resource_list = [:table, :source, :destination, :iniface, :outiface, :physdev_in,
                     :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
                     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
-                    :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
+                    :tcp_option, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
                     :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy, :state,
                     :ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
                     :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,

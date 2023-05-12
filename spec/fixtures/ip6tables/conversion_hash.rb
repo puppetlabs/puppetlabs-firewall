@@ -49,7 +49,94 @@ ARGS_TO_HASH6 = {
     params: {
       random_fully: 'true',
     }
-  }
+  },
+  'tcp_flags_1' => {
+    line: '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST,ACK,FIN SYN -m comment --comment "000 initiation"',
+    compare_all: true,
+    table: 'filter',
+    chain: 'INPUT',
+    proto: 'tcp',
+    params: {
+      name: '000 initiation',
+      tcp_flags: 'SYN,RST,ACK,FIN SYN',
+      proto: 'tcp',
+      chain: 'INPUT',
+      line: '-A INPUT -p tcp -m tcp --tcp-flags SYN,RST,ACK,FIN SYN -m comment --comment "000 initiation"',
+      provider: 'ip6tables',
+      table: 'filter',
+      ensure: :present,
+    },
+  },
+  'tcp_option_1' => {
+    line: '-A INPUT -p tcp -m tcp --tcp-option 8 -m comment --comment "001 tcp_option works alone"',
+    compare_all: true,
+    table: 'filter',
+    chain: 'INPUT',
+    proto: 'tcp',
+    params: {
+      chain: 'INPUT',
+      ensure: :present,
+      line: '-A INPUT -p tcp -m tcp --tcp-option 8 -m comment --comment "001 tcp_option works alone"',
+      name: '001 tcp_option works alone',
+      proto: 'tcp',
+      provider: 'ip6tables',
+      table: 'filter',
+      tcp_option: '8',
+    },
+  },
+  'tcp_option_2' => {
+    line: '-A INPUT -p tcp -m tcp ! --tcp-option 8 -m comment --comment "002 tcp_option works alone, negated"',
+    compare_all: true,
+    table: 'filter',
+    chain: 'INPUT',
+    proto: 'tcp',
+    params: {
+      chain: 'INPUT',
+      ensure: :present,
+      line: '-A INPUT -p tcp -m tcp ! --tcp-option 8 -m comment --comment "002 tcp_option works alone, negated"',
+      name: '002 tcp_option works alone, negated',
+      proto: 'tcp',
+      provider: 'ip6tables',
+      table: 'filter',
+      tcp_option: '! 8',
+    },
+  },
+  'tcp_option_with_tcp_flags_1' => {
+    line: '-A INPUT -p tcp -m tcp --tcp-option 8 --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "000 initiation"',
+    table: 'filter',
+    compare_all: true,
+    chain: 'INPUT',
+    proto: 'tcp',
+    params: {
+      chain: 'INPUT',
+      ensure: :present,
+      line: '-A INPUT -p tcp -m tcp --tcp-option 8 --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "000 initiation"',
+      name: '000 initiation',
+      proto: 'tcp',
+      provider: 'ip6tables',
+      table: 'filter',
+      tcp_flags: 'FIN,SYN,RST,ACK SYN',
+      tcp_option: '8',
+    },
+  },
+  'tcp_option_with_tcp_flags_2' => {
+    line: '-A INPUT -p tcp -m tcp ! --tcp-option 8 --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "000 initiation"',
+    table: 'filter',
+    compare_all: true,
+    chain: 'INPUT',
+    proto: 'tcp',
+    params: {
+      chain: 'INPUT',
+      ensure: :present,
+      line: '-A INPUT -p tcp -m tcp ! --tcp-option 8 --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "000 initiation"',
+      name: '000 initiation',
+      proto: 'tcp',
+      provider: 'ip6tables',
+      table: 'filter',
+      tcp_flags: 'FIN,SYN,RST,ACK SYN',
+      tcp_option: '! 8',
+    },
+  },
 }.freeze
 
 # This hash is for testing converting a hash to an argument line.
@@ -140,5 +227,56 @@ HASH_TO_ARGS6 = {
       table: 'filter',
     },
     args: ['-t', :filter, '-p', :tcp, '-j', 'NFLOG', '--nflog-group', 1, '--nflog-prefix', 'myprefix', '-m', 'comment', '--comment', '100 nflog'],
+  },
+  'tcp_flags_1' => {
+    params: {
+      name: '000 initiation',
+      tcp_flags: 'SYN,RST,ACK,FIN SYN',
+      table: 'filter',
+    },
+
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '--tcp-flags', 'SYN,RST,ACK,FIN', 'SYN', '-m', 'comment', '--comment', '000 initiation'],
+  },
+  'tcp_option_1' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_option: '8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '--tcp-option', '8', '-m', 'comment', '--comment', '000 initiation'],
+  },
+  'tcp_option_2' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_option: '! 8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '!', '--tcp-option', '8', '-m', 'comment', '--comment', '000 initiation'],
+  },
+  'tcp_option_with_tcp_flags_1' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_flags: 'FIN,SYN,RST,ACK SYN',
+      tcp_option: '8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '--tcp-option', '8', '--tcp-flags', 'FIN,SYN,RST,ACK', 'SYN', '-m', 'comment', '--comment', '000 initiation'],
+  },
+  'tcp_option_with_tcp_flags_2' => {
+    params: {
+      name: '000 initiation',
+      table: 'filter',
+      chain: 'INPUT',
+      proto: 'tcp',
+      tcp_flags: 'FIN,SYN,RST,ACK SYN',
+      tcp_option: '! 8',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'tcp', '!', '--tcp-option', '8', '--tcp-flags', 'FIN,SYN,RST,ACK', 'SYN', '-m', 'comment', '--comment', '000 initiation'],
   },
 }.freeze
