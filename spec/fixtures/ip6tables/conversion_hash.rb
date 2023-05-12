@@ -49,7 +49,46 @@ ARGS_TO_HASH6 = {
     params: {
       random_fully: 'true',
     }
-  }
+  },
+  'parses_synproxy_rule' => {
+    line: '-A INPUT -p tcp -m tcp --dport 80 -m comment --comment "001 parses rule with synproxy target" -j SYNPROXY --sack-perm --timestamp --wscale 9 --mss 1460 --ecn',
+    compare_all: true,
+    table: 'filter',
+    params: {
+      chain: 'INPUT',
+      dport: ['80'],
+      ensure: :present,
+      jump: 'SYNPROXY',
+      line: '-A INPUT -p tcp -m tcp --dport 80 -m comment --comment "001 parses rule with synproxy target" -j SYNPROXY --sack-perm --timestamp --wscale 9 --mss 1460 --ecn',
+      name: '001 parses rule with synproxy target',
+      proto: 'tcp',
+      provider: 'ip6tables',
+      synproxy_ecn: true,
+      synproxy_mss: '1460',
+      synproxy_sack_perm: true,
+      synproxy_timestamp: true,
+      synproxy_wscale: '9',
+      table: 'filter',
+    },
+  },
+  'parses_synproxy_rule_without_booleans' => {
+    line: '-A INPUT -p tcp -m tcp --dport 80 -m comment --comment "001 parses rule with synproxy target" -j SYNPROXY --wscale 9 --mss 1460',
+    compare_all: true,
+    table: 'filter',
+    params: {
+      chain: 'INPUT',
+      dport: ['80'],
+      ensure: :present,
+      jump: 'SYNPROXY',
+      line: '-A INPUT -p tcp -m tcp --dport 80 -m comment --comment "001 parses rule with synproxy target" -j SYNPROXY --wscale 9 --mss 1460',
+      name: '001 parses rule with synproxy target',
+      proto: 'tcp',
+      provider: 'ip6tables',
+      synproxy_mss: '1460',
+      synproxy_wscale: '9',
+      table: 'filter',
+    },
+  },
 }.freeze
 
 # This hash is for testing converting a hash to an argument line.
@@ -140,5 +179,49 @@ HASH_TO_ARGS6 = {
       table: 'filter',
     },
     args: ['-t', :filter, '-p', :tcp, '-j', 'NFLOG', '--nflog-group', 1, '--nflog-prefix', 'myprefix', '-m', 'comment', '--comment', '100 nflog'],
+  },
+  'creates_synproxy_rule' => {
+    params: {
+      name: '001 creates rule with synproxy target',
+      chain: 'INPUT',
+      ensure: :present,
+      dport: ['80'],
+      jump: 'SYNPROXY',
+      synproxy_ecn: true,
+      synproxy_mss: 1460,
+      synproxy_sack_perm: true,
+      synproxy_timestamp: true,
+      synproxy_wscale: 9,
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '80', '-j', 'SYNPROXY', '--sack-perm', '--timestamp', '--wscale', '9', '--mss', '1460', '--ecn', '-m', 'comment', '--comment', '001 creates rule with synproxy target'],
+  },
+  'creates_synproxy_rule_with_stringified_integers' => {
+    params: {
+      name: '001 creates rule with synproxy target',
+      chain: 'INPUT',
+      ensure: :present,
+      dport: ['80'],
+      jump: 'SYNPROXY',
+      synproxy_ecn: true,
+      synproxy_mss: '1460',
+      synproxy_sack_perm: true,
+      synproxy_timestamp: true,
+      synproxy_wscale: '9',
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '80', '-j', 'SYNPROXY', '--sack-perm', '--timestamp', '--wscale', '9', '--mss', '1460', '--ecn', '-m', 'comment', '--comment', '001 creates rule with synproxy target'],
+  },
+  'creates_synproxy_rule_with_booleans_set_false' => {
+    params: {
+      name: '001 creates rule with synproxy target',
+      chain: 'INPUT',
+      ensure: :present,
+      dport: ['80'],
+      jump: 'SYNPROXY',
+      synproxy_ecn: false,
+      synproxy_mss: '1460',
+      synproxy_sack_perm: false,
+      synproxy_timestamp: false,
+    },
+    args: ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '80', '-j', 'SYNPROXY', '--mss', '1460', '-m', 'comment', '--comment', '001 creates rule with synproxy target'],
   },
 }.freeze

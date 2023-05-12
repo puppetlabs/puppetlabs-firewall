@@ -29,6 +29,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :nflog_prefix
   has_feature :nflog_range
   has_feature :nflog_threshold
+  has_feature :synproxy
   has_feature :tcp_flags
   has_feature :pkttype
   has_feature :ishasmorefrags
@@ -182,6 +183,11 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     string_algo: '--algo',
     string_from: '--from',
     string_to: '--to',
+    synproxy_ecn: '--ecn',
+    synproxy_mss: '--mss',
+    synproxy_sack_perm: '--sack-perm',
+    synproxy_timestamp: '--timestamp',
+    synproxy_wscale: '--wscale',
     table: '-t',
     tcp_flags: '-m tcp --tcp-flags',
     todest: '--to-destination',
@@ -242,6 +248,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :physdev_is_bridged,
     :physdev_is_in,
     :physdev_is_out,
+    :synproxy_ecn,
+    :synproxy_sack_perm,
+    :synproxy_timestamp,
     :time_contiguous,
     :kernel_timezone,
     :queue_bypass,
@@ -323,7 +332,9 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
                     :clamp_mss_to_pmtu, :gateway, :todest,
                     :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :random_fully,
                     :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
-                    :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
+                    :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
+                    :synproxy_sack_perm, :synproxy_timestamp, :synproxy_wscale, :synproxy_mss, :synproxy_ecn,
+                    :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
                     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
                     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
                     :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :helper, :rpfilter, :condition, :name, :notrack]
