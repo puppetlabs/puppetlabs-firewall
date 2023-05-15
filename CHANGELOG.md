@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file. The format 
 
 - \(CONT-352\) Syntax update [\#1110](https://github.com/puppetlabs/puppetlabs-firewall/pull/1110) ([LukasAud](https://github.com/LukasAud))
 
-### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
+### Fixed
 
 - Ignore OpenBSD, similarly to FreeBSD [\#1107](https://github.com/puppetlabs/puppetlabs-firewall/pull/1107) ([buzzdeee](https://github.com/buzzdeee))
 - redhat9 needs iptables service [\#1103](https://github.com/puppetlabs/puppetlabs-firewall/pull/1103) ([robertc99](https://github.com/robertc99))
@@ -96,6 +96,10 @@ All notable changes to this project will be documented in this file. The format 
 ## [v3.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v3.3.0) (2021-12-15)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.2.0...v3.3.0)
+
+### Changed
+
+- pdksync - \(MAINT\) Remove SLES 11 support [\#977](https://github.com/puppetlabs/puppetlabs-firewall/pull/977) ([sanfrancrisko](https://github.com/sanfrancrisko))
 
 ### Added
 
