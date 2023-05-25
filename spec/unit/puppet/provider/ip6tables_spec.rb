@@ -21,7 +21,7 @@ describe 'ip6tables' do
 
     allow(Facter.fact(:kernel)).to receive(:value).and_return('Linux')
     allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Debian')
-    allow(Facter.fact('ip6tables_version')).to receive(:value).and_return(ip6tables_version)
+    stub_const('Puppet::Type::Firewall::ProviderIp6tables::Ip6tables_version', ip6tables_version)
     allow(Puppet::Util::Execution).to receive(:execute).and_return ''
     allow(Puppet::Util).to receive(:which).with('iptables-save')
                                           .and_return '/sbin/iptables-save'
