@@ -511,8 +511,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   end
 
   def self.rule_to_hash(line, table, counter)
-    hash = {}
-    keys = []
     values = ' ' + line
 
     ####################
@@ -646,34 +644,37 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     # MAIN PARSE
     ############
 
-    # Here we iterate across our values to generate an array of keys
-    parser_list.reverse_each do |k|
-      resource_map_key = resource_map[k]
-      [resource_map_key].flatten.each do |opt|
-        if values.slice!(%r{\s#{opt}})
-          keys << k
+    # Iterate through the sorted list of resource matchers we found, and
+    # pull them out of the rule text so only their matching values remain
+    keys = parser_list.each_with_object([]) do |resource_key, found_keys|
+      [resource_map[resource_key]].flatten.each do |matcher|
+        if values.slice!(%r{\s#{matcher}})
+          found_keys << resource_key
           break
         end
       end
     end
 
-    valrev = values.scan(%r{("([^"\\]|\\.)*"|\S+)}).transpose[0].reverse
+    # Slurp up the resource values
+    found_values = values.scan(%r{("(?:[^"\\]|\\.)*"|\S+)}).flatten
 
-    if keys.length != valrev.length
-      warning "Skipping unparsable iptables rule: keys (#{keys.length}) and values (#{valrev.length}) count mismatch on line: #{line}"
+    if keys.length != found_values.length
+      warning "Skipping unparsable iptables rule: keys (#{keys.length}) and values (#{found_values.length}) count mismatch on line: #{line}"
       return
     end
 
     # Here we generate the main hash by scanning arguments off the values
     # string, handling any quoted characters present in the value, and then
     # zipping the values with the array of keys.
-    keys.zip(valrev) do |f, v|
-      hash[f] = if %r{^".*"$}.match?(v)
-                  v.sub(%r{^"(.*)"$}, '\1').gsub(%r{\\(\\|'|")}, '\1')
-                else
-                  v.dup
-                end
+    found_values = found_values.map do |value|
+      if %r{^".*"$}.match?(value)
+        value.sub(%r{^"(.*)"$}, '\1').gsub(%r{\\(\\|'|")}, '\1')
+      else
+        value
+      end
     end
+
+    hash = keys.zip(found_values).to_h
 
     #####################
     # POST PARSE CLUDGING
