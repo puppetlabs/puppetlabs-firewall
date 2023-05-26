@@ -382,6 +382,30 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :cgroup, :rpfilter, :condition, :name
   ]
 
+  # Not all arguments are globally unique across all iptables extensions.  For matchers we should
+  # only find within a specific context, a start and end marker can be supplied here.  Either a
+  # plain string or a regex will work; these are passed as an argument to String#index(), and limit
+  # the search scope.  If the resource matches on or after the first matching character in
+  # context_start, and before the first matching character in context_end, the match succeeds.
+  @resource_parse_context = {
+    synproxy_mss: {
+      context_start: '-j SYNPROXY',
+    },
+    mss: {
+      # Extra starting space because the matcher for :mss includes '-m tcpmss',
+      # and the search for it prefixes the matcher with a space
+      context_start: ' -m tcpmss',
+      context_end: %r{ -[mgj] },
+    },
+    string_to: {
+      context_start: '-m string',
+      context_end: %r{ -[mgj] },
+    },
+    to: {
+      context_start: '-j NETMAP',
+    },
+  }
+
   def insert
     debug 'Inserting rule %s' % resource[:name]
     iptables insert_args
@@ -591,17 +615,31 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     ############
     # Populate parser_list with used value, in the correct order
     ############
-    map_index = {}
-    resource_map.each_pair do |map_k, map_v|
-      [map_v].flatten.each do |v|
-        ind = values.index(%r{\s#{v}\s})
-        next unless ind
-        map_index[map_k] = ind
+    index_map = resource_map.each_with_object({}) do |(resource_name, matchers), index_mapping|
+      # Get the start and end markers.  If none are defined, use start/end of the rule.
+      context_start = @resource_parse_context.dig(resource_name, :context_start) || %r{^}
+      context_end = @resource_parse_context.dig(resource_name, :context_end) || %r{$}
+
+      # Get the offset at which to start searching
+      search_start = values.index(context_start)
+      # If a context marker was defined but wasn't in the string, then the resource can't be here, either
+      next unless search_start
+
+      # Get the offset at which to stop searching
+      # Start the search for the end marker past the end of context_start, so end markers
+      # like '-m' won't match against their own start marker (e.g., '-m tcpmss')
+      context_start = values.match(context_start).to_s if context_start.is_a? Regexp
+      # If an end marker was defined but wasn't in the string, the context may be the last jump or match
+      # target in the rule; so if no end marker is found, just use something past the end of the string.
+      search_end = values.index(context_end, (search_start + context_start.length)) || values.length
+
+      [matchers].flatten.each do |v|
+        index = values.index(%r{\s#{v}\s}, search_start)
+        next unless index && index < search_end
+        index_mapping[resource_name] = index
       end
     end
-    # Generate parser_list based on the index of the found option
-    parser_list = []
-    map_index.sort_by { |_k, v| v }.each { |mapi| parser_list << mapi.first }
+    parser_list = index_map.sort_by { |_resource_name, index| index }.to_h.keys
 
     ############
     # MAIN PARSE

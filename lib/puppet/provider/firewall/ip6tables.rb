@@ -345,4 +345,28 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
     :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :rpfilter, :condition, :name
   ]
+
+  # Not all arguments are globally unique across all iptables extensions.  For matchers we should
+  # only find within a specific context, a start and end marker can be supplied here.  Either a
+  # plain string or a regex will work; these are passed as an argument to String#index(), and limit
+  # the search scope.  If the resource matches on or after the first matching character in
+  # context_start, and before the first matching character in context_end, the match succeeds.
+  @resource_parse_context = {
+    synproxy_mss: {
+      context_start: '-j SYNPROXY',
+    },
+    mss: {
+      # Extra starting space because the matcher for :mss includes '-m tcpmss',
+      # and the search for it prefixes the matcher with a space
+      context_start: ' -m tcpmss',
+      context_end: %r{ -[mgj] },
+    },
+    string_to: {
+      context_start: '-m string',
+      context_end: %r{ -[mgj] },
+    },
+    to: {
+      context_start: '-j NETMAP',
+    },
+  }
 end
