@@ -85,6 +85,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
   @resource_map = {
     burst: '--limit-burst',
+    chain: '-A',
     checksum_fill: '--checksum-fill',
     clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
     condition: '--condition',
@@ -512,7 +513,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   def self.rule_to_hash(line, table, counter)
     hash = {}
     keys = []
-    values = line.dup
+    values = ' ' + line
 
     ####################
     # PRE-PARSE CLUDGING
@@ -654,23 +655,6 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
           break
         end
       end
-    end
-
-    # Manually remove chain
-    if %r{(\s|^)-A\s}.match?(values)
-      values = values.sub(%r{(\s|^)-A\s}, '\1')
-      keys << :chain
-    end
-
-    # Manually remove table (used in some tests)
-    if %r{^-t\s}.match?(values)
-      values = values.sub(%r{^-t\s}, '')
-      keys << :table
-    end
-
-    # manually remove comments if they made it this far
-    if %r{-m comment --comment}.match?(values)
-      values = values.sub(%r{-m comment --comment "((?:\\"|[^"])*)"}, {})
     end
 
     valrev = values.scan(%r{("([^"\\]|\\.)*"|\S+)}).transpose[0].reverse

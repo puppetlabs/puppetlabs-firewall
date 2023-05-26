@@ -93,6 +93,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
 
   @resource_map = {
     burst: '--limit-burst',
+    chain: '-A',
     checksum_fill: '--checksum-fill',
     clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
     condition: '--condition',
