@@ -243,7 +243,6 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :rsource,
     :rdest,
     :reap,
-    :rpfilter,
     :rttl,
     :socket,
     :physdev_is_bridged,
