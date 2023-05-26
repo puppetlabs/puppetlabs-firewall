@@ -130,7 +130,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     mac_source: ['-m mac --mac-source', '--mac-source'],
     mask: '--mask',
     match_mark: '-m mark --mark',
-    mss: '-m tcpmss --mss',
+    mss: '--mss',
     name: '-m comment --comment',
     nflog_group: '--nflog-group',
     nflog_prefix: '--nflog-prefix',
@@ -276,6 +276,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     iprange: [:src_range, :dst_range],
     owner: [:uid, :gid],
     condition: [:condition],
+    tcpmss: [:mss],
     conntrack: [:ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
                 :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir],
     time: [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
@@ -393,8 +394,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
       context_start: '-j SYNPROXY',
     },
     mss: {
-      # Extra starting space because the matcher for :mss includes '-m tcpmss',
-      # and the search for it prefixes the matcher with a space
+      # Extra starting space because '-m tcpmss' gets prepended to the matcher for :mss before parse,
+      # and the search for it while building the parser list prefixes the matcher with a space
       context_start: ' -m tcpmss',
       context_end: %r{ -[mgj] },
     },
