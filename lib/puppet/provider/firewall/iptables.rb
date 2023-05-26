@@ -585,6 +585,10 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     rpfilter_opts = values.scan(%r{-m\srpfilter(?:\s--(loose)|\s--(validmark)|\s--(accept-local)|\s--(invert))+}).flatten.compact
     values.sub!(%r{-m\srpfilter(?:\s--(?:loose|validmark|accept-local|invert))+}, "-m rpfilter #{rpfilter_opts.join(',')}")
 
+    # For recent matching, the 'recent' param takes the name of the long opt that should follow '-m recent',
+    # which otherwise gets parsed out with the double-dashes for the long opt still present
+    values.gsub!(%r{#{@resource_map[:recent]}\s--(set|rcheck|update|remove)}, "#{@resource_map[:recent]} \\1")
+
     # on some iptables versions, --connlimit-saddr switch is added after the rule is applied
     values = values.gsub(%r{--connlimit-saddr}, '')
 
