@@ -66,7 +66,7 @@ describe 'firewall basics', docker: true do
 
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
-          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --dports 9999561-562 -m comment --comment "560 - test" -j ACCEPT})
+          expect(r.stdout).not_to match(%r{-A INPUT -p tcp -m multiport --dports 9999561-562 -m comment --comment "561 - test" -j ACCEPT})
         end
       end
     end
