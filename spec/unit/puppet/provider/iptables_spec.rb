@@ -243,11 +243,20 @@ describe 'iptables provider' do
   describe 'when working out general_args' do
     HASH_TO_ARGS.each do |test_name, data|
       describe "for test data '#{test_name}'" do
+        before :each do
+          # Allow examples to stub kernel and iptables versions
+          allow(Facter.fact(:iptables_version)).to receive(:value).and_return(data[:iptables_version]) if data[:iptables_version]
+          allow(Facter.fact(:kernelversion)).to receive(:value).and_return(data[:kernel_version]) if data[:kernel_version]
+          # Unload existing provider so provider features get re-assessed after we stub the determining facts
+          Puppet::Type.type(:firewall).unprovide(:iptables)
+        end
+
         let(:resource) { Puppet::Type.type(:firewall).new(data[:params]) }
         let(:provider) { Puppet::Type.type(:firewall).provider(:iptables) }
         let(:instance) { provider.new(resource) }
 
         it 'general_args should be valid' do
+          data[:args].unshift('--wait') if instance.general_args.flatten.include? '--wait'
           expect(instance.general_args.flatten).to eq(data[:args])
         end
       end

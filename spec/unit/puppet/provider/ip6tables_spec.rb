@@ -124,6 +124,14 @@ describe 'ip6tables provider' do
   describe 'when working out general_args' do
     HASH_TO_ARGS6.each do |test_name, data|
       describe "for test data '#{test_name}'" do
+        before :each do
+          # Allow examples to stub kernel and iptables versions
+          allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return(data[:ip6tables_version]) if data[:ip6tables_version]
+          allow(Facter.fact(:kernelversion)).to receive(:value).and_return(data[:kernel_version]) if data[:kernel_version]
+          # Unload existing provider so provider features get re-assessed after we stub the determining facts
+          Puppet::Type.type(:firewall).unprovide(:ip6tables)
+        end
+
         let(:resource) { Puppet::Type.type(:firewall).new(data[:params]) }
         let(:provider6) { Puppet::Type.type(:firewall).provider(:ip6tables) }
         let(:instance) { provider6.new(resource) }
