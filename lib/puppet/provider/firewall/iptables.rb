@@ -355,6 +355,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface,
+    # Match module options
     :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
     :proto, :isfragment, :stat_mode, :stat_every, :stat_packet, :stat_probability,
     :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
@@ -363,16 +364,22 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
     :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_hex, :string_algo,
-    :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
-    :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
-    :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
+    :string_from, :string_to,
+    # ONLY target extension options from here to END
+    # otherwise a target spec and its options can end up separated by a match module and ITS options
+    :jump, :goto,
+    :clusterip_new, :clusterip_hashmode, :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init,
+    :queue_num, :queue_bypass, :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
     :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random_fully, :random, :log_prefix,
-    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
+    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :zone, :helper, :notrack,
     :synproxy_sack_perm, :synproxy_timestamp, :synproxy_wscale, :synproxy_mss, :synproxy_ecn,
+    # END target extension options
+    # Resume matcher options
+    :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :condition, :name, :notrack
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :cgroup, :rpfilter, :condition, :name
   ]
 
   def insert

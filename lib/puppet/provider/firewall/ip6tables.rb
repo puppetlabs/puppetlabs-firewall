@@ -320,6 +320,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   # not provided with current parser [georg.koester])
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface,
+    # Match module options
     :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
     :proto, :ishasmorefrags, :islastfrag, :isfirstfrag,
     :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
@@ -328,14 +329,20 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
     :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_hex, :string_algo,
-    :string_from, :string_to, :jump, :queue_num, :queue_bypass,
-    :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
+    :string_from, :string_to,
+    # ONLY target extension options from here to END
+    # otherwise a jump target spec and its options can end up separated by a match module and ITS options
+    :jump,
+    :queue_num, :queue_bypass, :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
     :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :checksum_fill, :random_fully, :log_prefix,
-    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
+    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :zone, :helper, :notrack,
     :synproxy_sack_perm, :synproxy_timestamp, :synproxy_wscale, :synproxy_mss, :synproxy_ecn,
+    # END target extension options
+    # Resume matcher options
+    :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :helper, :rpfilter, :condition, :name, :notrack
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :rpfilter, :condition, :name
   ]
 end
