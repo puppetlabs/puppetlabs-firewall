@@ -66,7 +66,7 @@ class firewall::linux::redhat (
   }
 
   if $package_name {
-    ensure_packages($package_name, {
+    stdlib::ensure_packages($package_name, {
         'ensure' => $package_ensure,
       'before' => Service[$service_name] }
     )
