@@ -26,7 +26,7 @@ class firewall::linux::debian (
   Enum[present, latest, 'present', 'latest']     $package_ensure = $firewall::params::package_ensure,
 ) inherits firewall::params {
   if $package_name {
-    ensure_packages([$package_name], {
+    stdlib::ensure_packages([$package_name], {
         ensure  => $package_ensure
     })
   }
