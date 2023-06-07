@@ -410,27 +410,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   end
 
   def exists?
-    if duplicate_rule?(@property_hash[:name])
-      core_message = "Duplicate rule found for #{@property_hash[:name]}."
-      case @resource.parameters[:onduplicaterulebehaviour].value
-      when :error
-        raise   "#{core_message} Skipping update."
-      when :warn
-        warning "#{core_message}. This may add an additional rule to the system."
-      when :ignore
-        debug "#{core_message}. This may add an additional rule to the system."
-      end
-    end
-
     properties[:ensure] != :absent
-  end
-
-  def duplicate_rule?(rule)
-    rules = self.class.instances
-    system_rule_count = Hash.new(0)
-    rules.each { |r| system_rule_count[r.name] += 1 }
-    duplicate_rules = rules.select { |r| system_rule_count[r.name] > 1 }
-    duplicate_rules.select { |r| r.name == rule }.any?
   end
 
   # Flush the property hash once done.
@@ -448,6 +428,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     debug '[instances]'
     table = nil
     rules = []
+    # Used for detecting duplicate rules
+    duplicate_rules = []
     counter = 1
 
     # String#lines would be nice, but we need to support Ruby 1.8.5
@@ -459,6 +441,8 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         else
           hash = rule_to_hash(line, table, counter)
           if hash
+            raise "Duplicate rule found for #{hash[:name]}. Skipping update." if duplicate_rules.include?(hash[:name])
+            duplicate_rules << hash[:name]
             rules << new(hash)
             counter += 1
           end
