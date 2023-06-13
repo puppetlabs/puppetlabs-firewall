@@ -396,7 +396,7 @@ It is possible for an unmanaged rule to exist on the target system that has the 
 
 In the event of a duplicate rule, the module will throw an error message notifying the user that it has found a duplicate and halt in it's update.
 
-This behaviour was previously configurable via the `onduplicaterulebehaviour` parameter. However the implementation of this resulted in a massive slowdown of the module and so this has been removed infavour of a simple error being thrown whenever a duplicate is detected.
+This behaviour was previously configurable via the `onduplicaterulebehaviour` parameter. However the implementation of this resulted in a massive slowdown of the module and so this has been removed in favour of a simple error being thrown whenever a duplicate is detected.
 
 ### Additional information
 
