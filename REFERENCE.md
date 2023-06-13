@@ -1382,7 +1382,6 @@ The following parameters are available in the `firewall` type.
 
 * [`line`](#-firewall--line)
 * [`name`](#-firewall--name)
-* [`onduplicaterulebehaviour`](#-firewall--onduplicaterulebehaviour)
 * [`provider`](#-firewall--provider)
 
 ##### <a name="-firewall--line"></a>`line`
@@ -1403,24 +1402,6 @@ so make sure you prefix the rule with a number:
 
 Depending on the provider, the name of the rule can be stored using
 the comment feature of the underlying firewall subsystem.
-
-##### <a name="-firewall--onduplicaterulebehaviour"></a>`onduplicaterulebehaviour`
-
-Valid values: `ignore`, `warn`, `error`
-
-In certain situations it is possible for an unmanaged rule to exist
-on the target system that has the same comment as the rule
-specified in the manifest.
-
-This setting determines what happens when such a duplicate is found.
-
-It offers three options:
-
-  * ignore - The duplicate rule is ignored and any updates to the resource will continue unaffected.
-  * warn - The duplicate rule is logged as a warning and any updates to the resource will continue unaffected.
-  * error - The duplicate rule is logged as an error and any updates to the resource will be skipped.
-
-Default value: `warn`
 
 ##### <a name="-firewall--provider"></a>`provider`
 
