@@ -151,6 +151,16 @@ class firewall::linux::redhat (
                 $seltype = 'system_conf_t'
               }
 
+              /^8\..*/: {
+                $seluser = 'system_u'
+                $seltype = 'etc_t'
+              }
+
+              /^9\..*/: {
+                $seluser = 'system_u'
+                $seltype = 'etc_t'
+              }
+
               default : {
                 $seluser = 'unconfined_u'
                 $seltype = 'etc_t'
