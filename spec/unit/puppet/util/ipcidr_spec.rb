@@ -40,10 +40,10 @@ describe 'Puppet::Util::IPCidr' do
 
     let(:ipcidr) { Puppet::Util::IPCidr.new('96.126.112.20/24') }
 
-    specify { host.cidr.should == '96.126.112.0/24' } # .20 is expected to
+    it { expect(host.cidr).to eql '96.126.112.0/24' } # .20 is expected to
     # be silently dropped.
-    specify { host.prefixlen.should == 24 }
-    specify { host.netmask.should == '255.255.255.0' }
+    it { expect(host.prefixlen).to be 24 }
+    it { expect(host.netmask).to eql '255.255.255.0' }
   end
 
   describe 'ipv4 open range with cidr' do

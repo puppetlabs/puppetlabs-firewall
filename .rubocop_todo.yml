@@ -112,13 +112,13 @@ Lint/RedundantSafeNavigation:
 # Offense count: 13
 # Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes.
 Metrics/AbcSize:
-  Max: 235
+  Max: 226.8
 
-# Offense count: 23
+# Offense count: 17
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns, inherit_mode.
 # AllowedMethods: refine
 Metrics/BlockLength:
-  Max: 1961
+  Max: 64
 
 # Offense count: 2
 # Configuration parameters: CountBlocks.
@@ -128,7 +128,7 @@ Metrics/BlockNesting:
 # Offense count: 8
 # Configuration parameters: AllowedMethods, AllowedPatterns.
 Metrics/CyclomaticComplexity:
-  Max: 60
+  Max: 57
 
 # Offense count: 19
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns.
@@ -143,7 +143,7 @@ Metrics/ModuleLength:
 # Offense count: 6
 # Configuration parameters: AllowedMethods, AllowedPatterns.
 Metrics/PerceivedComplexity:
-  Max: 65
+  Max: 62
 
 # Offense count: 1
 # Configuration parameters: EnforcedStyleForLeadingUnderscores.

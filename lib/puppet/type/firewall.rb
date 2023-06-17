@@ -134,6 +134,8 @@ Puppet::Type.newtype(:firewall) do
 
       * string_matching: The ability to match a given string by using some pattern matching strategy.
 
+      * synproxy: The ability to use the SYNPROXY jump target.
+
       * tcp_flags: The ability to match on particular TCP flag settings.
 
       * netmap: The ability to map entire subnets via source or destination nat rules.
@@ -171,6 +173,7 @@ Puppet::Type.newtype(:firewall) do
   feature :log_ip_options, 'Add IP/IPv6 packet header to log messages'
   feature :mark, 'Match or Set the netfilter mark value associated with the packet'
   feature :mss, 'Match a given TCP MSS value or range.'
+  feature :synproxy, 'Use the SYNPROXY extension'
   feature :tcp_flags, 'The ability to match on particular TCP flag settings'
   feature :pkttype, 'Match a packet type'
   feature :rpfilter, 'Perform reverse-path filtering'
@@ -2294,6 +2297,63 @@ Puppet::Type.newtype(:firewall) do
     end
   end
 
+  newproperty(:synproxy_ecn, required_features: :synproxy) do
+    desc <<-PUPPETCODE
+      If the SYNPROXY jump target is being used, whether to supply the `--ecn` option to it.  This
+      option is undocumented in the main iptables-extensions documentation, and appears to be unique
+      to and supported by RedHat; see RedHat's documentation for what it does.
+    PUPPETCODE
+    newvalues(:true, :false)
+  end
+
+  newproperty(:synproxy_mss, required_features: :synproxy) do
+    desc <<-PUPPETCODE
+      If the SYNPROXY jump target is being used, the TCP Maxiumum Segment Size for the proxied
+      interface.  If SYNPROXY is being used to protect another host that we forward traffic to,
+      then this should be the Maximum Segement Size for the interface that host uses to receive the
+      forwarded traffic.  Integer or Stringified Integer value between 0 and 65535.  For more
+      information, see RFC 6691.
+    PUPPETCODE
+    validate do |value|
+      unless value.to_i.bit_length <= 16 && value.to_i > 0
+        raise ArgumentError, 'Segment size must fit within an unsigned 16-bit integer'
+      end
+    end
+    munge { |value| value.to_s }
+  end
+
+  newproperty(:synproxy_sack_perm, required_features: :synproxy) do
+    desc <<-PUPPETCODE
+      If the SYNPROXY jump target is being used, whether or not to enable Selective Acknowledgements
+      on behalf of the proxied interface.  This Boolean value should match the numeric truth value
+      of net.ipv4.tcp_sack on the protected system.  Boolean, omitted by default.
+    PUPPETCODE
+    newvalues(:true, :false)
+  end
+
+  newproperty(:synproxy_timestamp, required_features: :synproxy) do
+    desc <<-PUPPETCODE
+      If the SYNPROXY jump target is being used, whether to pass client timestamp option to proxied
+      interface.  Will be disabled if not present; this option is needed for selective
+      acknowledgement and window scaling.  Boolean, omitted by default.
+    PUPPETCODE
+    newvalues(:true, :false)
+  end
+
+  newproperty(:synproxy_wscale, required_features: :synproxy) do
+    desc <<-PUPPETCODE
+      If the SYNPROXY jump target is being used, this should be the TCP Window Scaling Factor for
+      the proxied interface (for more information on TCP Window Scaling, see RFC7323).  Integer or
+      Stringified Integer between 1 and 14.
+    PUPPETCODE
+    validate do |value|
+      unless value.to_i >= 1 && value.to_i <= 14
+        raise ArgumentError, 'Window scale exponent must be between 1 and 14'
+      end
+    end
+    munge { |value| value.to_s }
+  end
+
   autorequire(:firewallchain) do
     reqs = []
     protocol = nil
@@ -2341,7 +2401,7 @@ Puppet::Type.newtype(:firewall) do
     ['/etc/sysconfig/iptables', '/etc/sysconfig/ip6tables']
   end
 
-  validate do
+  validate do # rubocop:disable Metrics/BlockLength
     debug('[validate]')
 
     # TODO: this is put here to skip validation if ensure is not set. This
@@ -2526,6 +2586,14 @@ Puppet::Type.newtype(:firewall) do
       unless %r{raw}.match?(value(:table).to_s)
         raise 'Parameter jump => CT only applies to table => raw'
       end
+    end
+    if value(:jump).to_s != 'SYNPROXY' && (value(:synproxy_ecn) || value(:synproxy_mss) || value(:synproxy_sack_perm) || value(:synproxy_timestamp) || value(:synproxy_wscale))
+      raise 'Options for SYNPROXY jump target are only valid when the SYNPROXY target is used'
+    end
+    if value(:jump).to_s == 'SYNPROXY' && (value(:synproxy_sack_perm) || value(:synproxy_wscale)) && value(:synproxy_timestamp).nil?
+      raise <<~PUPPETCODE
+        When using SYNPROXY jump target and Selective Acknowledgements or TCP Window Scaliing are enabled, you must also enable timestamps
+      PUPPETCODE
     end
   end
 end

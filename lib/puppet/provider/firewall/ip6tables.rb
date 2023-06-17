@@ -29,6 +29,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   has_feature :nflog_prefix
   has_feature :nflog_range
   has_feature :nflog_threshold
+  has_feature :synproxy
   has_feature :tcp_flags
   has_feature :pkttype
   has_feature :ishasmorefrags
@@ -92,6 +93,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
 
   @resource_map = {
     burst: '--limit-burst',
+    chain: '-A',
     checksum_fill: '--checksum-fill',
     clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
     condition: '--condition',
@@ -140,7 +142,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     match_mark: '-m mark --mark',
     name: '-m comment --comment',
     mac_source: ['-m mac --mac-source', '--mac-source'],
-    mss: '-m tcpmss --mss',
+    mss: '--mss',
     nflog_group: '--nflog-group',
     nflog_prefix: '--nflog-prefix',
     nflog_range: '--nflog-range',
@@ -182,6 +184,11 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     string_algo: '--algo',
     string_from: '--from',
     string_to: '--to',
+    synproxy_ecn: '--ecn',
+    synproxy_mss: '--mss',
+    synproxy_sack_perm: '--sack-perm',
+    synproxy_timestamp: '--timestamp',
+    synproxy_wscale: '--wscale',
     table: '-t',
     tcp_flags: '-m tcp --tcp-flags',
     todest: '--to-destination',
@@ -236,12 +243,14 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     :rsource,
     :rdest,
     :reap,
-    :rpfilter,
     :rttl,
     :socket,
     :physdev_is_bridged,
     :physdev_is_in,
     :physdev_is_out,
+    :synproxy_ecn,
+    :synproxy_sack_perm,
+    :synproxy_timestamp,
     :time_contiguous,
     :kernel_timezone,
     :queue_bypass,
@@ -266,6 +275,7 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
     iprange: [:src_range, :dst_range],
     owner: [:uid, :gid],
     condition: [:condition],
+    tcpmss: [:mss],
     conntrack: [:ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
                 :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir],
     time: [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
@@ -309,22 +319,55 @@ Puppet::Type.type(:firewall).provide :ip6tables, parent: :iptables, source: :ip6
   # (Note: on my CentOS 6.4 ip6tables-save returns -m frag on the place
   # I put it when calling the command. So compability with manual changes
   # not provided with current parser [georg.koester])
-  @resource_list = [:table, :source, :destination, :iniface, :outiface, :physdev_in,
-                    :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
-                    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag, :src_range, :dst_range,
-                    :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port, :src_type,
-                    :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy, :state,
-                    :ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
-                    :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
-                    :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
-                    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_hex, :string_algo,
-                    :string_from, :string_to, :jump,
-                    :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold,
-                    :clamp_mss_to_pmtu, :gateway, :todest,
-                    :tosource, :toports, :checksum_fill, :log_level, :log_prefix, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :random_fully,
-                    :reject, :set_mss, :set_dscp, :set_dscp_class, :mss, :queue_num, :queue_bypass,
-                    :set_mark, :match_mark, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
-                    :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
-                    :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-                    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :zone, :helper, :rpfilter, :condition, :name, :notrack]
+  @resource_list = [
+    :table, :source, :destination, :iniface, :outiface,
+    # Match module options
+    :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
+    :proto, :ishasmorefrags, :islastfrag, :isfirstfrag,
+    :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
+    :src_type, :dst_type, :socket, :pkttype, :ipsec_dir, :ipsec_policy,
+    :state, :ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
+    :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
+    :icmp, :hop_limit, :limit, :burst, :length, :recent, :rseconds, :reap,
+    :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_hex, :string_algo,
+    :string_from, :string_to,
+    # ONLY target extension options from here to END
+    # otherwise a jump target spec and its options can end up separated by a match module and ITS options
+    :jump,
+    :queue_num, :queue_bypass, :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
+    :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :checksum_fill, :random_fully, :log_prefix,
+    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :zone, :helper, :notrack,
+    :synproxy_sack_perm, :synproxy_timestamp, :synproxy_wscale, :synproxy_mss, :synproxy_ecn,
+    # END target extension options
+    # Resume matcher options
+    :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
+    :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
+    :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
+    :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :rpfilter, :condition, :name
+  ]
+
+  # Not all arguments are globally unique across all iptables extensions.  For matchers we should
+  # only find within a specific context, a start and end marker can be supplied here.  Either a
+  # plain string or a regex will work; these are passed as an argument to String#index(), and limit
+  # the search scope.  If the resource matches on or after the first matching character in
+  # context_start, and before the first matching character in context_end, the match succeeds.
+  @resource_parse_context = {
+    synproxy_mss: {
+      context_start: '-j SYNPROXY',
+    },
+    mss: {
+      # Extra starting space because '-m tcpmss' gets prepended to the matcher for :mss before parse,
+      # and the search for it while building the parser list prefixes the matcher with a space
+      context_start: ' -m tcpmss',
+      context_end: %r{ -[mgj] },
+    },
+    string_to: {
+      context_start: '-m string',
+      context_end: %r{ -[mgj] },
+    },
+    to: {
+      context_start: '-j NETMAP',
+    },
+  }
 end

@@ -34,7 +34,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'does not accept a name with non-ASCII chars' do
-      expect(-> { resource[:name] = '%*#^(#$' }).to raise_error(Puppet::Error)
+      expect { resource[:name] = '%*#^(#$' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -52,7 +52,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'fails when value is not recognized' do
-      expect(-> { resource[:action] = 'not valid' }).to raise_error(Puppet::Error)
+      expect { resource[:action] = 'not valid' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -65,7 +65,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'fails when the chain value is not recognized' do
-      expect(-> { resource[:chain] = 'not valid' }).to raise_error(Puppet::Error)
+      expect { resource[:chain] = 'not valid' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -78,7 +78,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'fails when table value is not recognized' do
-      expect(-> { resource[:table] = 'not valid' }).to raise_error(Puppet::Error)
+      expect { resource[:table] = 'not valid' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -91,7 +91,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'fails when proto value is not recognized' do
-      expect(-> { resource[:proto] = 'foo' }).to raise_error(Puppet::Error)
+      expect { resource[:proto] = 'foo' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -101,7 +101,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       expect(res.parameters[:jump]).to be nil
     end
 
-    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'NFLOG', 'MASQUERADE', 'REDIRECT', 'MARK'].each do |jump|
+    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'NFLOG', 'MASQUERADE', 'REDIRECT', 'MARK', 'SYNPROXY'].each do |jump|
       it "accepts jump value #{jump}" do
         resource[:jump] = jump
         expect(resource[:jump]).to eql jump
@@ -110,12 +110,12 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
     ['ACCEPT', 'DROP', 'REJECT'].each do |jump|
       it "nows fail when value #{jump}" do
-        expect(-> { resource[:jump] = jump }).to raise_error(Puppet::Error)
+        expect { resource[:jump] = jump }.to raise_error(Puppet::Error)
       end
     end
 
     it 'fails when jump value is not recognized' do
-      expect(-> { resource[:jump] = '%^&*' }).to raise_error(Puppet::Error)
+      expect { resource[:jump] = '%^&*' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -241,7 +241,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it "fails when #{addrtype} value is not recognized" do
-      expect(-> { resource[addrtype] = 'foo' }).to raise_error(Puppet::Error)
+      expect { resource[addrtype] = 'foo' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -295,7 +295,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
         expect(resource[:log_level]).to be 3
       }
 
-      it { expect(-> { resource[:log_level] = 'foo' }).to raise_error(Puppet::Error) }
+      it { expect { resource[:log_level] = 'foo' }.to raise_error(Puppet::Error) }
     end
   end
 
@@ -310,7 +310,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
       [-3, 999_999].each do |v|
         it {
-          expect(-> { resource[:nflog_group] = v }).to raise_error(Puppet::Error, %r{2\^16\-1})
+          expect { resource[:nflog_group] = v }.to raise_error(Puppet::Error, %r{2\^16\-1})
         }
       end
     end
@@ -325,7 +325,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
       }
 
       it {
-        expect(-> { resource[:nflog_prefix] = invalid_prefix }).to raise_error(Puppet::Error, %r{64 characters})
+        expect { resource[:nflog_prefix] = invalid_prefix }.to raise_error(Puppet::Error, %r{64 characters})
       }
     end
   end
@@ -381,14 +381,14 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'fails if icmp type is "any"' do
-      expect(-> { resource[:icmp] = 'any' }).to raise_error(Puppet::Error)
+      expect { resource[:icmp] = 'any' }.to raise_error(Puppet::Error)
     end
     it 'fails if icmp type is an array' do
-      expect(-> { resource[:icmp] = "['0', '8']" }).to raise_error(Puppet::Error)
+      expect { resource[:icmp] = "['0', '8']" }.to raise_error(Puppet::Error)
     end
 
     it 'fails if icmp type cannot be mapped to a numeric' do
-      expect(-> { resource[:icmp] = 'foo' }).to raise_error(Puppet::Error)
+      expect { resource[:icmp] = 'foo' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -538,6 +538,64 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
   end
 
+  describe 'individual SYNPROXY options' do
+    describe ':synproxy_mss' do
+      ['1', 1, '65535', 65_535].each do |v|
+        it 'resolves correctly when given valid values' do
+          resource[:synproxy_mss] = v
+          expect(resource[:synproxy_mss]).to eq v.to_s
+        end
+      end
+
+      ['0', 0, '65536', 65_536].each do |v|
+        it 'produces the expected error when given invalid values' do
+          expect { resource[:synproxy_mss] = v }.to raise_error(Puppet::Error, %r{Segment size must fit within an unsigned 16-bit integer})
+        end
+      end
+    end
+
+    describe ':synproxy_wscale' do
+      ['1', 1, '14', 14].each do |v|
+        it 'resolves correctly when given valid values' do
+          resource[:synproxy_wscale] = v
+          expect(resource[:synproxy_wscale]).to eq v.to_s
+        end
+      end
+
+      ['0', 0, '15', 15].each do |v|
+        it 'produces the expected error when given invalid values' do
+          expect { resource[:synproxy_wscale] = v }.to raise_error(Puppet::Error, %r{Window scale exponent must be between 1 and 14})
+        end
+      end
+    end
+  end
+
+  describe 'SYNPROXY option combinatorics' do
+    it 'does not allow any SYNPROXY-related options to be set if :jump is not SYNPROXY' do
+      {
+        synproxy_ecn: true,
+        synproxy_mss: 1024,
+        synproxy_sack_perm: true,
+        synproxy_timestamp: true,
+        synproxy_wscale: 10,
+      }.each do |syn_param, syn_value|
+        expect {
+          firewall_class.new(:name => '001-test', :jump => 'custom_chain', syn_param => syn_value)
+        }.to raise_error(RuntimeError, %r{Options for SYNPROXY jump target are only valid when the SYNPROXY target is used})
+      end
+    end
+    it 'does not allow either synproxy_sack_perm or synproxy_wscale to be set if synproxy_timestamp is omitted' do
+      {
+        synproxy_sack_perm: true,
+        synproxy_wscale: 10,
+      }.each do |syn_param, syn_value|
+        expect {
+          firewall_class.new(:name => '001-test', :jump => 'SYNPROXY', syn_param => syn_value)
+        }.to raise_error(RuntimeError, %r{SYNPROXY.*Selective Acknowledgements or TCP Window Scaliing.*enable timestamps})
+      end
+    end
+  end
+
   describe ':burst' do
     it 'accepts numeric values' do
       resource[:burst] = 12
@@ -545,10 +603,10 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'fails if value is not numeric' do
-      expect(-> { resource[:burst] = 'foo' }).to raise_error(Puppet::Error)
+      expect { resource[:burst] = 'foo' }.to raise_error(Puppet::Error)
     end
     it 'fails if value contains /sec' do
-      expect(-> { resource[:burst] = '1500/sec' }).to raise_error(Puppet::Error)
+      expect { resource[:burst] = '1500/sec' }.to raise_error(Puppet::Error)
     end
   end
 
@@ -607,7 +665,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
             expect(resource[:set_mark]).to eql '0x3e8'
           end
           it 'fails if mask is present' do
-            expect(-> { resource[:set_mark] = '0x3e8/0xffffffff' }).to raise_error(
+            expect { resource[:set_mark] = '0x3e8/0xffffffff' }.to raise_error(
               Puppet::Error, %r{iptables version #{iptables_version} does not support masks on MARK rules$}
             )
           end
@@ -635,12 +693,12 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
             expect(resource[:set_mark]).to eql '0x3e8/0x4'
           end
           it 'fails if mask value is more than 32 bits' do
-            expect(-> { resource[:set_mark] = '1/4294967296' }).to raise_error(
+            expect { resource[:set_mark] = '1/4294967296' }.to raise_error(
               Puppet::Error, %r{MARK mask must be integer or hex between 0 and 0xffffffff$}
             )
           end
           it 'fails if mask is malformed' do
-            expect(-> { resource[:set_mark] = '1000/0xq4' }).to raise_error(
+            expect { resource[:set_mark] = '1000/0xq4' }.to raise_error(
               Puppet::Error, %r{MARK mask must be integer or hex between 0 and 0xffffffff$}
             )
           end
@@ -648,11 +706,11 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
 
         ['/', '1000/', 'pwnie'].each do |bad_mark|
           it "fails with malformed mark '#{bad_mark}'" do
-            expect(-> { resource[:set_mark] = bad_mark }).to raise_error(Puppet::Error)
+            expect { resource[:set_mark] = bad_mark }.to raise_error(Puppet::Error)
           end
         end
         it 'fails if mark value is more than 32 bits' do
-          expect(-> { resource[:set_mark] = '4294967296' }).to raise_error(
+          expect { resource[:set_mark] = '4294967296' }.to raise_error(
             Puppet::Error, %r{MARK value must be integer or hex between 0 and 0xffffffff$}
           )
         end
@@ -819,7 +877,7 @@ describe firewall do # rubocop:disable RSpec/MultipleDescribes
     end
 
     it 'fails when the pkttype value is not recognized' do
-      expect(-> { resource[:pkttype] = 'not valid' }).to raise_error(Puppet::Error)
+      expect { resource[:pkttype] = 'not valid' }.to raise_error(Puppet::Error)
     end
   end
 

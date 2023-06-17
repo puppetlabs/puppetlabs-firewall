@@ -34,6 +34,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   has_feature :nflog_prefix
   has_feature :nflog_range
   has_feature :nflog_threshold
+  has_feature :synproxy
   has_feature :tcp_flags
   has_feature :pkttype
   has_feature :isfragment
@@ -84,6 +85,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
 
   @resource_map = {
     burst: '--limit-burst',
+    chain: '-A',
     checksum_fill: '--checksum-fill',
     clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
     condition: '--condition',
@@ -128,7 +130,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     mac_source: ['-m mac --mac-source', '--mac-source'],
     mask: '--mask',
     match_mark: '-m mark --mark',
-    mss: '-m tcpmss --mss',
+    mss: '--mss',
     name: '-m comment --comment',
     nflog_group: '--nflog-group',
     nflog_prefix: '--nflog-prefix',
@@ -172,6 +174,11 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     string_algo: '--algo',
     string_from: '--from',
     string_to: '--to',
+    synproxy_ecn: '--ecn',
+    synproxy_mss: '--mss',
+    synproxy_sack_perm: '--sack-perm',
+    synproxy_timestamp: '--timestamp',
+    synproxy_wscale: '--wscale',
     table: '-t',
     tcp_flags: ['-m tcp --tcp-flags', '--tcp-flags'],
     todest: '--to-destination',
@@ -240,6 +247,9 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :physdev_is_bridged,
     :physdev_is_in,
     :physdev_is_out,
+    :synproxy_ecn,
+    :synproxy_sack_perm,
+    :synproxy_timestamp,
     :time_contiguous,
     :kernel_timezone,
     :clusterip_new,
@@ -266,6 +276,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     iprange: [:src_range, :dst_range],
     owner: [:uid, :gid],
     condition: [:condition],
+    tcpmss: [:mss],
     conntrack: [:ctstate, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
                 :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir],
     time: [:time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone],
@@ -346,6 +357,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   # This order can be determined by going through iptables source code or just tweaking and trying manually
   @resource_list = [
     :table, :source, :destination, :iniface, :outiface,
+    # Match module options
     :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
     :proto, :isfragment, :stat_mode, :stat_every, :stat_packet, :stat_probability,
     :src_range, :dst_range, :tcp_flags, :uid, :gid, :mac_source, :sport, :dport, :port,
@@ -354,16 +366,47 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctstatus, :ctexpire, :ctdir,
     :icmp, :limit, :burst, :length, :recent, :rseconds, :reap,
     :rhitcount, :rttl, :rname, :mask, :rsource, :rdest, :ipset, :string, :string_hex, :string_algo,
-    :string_from, :string_to, :jump, :goto, :clusterip_new, :clusterip_hashmode,
-    :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
-    :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
+    :string_from, :string_to,
+    # ONLY target extension options from here to END
+    # otherwise a target spec and its options can end up separated by a match module and ITS options
+    :jump, :goto,
+    :clusterip_new, :clusterip_hashmode, :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init,
+    :queue_num, :queue_bypass, :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
     :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random_fully, :random, :log_prefix,
-    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
+    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :zone, :helper, :notrack,
+    :synproxy_sack_perm, :synproxy_timestamp, :synproxy_wscale, :synproxy_mss, :synproxy_ecn,
+    # END target extension options
+    # Resume matcher options
+    :match_mark, :mss, :connlimit_above, :connlimit_mask, :connmark, :time_start, :time_stop,
     :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
     :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size,
-    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :zone, :helper, :cgroup, :rpfilter, :condition, :name, :notrack
+    :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval, :bytecode, :ipvs, :cgroup, :rpfilter, :condition, :name
   ]
+
+  # Not all arguments are globally unique across all iptables extensions.  For matchers we should
+  # only find within a specific context, a start and end marker can be supplied here.  Either a
+  # plain string or a regex will work; these are passed as an argument to String#index(), and limit
+  # the search scope.  If the resource matches on or after the first matching character in
+  # context_start, and before the first matching character in context_end, the match succeeds.
+  @resource_parse_context = {
+    synproxy_mss: {
+      context_start: '-j SYNPROXY',
+    },
+    mss: {
+      # Extra starting space because '-m tcpmss' gets prepended to the matcher for :mss before parse,
+      # and the search for it while building the parser list prefixes the matcher with a space
+      context_start: ' -m tcpmss',
+      context_end: %r{ -[mgj] },
+    },
+    string_to: {
+      context_start: '-m string',
+      context_end: %r{ -[mgj] },
+    },
+    to: {
+      context_start: '-j NETMAP',
+    },
+  }
 
   def insert
     debug 'Inserting rule %s' % resource[:name]
@@ -453,9 +496,7 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
   end
 
   def self.rule_to_hash(line, table, counter)
-    hash = {}
-    keys = []
-    values = line.dup
+    values = ' ' + line
 
     ####################
     # PRE-PARSE CLUDGING
@@ -524,15 +565,13 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
         (\s--next)?}x,
                         '--pol "ipsec\1\2\3\4\5\6\7\8" ')
 
-    # rpfilter also takes multiple parameters; use quote trick again
-    rpfilter_opts = values.scan(%r{-m\srpfilter(\s(--loose)|\s(--validmark)|\s(--accept-local)|\s(--invert))+})
-    if rpfilter_opts && rpfilter_opts.length == 1 && rpfilter_opts[0]
-      rpfilter_opts = rpfilter_opts[0][1..-1].reject { |x| x.nil? }
-      values = values.sub(
-        %r{-m\srpfilter(\s(--loose)|\s(--validmark)|\s(--accept-local)|\s(--invert))+},
-        "-m rpfilter \"#{rpfilter_opts.join(' ')}\"",
-      )
-    end
+    # rpfilter can take multiple parameters; if present, strip and comma-join them.
+    rpfilter_opts = values.scan(%r{-m\srpfilter(?:\s--(loose)|\s--(validmark)|\s--(accept-local)|\s--(invert))+}).flatten.compact
+    values.sub!(%r{-m\srpfilter(?:\s--(?:loose|validmark|accept-local|invert))+}, "-m rpfilter #{rpfilter_opts.join(',')}")
+
+    # For recent matching, the 'recent' param takes the name of the long opt that should follow '-m recent',
+    # which otherwise gets parsed out with the double-dashes for the long opt still present
+    values.gsub!(%r{#{@resource_map[:recent]}\s--(set|rcheck|update|remove)}, "#{@resource_map[:recent]} \\1")
 
     # on some iptables versions, --connlimit-saddr switch is added after the rule is applied
     values = values.gsub(%r{--connlimit-saddr}, '')
@@ -558,81 +597,79 @@ Puppet::Type.type(:firewall).provide :iptables, parent: Puppet::Provider::Firewa
     ############
     # Populate parser_list with used value, in the correct order
     ############
-    map_index = {}
-    resource_map.each_pair do |map_k, map_v|
-      [map_v].flatten.each do |v|
-        ind = values.index(%r{\s#{v}\s})
-        next unless ind
-        map_index[map_k] = ind
+    index_map = resource_map.each_with_object({}) do |(resource_name, matchers), index_mapping|
+      # Get the start and end markers.  If none are defined, use start/end of the rule.
+      context_start = @resource_parse_context.dig(resource_name, :context_start) || %r{^}
+      context_end = @resource_parse_context.dig(resource_name, :context_end) || %r{$}
+
+      # Get the offset at which to start searching
+      search_start = values.index(context_start)
+      # If a context marker was defined but wasn't in the string, then the resource can't be here, either
+      next unless search_start
+
+      # Get the offset at which to stop searching
+      # Start the search for the end marker past the end of context_start, so end markers
+      # like '-m' won't match against their own start marker (e.g., '-m tcpmss')
+      context_start = values.match(context_start).to_s if context_start.is_a? Regexp
+      # If an end marker was defined but wasn't in the string, the context may be the last jump or match
+      # target in the rule; so if no end marker is found, just use something past the end of the string.
+      search_end = values.index(context_end, (search_start + context_start.length)) || values.length
+
+      [matchers].flatten.each do |v|
+        index = values.index(%r{\s#{v}\s}, search_start)
+        next unless index && index < search_end
+        index_mapping[resource_name] = index
       end
     end
-    # Generate parser_list based on the index of the found option
-    parser_list = []
-    map_index.sort_by { |_k, v| v }.each { |mapi| parser_list << mapi.first }
+    parser_list = index_map.sort_by { |_resource_name, index| index }.to_h.keys
 
     ############
     # MAIN PARSE
     ############
 
-    # Here we iterate across our values to generate an array of keys
-    parser_list.reverse_each do |k|
-      resource_map_key = resource_map[k]
-      [resource_map_key].flatten.each do |opt|
-        if values.slice!(%r{\s#{opt}})
-          keys << k
+    # Iterate through the sorted list of resource matchers we found, and
+    # pull them out of the rule text so only their matching values remain
+    keys = parser_list.each_with_object([]) do |resource_key, found_keys|
+      [resource_map[resource_key]].flatten.each do |matcher|
+        if values.slice!(%r{\s#{matcher}})
+          found_keys << resource_key
           break
         end
       end
     end
 
-    # Manually remove chain
-    if %r{(\s|^)-A\s}.match?(values)
-      values = values.sub(%r{(\s|^)-A\s}, '\1')
-      keys << :chain
-    end
+    # Slurp up the resource values
+    found_values = values.scan(%r{("(?:[^"\\]|\\.)*"|\S+)}).flatten
 
-    # Manually remove table (used in some tests)
-    if %r{^-t\s}.match?(values)
-      values = values.sub(%r{^-t\s}, '')
-      keys << :table
-    end
-
-    # manually remove comments if they made it this far
-    if %r{-m comment --comment}.match?(values)
-      values = values.sub(%r{-m comment --comment "((?:\\"|[^"])*)"}, {})
-    end
-
-    valrev = values.scan(%r{("([^"\\]|\\.)*"|\S+)}).transpose[0].reverse
-
-    if keys.length != valrev.length
-      warning "Skipping unparsable iptables rule: keys (#{keys.length}) and values (#{valrev.length}) count mismatch on line: #{line}"
+    if keys.length != found_values.length
+      warning "Skipping unparsable iptables rule: keys (#{keys.length}) and values (#{found_values.length}) count mismatch on line: #{line}"
       return
     end
 
     # Here we generate the main hash by scanning arguments off the values
     # string, handling any quoted characters present in the value, and then
     # zipping the values with the array of keys.
-    keys.zip(valrev) do |f, v|
-      hash[f] = if %r{^".*"$}.match?(v)
-                  v.sub(%r{^"(.*)"$}, '\1').gsub(%r{\\(\\|'|")}, '\1')
-                else
-                  v.dup
-                end
+    found_values = found_values.map do |value|
+      if %r{^".*"$}.match?(value)
+        value.sub(%r{^"(.*)"$}, '\1').gsub(%r{\\(\\|'|")}, '\1')
+      else
+        value
+      end
     end
+
+    hash = keys.zip(found_values).to_h
 
     #####################
     # POST PARSE CLUDGING
     #####################
 
-    [:dport, :sport, :port, :state, :ctstate, :ctstatus].each do |prop|
+    [:dport, :sport, :port, :state, :ctstate, :ctstatus, :rpfilter].each do |prop|
       hash[prop] = hash[prop].split(',') unless hash[prop].nil?
     end
 
     [:ipset, :dst_type, :src_type].each do |prop|
       hash[prop] = hash[prop].split(';') unless hash[prop].nil?
     end
-
-    hash[:rpfilter] = hash[:rpfilter].split(' ') unless hash[:rpfilter].nil?
 
     ## clean up DSCP class to HEX mappings
     valid_dscp_classes = {
