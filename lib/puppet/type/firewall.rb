@@ -134,6 +134,8 @@ Puppet::Type.newtype(:firewall) do
 
       * string_matching: The ability to match a given string by using some pattern matching strategy.
 
+      * tcp_option: The ability to match on particular TCP options.
+
       * tcp_flags: The ability to match on particular TCP flag settings.
 
       * netmap: The ability to map entire subnets via source or destination nat rules.
@@ -171,6 +173,7 @@ Puppet::Type.newtype(:firewall) do
   feature :log_ip_options, 'Add IP/IPv6 packet header to log messages'
   feature :mark, 'Match or Set the netfilter mark value associated with the packet'
   feature :mss, 'Match a given TCP MSS value or range.'
+  feature :tcp_option, 'The ability to match on particular TCP options'
   feature :tcp_flags, 'The ability to match on particular TCP flag settings'
   feature :pkttype, 'Match a packet type'
   feature :rpfilter, 'Perform reverse-path filtering'
@@ -567,6 +570,24 @@ Puppet::Type.newtype(:firewall) do
     desc <<-PUPPETCODE
       Match a given TCP MSS value or range.
     PUPPETCODE
+  end
+
+  # tcp-specific
+  newproperty(:tcp_option, required_features: :tcp_option) do
+    desc <<-PUPPETCODE
+      Match when the TCP option is present or absent.
+      Given as a single TCP option, optionally prefixed with '! ' to match
+      on absence instead.  Only one TCP option can be matched in a given rule.
+      TCP option numbers are an eight-bit field, so valid option numbers range
+      from 0-255.
+    PUPPETCODE
+
+    validate do |value|
+      unless value.to_i.bit_length < 8 && value.to_i >= 0
+        raise ArgumentError, "TCP Options fall in the range 0-255, #{value} is not a valid TCP Option number"
+      end
+    end
+    munge { |value| value.to_s }
   end
 
   # tcp-specific
@@ -2341,7 +2362,7 @@ Puppet::Type.newtype(:firewall) do
     ['/etc/sysconfig/iptables', '/etc/sysconfig/ip6tables']
   end
 
-  validate do
+  validate do # rubocop:disable Metrics/BlockLength
     debug('[validate]')
 
     # TODO: this is put here to skip validation if ensure is not set. This
