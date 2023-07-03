@@ -35,7 +35,7 @@ class firewall::params {
             $package_name = ['iptables-services', 'nftables', 'iptables-nft-services']
             $iptables_name = 'iptables-nft'
             $sysconfig_manage = false
-            $firewalld_manage = false
+            $firewalld_manage = true
           } elsif versioncmp($facts['os']['release']['full'], '8.0') >= 0 {
             $service_name = ['iptables', 'nftables']
             $service_name_v6 = 'ip6tables'
