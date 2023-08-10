@@ -542,5 +542,3 @@ And run the tests from the root of the source code:
 ```text
 bundle exec rake parallel_spec
 ```
-
-See also `.travis.yml` for information on running the acceptance and other tests.
