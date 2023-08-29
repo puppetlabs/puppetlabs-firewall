@@ -139,6 +139,21 @@ class firewall::linux::redhat (
       #lint:ignore:quoted_booleans
       'true',true: {
         case $facts['os']['name'] {
+          'RedHat': {
+            case $facts['os']['release']['full'] {
+              /^7\..*/: {
+                $seluser = 'unconfined_u'
+                $seltype = 'system_conf_t'
+              }
+              default : {
+                $seluser = 'system_u'
+                $seltype = 'system_conf_t'
+              }
+            }
+
+            File<| title == "/etc/sysconfig/${service_name}" |> { seluser => $seluser, seltype => $seltype }
+            File<| title == "/etc/sysconfig/${service_name_v6}" |> { seluser => $seluser, seltype => $seltype }
+          }
           'CentOS': {
             case $facts['os']['release']['full'] {
               /^6\..*/: {
