@@ -88,3 +88,6 @@ Style/Documentation:
   - spec/**/*
 Style/WordArray:
   EnforcedStyle: brackets
+Naming/MethodParameterName:
+  AllowedNames:
+    - 'is'
