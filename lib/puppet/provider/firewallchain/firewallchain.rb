@@ -189,4 +189,39 @@ class Puppet::Provider::Firewallchain::Firewallchain
     warn "Warning: Inbuilt Chains may not be deleted. Chain `#{should[:name]}` will be flushed and have it's policy reverted to default." if $built_in_regex.match(should[:chain]) &&
                                                                                                                                              should[:ensure] == 'absent'
   end
+
+  # Customer generate method called by the resource_api
+  # Finds and returns all unmanaged rules on the chain that are not set to be ignored
+  def generate(_context, title, _is, should)
+    # Unless purge is true, return an empty array
+    return [] unless should[:purge]
+
+    # gather a list of all rules present on the system
+    rules_resources = Puppet::Type.type(:firewall).instances
+
+    # Retrieve information from the title
+    name, table, protocol = title.split(':')
+
+    # Keep only rules in this chain
+    rules_resources.delete_if do |resource|
+      resource.rsapi_current_state[:chain] != name || resource.rsapi_current_state[:table] != table || resource.rsapi_current_state[:protocol] != protocol
+    end
+
+    # Remove rules which match our ignore filter
+    # Ensure ignore value is wrapped as an array to simplify the code
+    should[:ignore] = [should[:ignore]] if should[:ignore].is_a?(String)
+    rules_resources.delete_if { |resource| should[:ignore].find_index { |ignore| resource.rsapi_current_state[:line].match(ignore) } } if should[:ignore]
+
+    # Remove rules that were (presumably) not put in by puppet
+    rules_resources.delete_if { |resource| resource.rsapi_current_state[:name].match(%r{^(\d+)[[:graph:][:space:]]})[1].to_i >= 9000 } if should[:ignore_foreign]
+
+    # We mark all remaining rules for deletion, and then let the catalog override us on rules which should be present
+    # We also ensure that the generate rules have the correct protocol to avoid issues with our validation
+    rules_resources.each do |resource|
+      resource[:ensure] = :absent
+      resource[:protocol] = protocol
+    end
+
+    rules_resources
+  end
 end
