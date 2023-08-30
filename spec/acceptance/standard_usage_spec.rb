@@ -13,28 +13,28 @@ describe 'standard usage tests' do
         # Default firewall rules
         firewall { '000 accept all icmp':
           proto   => 'icmp',
-          action  => 'accept',
+          jump    => 'ACCEPT',
         }->
         firewall { '001 accept all to lo interface':
           proto   => 'all',
           iniface => 'lo',
-          action  => 'accept',
+          jump    => 'ACCEPT',
         }->
         firewall { "0002 reject local traffic not on loopback interface":
           iniface     => '! lo',
-          destination => '127.0.0.1/8',
-          action      => 'reject',
+          destination => '127.0.0.0/8',
+          jump        => 'REJECT',
         }->
         firewall { '003 accept related established rules':
           proto   => 'all',
           ctstate => ['RELATED', 'ESTABLISHED'],
-          action  => 'accept',
+          jump    => 'ACCEPT',
         }
       }
       class my_fw::post {
         firewall { '999 drop all':
           proto   => 'all',
-          action  => 'drop',
+          jump    => 'DROP',
           before  => undef,
         }
       }
@@ -48,9 +48,9 @@ describe 'standard usage tests' do
       class { ['my_fw::pre', 'my_fw::post']: }
       class { 'firewall': }
       firewall { '500 open up port 22':
-        action => 'accept',
+        jump  => 'ACCEPT',
         proto => 'tcp',
-        dport => 22,
+        dport => '22',
       }
   PUPPETCODE
   it 'applies twice' do

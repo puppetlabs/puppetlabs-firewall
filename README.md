@@ -170,15 +170,7 @@ resources { 'firewallchain':
 Internal chains can not be deleted. In order to avoid all the confusing
 Warning/Notice messages when using `purge => true`, like these ones:
 
-    Notice: Compiled catalog for blonde-height.delivery.puppetlabs.net in environment production in 0.05 seconds
-    Warning: Firewallchain[INPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain INPUT:mangle:IPv4
-    Notice: /Stage[main]/Main/Firewallchain[INPUT:mangle:IPv4]/ensure: removed
-    Warning: Firewallchain[FORWARD:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain FORWARD:mangle:IPv4
-    Notice: /Stage[main]/Main/Firewallchain[FORWARD:mangle:IPv4]/ensure: removed
-    Warning: Firewallchain[OUTPUT:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain OUTPUT:mangle:IPv4
-    Notice: /Stage[main]/Main/Firewallchain[OUTPUT:mangle:IPv4]/ensure: removed
-    Warning: Firewallchain[POSTROUTING:mangle:IPv4](provider=iptables_chain): Attempting to destroy internal chain POSTROUTING:mangle:IPv4
-    Notice: /Stage[main]/Main/Firewallchain[POSTROUTING:mangle:IPv4]/ensure: removed
+  Warning: Inbuilt Chains may not be deleted. Chain `POSTROUTING:mangle:IPv6` will be flushed and have it's policy reverted to default.
 
   Please create firewallchains for every internal chain. Here is an example:
 
@@ -248,7 +240,7 @@ firewall { '006 Allow inbound SSH (v6)':
   dport    => 22,
   proto    => 'tcp',
   action   => 'accept',
-  provider => 'ip6tables',
+  protocol => 'ip6tables',
 }
 ```
 
@@ -280,9 +272,12 @@ class profile::apache {
 
 ### Rule inversion
 
-Firewall rules may be inverted by prefixing the value of a parameter by "! ". If the value is an array, then every item in the array must be prefixed as iptables does not understand inverting a single value.
+Firewall rules may be inverted by prefixing the value of a parameter by "! ".
 
 Parameters that understand inversion are: connmark, ctstate, destination, dport, dst\_range, dst\_type, iniface, outiface, port, proto, source, sport, src\_range and src\_type.
+
+If the value is an array, then either the first value of the array, or all of its values must be prefixed in order to invert them all.
+For most array attributes it is not possible to invert only one passed value.
 
 Examples:
 
@@ -297,9 +292,20 @@ firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN u
   state     => 'NEW',
   action    => 'drop',
   proto     => 'tcp',
-  sport     => ['! http', '! 443'],
+  sport     => ['! http', '443'],
   source    => '! 10.0.0.0/8',
   tcp_flags => '! FIN,SYN,RST,ACK SYN',
+}
+```
+
+There are exceptions to this however, with attributes such as src\_type, dst\_type and ipset allowing the user to negate each passed values seperately.
+
+Examples:
+
+```puppet
+firewall { '001 allow local disallow anycast':
+  action   => 'accept',
+  src_type => ['LOCAL', '! ANYCAST'],
 }
 ```
 
@@ -541,4 +547,62 @@ And run the tests from the root of the source code:
 
 ```text
 bundle exec rake parallel_spec
+```
+
+See the Github Action runs for information on running the acceptance and other tests.
+
+### Migration path to v7.0.0
+
+As of `v7.0.0` of this module a major rework has been done to adopt the [puppet-resource_api](https://github.com/puppetlabs/puppet-resource_api) into the module and use it style of code in place of the original form of Puppet Type and Providers. This was done in the most part to increase the ease with with the module could be maintained and updated in the future, the changes helping to structure the module in such a way as to be more easily understood and altered going forward.
+
+As part of this process several breaking changes where made to the code that will need to be accounted for whenever you update to this new version of the module, with these changes including:
+
+* The `provider` attibute within the `firewall` type has been renamed to `protocol`, both to bring it in line with the matching attribute within the `firewallchain` type and due to the resource_api forbidding the use of `provider` as a attribute name. As part of this the attribute has also been updated to accept `IPv4` and `IPv6` in place of `iptables` or `ip6tables`, though they are still valid as input.
+* The `action` attribute within the `firewall` type has been removed as it was merely a restricted version of the `jump` attribute, both of them managing the same function, this being reasoned as a way to enforce the use of generic parameters. From this point the parameters formerly unique to `action` should now be passed to `jump`.
+* Strict types have now been implemented for all attributes, while this should not require changes on the user end in most cases, there may be some instances where manifests will require updated to match the new expected form of input.
+* Attributes that allow both arrays and negated values have now been updated.
+  * For attributes that require that all passed values be negated as one, you now merely have to negate the first value within the array, rather than all of them, though negating all is still accepted.
+  * For attributes that allow passed values to be negated seperately this is not the case. All attributes in this situation are noted within their description.
+* The `sport` and `dport` attributes have been updated so that they will now accept with `:` or `-` as a separator when passing ranges, with `:` being preferred as it matchs what is passed to iptables.
+
+Two pairs of manifest tkane from the tests can be seen below, illustrating the changes that may be required, the fist applying a hoplimit on `ip6tables`:
+
+```Puppet
+firewall { '571 - hop_limit':
+  ensure    => present,
+  proto     => 'tcp',
+  dport     => '571',
+  action    => 'accept',
+  hop_limit => '5',
+  provider  => 'ip6tables',
+}
+```
+
+```Puppet
+firewall { '571 - hop_limit':
+  ensure    => present,
+  proto     => 'tcp',
+  dport     => '571',
+  jump      => 'accept',
+  hop_limit => '5',
+  protocol  => 'IPv6',
+}
+```
+
+And the second negating access to a range of ports on `iptables`:
+
+```puppet
+firewall { '560 - negated ports':
+  proto  => `tcp`,
+  sport  => ['! 560-570','! 580'],
+  action => `accept`,
+}
+```
+
+```puppet
+firewall { '560 - negated ports':
+  proto  => `tcp`,
+  sport  => '! 560:570','580',
+  jump   => `accept`,
+}
 ```

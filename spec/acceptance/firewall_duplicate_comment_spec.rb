@@ -4,9 +4,7 @@ require 'spec_helper_acceptance'
 
 describe 'firewall - duplicate comments' do
   before(:all) do
-    if os[:family] == 'ubuntu' || os[:family] == 'debian'
-      update_profile_file
-    end
+    update_profile_file if os[:family] == 'ubuntu' || os[:family] == 'debian'
   end
 
   after(:each) do
@@ -21,9 +19,9 @@ describe 'firewall - duplicate comments' do
     }
 
     firewall { '550 destination':
-      proto  => tcp,
-      dport   => '550',
-      action => accept,
+      proto => tcp,
+      dport => '550',
+      jump => accept,
       destination => '192.168.2.0/24',
     }
     PUPPETCODE
@@ -33,7 +31,7 @@ describe 'firewall - duplicate comments' do
       run_shell('iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 552 -j ACCEPT -m comment --comment "550 destination"')
 
       apply_manifest(pp) do |r|
-        expect(r.stderr).to include('Duplicate rule found for 550 destination. Skipping update.')
+        expect(r.stderr).to include('Duplicate names have been found within your Firewalls. This prevents the module from working correctly and must be manually resolved.')
       end
     end
   end

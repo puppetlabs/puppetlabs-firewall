@@ -4,22 +4,20 @@ require 'spec_helper_acceptance'
 
 describe 'firewall class' do
   before(:all) do
-    if os[:family] == 'ubuntu' || os[:family] == 'debian'
-      update_profile_file
-    end
+    update_profile_file if os[:family] == 'ubuntu' || os[:family] == 'debian'
   end
 
-  it 'runs successfully', unless: os[:family] == 'redhat' && os[:release].to_i == 6 do
+  it 'runs successfully' do
     pp = "class { 'firewall': }"
     idempotent_apply(pp)
   end
 
-  it 'ensure => stopped:', unless: os[:family] == 'redhat' && os[:release].to_i == 6 do
+  it 'ensure => stopped:' do
     pp = "class { 'firewall': ensure => stopped }"
     idempotent_apply(pp)
   end
 
-  it 'ensure => running:', unless: os[:family] == 'redhat' && os[:release].to_i == 6 do
+  it 'ensure => running:' do
     pp = "class { 'firewall': ensure => running }"
     idempotent_apply(pp)
   end

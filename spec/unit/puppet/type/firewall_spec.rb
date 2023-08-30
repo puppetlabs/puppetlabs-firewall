@@ -1,890 +1,750 @@
-#!/usr/bin/env rspec
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'puppet/type/firewall'
 
-firewall = Puppet::Type.type(:firewall)
+RSpec.describe 'firewall type' do
+  let(:firewall) { Puppet::Type.type(:firewall) }
 
-describe firewall do # rubocop:disable RSpec/MultipleDescribes
-  let(:firewall_class) { firewall }
-  let(:provider) { instance_double('provider') }
-  let(:resource) { firewall_class.new(name: '000 test foo') }
-
-  before :each do
-    allow(provider).to receive(:name).and_return(:iptables)
-    allow(Puppet::Type::Firewall).to receive(:defaultprovider).and_return provider
-
-    # Stub iptables version
-    allow(Facter.fact(:iptables_version)).to receive(:value).and_return('1.4.2')
-    allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return('1.4.2')
-
-    # Stub confine facts
-    allow(Facter.fact(:kernel)).to receive(:value).and_return('Linux')
-    allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Debian')
+  it 'loads' do
+    expect(firewall).not_to be_nil
   end
 
   it 'has :name be its namevar' do
-    expect(firewall_class.key_attributes).to eql [:name]
+    expect(firewall.key_attributes).to eql [:name]
   end
 
-  describe ':name' do
-    it 'accepts a name' do
-      resource[:name] = '000-test-foo'
-      expect(resource[:name]).to eql '000-test-foo'
-    end
-
-    it 'does not accept a name with non-ASCII chars' do
-      expect(-> { resource[:name] = '%*#^(#$' }).to raise_error(Puppet::Error)
+  describe ':line' do
+    it 'is read only' do
+      expect { firewall.new(name: '001 test rule', line: 'test') }.to raise_error(Puppet::Error)
     end
   end
 
-  describe ':action' do
-    it 'has no default' do
-      res = firewall_class.new(name: '000 test')
-      expect(res.parameters[:action]).to be nil
-    end
-
-    [:accept, :drop, :reject].each do |action|
-      it "accepts value #{action}" do
-        resource[:action] = action
-        expect(resource[:action]).to eql action
-      end
-    end
-
-    it 'fails when value is not recognized' do
-      expect(-> { resource[:action] = 'not valid' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  describe ':chain' do
-    [:INPUT, :FORWARD, :OUTPUT, :PREROUTING, :POSTROUTING].each do |chain|
-      it "accepts chain value #{chain}" do
-        resource[:chain] = chain
-        expect(resource[:chain]).to eql chain
-      end
-    end
-
-    it 'fails when the chain value is not recognized' do
-      expect(-> { resource[:chain] = 'not valid' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  describe ':table' do
-    [:nat, :mangle, :filter, :raw].each do |table|
-      it "accepts table value #{table}" do
-        resource[:table] = table
-        expect(resource[:table]).to eql table
-      end
-    end
-
-    it 'fails when table value is not recognized' do
-      expect(-> { resource[:table] = 'not valid' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  describe ':proto' do
-    [:ip, :tcp, :udp, :icmp, :esp, :ah, :vrrp, :carp, :igmp, :ipencap, :ipv4, :ipv6, :ospf, :gre, :pim, :all].each do |proto|
-      it "accepts proto value #{proto}" do
-        resource[:proto] = proto
-        expect(resource[:proto]).to eql proto
-      end
-    end
-
-    it 'fails when proto value is not recognized' do
-      expect(-> { resource[:proto] = 'foo' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  describe ':jump' do
-    it 'has no default' do
-      res = firewall_class.new(name: '000 test')
-      expect(res.parameters[:jump]).to be nil
-    end
-
-    ['QUEUE', 'RETURN', 'DNAT', 'SNAT', 'LOG', 'NFLOG', 'MASQUERADE', 'REDIRECT', 'MARK'].each do |jump|
-      it "accepts jump value #{jump}" do
-        resource[:jump] = jump
-        expect(resource[:jump]).to eql jump
-      end
-    end
-
-    ['ACCEPT', 'DROP', 'REJECT'].each do |jump|
-      it "nows fail when value #{jump}" do
-        expect(-> { resource[:jump] = jump }).to raise_error(Puppet::Error)
-      end
-    end
-
-    it 'fails when jump value is not recognized' do
-      expect(-> { resource[:jump] = '%^&*' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  [:source, :destination].each do |addr|
-    describe addr do
-      it "accepts a #{addr} as a string" do
-        resource[addr] = '127.0.0.1'
-        expect(resource[addr]).to eql '127.0.0.1/32'
-      end
-      ['0.0.0.0/0', '::/0'].each do |prefix|
-        it "is nil for zero prefix length address #{prefix}" do
-          resource[addr] = prefix
-          expect(resource[addr]).to be nil
-        end
-      end
-      it "accepts a negated #{addr} as a string" do
-        resource[addr] = '! 127.0.0.1'
-        expect(resource[addr]).to eql '! 127.0.0.1/32'
-      end
-    end
-  end
-
-  describe 'source error checking' do
-    it 'Invalid address when 256.168.2.0/24' do
-      expect { resource[:source] = '256.168.2.0/24' }.to raise_error(
-        Puppet::Error, %r{host_to_ip failed}
-      )
-    end
-  end
-
-  describe 'destination error checking' do
-    it 'Invalid address when 256.168.2.0/24' do
-      expect { resource[:destination] = '256.168.2.0/24' }.to raise_error(
-        Puppet::Error, %r{host_to_ip failed}
-      )
-    end
-  end
-
-  describe 'src_range error checking' do
-    it 'Invalid IP when 392.168.1.1-192.168.1.10' do
-      expect { resource[:src_range] = '392.168.1.1-192.168.1.10' }.to raise_error(
-        Puppet::Error, %r{Invalid IP address}
-      )
-    end
-  end
-
-  describe 'dst_range error checking' do
-    it 'Invalid IP when 392.168.1.1-192.168.1.10' do
-      expect { resource[:dst_range] = '392.168.1.1-192.168.1.10' }.to raise_error(
-        Puppet::Error, %r{Invalid IP address}
-      )
-    end
-  end
-
-  [:dport, :sport].each do |port|
-    describe port do
-      it "accepts a #{port} as string" do
-        resource[port] = '22'
-        expect(resource[port]).to eql ['22']
-      end
-
-      it "accepts a #{port} as an array" do
-        resource[port] = ['22', '23']
-        expect(resource[port]).to eql ['22', '23']
-      end
-
-      it "accepts a #{port} as a number" do
-        resource[port] = 22
-        expect(resource[port]).to eql ['22']
-      end
-
-      it "accepts a #{port} as a hyphen separated range" do
-        resource[port] = ['22-1000']
-        expect(resource[port]).to eql ['22-1000']
-      end
-
-      it "should accept a #{port} as a combination of arrays of single and " \
-        'hyphen separated ranges' do
-        resource[port] = ['22-1000', '33', '3000-4000']
-        expect(resource[port]).to eql ['22-1000', '33', '3000-4000']
-      end
-
-      it "converts a port name for #{port} to its number" do
-        resource[port] = 'ssh'
-        expect(resource[port]).to eql ['22']
-      end
-
-      it "does not accept something invalid for #{port}" do
-        expect { resource[port] = 'something odd' }.to raise_error(Puppet::Error, %r{^Parameter .+ failed.+Munging failed for value ".+" in class .+: no such service})
-      end
-
-      it "does not accept something invalid in an array for #{port}" do
-        expect { resource[port] = ['something odd', 'something even odder'] }.to raise_error(Puppet::Error, %r{^Parameter .+ failed.+Munging failed for value ".+" in class .+: no such service})
-      end
-    end
-  end
-
-  describe 'port deprecated' do
-    it 'raises a warning' do
-      allow(Puppet).to receive(:warning).with %r{port to firewall is deprecated}
-      resource[:port] = '22'
-    end
-  end
-
-  [:dst_type, :src_type].each do |addrtype|
-    describe addrtype do
-      it 'has no default' do
-        res = firewall_class.new(name: '000 test')
-        expect(res.parameters[addrtype]).to be nil
-      end
-    end
-
-    [:UNSPEC, :UNICAST, :LOCAL, :BROADCAST, :ANYCAST, :MULTICAST, :BLACKHOLE,
-     :UNREACHABLE, :PROHIBIT, :THROW, :NAT, :XRESOLVE].each do |type|
-      ['! ', ''].each do |negation|
-        ['', ' --limit-iface-in', ' --limit-iface-out'].each do |limit|
-          it "accepts #{addrtype} value #{negation}#{type}#{limit}" do
-            resource[addrtype] = type
-            expect(resource[addrtype]).to eql [type]
-          end
-        end
-      end
-    end
-
-    it "fails when #{addrtype} value is not recognized" do
-      expect(-> { resource[addrtype] = 'foo' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  [:iniface, :outiface].each do |iface|
-    describe iface do
-      it "accepts #{iface} value as a string" do
-        resource[iface] = 'eth1'
-        expect(resource[iface]).to eql 'eth1'
-      end
-      it "accepts a negated #{iface} value as a string" do
-        resource[iface] = '! eth1'
-        expect(resource[iface]).to eql '! eth1'
-      end
-      it "accepts an interface alias for the #{iface} value as a string" do
-        resource[iface] = 'eth1:2'
-        expect(resource[iface]).to eql 'eth1:2'
-      end
-    end
-  end
-
-  [:tosource, :todest, :to].each do |addr|
-    describe addr do
-      it "accepts #{addr} value as a string" do
-        resource[addr] = '127.0.0.1'
-      end
-    end
-  end
-
-  describe ':log_level' do
-    values = {
-      'panic' => '0',
-      'alert' => '1',
-      'crit'  => '2',
-      'err'   => '3',
-      'warn'  => '4',
-      'warning' => '4',
-      'not' => '5',
-      'notice' => '5',
-      'info' => '6',
-      'debug' => '7',
+  {
+    ':ensure': {
+      valid: [{ name: '001 test rule', ensure: 'present' }, { name: '001 test rule', ensure: 'absent' }],
+      invalid: [{ name: '001 test rule', ensure: true }, { name: '001 test rule', ensure: 313 }, { name: '001 test rule', ensure: 'false' }]
+    },
+    ':name': {
+      valid: [{ name: '001 first' }, { name: '202 second rule' }, { name: '333 third rule also' }],
+      invalid: [{ name: 'invalid rule 001' }, { name: 'invalid rule two' }]
+    },
+    ':protocol': {
+      valid: [{ name: '001 test rule', protocol: 'iptables' }, { name: '001 test rule', protocol: 'ip6tables' },
+              { name: '001 test rule', protocol: 'IPv4' }, { name: '001 test rule', protocol: 'IPv6' }],
+      invalid: [{ name: '001 test rule', protocol: true }, { name: '001 test rule', protocol: 313 },
+                { name: '001 test rule', protocol: 'IPv6tables' }]
+    },
+    ':table': {
+      valid: [{ name: '001 test rule', table: 'nat' }, { name: '001 test rule', table: 'raw' },
+              { name: '001 test rule', table: 'broute' }, { name: '001 test rule', table: 'security' }],
+      invalid: [{ name: '001 test rule', table: true }, { name: '001 test rule', table: 313 },
+                { name: '001 test rule', table: 'rawroute' }]
+    },
+    ':chain': {
+      valid: [{ name: '001 test rule', chain: 'INPUT' }, { name: '001 test rule', chain: 'OUTPUT' },
+              { name: '001 test rule', chain: 'POSTROUTING' }, { name: '001 test rule', chain: 'test_chain' }],
+      invalid: [{ name: '001 test rule', chain: true }, { name: '001 test rule', chain: 313 },
+                { name: '001 test rule', chain: '' }]
+    },
+    ':source': {
+      valid: [{ name: '001 test rule', source: '192.168.2.0/24' }, { name: '001 test rule', source: '! 192.168.2.0/24' },
+              { name: '001 test rule', source: '1::46' }, { name: '001 test rule', source: '! 1::46' }],
+      invalid: [{ name: '001 test rule', source: true }, { name: '001 test rule', source: 313 },
+                { name: '001 test rule', source: '' }]
+    },
+    ':destination': {
+      valid: [{ name: '001 test rule', destination: '192.168.2.0/24' }, { name: '001 test rule', destination: '! 192.168.2.0/24' },
+              { name: '001 test rule', destination: '1::46' }, { name: '001 test rule', destination: '! 1::46' }],
+      invalid: [{ name: '001 test rule', destination: true }, { name: '001 test rule', destination: 313 },
+                { name: '001 test rule', destination: '' }]
+    },
+    ':iniface': {
+      valid: [{ name: '001 test rule', iniface: 'enp0s8' }, { name: '001 test rule', iniface: '! enp0s8' },
+              { name: '001 test rule', iniface: 'lo' }, { name: '001 test rule', iniface: '! lo' }],
+      invalid: [{ name: '001 test rule', iniface: true }, { name: '001 test rule', iniface: 313 },
+                { name: '001 test rule', iniface: 'invalid/' }, { name: '001 test rule', iniface: '' }]
+    },
+    ':outiface': {
+      valid: [{ name: '001 test rule', outiface: 'enp0s8' }, { name: '001 test rule', outiface: '! enp0s8' },
+              { name: '001 test rule', outiface: 'lo' }, { name: '001 test rule', outiface: '! lo' }],
+      invalid: [{ name: '001 test rule', outiface: true }, { name: '001 test rule', outiface: 313 },
+                { name: '001 test rule', outiface: 'invalid/' }, { name: '001 test rule', outiface: '' }]
+    },
+    ':physdev_in': {
+      valid: [{ name: '001 test rule', physdev_in: 'enp0s8' }, { name: '001 test rule', physdev_in: '! enp0s8' },
+              { name: '001 test rule', physdev_in: 'lo' }, { name: '001 test rule', physdev_in: '! lo' }],
+      invalid: [{ name: '001 test rule', physdev_in: true }, { name: '001 test rule', physdev_in: 313 },
+                { name: '001 test rule', physdev_in: 'invalid/' }, { name: '001 test rule', physdev_in: '' }]
+    },
+    ':physdev_out': {
+      valid: [{ name: '001 test rule', physdev_out: 'enp0s8' }, { name: '001 test rule', physdev_out: '! enp0s8' },
+              { name: '001 test rule', physdev_out: 'lo' }, { name: '001 test rule', physdev_out: '! lo' }],
+      invalid: [{ name: '001 test rule', physdev_out: true }, { name: '001 test rule', physdev_out: 313 },
+                { name: '001 test rule', physdev_out: 'invalid/' }, { name: '001 test rule', physdev_out: '' }]
+    },
+    ':physdev_is_bridged': {
+      valid: [{ name: '001 test rule', physdev_is_bridged: true }, { name: '001 test rule', physdev_is_bridged: false }],
+      invalid: [{ name: '001 test rule', physdev_is_bridged: 'invalid' }, { name: '001 test rule', physdev_is_bridged: 313 }]
+    },
+    ':physdev_is_in': {
+      valid: [{ name: '001 test rule', physdev_is_in: true }, { name: '001 test rule', physdev_is_in: false }],
+      invalid: [{ name: '001 test rule', physdev_is_in: 'invalid' }, { name: '001 test rule', physdev_is_in: 313 }]
+    },
+    ':physdev_is_out': {
+      valid: [{ name: '001 test rule', physdev_is_out: true }, { name: '001 test rule', physdev_is_out: false }],
+      invalid: [{ name: '001 test rule', physdev_is_out: 'invalid' }, { name: '001 test rule', physdev_is_out: 313 }]
+    },
+    ':proto': {
+      valid: [{ name: '001 test rule', proto: 'ipencap' }, { name: '001 test rule', proto: 'gre' },
+              { name: '001 test rule', proto: 'ip' }, { name: '001 test rule', proto: 'udp' }],
+      invalid: [{ name: '001 test rule', proto: 'invalid' }, { name: '001 test rule', proto: 313 }]
+    },
+    ':isfragment': {
+      valid: [{ name: '001 test rule', isfragment: true }, { name: '001 test rule', isfragment: false }],
+      invalid: [{ name: '001 test rule', isfragment: 'invalid' }, { name: '001 test rule', isfragment: 313 }]
+    },
+    ':isfirstfrag': {
+      valid: [{ name: '001 test rule', isfirstfrag: true }, { name: '001 test rule', isfirstfrag: false }],
+      invalid: [{ name: '001 test rule', isfirstfrag: 'invalid' }, { name: '001 test rule', isfirstfrag: 313 }]
+    },
+    ':ishasmorefrags': {
+      valid: [{ name: '001 test rule', ishasmorefrags: true }, { name: '001 test rule', ishasmorefrags: false }],
+      invalid: [{ name: '001 test rule', ishasmorefrags: 'invalid' }, { name: '001 test rule', ishasmorefrags: 313 }]
+    },
+    ':islastfrag': {
+      valid: [{ name: '001 test rule', islastfrag: true }, { name: '001 test rule', islastfrag: false }],
+      invalid: [{ name: '001 test rule', islastfrag: 'invalid' }, { name: '001 test rule', islastfrag: 313 }]
+    },
+    ':stat_mode': {
+      valid: [{ name: '001 test rule', stat_mode: 'nth' }, { name: '001 test rule', stat_mode: 'random' }],
+      invalid: [{ name: '001 test rule', stat_mode: 'invalid' }, { name: '001 test rule', stat_mode: 313 }]
+    },
+    ':stat_every': {
+      valid: [{ name: '001 test rule', stat_every: 1 }, { name: '001 test rule', stat_every: 313 }],
+      invalid: [{ name: '001 test rule', stat_every: 'invalid' }, { name: '001 test rule', stat_every: false }]
+    },
+    ':stat_packet': {
+      valid: [{ name: '001 test rule', stat_packet: 1 }, { name: '001 test rule', stat_packet: 313 }],
+      invalid: [{ name: '001 test rule', stat_packet: 'invalid' }, { name: '001 test rule', stat_packet: false }]
+    },
+    ':stat_probability': {
+      valid: [{ name: '001 test rule', stat_probability: 1 }, { name: '001 test rule', stat_probability: 0 },
+              { name: '001 test rule', stat_probability: 0.15 }, { name: '001 test rule', stat_probability: 0.313 }],
+      invalid: [{ name: '001 test rule', stat_probability: 'invalid' }, { name: '001 test rule', stat_probability: false },
+                { name: '001 test rule', stat_probability: 15 }, { name: '001 test rule', stat_probability: 313 }]
+    },
+    ':src_range': {
+      valid: [{ name: '001 test rule', src_range: '192.168.1.1-192.168.1.10' }, { name: '001 test rule', src_range: '! 192.168.1.1-192.168.1.10' },
+              { name: '001 test rule', src_range: '1::46-2::48' }, { name: '001 test rule', src_range: '! 1::46-2::48' }],
+      invalid: [{ name: '001 test rule', src_range: true }, { name: '001 test rule', src_range: 313 },
+                { name: '001 test rule', src_range: '' }]
+    },
+    ':dst_range': {
+      valid: [{ name: '001 test rule', dst_range: '192.168.1.1-192.168.1.10' }, { name: '001 test rule', dst_range: '! 192.168.1.1-192.168.1.10' },
+              { name: '001 test rule', dst_range: '1::46-2::48' }, { name: '001 test rule', dst_range: '! 1::46-2::48' }],
+      invalid: [{ name: '001 test rule', dst_range: true }, { name: '001 test rule', dst_range: 313 },
+                { name: '001 test rule', dst_range: '' }]
+    },
+    ':tcp_option': {
+      valid: [{ name: '001 test rule', tcp_option: '! 1' }, { name: '001 test rule', tcp_option: '15' },
+              { name: '001 test rule', tcp_option: 121 }, { name: '001 test rule', tcp_option: '! 255' }],
+      invalid: [{ name: '001 test rule', tcp_option: 'invalid' }, { name: '001 test rule', tcp_option: false },
+                { name: '001 test rule', tcp_option: 313 }, { name: '001 test rule', tcp_option: '313' }]
+    },
+    ':tcp_flags': {
+      valid: [{ name: '001 test rule', tcp_flags: 'FIN FIN,SYN,RST,ACK' }, { name: '001 test rule', tcp_flags: '! FIN,SYN,RST,ACK SYN' }],
+      invalid: [{ name: '001 test rule', tcp_flags: 'invalid' }, { name: '001 test rule', tcp_flags: false },
+                { name: '001 test rule', tcp_flags: 313 }, { name: '001 test rule', tcp_flags: 'FIN,SYN,RST,ACK' }]
+    },
+    ':uid': {
+      valid: [{ name: '001 test rule', uid: 'testuser' }, { name: '001 test rule', uid: '! 0' },
+              { name: '001 test rule', uid: 4 }, { name: '001 test rule', uid: 0 }],
+      invalid: [{ name: '001 test rule', uid: 0.3 }, { name: '001 test rule', uid: false },
+                { name: '001 test rule', uid: '' }]
+    },
+    ':gid': {
+      valid: [{ name: '001 test rule', gid: 'testuser' }, { name: '001 test rule', gid: '! 0' },
+              { name: '001 test rule', gid: 4 }, { name: '001 test rule', gid: 0 }],
+      invalid: [{ name: '001 test rule', gid: 0.3 }, { name: '001 test rule', gid: false },
+                { name: '001 test rule', gid: '' }]
+    },
+    ':mac_source': {
+      valid: [{ name: '001 test rule', mac_source: 'FA:16:00:00:00:00' }, { name: '001 test rule', mac_source: '! FA:16:00:00:00:00' }],
+      invalid: [{ name: '001 test rule', mac_source: 'FA1600000000' }, { name: '001 test rule', mac_source: false },
+                { name: '001 test rule', mac_source: 1_600_000_000 }]
+    },
+    ':sport': {
+      valid: [{ name: '001 test rule', sport: '1:1024' }, { name: '001 test rule', sport: '! 1-1024' },
+              { name: '001 test rule', sport: 1024 }, { name: '001 test rule', sport: '! 1024' },
+              { name: '001 test rule', sport: ['1:1024', '2024'] }, { name: '001 test rule', sport: ['! 1', 1024] }],
+      invalid: [{ name: '001 test rule', sport: 'invalid' }, { name: '001 test rule', sport: false }]
+    },
+    ':dport': {
+      valid: [{ name: '001 test rule', dport: '1:1024' }, { name: '001 test rule', dport: '! 1-1024' },
+              { name: '001 test rule', dport: 1024 }, { name: '001 test rule', dport: '! 1024' },
+              { name: '001 test rule', dport: ['1:1024', '1024'] }, { name: '001 test rule', dport: ['! 1', 1024] }],
+      invalid: [{ name: '001 test rule', dport: 'invalid' }, { name: '001 test rule', dport: false }]
+    },
+    ':src_type': {
+      valid: [{ name: '001 test rule', src_type: 'LOCAL' }, { name: '001 test rule', src_type: '! BROADCAST' },
+              { name: '001 test rule', src_type: 'ANYCAST --limit-iface-in' },
+              { name: '001 test rule', src_type: ['! LOCAL', 'PROHIBIT --limit-iface-in'] }],
+      invalid: [{ name: '001 test rule', src_type: 'local' }, { name: '001 test rule', src_type: false },
+                { name: '001 test rule', src_type: 123 }, { name: '001 test rule', src_type: ['unicast', 123] }]
+    },
+    ':dst_type': {
+      valid: [{ name: '001 test rule', dst_type: 'LOCAL' }, { name: '001 test rule', dst_type: '! BROADCAST' },
+              { name: '001 test rule', dst_type: 'ANYCAST --limit-iface-in' },
+              { name: '001 test rule', dst_type: ['! LOCAL', 'PROHIBIT --limit-iface-in'] }],
+      invalid: [{ name: '001 test rule', dst_type: 'local' }, { name: '001 test rule', dst_type: false },
+                { name: '001 test rule', dst_type: 123 }, { name: '001 test rule', dst_type: ['unicast', 123] }]
+    },
+    ':socket': {
+      valid: [{ name: '001 test rule', socket: true }, { name: '001 test rule', socket: false }],
+      invalid: [{ name: '001 test rule', socket: 'invalid' }, { name: '001 test rule', socket: 313 }]
+    },
+    ':pkttype': {
+      valid: [{ name: '001 test rule', pkttype: 'unicast' }, { name: '001 test rule', uid: 'broadcast' },
+              { name: '001 test rule', pkttype: 'multicast' }],
+      invalid: [{ name: '001 test rule', pkttype: 'invalid' }, { name: '001 test rule', pkttype: false },
+                { name: '001 test rule', pkttype: 313 }]
+    },
+    ':ipsec_dir': {
+      valid: [{ name: '001 test rule', ipsec_dir: 'in' }, { name: '001 test rule', ipsec_dir: 'out' }],
+      invalid: [{ name: '001 test rule', ipsec_dir: 'invalid' }, { name: '001 test rule', ipsec_dir: false },
+                { name: '001 test rule', ipsec_dir: 313 }]
+    },
+    ':ipsec_policy': {
+      valid: [{ name: '001 test rule', ipsec_policy: 'none' }, { name: '001 test rule', ipsec_policy: 'ipsec' }],
+      invalid: [{ name: '001 test rule', ipsec_policy: 'invalid' }, { name: '001 test rule', ipsec_policy: false },
+                { name: '001 test rule', ipsec_policy: 313 }]
+    },
+    ':state': {
+      valid: [{ name: '001 test rule', state: 'INVALID' }, { name: '001 test rule', state: '! ESTABLISHED' },
+              { name: '001 test rule', state: ['! UNTRACKED', 'INVALID'] }],
+      invalid: [{ name: '001 test rule', state: 'invalid' }, { name: '001 test rule', state: false }]
+    },
+    ':ctstate': {
+      valid: [{ name: '001 test rule', ctstate: 'INVALID' }, { name: '001 test rule', ctstate: '! ESTABLISHED' },
+              { name: '001 test rule', ctstate: ['! UNTRACKED', 'INVALID'] }],
+      invalid: [{ name: '001 test rule', ctstate: 'invalid' }, { name: '001 test rule', ctstate: false }]
+    },
+    ':ctproto': {
+      valid: [{ name: '001 test rule', ctproto: '! 1' }, { name: '001 test rule', ctproto: '15' },
+              { name: '001 test rule', ctproto: 313 }, { name: '001 test rule', ctproto: '! 313' }],
+      invalid: [{ name: '001 test rule', ctproto: 'invalid' }, { name: '001 test rule', ctproto: false }]
+    },
+    ':ctorigsrc': {
+      valid: [{ name: '001 test rule', ctorigsrc: '192.168.2.0/24' }, { name: '001 test rule', ctorigsrc: '! 192.168.2.0/24' },
+              { name: '001 test rule', ctorigsrc: '1::46' }, { name: '001 test rule', ctorigsrc: '! 1::46' }],
+      invalid: [{ name: '001 test rule', ctorigsrc: true }, { name: '001 test rule', ctorigsrc: 313 },
+                { name: '001 test rule', ctorigsrc: '' }]
+    },
+    ':ctorigdst': {
+      valid: [{ name: '001 test rule', ctorigdst: '192.168.2.0/24' }, { name: '001 test rule', ctorigdst: '! 192.168.2.0/24' },
+              { name: '001 test rule', ctorigdst: '1::46' }, { name: '001 test rule', ctorigdst: '! 1::46' }],
+      invalid: [{ name: '001 test rule', ctorigdst: true }, { name: '001 test rule', ctorigdst: 313 },
+                { name: '001 test rule', ctorigdst: '' }]
+    },
+    ':ctreplsrc': {
+      valid: [{ name: '001 test rule', ctreplsrc: '192.168.2.0/24' }, { name: '001 test rule', ctreplsrc: '! 192.168.2.0/24' },
+              { name: '001 test rule', ctreplsrc: '1::46' }, { name: '001 test rule', ctreplsrc: '! 1::46' }],
+      invalid: [{ name: '001 test rule', ctreplsrc: true }, { name: '001 test rule', ctreplsrc: 313 },
+                { name: '001 test rule', ctreplsrc: '' }]
+    },
+    ':ctrepldst': {
+      valid: [{ name: '001 test rule', ctrepldst: '192.168.2.0/24' }, { name: '001 test rule', ctrepldst: '! 192.168.2.0/24' },
+              { name: '001 test rule', ctrepldst: '1::46' }, { name: '001 test rule', ctrepldst: '! 1::46' }],
+      invalid: [{ name: '001 test rule', ctrepldst: true }, { name: '001 test rule', ctrepldst: 313 },
+                { name: '001 test rule', ctrepldst: '' }]
+    },
+    ':ctorigsrcport': {
+      valid: [{ name: '001 test rule', ctorigsrcport: '80' }, { name: '001 test rule', ctorigsrcport: '! 80' },
+              { name: '001 test rule', ctorigsrcport: '80:90' }, { name: '001 test rule', ctorigsrcport: '! 80:90' }],
+      invalid: [{ name: '001 test rule', ctorigsrcport: true }, { name: '001 test rule', ctorigsrcport: 313 },
+                { name: '001 test rule', ctorigsrcport: 'invalid' }]
+    },
+    ':ctorigdstport': {
+      valid: [{ name: '001 test rule', ctorigdstport: '80' }, { name: '001 test rule', ctorigdstport: '! 80' },
+              { name: '001 test rule', ctorigdstport: '80:90' }, { name: '001 test rule', ctorigdstport: '! 80:90' }],
+      invalid: [{ name: '001 test rule', ctorigdstport: true }, { name: '001 test rule', ctorigdstport: 313 },
+                { name: '001 test rule', ctorigdstport: 'invalid' }]
+    },
+    ':ctreplsrcport': {
+      valid: [{ name: '001 test rule', ctreplsrcport: '80' }, { name: '001 test rule', ctreplsrcport: '! 80' },
+              { name: '001 test rule', ctreplsrcport: '80:90' }, { name: '001 test rule', ctreplsrcport: '! 80:90' }],
+      invalid: [{ name: '001 test rule', ctreplsrcport: true }, { name: '001 test rule', ctreplsrcport: 313 },
+                { name: '001 test rule', ctreplsrcport: 'invalid' }]
+    },
+    ':ctrepldstport': {
+      valid: [{ name: '001 test rule', ctrepldstport: '80' }, { name: '001 test rule', ctrepldstport: '! 80' },
+              { name: '001 test rule', ctrepldstport: '80:90' }, { name: '001 test rule', ctrepldstport: '! 80:90' }],
+      invalid: [{ name: '001 test rule', ctrepldstport: true }, { name: '001 test rule', ctrepldstport: 313 },
+                { name: '001 test rule', ctrepldstport: 'invalid' }]
+    },
+    ':ctstatus': {
+      valid: [{ name: '001 test rule', ctstatus: 'EXPECTED' }, { name: '001 test rule', ctstatus: '! CONFIRMED' },
+              { name: '001 test rule', ctstatus: ['! EXPECTED', 'CONFIRMED'] }],
+      invalid: [{ name: '001 test rule', ctstatus: 'invalid' }, { name: '001 test rule', ctstatus: false }]
+    },
+    ':ctexpire': {
+      valid: [{ name: '001 test rule', ctexpire: '80' }, { name: '001 test rule', ctexpire: '80:160' }],
+      invalid: [{ name: '001 test rule', ctexpire: true }, { name: '001 test rule', ctexpire: 313 },
+                { name: '001 test rule', ctexpire: 'invalid' }]
+    },
+    ':ctdir': {
+      valid: [{ name: '001 test rule', ctdir: 'REPLY' }, { name: '001 test rule', ctdir: 'ORIGINAL' }],
+      invalid: [{ name: '001 test rule', ctstate: 'invalid' }, { name: '001 test rule', ctstate: false }]
+    },
+    ':hoplimit': {
+      valid: [{ name: '001 test rule', hop_limit: '! 1' }, { name: '001 test rule', hop_limit: '15' },
+              { name: '001 test rule', hop_limit: 313 }, { name: '001 test rule', hop_limit: '! 313' }],
+      invalid: [{ name: '001 test rule', hop_limit: 'invalid' }, { name: '001 test rule', hop_limit: false }]
+    },
+    ':icmp': {
+      valid: [{ name: '001 test rule', icmp: 'echo-reply' }, { name: '001 test rule', icmp: '15' },
+              { name: '001 test rule', icmp: 313 }],
+      invalid: [{ name: '001 test rule', icmp: true }, { name: '001 test rule', icmp: '' }]
+    },
+    ':limit': {
+      valid: [{ name: '001 test rule', limit: '50/sec' }, { name: '001 test rule', limit: '50/second' },
+              { name: '001 test rule', limit: '40/min' }, { name: '001 test rule', limit: '40/minute' },
+              { name: '001 test rule', limit: '30/hour' }, { name: '001 test rule', limit: '10/day' }],
+      invalid: [{ name: '001 test rule', limit: true }, { name: '001 test rule', limit: 30 },
+                { name: '001 test rule', limit: 'invalid' }]
+    },
+    ':burst': {
+      valid: [{ name: '001 test rule', burst: 1 }, { name: '001 test rule', burst: 313 }],
+      invalid: [{ name: '001 test rule', burst: 'invalid' }, { name: '001 test rule', burst: false }]
+    },
+    ':length': {
+      valid: [{ name: '001 test rule', length: '80' }, { name: '001 test rule', length: '80:90' }],
+      invalid: [{ name: '001 test rule', length: true }, { name: '001 test rule', length: 313 },
+                { name: '001 test rule', length: 'invalid' }]
+    },
+    ':recent': {
+      valid: [{ name: '001 test rule', recent: 'set' }, { name: '001 test rule', recent: 'update' },
+              { name: '001 test rule', recent: 'rcheck' }, { name: '001 test rule', recent: 'remove' },
+              { name: '001 test rule', recent: '! set' }, { name: '001 test rule', recent: '! update' },
+              { name: '001 test rule', recent: '! rcheck' }, { name: '001 test rule', recent: '! remove' }],
+      invalid: [{ name: '001 test rule', recent: true }, { name: '001 test rule', recent: 30 },
+                { name: '001 test rule', recent: 'invalid' }]
+    },
+    ':rseconds': {
+      valid: [{ name: '001 test rule', rseconds: 1 }, { name: '001 test rule', rseconds: 313 }],
+      invalid: [{ name: '001 test rule', rseconds: 'invalid' }, { name: '001 test rule', rseconds: false },
+                { name: '001 test rule', rseconds: 0 }]
+    },
+    ':reap': {
+      valid: [{ name: '001 test rule', reap: true }, { name: '001 test rule', reap: false }],
+      invalid: [{ name: '001 test rule', reap: 'invalid' }, { name: '001 test rule', reap: 313 }]
+    },
+    ':rhitcount': {
+      valid: [{ name: '001 test rule', rhitcount: 1 }, { name: '001 test rule', rhitcount: 313 }],
+      invalid: [{ name: '001 test rule', rhitcount: 'invalid' }, { name: '001 test rule', rhitcount: false },
+                { name: '001 test rule', rhitcount: 0 }]
+    },
+    ':rttl': {
+      valid: [{ name: '001 test rule', rttl: true }, { name: '001 test rule', rttl: false }],
+      invalid: [{ name: '001 test rule', rttl: 'invalid' }, { name: '001 test rule', rttl: 313 }]
+    },
+    ':rname': {
+      valid: [{ name: '001 test rule', rname: 'list1' }, { name: '001 test rule', rname: 'list2' }],
+      invalid: [{ name: '001 test rule', rname: true }, { name: '001 test rule', rname: 30 },
+                { name: '001 test rule', rname: '' }]
+    },
+    ':mask': {
+      valid: [{ name: '001 test rule', mask: '255.255.255.255' }, { name: '001 test rule', mask: '1.1.1.1' }],
+      invalid: [{ name: '001 test rule', mask: true }, { name: '001 test rule', mask: 30 },
+                { name: '001 test rule', mask: 'invalid' }]
+    },
+    ':rsource': {
+      valid: [{ name: '001 test rule', rsource: true }, { name: '001 test rule', rsource: false }],
+      invalid: [{ name: '001 test rule', rsource: 'invalid' }, { name: '001 test rule', rsource: 313 }]
+    },
+    ':rdest': {
+      valid: [{ name: '001 test rule', rdest: true }, { name: '001 test rule', rdest: false }],
+      invalid: [{ name: '001 test rule', rdest: 'invalid' }, { name: '001 test rule', rdest: 313 }]
+    },
+    ':ipset': {
+      valid: [{ name: '001 test rule', ipset: 'setname1 src' }, { name: '001 test rule', ipset: '! setname2 dst' },
+              { name: '001 test rule', ipset: ['setname1 src', '! setname2 dst'] }],
+      invalid: [{ name: '001 test rule', ipset: 'invalid' }, { name: '001 test rule', ipset: false },
+                { name: '001 test rule', ipset: false }]
+    },
+    ':string': {
+      valid: [{ name: '001 test rule', string: 'GET /index.html' }],
+      invalid: [{ name: '001 test rule', string: '' }, { name: '001 test rule', string: false },
+                { name: '001 test rule', string: false }]
+    },
+    ':string_hex': {
+      valid: [{ name: '001 test rule', string_hex: '|f4 6d 04 25 b2 02 00 0a|' }, { name: '001 test rule', string_hex: '! |0000ff0001|' }],
+      invalid: [{ name: '001 test rule', string_hex: 'invalid' }, { name: '001 test rule', string_hex: false },
+                { name: '001 test rule', string_hex: false }]
+    },
+    ':string_algo': {
+      valid: [{ name: '001 test rule', string_algo: 'bm' }, { name: '001 test rule', string_algo: 'kmp' }],
+      invalid: [{ name: '001 test rule', string_algo: 'invalid' }, { name: '001 test rule', string_algo: false },
+                { name: '001 test rule', string_algo: false }]
+    },
+    ':string_from': {
+      valid: [{ name: '001 test rule', string_from: 1 }, { name: '001 test rule', string_from: 313 }],
+      invalid: [{ name: '001 test rule', string_from: 'invalid' }, { name: '001 test rule', string_from: false },
+                { name: '001 test rule', string_from: 0 }]
+    },
+    ':string_to': {
+      valid: [{ name: '001 test rule', string_to: 1 }, { name: '001 test rule', string_to: 313 }],
+      invalid: [{ name: '001 test rule', string_to: 'invalid' }, { name: '001 test rule', string_to: false },
+                { name: '001 test rule', string_to: 0 }]
+    },
+    ':jump': {
+      valid: [{ name: '001 test rule', jump: 'QUEUE' }, { name: '001 test rule', jump: 'test_chain' }],
+      invalid: [{ name: '001 test rule', jump: '' }, { name: '001 test rule', jump: false },
+                { name: '001 test rule', jump: false }]
+    },
+    ':goto': {
+      valid: [{ name: '001 test rule', goto: 'QUEUE' }, { name: '001 test rule', goto: 'test_chain' }],
+      invalid: [{ name: '001 test rule', goto: '' }, { name: '001 test rule', goto: false },
+                { name: '001 test rule', goto: false }]
+    },
+    ':clusterip_new': {
+      valid: [{ name: '001 test rule', clusterip_new: true }, { name: '001 test rule', clusterip_new: false }],
+      invalid: [{ name: '001 test rule', clusterip_new: 'invalid' }, { name: '001 test rule', clusterip_new: 313 }]
+    },
+    ':clusterip_hashmode': {
+      valid: [{ name: '001 test rule', clusterip_hashmode: 'sourceip' }, { name: '001 test rule', clusterip_hashmode: 'sourceip-sourceport' },
+              { name: '001 test rule', clusterip_hashmode: 'sourceip-sourceport-destport' }],
+      invalid: [{ name: '001 test rule', clusterip_hashmode: 'invalid' }, { name: '001 test rule', clusterip_hashmode: false },
+                { name: '001 test rule', clusterip_hashmode: false }]
+    },
+    ':clusterip_clustermac': {
+      valid: [{ name: '001 test rule', clusterip_clustermac: 'FA:16:00:00:00:00' }],
+      invalid: [{ name: '001 test rule', clusterip_clustermac: 'FA1600000000' }, { name: '001 test rule', clusterip_clustermac: false },
+                { name: '001 test rule', clusterip_clustermac: 1_600_000_000 }]
+    },
+    ':clusterip_total_nodes': {
+      valid: [{ name: '001 test rule', clusterip_total_nodes: 1 }, { name: '001 test rule', clusterip_total_nodes: 313 }],
+      invalid: [{ name: '001 test rule', clusterip_total_nodes: 'invalid' }, { name: '001 test rule', clusterip_total_nodes: false }]
+    },
+    ':clusterip_local_node': {
+      valid: [{ name: '001 test rule', clusterip_local_node: 1 }, { name: '001 test rule', clusterip_local_node: 313 }],
+      invalid: [{ name: '001 test rule', clusterip_local_node: 'invalid' }, { name: '001 test rule', clusterip_local_node: false }]
+    },
+    ':clusterip_hash_init': {
+      valid: [{ name: '001 test rule', clusterip_hash_init: 'random' }],
+      invalid: [{ name: '001 test rule', clusterip_hash_init: '' }, { name: '001 test rule', clusterip_hash_init: false },
+                { name: '001 test rule', clusterip_hash_init: 313 }]
+    },
+    ':queue_num': {
+      valid: [{ name: '001 test rule', queue_num: 1 }, { name: '001 test rule', queue_num: 313 }],
+      invalid: [{ name: '001 test rule', queue_num: 'invalid' }, { name: '001 test rule', queue_num: false },
+                { name: '001 test rule', queue_num: 0 }]
+    },
+    ':queue_bypass': {
+      valid: [{ name: '001 test rule', queue_bypass: true }, { name: '001 test rule', queue_bypass: false }],
+      invalid: [{ name: '001 test rule', queue_bypass: 'invalid' }, { name: '001 test rule', queue_bypass: 313 }]
+    },
+    ':nflog_group': {
+      valid: [{ name: '001 test rule', nflog_group: 1 }, { name: '001 test rule', queue_num: 313 }],
+      invalid: [{ name: '001 test rule', nflog_group: 'invalid' }, { name: '001 test nflog_group', nflog_group: false },
+                { name: '001 test rule', nflog_group: 0 }, { name: '001 test rule', nflog_group: 65_536 }]
+    },
+    ':nflog_prefix': {
+      valid: [{ name: '001 test rule', nflog_prefix: 'Prefix Number One' }],
+      invalid: [{ name: '001 test rule', nflog_prefix: 313 }, { name: '001 test rule', nflog_prefix: false }]
+      # { name: '001 test rule', nflog_prefix: '' } attribute throws errors when type set to String[1]
+    },
+    ':nflog_range': {
+      valid: [{ name: '001 test rule', nflog_range: 1 }, { name: '001 test rule', nflog_range: 313 }],
+      invalid: [{ name: '001 test rule', nflog_range: 'invalid' }, { name: '001 test rule', nflog_range: false },
+                { name: '001 test rule', nflog_range: 0 }]
+    },
+    ':nflog_size': {
+      valid: [{ name: '001 test rule', nflog_size: 1 }, { name: '001 test rule', nflog_size: 313 }],
+      invalid: [{ name: '001 test rule', nflog_size: 'invalid' }, { name: '001 test rule', nflog_size: false },
+                { name: '001 test rule', nflog_size: 0 }]
+    },
+    ':nflog_threshold': {
+      valid: [{ name: '001 test rule', nflog_threshold: 1 }, { name: '001 test rule', nflog_threshold: 313 }],
+      invalid: [{ name: '001 test rule', nflog_threshold: 'invalid' }, { name: '001 test rule', nflog_threshold: false },
+                { name: '001 test rule', nflog_threshold: 0 }]
+    },
+    ':gateway': {
+      valid: [{ name: '001 test rule', gateway: '10.0.0.2' }, { name: '001 test rule', gateway: '2001:db1::1' }],
+      invalid: [{ name: '001 test rule', gateway: 'invalid' }, { name: '001 test rule', gateway: false },
+                { name: '001 test rule', gateway: false }]
+    },
+    ':clamp_mss_to_pmtu': {
+      valid: [{ name: '001 test rule', clamp_mss_to_pmtu: true }, { name: '001 test rule', clamp_mss_to_pmtu: false }],
+      invalid: [{ name: '001 test rule', clamp_mss_to_pmtu: 'invalid' }, { name: '001 test rule', clamp_mss_to_pmtu: 313 }]
+    },
+    ':set_mss': {
+      valid: [{ name: '001 test rule', set_mss: 1 }, { name: '001 test rule', set_mss: 313 }],
+      invalid: [{ name: '001 test rule', set_mss: 'invalid' }, { name: '001 test rule', set_mss: false },
+                { name: '001 test rule', set_mss: 0 }]
+    },
+    ':set_dscp': {
+      valid: [{ name: '001 test rule', set_dscp: '0x0a' }],
+      invalid: [{ name: '001 test rule', set_dscp: '' }, { name: '001 test rule', set_dscp: false },
+                { name: '001 test rule', set_dscp: 313 }]
+    },
+    ':set_dscp_class': {
+      valid: [{ name: '001 test rule', set_dscp_class: 'af11' }, { name: '001 test rule', set_dscp_class: 'cs7' }],
+      invalid: [{ name: '001 test rule', set_dscp_class: 'invalid' }, { name: '001 test rule', set_dscp_class: false },
+                { name: '001 test rule', set_dscp_class: 313 }]
+    },
+    ':todest': {
+      valid: [{ name: '001 test rule', todest: '10.0.0.2' }, { name: '001 test rule', todest: '10.0.0.2-10.0.0.3' },
+              { name: '001 test rule', todest: '10.0.0.2:24' }, { name: '001 test rule', todest: '10.0.0.2-10.0.0.3:24-25' }],
+      invalid: [{ name: '001 test rule', todest: '' }, { name: '001 test rule', todest: false },
+                { name: '001 test rule', todest: 313 }]
+    },
+    ':tosource': {
+      valid: [{ name: '001 test rule', tosource: '10.0.0.2' }, { name: '001 test rule', tosource: '10.0.0.2-10.0.0.3' },
+              { name: '001 test rule', tosource: '10.0.0.2:24' }, { name: '001 test rule', tosource: '10.0.0.2-10.0.0.3:24-25' }],
+      invalid: [{ name: '001 test rule', tosource: '' }, { name: '001 test rule', tosource: false },
+                { name: '001 test rule', tosource: 313 }]
+    },
+    ':toports': {
+      valid: [{ name: '001 test rule', toports: '40' }, { name: '001 test rule', tosource: '50-60' }],
+      invalid: [{ name: '001 test rule', toports: 'invalid' }, { name: '001 test rule', toports: false },
+                { name: '001 test rule', toports: 313 }]
+    },
+    ':to': {
+      valid: [{ name: '001 test rule', to: '10.0.0.2' }, { name: '001 test rule', to: '10.0.0.2/24' }],
+      invalid: [{ name: '001 test rule', to: '' }, { name: '001 test rule', to: false },
+                { name: '001 test rule', to: 313 }]
+    },
+    ':checksum_fill': {
+      valid: [{ name: '001 test rule', checksum_fill: true }, { name: '001 test rule', checksum_fill: false }],
+      invalid: [{ name: '001 test rule', checksum_fill: 'invalid' }, { name: '001 test rule', checksum_fill: 313 }]
+    },
+    ':random_fully': {
+      valid: [{ name: '001 test rule', random_fully: true }, { name: '001 test rule', random_fully: false }],
+      invalid: [{ name: '001 test rule', random_fully: 'invalid' }, { name: '001 test rule', random_fully: 313 }]
+    },
+    ':random': {
+      valid: [{ name: '001 test rule', random: true }, { name: '001 test rule', random: false }],
+      invalid: [{ name: '001 test rule', random: 'invalid' }, { name: '001 test rule', random: 313 }]
+    },
+    ':log_prefix': {
+      valid: [{ name: '001 test rule', log_prefix: 'Prefix Number One' }],
+      invalid: [{ name: '001 test rule', log_prefix: 313 }, { name: '001 test rule', log_prefix: false },
+                { name: '001 test rule', flog_prefix: '' }]
+    },
+    ':log_level': {
+      valid: [{ name: '001 test rule', log_level: 'warn' }, { name: '001 test rule', log_level: 4 }],
+      invalid: [{ name: '001 test rule', log_level: 313 }, { name: '001 test rule', log_level: false },
+                { name: '001 test rule', log_level: '' }]
+    },
+    ':log_uid': {
+      valid: [{ name: '001 test rule', log_uid: true }, { name: '001 test rule', log_uid: false }],
+      invalid: [{ name: '001 test rule', log_uid: 'invalid' }, { name: '001 test rule', log_uid: 313 }]
+    },
+    ':log_tcp_sequence': {
+      valid: [{ name: '001 test rule', log_tcp_sequence: true }, { name: '001 test rule', log_tcp_sequence: false }],
+      invalid: [{ name: '001 test rule', log_tcp_sequence: 'invalid' }, { name: '001 test rule', log_tcp_sequence: 313 }]
+    },
+    ':log_tcp_options': {
+      valid: [{ name: '001 test rule', log_tcp_options: true }, { name: '001 test rule', log_tcp_options: false }],
+      invalid: [{ name: '001 test rule', log_tcp_options: 'invalid' }, { name: '001 test rule', log_tcp_options: 313 }]
+    },
+    ':log_ip_options': {
+      valid: [{ name: '001 test rule', log_ip_options: true }, { name: '001 test rule', log_ip_options: false }],
+      invalid: [{ name: '001 test rule', log_ip_options: 'invalid' }, { name: '001 test rule', log_ip_options: 313 }]
+    },
+    ':reject': {
+      valid: [{ name: '001 test rule', reject: 'icmp-net-unreachable' }, { name: '001 test rule', reject: 'icmp-proto-unreachable' },
+              { name: '001 test rule', reject: 'icmp-admin-prohibited' }, { name: '001 test rule', reject: 'icmp6-port-unreachable' }],
+      invalid: [{ name: '001 test rule', reject: 'invalid' }, { name: '001 test rule', reject: false },
+                { name: '001 test rule', reject: 313 }]
+    },
+    ':set_mark': {
+      valid: [{ name: '001 test rule', set_mark: '0x3e8' }, { name: '001 test rule', set_mark: '0x3e8/0xffffffff' }],
+      invalid: [{ name: '001 test rule', set_mark: 'invalid' }, { name: '001 test rule', set_mark: false },
+                { name: '001 test rule', set_mark: 313 }]
+    },
+    ':match_mark': {
+      valid: [{ name: '001 test rule', match_mark: '0x1' }, { name: '001 test rule', match_mark: '! 0x1' }],
+      invalid: [{ name: '001 test rule', match_mark: 'invalid' }, { name: '001 test rule', match_mark: false },
+                { name: '001 test rule', match_mark: 313 }]
+    },
+    ':mss': {
+      valid: [{ name: '001 test rule', mss: '1361:1541' }, { name: '001 test rule', mss: '! 1361' },
+              { name: '001 test rule', mss: '1361:1541' }, { name: '001 test rule', mss: '! 1361:1541' }],
+      invalid: [{ name: '001 test rule', mss: 'invalid' }, { name: '001 test rule', mss: false },
+                { name: '001 test rule', mss: 313 }]
+    },
+    ':connlimit_upto': {
+      valid: [{ name: '001 test rule', connlimit_upto: 1 }, { name: '001 test rule', connlimit_upto: 313 }],
+      invalid: [{ name: '001 test rule', connlimit_upto: 'invalid' }, { name: '001 test rule', connlimit_upto: false }]
+    },
+    ':connlimit_above': {
+      valid: [{ name: '001 test rule', connlimit_above: 1 }, { name: '001 test rule', connlimit_above: 313 }],
+      invalid: [{ name: '001 test rule', connlimit_above: 'invalid' }, { name: '001 test rule', connlimit_above: false }]
+    },
+    ':connlimit_mask': {
+      valid: [{ name: '001 test rule', connlimit_mask: 1 }, { name: '001 test rule', connlimit_mask: 128 }],
+      invalid: [{ name: '001 test rule', connlimit_mask: 'invalid' }, { name: '001 test rule', connlimit_mask: false },
+                { name: '001 test rule', connlimit_mask: 313 }]
+    },
+    ':connmark': {
+      valid: [{ name: '001 test rule', connmark: '0x1' }, { name: '001 test rule', connmark: '! 0x1' }],
+      invalid: [{ name: '001 test rule', connmark: 'invalid' }, { name: '001 test rule', connmark: false },
+                { name: '001 test rule', connmark: 313 }]
+    },
+    ':time_start': {
+      valid: [{ name: '001 test rule', time_start: '23:59:59' }, { name: '001 test rule', time_start: '03:59' }],
+      invalid: [{ name: '001 test rule', time_start: '26:70:70' }, { name: '001 test rule', time_start: false },
+                { name: '001 test rule', time_start: 313 }]
+    },
+    ':time_stop': {
+      valid: [{ name: '001 test rule', time_stop: '23:59:59' }, { name: '001 test rule', time_stop: '03:59' }],
+      invalid: [{ name: '001 test rule', time_stop: '26:70:70' }, { name: '001 test rule', time_stop: false },
+                { name: '001 test rule', time_stop: 313 }]
+    },
+    ':month_days': {
+      valid: [{ name: '001 test rule', month_days: 1 }, { name: '001 test rule', month_days: [3, 1, 3] }],
+      invalid: [{ name: '001 test rule', month_days: 'invalid' }, { name: '001 test rule', month_days: false },
+                { name: '001 test rule', month_days: 313 }, { name: '001 test rule', month_days: [313, 619] }]
+    },
+    ':date_start': {
+      valid: [{ name: '001 test rule', date_start: '1970-01-01T00:00:00' }, { name: '001 test rule', date_start: '2023-08-08T15:18:00' }],
+      invalid: [{ name: '001 test rule', date_start: '1690-00-00T70:70:70' }, { name: '001 test rule', date_start: false },
+                { name: '001 test rule', date_start: 313 }, { name: '001 test rule', date_start: 'invalid' }]
+    },
+    ':date_stop': {
+      valid: [{ name: '001 test rule', date_stop: '1970-01-01T00:00:00' }, { name: '001 test rule', date_stop: '2023-08-08T15:18:00' }],
+      invalid: [{ name: '001 test rule', date_stop: '1690-00-00T70:70:70' }, { name: '001 test rule', date_stop: false },
+                { name: '001 test rule', date_stop: 313 }, { name: '001 test rule', date_stop: 'invalid' }]
+    },
+    ':kernel_timezone': {
+      valid: [{ name: '001 test rule', kernel_timezone: true }, { name: '001 test rule', kernel_timezone: false }],
+      invalid: [{ name: '001 test rule', kernel_timezone: 'invalid' }, { name: '001 test rule', kernel_timezone: 313 }]
+    },
+    ':u32': {
+      valid: [{ name: '001 test rule', u32: '0x4&0x1fff=0x0&&0x0&0xf000000=0x5000000' }],
+      invalid: [{ name: '001 test rule', u32: 'invalid' }, { name: '001 test rule', u32: false },
+                { name: '001 test rule', u32: 313 }]
+    },
+    ':src_cc': {
+      valid: [{ name: '001 test rule', src_cc: 'GB' }, { name: '001 test rule', src_cc: 'GB,US' }],
+      invalid: [{ name: '001 test rule', src_cc: 'invalid' }, { name: '001 test rule', src_cc: false },
+                { name: '001 test rule', src_cc: 313 }]
+    },
+    ':dst_cc': {
+      valid: [{ name: '001 test rule', dst_cc: 'GB' }, { name: '001 test rule', dst_cc: 'GB,US' }],
+      invalid: [{ name: '001 test rule', dst_cc: 'invalid' }, { name: '001 test rule', dst_cc: false },
+                { name: '001 test rule', dst_cc: 313 }]
+    },
+    ':hashlimit_upto': {
+      valid: [{ name: '001 test rule', hashlimit_upto: '50/sec' }, { name: '001 test rule', hashlimit_upto: '40/min' },
+              { name: '001 test rule', hashlimit_upto: '30/hour' }, { name: '001 test rule', hashlimit_upto: '10/day' }],
+      invalid: [{ name: '001 test rule', hashlimit_upto: true }, { name: '001 test rule', hashlimit_upto: 30 },
+                { name: '001 test rule', hashlimit_upto: 'invalid' }]
+    },
+    ':hashlimit_above': {
+      valid: [{ name: '001 test rule', hashlimit_above: '50/sec' }, { name: '001 test rule', hashlimit_above: '40/min' },
+              { name: '001 test rule', hashlimit_above: '30/hour' }, { name: '001 test rule', hashlimit_above: '10/day' }],
+      invalid: [{ name: '001 test rule', hashlimit_above: true }, { name: '001 test rule', hashlimit_above: 30 },
+                { name: '001 test rule', hashlimit_above: 'invalid' }]
+    },
+    ':hashlimit_name': {
+      valid: [{ name: '001 test rule', hashlimit_name: 'above' }, { name: '001 test rule', hashlimit_name: 'upto' }],
+      invalid: [{ name: '001 test rule', hashlimit_name: true }, { name: '001 test rule', hashlimit_name: 30 },
+                { name: '001 test rule', hashlimit_name: '' }]
+    },
+    ':hashlimit_burst': {
+      valid: [{ name: '001 test rule', hashlimit_burst: 1 }, { name: '001 test rule', hashlimit_burst: 313 }],
+      invalid: [{ name: '001 test rule', hashlimit_burst: 'invalid' }, { name: '001 test rule', hashlimit_burst: false }]
+    },
+    ':hashlimit_mode': {
+      valid: [{ name: '001 test rule', hashlimit_mode: 'srcip' }, { name: '001 test rule', hashlimit_mode: 'srcip,srcport,dstip,dstport' }],
+      invalid: [{ name: '001 test rule', hashlimit_mode: true }, { name: '001 test rule', hashlimit_mode: 30 },
+                { name: '001 test rule', hashlimit_mode: 'invalid' }]
+    },
+    ':hashlimit_srcmask': {
+      valid: [{ name: '001 test rule', hashlimit_srcmask: 1 }, { name: '001 test rule', hashlimit_srcmask: 32 }],
+      invalid: [{ name: '001 test rule', hashlimit_srcmask: 'invalid' }, { name: '001 test rule', hashlimit_srcmask: false },
+                { name: '001 test rule', hashlimit_mode: 33 }]
+    },
+    ':hashlimit_dstmask': {
+      valid: [{ name: '001 test rule', hashlimit_dstmask: 1 }, { name: '001 test rule', hashlimit_dstmask: 32 }],
+      invalid: [{ name: '001 test rule', hashlimit_dstmask: 'invalid' }, { name: '001 test rule', hashlimit_dstmask: false },
+                { name: '001 test rule', hashlimit_dstmask: 33 }]
+    },
+    ':hashlimit_htable_size': {
+      valid: [{ name: '001 test rule', hashlimit_htable_size: 1 }, { name: '001 test rule', hashlimit_htable_size: 313 }],
+      invalid: [{ name: '001 test rule', hashlimit_htable_size: 'invalid' }, { name: '001 test rule', hashlimit_htable_size: false }]
+    },
+    ':hashlimit_htable_max': {
+      valid: [{ name: '001 test rule', hashlimit_htable_max: 1 }, { name: '001 test rule', hashlimit_htable_max: 313 }],
+      invalid: [{ name: '001 test rule', hashlimit_htable_max: 'invalid' }, { name: '001 test rule', hashlimit_htable_max: false }]
+    },
+    ':hashlimit_htable_expire': {
+      valid: [{ name: '001 test rule', hashlimit_htable_expire: 1 }, { name: '001 test rule', hashlimit_htable_expire: 313 }],
+      invalid: [{ name: '001 test rule', hashlimit_htable_expire: 'invalid' }, { name: '001 test rule', hashlimit_htable_expire: false }]
+    },
+    ':hashlimit_htable_gcinterval': {
+      valid: [{ name: '001 test rule', hashlimit_htable_gcinterval: 1 }, { name: '001 test rule', hashlimit_htable_gcinterval: 313 }],
+      invalid: [{ name: '001 test rule', hashlimit_htable_gcinterval: 'invalid' }, { name: '001 test rule', hashlimit_htable_gcinterval: false }]
+    },
+    ':bytecode': {
+      valid: [{ name: '001 test rule', bytecode: '4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0' }],
+      invalid: [{ name: '001 test rule', bytecode: 313 }, { name: '001 test rule', bytecode: false },
+                { name: '001 test rule', bytecode: '' }]
+    },
+    ':ipvs': {
+      valid: [{ name: '001 test rule', ipvs: true }, { name: '001 test rule', ipvs: false }],
+      invalid: [{ name: '001 test rule', ipvs: 'invalid' }, { name: '001 test rule', ipvs: 313 }]
+    },
+    ':zone': {
+      valid: [{ name: '001 test rule', zone: 1 }, { name: '001 test rule', zone: 313 }],
+      invalid: [{ name: '001 test rule', zone: 'invalid' }, { name: '001 test rule', zone: false }]
+    },
+    ':helper': {
+      valid: [{ name: '001 test rule', helper: 'helperOne' }],
+      invalid: [{ name: '001 test rule', helper: 313 }, { name: '001 test rule', helper: false },
+                { name: '001 test rule', helper: '' }]
+    },
+    ':cgroup': {
+      valid: [{ name: '001 test rule', cgroup: '0x100001' }],
+      invalid: [{ name: '001 test rule', cgroup: 313 }, { name: '001 test rule', cgroup: false },
+                { name: '001 test rule', cgroup: '' }]
+    },
+    ':rpfilter': {
+      valid: [{ name: '001 test rule', rpfilter: 'loose' }, { name: '001 test rule', rpfilter: 'accept-local' },
+              { name: '001 test rule', rpfilter: ['validmark', 'invert'] }],
+      invalid: [{ name: '001 test rule', rpfilter: 'invalid' }, { name: '001 test rule', rpfilter: false },
+                { name: '001 test rule', rpfilter: false }]
+    },
+    ':condition': {
+      valid: [{ name: '001 test rule', condition: 'isblue' }, { name: '001 test rule', condition: '! isblue' }],
+      invalid: [{ name: '001 test rule', condition: 313 }, { name: '001 test rule', condition: false },
+                { name: '001 test rule', condition: '' }]
+    },
+    ':notrack': {
+      valid: [{ name: '001 test rule', notrack: true }, { name: '001 test rule', notrack: false }],
+      invalid: [{ name: '001 test rule', notrack: 'invalid' }, { name: '001 test rule', notrack: 313 }]
     }
-
-    values.each do |k, v|
-      it {
-        resource[:log_level] = k
-        expect(resource[:log_level]).to eql v
-      }
-
-      it {
-        resource[:log_level] = 3
-        expect(resource[:log_level]).to be 3
-      }
-
-      it { expect(-> { resource[:log_level] = 'foo' }).to raise_error(Puppet::Error) }
-    end
-  end
-
-  describe 'NFLOG' do
-    describe ':nflog_group' do
-      [0, 1, 5, 10].each do |v|
-        it {
-          resource[:nflog_group] = v
-          expect(resource[:nflog_group]).to eq v
-        }
+  }.each do |attribute|
+    describe attribute[0] do
+      context 'when given a valid value' do
+        attribute[1][:valid].each do |valid_input|
+          it valid_input do
+            expect { firewall.new(valid_input) }.not_to raise_error
+          end
+        end
       end
 
-      [-3, 999_999].each do |v|
-        it {
-          expect(-> { resource[:nflog_group] = v }).to raise_error(Puppet::Error, %r{2\^16\-1})
-        }
-      end
-    end
-
-    describe ':nflog_prefix' do
-      let(:valid_prefix) { 'This is a valid prefix' }
-      let(:invalid_prefix) { 'This is not a valid prefix. !t is longer than 64 char@cters for sure. How do I know? I c0unted.' }
-
-      it {
-        resource[:nflog_prefix] = valid_prefix
-        expect(resource[:nflog_prefix]).to eq valid_prefix
-      }
-
-      it {
-        expect(-> { resource[:nflog_prefix] = invalid_prefix }).to raise_error(Puppet::Error, %r{64 characters})
-      }
-    end
-  end
-
-  describe ':icmp' do
-    icmp_codes = {
-      iptables: {
-        '0' => 'echo-reply',
-        '3' => 'destination-unreachable',
-        '4' => 'source-quench',
-        '6' => 'redirect',
-        '8' => 'echo-request',
-        '9' => 'router-advertisement',
-        '10' => 'router-solicitation',
-        '11' => 'time-exceeded',
-        '12' => 'parameter-problem',
-        '13' => 'timestamp-request',
-        '14' => 'timestamp-reply',
-        '17' => 'address-mask-request',
-        '18' => 'address-mask-reply',
-      },
-      ip6tables: {
-        '1' => 'destination-unreachable',
-        '2' => 'too-big',
-        '3' => 'time-exceeded',
-        '4' => 'parameter-problem',
-        '128' => 'echo-request',
-        '129' => 'echo-reply',
-        '133' => 'router-solicitation',
-        '134' => 'router-advertisement',
-        '137' => 'redirect',
-      },
-    }
-    icmp_codes.each do |provider, values|
-      describe provider do
-        values.each do |k, v|
-          resource_type = [:provider, :icmp]
-          resource_value = [provider, v]
-          resource_expected = [provider, k]
-          it 'converts icmp string to number' do
-            resource_type.each_with_index do |type, index|
-              resource[type] = resource_value[index]
-              expect(resource[type]).to eql resource_expected[index]
-            end
+      context 'when given an invalid value' do
+        attribute[1][:invalid].each do |invalid_input|
+          it invalid_input do
+            expect { firewall.new(invalid_input) }.to raise_error(Puppet::Error)
           end
         end
       end
     end
-
-    it 'accepts values as integers' do
-      resource[:icmp] = 9
-      expect(resource[:icmp]).to be 9
-    end
-
-    it 'fails if icmp type is "any"' do
-      expect(-> { resource[:icmp] = 'any' }).to raise_error(Puppet::Error)
-    end
-    it 'fails if icmp type is an array' do
-      expect(-> { resource[:icmp] = "['0', '8']" }).to raise_error(Puppet::Error)
-    end
-
-    it 'fails if icmp type cannot be mapped to a numeric' do
-      expect(-> { resource[:icmp] = 'foo' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  describe ':state' do
-    it 'accepts value as a string - INVALID' do
-      resource[:state] = :INVALID
-      expect(resource[:state]).to eql [:INVALID]
-    end
-
-    it 'accepts value as a string - UNTRACKED' do
-      resource[:state] = :UNTRACKED
-      expect(resource[:state]).to eql [:UNTRACKED]
-    end
-
-    it 'accepts value as an array - INVALID, NEW' do
-      resource[:state] = [:INVALID, :NEW]
-      expect(resource[:state]).to eql [:INVALID, :NEW]
-    end
-
-    it 'sorts values alphabetically - NEW, UNTRACKED, ESTABLISHED' do
-      resource[:state] = [:NEW, :UNTRACKED, :ESTABLISHED]
-      expect(resource[:state]).to eql [:ESTABLISHED, :NEW, :UNTRACKED]
-    end
-  end
-
-  describe ':ctstate' do
-    it 'accepts value as a string - INVALID' do
-      resource[:ctstate] = :INVALID
-      expect(resource[:ctstate]).to eql [:INVALID]
-    end
-
-    it 'accepts value as a string - UNTRACKED' do
-      resource[:state] = :UNTRACKED
-      expect(resource[:state]).to eql [:UNTRACKED]
-    end
-
-    it 'accepts value as an array - INVALID, NEW' do
-      resource[:ctstate] = [:INVALID, :NEW]
-      expect(resource[:ctstate]).to eql [:INVALID, :NEW]
-    end
-
-    it 'sorts values alphabetically - NEW, ESTABLISHED' do
-      resource[:ctstate] = [:NEW, :ESTABLISHED]
-      expect(resource[:ctstate]).to eql [:ESTABLISHED, :NEW]
-    end
-  end
-
-  describe ':ctproto' do
-    it 'accepts numeric value' do
-      resource[:ctproto] = 6
-      expect(resource[:ctproto]).to be 6
-    end
-    it 'accepts negated string value' do
-      resource[:ctproto] = '! 6'
-      expect(resource[:ctproto]).to eql '! 6'
-    end
-  end
-
-  [:ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst].each do |addr|
-    describe addr do
-      it "accepts a #{addr} as a string without /32" do
-        resource[addr] = '127.0.0.1'
-        expect(resource[addr]).to eql '127.0.0.1'
-      end
-      it "accepts a #{addr} as a string with /32" do
-        resource[addr] = '127.0.0.1/32'
-        expect(resource[addr]).to eql '127.0.0.1'
-      end
-      it "accepts a #{addr} as a string with cidr" do
-        resource[addr] = '10.0.0.0/8'
-        expect(resource[addr]).to eql '10.0.0.0/8'
-      end
-      it "accepts a #{addr} as a string with ipv6 cidr" do
-        resource[addr] = '2001:DB8::/64'
-        expect(resource[addr]).to eql '2001:DB8::/64'
-      end
-      it "accepts a negated #{addr} as a string" do
-        resource[addr] = '! 127.0.0.1'
-        expect(resource[addr]).to eql '! 127.0.0.1'
-      end
-      it "accepts a negated #{addr} as a string with cidr" do
-        resource[addr] = '! 10.0.0.0/8'
-        expect(resource[addr]).to eql '! 10.0.0.0/8'
-      end
-    end
-  end
-
-  [:ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport].each do |port|
-    describe port do
-      it "accepts #{port} as numeric value" do
-        resource[port] = 80
-        expect(resource[port]).to be 80
-      end
-      it "accepts #{port} as range value" do
-        resource[port] = '80:81'
-        expect(resource[port]).to eql '80:81'
-      end
-      it "accepts a negated #{port} as string value" do
-        resource[port] = '! 80'
-        expect(resource[port]).to eql '! 80'
-      end
-      it "accepts a negated #{port} as range value" do
-        resource[port] = '! 80:81'
-        expect(resource[port]).to eql '! 80:81'
-      end
-    end
-  end
-
-  describe ':ctstatus' do
-    it 'accepts value as a string - EXPECTED' do
-      resource[:ctstatus] = :EXPECTED
-      expect(resource[:ctstatus]).to eql [:EXPECTED]
-    end
-
-    it 'accepts value as an array - EXPECTED, SEEN_REPLY' do
-      resource[:ctstatus] = [:EXPECTED, :SEEN_REPLY]
-      expect(resource[:ctstatus]).to eql [:EXPECTED, :SEEN_REPLY]
-    end
-
-    it 'sorts values alphabetically - SEEN_REPLY, EXPECTED' do
-      resource[:ctstatus] = [:SEEN_REPLY, :EXPECTED]
-      expect(resource[:ctstatus]).to eql [:EXPECTED, :SEEN_REPLY]
-    end
-  end
-
-  describe ':ctexpire' do
-    it 'accepts numeric values' do
-      resource[:ctexpire] = 100
-      expect(resource[:ctexpire]).to be 100
-    end
-
-    it 'accepts numeric range values' do
-      resource[:ctexpire] = '100:120'
-      expect(resource[:ctexpire]).to eql '100:120'
-    end
-  end
-
-  describe ':ctdir' do
-    it 'accepts value as a string - REPLY' do
-      resource[:ctdir] = :REPLY
-      expect(resource[:ctdir]).to be :REPLY
-    end
-
-    it 'accepts value as a string - ORIGINAL' do
-      resource[:ctdir] = :ORIGINAL
-      expect(resource[:ctdir]).to be :ORIGINAL
-    end
-  end
-
-  describe ':burst' do
-    it 'accepts numeric values' do
-      resource[:burst] = 12
-      expect(resource[:burst]).to be 12
-    end
-
-    it 'fails if value is not numeric' do
-      expect(-> { resource[:burst] = 'foo' }).to raise_error(Puppet::Error)
-    end
-    it 'fails if value contains /sec' do
-      expect(-> { resource[:burst] = '1500/sec' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  describe ':recent' do
-    ['set', 'update', 'rcheck', 'remove'].each do |recent|
-      it "accepts recent value #{recent}" do
-        resource[:recent] = recent
-        expect(resource[:recent]).to eql "--#{recent}"
-      end
-    end
-  end
-
-  describe ':action and :jump' do
-    it 'allows only 1 to be set at a time' do
-      expect {
-        firewall_class.new(name: '001-test', action: 'accept', jump: 'custom_chain')
-      }.to raise_error(RuntimeError, %r{Only one of the parameters 'action' and 'jump' can be set$})
-    end
-  end
-
-  describe ':gid and :uid' do
-    it 'allows me to set uid' do
-      resource[:uid] = 'root'
-      expect(resource[:uid]).to eql 'root'
-    end
-    it 'allows me to set uid as an array, and silently hide my error' do
-      resource[:uid] = ['root', 'bobby']
-      expect(resource[:uid]).to eql 'root'
-    end
-    it 'allows me to set gid' do
-      resource[:gid] = 'root'
-      expect(resource[:gid]).to eql 'root'
-    end
-    it 'allows me to set gid as an array, and silently hide my error' do
-      resource[:gid] = ['root', 'bobby']
-      expect(resource[:gid]).to eql 'root'
-    end
-  end
-
-  describe ':set_mark' do
-    ['1.3.2', '1.4.2'].each do |iptables_version|
-      describe "with iptables #{iptables_version}" do
-        before(:each) do
-          Facter.clear
-          allow(Facter.fact(:iptables_version)).to receive(:value).and_return iptables_version
-          allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return iptables_version
-        end
-
-        if iptables_version == '1.3.2'
-          it 'allows me to set set-mark without mask' do
-            resource[:set_mark] = '0x3e8'
-            expect(resource[:set_mark]).to eql '0x3e8'
-          end
-          it 'converts int to hex without mask' do
-            resource[:set_mark] = '1000'
-            expect(resource[:set_mark]).to eql '0x3e8'
-          end
-          it 'fails if mask is present' do
-            expect(-> { resource[:set_mark] = '0x3e8/0xffffffff' }).to raise_error(
-              Puppet::Error, %r{iptables version #{iptables_version} does not support masks on MARK rules$}
-            )
-          end
-        end
-
-        if iptables_version == '1.4.2'
-          it 'allows me to set set-mark with mask' do
-            resource[:set_mark] = '0x3e8/0xffffffff'
-            expect(resource[:set_mark]).to eql '0x3e8/0xffffffff'
-          end
-          it 'converts int to hex and add a 32 bit mask' do
-            resource[:set_mark] = '1000'
-            expect(resource[:set_mark]).to eql '0x3e8/0xffffffff'
-          end
-          it 'adds a 32 bit mask' do
-            resource[:set_mark] = '0x32'
-            expect(resource[:set_mark]).to eql '0x32/0xffffffff'
-          end
-          it 'uses the mask provided' do
-            resource[:set_mark] = '0x32/0x4'
-            expect(resource[:set_mark]).to eql '0x32/0x4'
-          end
-          it 'uses the mask provided and convert int to hex' do
-            resource[:set_mark] = '1000/0x4'
-            expect(resource[:set_mark]).to eql '0x3e8/0x4'
-          end
-          it 'fails if mask value is more than 32 bits' do
-            expect(-> { resource[:set_mark] = '1/4294967296' }).to raise_error(
-              Puppet::Error, %r{MARK mask must be integer or hex between 0 and 0xffffffff$}
-            )
-          end
-          it 'fails if mask is malformed' do
-            expect(-> { resource[:set_mark] = '1000/0xq4' }).to raise_error(
-              Puppet::Error, %r{MARK mask must be integer or hex between 0 and 0xffffffff$}
-            )
-          end
-        end
-
-        ['/', '1000/', 'pwnie'].each do |bad_mark|
-          it "fails with malformed mark '#{bad_mark}'" do
-            expect(-> { resource[:set_mark] = bad_mark }).to raise_error(Puppet::Error)
-          end
-        end
-        it 'fails if mark value is more than 32 bits' do
-          expect(-> { resource[:set_mark] = '4294967296' }).to raise_error(
-            Puppet::Error, %r{MARK value must be integer or hex between 0 and 0xffffffff$}
-          )
-        end
-      end
-    end
-  end
-
-  describe 'ct_target' do
-    it 'allows me to set zone' do
-      resource[:zone] = 4000
-      expect(resource[:zone]).to be 4000
-    end
-  end
-
-  [:chain, :jump].each do |param|
-    describe param do
-      it 'autorequires fwchain when table and provider are undefined' do
-        resource[param] = 'FOO'
-        expect(resource[:table]).to be :filter
-        expect(resource[:provider]).to be :iptables
-
-        chain = Puppet::Type.type(:firewallchain).new(name: 'FOO:filter:IPv4')
-        catalog = Puppet::Resource::Catalog.new
-        catalog.add_resource resource
-        catalog.add_resource chain
-        rel = resource.autorequire[0]
-        expect(rel.source.ref).to eql chain.ref
-        expect(rel.target.ref).to eql resource.ref
-      end
-
-      it 'autorequires fwchain when table is undefined and provider is ip6tables' do
-        resource[param] = 'FOO'
-        expect(resource[:table]).to be :filter
-        resource[:provider] = :ip6tables
-
-        chain = Puppet::Type.type(:firewallchain).new(name: 'FOO:filter:IPv6')
-        catalog = Puppet::Resource::Catalog.new
-        catalog.add_resource resource
-        catalog.add_resource chain
-        rel = resource.autorequire[0]
-        expect(rel.source.ref).to eql chain.ref
-        expect(rel.target.ref).to eql resource.ref
-      end
-
-      it 'autorequires fwchain when table is raw and provider is undefined' do
-        resource[param] = 'FOO'
-        resource[:table] = :raw
-        expect(resource[:provider]).to be :iptables
-
-        chain = Puppet::Type.type(:firewallchain).new(name: 'FOO:raw:IPv4')
-        catalog = Puppet::Resource::Catalog.new
-        catalog.add_resource resource
-        catalog.add_resource chain
-        rel = resource.autorequire[0]
-        expect(rel.source.ref).to eql chain.ref
-        expect(rel.target.ref).to eql resource.ref
-      end
-
-      it 'autorequires fwchain when table is raw and provider is ip6tables' do
-        resource[param] = 'FOO'
-        resource[:table] = :raw
-        resource[:provider] = :ip6tables
-
-        chain = Puppet::Type.type(:firewallchain).new(name: 'FOO:raw:IPv6')
-        catalog = Puppet::Resource::Catalog.new
-        catalog.add_resource resource
-        catalog.add_resource chain
-        rel = resource.autorequire[0]
-        expect(rel.source.ref).to eql chain.ref
-        expect(rel.target.ref).to eql resource.ref
-      end
-
-      # test where autorequire is still needed (table != filter)
-      ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
-        it "autorequires fwchain #{test_chain} when table is mangle and provider is undefined" do
-          resource[param] = test_chain
-          resource[:table] = :mangle
-          expect(resource[:provider]).to be :iptables
-
-          chain = Puppet::Type.type(:firewallchain).new(name: "#{test_chain}:mangle:IPv4")
-          catalog = Puppet::Resource::Catalog.new
-          catalog.add_resource resource
-          catalog.add_resource chain
-          rel = resource.autorequire[0]
-          expect(rel.source.ref).to eql chain.ref
-          expect(rel.target.ref).to eql resource.ref
-        end
-
-        it "autorequires fwchain #{test_chain} when table is mangle and provider is ip6tables" do
-          resource[param] = test_chain
-          resource[:table] = :mangle
-          resource[:provider] = :ip6tables
-
-          chain = Puppet::Type.type(:firewallchain).new(name: "#{test_chain}:mangle:IPv6")
-          catalog = Puppet::Resource::Catalog.new
-          catalog.add_resource resource
-          catalog.add_resource chain
-          rel = resource.autorequire[0]
-          expect(rel.source.ref).to eql chain.ref
-          expect(rel.target.ref).to eql resource.ref
-        end
-      end
-
-      # test of case where autorequire should not happen
-      ['INPUT', 'OUTPUT', 'FORWARD'].each do |test_chain|
-        it "does not autorequire fwchain #{test_chain} when table and provider are undefined" do
-          resource[param] = test_chain
-          expect(resource[:table]).to be :filter
-          expect(resource[:provider]).to be :iptables
-
-          chain = Puppet::Type.type(:firewallchain).new(name: "#{test_chain}:filter:IPv4")
-          catalog = Puppet::Resource::Catalog.new
-          catalog.add_resource resource
-          catalog.add_resource chain
-          rel = resource.autorequire[0]
-          expect(rel).to be nil
-        end
-
-        it "does not autorequire fwchain #{test_chain} when table is undefined and provider is ip6tables" do
-          resource[param] = test_chain
-          expect(resource[:table]).to be :filter
-          resource[:provider] = :ip6tables
-
-          chain = Puppet::Type.type(:firewallchain).new(name: "#{test_chain}:filter:IPv6")
-          catalog = Puppet::Resource::Catalog.new
-          catalog.add_resource resource
-          catalog.add_resource chain
-          rel = resource.autorequire[0]
-          expect(rel).to be nil
-        end
-      end
-    end
-  end
-
-  describe ':chain and :jump' do
-    it 'autorequires independent fwchains' do
-      resource[:chain] = 'FOO'
-      resource[:jump] = 'BAR'
-      expect(resource[:table]).to be :filter
-      expect(resource[:provider]).to be :iptables
-
-      chain_foo = Puppet::Type.type(:firewallchain).new(name: 'FOO:filter:IPv4')
-      chain_bar = Puppet::Type.type(:firewallchain).new(name: 'BAR:filter:IPv4')
-      catalog = Puppet::Resource::Catalog.new
-      catalog.add_resource resource
-      catalog.add_resource chain_foo
-      catalog.add_resource chain_bar
-      rel = resource.autorequire
-      expect(rel[0].source.ref).to eql chain_foo.ref
-      expect(rel[0].target.ref).to eql resource.ref
-      expect(rel[1].source.ref).to eql chain_bar.ref
-      expect(rel[1].target.ref).to eql resource.ref
-    end
-  end
-  # rubocop:enable RSpec/ExampleLength
-  # rubocop:enable RSpec/MultipleExpectations
-
-  describe ':pkttype' do
-    [:multicast, :broadcast, :unicast].each do |pkttype|
-      it "accepts pkttype value #{pkttype}" do
-        resource[:pkttype] = pkttype
-        expect(resource[:pkttype]).to eql pkttype
-      end
-    end
-
-    it 'fails when the pkttype value is not recognized' do
-      expect(-> { resource[:pkttype] = 'not valid' }).to raise_error(Puppet::Error)
-    end
-  end
-
-  describe ':condition' do
-    it 'accepts value as a string' do
-      resource[:condition] = 'somefile'
-      expect(resource[:condition]).to eq('somefile')
-    end
-  end
-
-  describe 'autorequire packages' do
-    [:iptables, :ip6tables].each do |provider|
-      it "provider #{provider} should autorequire package iptables" do
-        resource[:provider] = provider
-        expect(resource[:provider]).to eql provider
-        package = Puppet::Type.type(:package).new(name: 'iptables')
-        catalog = Puppet::Resource::Catalog.new
-        catalog.add_resource resource
-        catalog.add_resource package
-        rel = resource.autorequire[0]
-        expect(rel.source.ref).to eql package.ref
-        expect(rel.target.ref).to eql resource.ref
-      end
-
-      it "provider #{provider} should autorequire packages iptables, iptables-persistent, and iptables-services" do
-        resource[:provider] = provider
-        expect(resource[:provider]).to eql provider
-        packages = [
-          Puppet::Type.type(:package).new(name: 'iptables'),
-          Puppet::Type.type(:package).new(name: 'iptables-persistent'),
-          Puppet::Type.type(:package).new(name: 'iptables-services'),
-        ]
-        catalog = Puppet::Resource::Catalog.new
-        catalog.add_resource resource
-        packages.each do |package|
-          catalog.add_resource package
-        end
-        packages.zip(resource.autorequire) do |package, rel|
-          expect(rel.source.ref).to eql package.ref
-          expect(rel.target.ref).to eql resource.ref
-        end
-      end
-    end
-    # rubocop:enable RSpec/ExampleLength
-    # rubocop:enable RSpec/MultipleExpectations
-  end
-  it 'is suitable' do
-    expect(resource).to be_suitable
-  end
-end
-
-describe 'firewall on unsupported platforms' do
-  it 'is not suitable' do
-    # Stub iptables version
-    allow(Facter.fact(:iptables_version)).to receive(:value).and_return(nil)
-    allow(Facter.fact(:ip6tables_version)).to receive(:value).and_return(nil)
-
-    # Stub confine facts
-    allow(Facter.fact(:kernel)).to receive(:value).and_return('Darwin')
-    allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Darwin')
-    resource = firewall.new(name: '000 test foo', ensure: :present)
-
-    # If our provider list is nil, then the Puppet::Transaction#evaluate will
-    # say 'Error: Could not find a suitable provider for firewall' but there
-    # isn't a unit testable way to get this.
-    expect(resource).not_to be_suitable
   end
 end

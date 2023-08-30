@@ -9,7 +9,7 @@ describe 'puppet resource firewall command' do
   before(:all) do
     # In order to properly check stderr for anomalies we need to fix the deprecation warnings from puppet.conf.
     config = run_shell('puppet config print config').stdout
-    run_shell("sed -i -e \'s/^templatedir.*$//\' #{config}")
+    run_shell("sed -i -e 's/^templatedir.*$//' #{config}")
     if fetch_os_name == 'redhat' && [6, 7].include?(os[:release].to_i)
       run_shell('echo export LC_ALL="C" > /etc/profile.d/my-custom.lang.sh')
       run_shell('echo "## US English ##" >> /etc/profile.d/my-custom.lang.sh')
@@ -24,6 +24,11 @@ describe 'puppet resource firewall command' do
   end
 
   context 'when make sure it returns no errors when executed on a clean machine' do
+    before(:all) do
+      iptables_flush_all_tables
+      ip6tables_flush_all_tables
+    end
+
     run_shell('locale')
     let(:result) { run_shell('puppet resource firewall') }
 
@@ -145,7 +150,7 @@ describe 'puppet resource firewall command' do
     end
   end
 
-  context 'when accepts rules with negation' do
+  context 'when accepts rules with --dir' do
     before :all do
       iptables_flush_all_tables
       run_shell('iptables -t nat -A POSTROUTING -s 192.168.122.0/24 -m policy --dir out --pol ipsec -j ACCEPT')
@@ -197,10 +202,9 @@ describe 'puppet resource firewall command' do
     end
   end
 
-  # version of iptables that ships with el5 doesn't work with the
   # ip6tables provider
   # TODO: Test below fails if this file is run seperately. i.e. bundle exec rspec spec/acceptance/resource_cmd_spec.rb
-  context 'when dport/sport with ip6tables', unless: os[:family] == 'redhat' && os[:release].start_with?('5') do
+  context 'when dport/sport with ip6tables' do
     before :all do
       if os['family'] == 'debian'
         run_shell('echo "iptables-persistent iptables-persistent/autosave_v4 boolean false" | debconf-set-selections')
