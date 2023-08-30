@@ -469,7 +469,7 @@ class Puppet::Provider::Firewall::Firewall
   # Retrieve the rules
   # Optional values lets you return a simplified set of data, used for determining order when adding/updating/deleting rules,
   #   while also allowing for the protocols used to retrieve the rules to be limited.
-  # @api.private
+  # @api private
   def self.get_rules(context, basic, protocols = ['IPv4', 'IPv6'])
     # Create empty return array
     rules = []
@@ -498,7 +498,7 @@ class Puppet::Provider::Firewall::Firewall
   end
 
   # Simplified version of 'self.rules_to_hash' meant to return name, chain and table only
-  # @api.private
+  # @api private
   def self.rule_to_name(_context, rule, table_name, protocol)
     rule_hash = {}
     rule_hash[:ensure] = 'present'
@@ -517,7 +517,7 @@ class Puppet::Provider::Firewall::Firewall
   end
 
   # Converts a given rule to a hash value
-  # @api.private
+  # @api private
   def self.rule_to_hash(_context, rule, table_name, protocol)
     # loop through resource map
     rule_hash = {}
@@ -698,7 +698,7 @@ class Puppet::Provider::Firewall::Firewall
   end
 
   # Verify that the information being retrieved is correct
-  # @api.private
+  # @api private
   def self.validate_get(_context, rules)
     # Verify that names are unique
     names = []
@@ -710,7 +710,7 @@ class Puppet::Provider::Firewall::Firewall
   end
 
   # Certain attributes need custom logic to ensure that they are returning the correct information
-  # @api.private
+  # @api private
   def self.process_get(_context, rule_hash, rule, counter)
     # Puppet-firewall requires that all rules have structured comments (resource names) and will fail if a
     # rule in iptables does not have a matching comment.
@@ -747,7 +747,7 @@ class Puppet::Provider::Firewall::Firewall
   ###### SET ######
 
   # Verify that the information being set is correct
-  # @api.private
+  # @api private
   def self.validate_input(_is, should)
     # Verify that name does not start with 9000-9999, this range has been reserved. Ignore check when deleting the rule
     raise ArgumentError, 'Rule name cannot start with 9000-9999, as this range is reserved for unmanaged rules.' if should[:name].match($unmanaged_rule_regex) && should[:ensure].to_s == 'present'
@@ -861,7 +861,7 @@ class Puppet::Provider::Firewall::Firewall
   end
 
   # Certain attributes need processed in ways that can vary between IPv4 and IPv6
-  # @api.private
+  # @api private
   def self.process_input(should)
     # `dport`, `sport` `state` `ctstate` and `ctstatus` arrays should only have the first value negated.
     [:dport, :sport, :state, :ctstate, :ctstatus].each do |key|
@@ -922,7 +922,7 @@ class Puppet::Provider::Firewall::Firewall
   end
 
   # Converts a given hash value to a command line argument
-  # @api.private
+  # @api private
   def self.hash_to_rule(_context, _name, rule)
     arguments = ''
 
@@ -1041,7 +1041,7 @@ class Puppet::Provider::Firewall::Firewall
 
   # Find the correct position for our new rule in its chain
   # This has been lifted from the previous provider in order to maintain the logic between them
-  # @api.private
+  # @api private
   def self.insert_order(context, name, chain, table, protocol)
     rules = []
     # Find any rules that match the given chain and table pairing

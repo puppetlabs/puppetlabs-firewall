@@ -142,7 +142,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
   ###### PRIVATE METHODS ######
 
   # Process the information so that it can be correctly applied
-  # @api.private
+  # @api private
   def self.process_input(is, should)
     # Split the name into it's relevant parts
     is[:name] = is[:title] if is[:name].nil?
@@ -162,7 +162,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
   end
 
   # Verify that the information is correct
-  # @api.private
+  # @api private
   def self.verify(_is, should)
     # Verify that no incorrect chain names are passed
     case should[:table]

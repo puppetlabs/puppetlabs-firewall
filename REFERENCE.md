@@ -556,7 +556,9 @@ _*this data type contains a regex that may not be accurately reflected in genera
 
       ctstate => ['! INVALID', 'ESTABLISHED']
 
-      Note: this will negate all passed states, it is not possible to negate a single one of the array.
+      Note:
+        This will negate all passed states, it is not possible to negate a single one of the array.
+        In order to maintain compatibility it is also possible to negate all values given in the array to achieve the same behaviour.
 
 ##### `ctstatus`
 
@@ -582,7 +584,9 @@ _*this data type contains a regex that may not be accurately reflected in genera
 
         ctstatus => ['! EXPECTED', 'CONFIRMED']
 
-      Note: this will negate all passed states, it is not possible to negate a single one of the array.
+      Note:#{' '}
+        This will negate all passed states, it is not possible to negate a single one of the array.
+        In order to maintain compatibility it is also possible to negate all values given in the array to achieve the same behaviour.
 
 ##### `date_start`
 
@@ -637,7 +641,9 @@ _*this data type contains a regex that may not be accurately reflected in genera
 
           dport => ['! 54','23']
 
-      Note: this will negate all passed ports, it is not possible to negate a single one of the array.
+      Note:
+        This will negate all passed ports, it is not possible to negate a single one of the array.
+        In order to maintain compatibility it is also possible to negate all values given in the array to achieve the same behaviour.
 
 ##### `dst_cc`
 
@@ -1392,7 +1398,9 @@ _*this data type contains a regex that may not be accurately reflected in genera
 
           sport => ['! 54','23']
 
-      Note: this will negate all passed ports, it is not possible to negate a single one of the array.
+      Note:
+        This will negate all passed ports, it is not possible to negate a single one of the array.
+        In order to maintain compatibility it is also possible to negate all values given in the array to achieve the same behaviour.
 
 ##### `src_cc`
 
@@ -1503,7 +1511,9 @@ _*this data type contains a regex that may not be accurately reflected in genera
 
           state => ['! INVALID', 'ESTABLISHED']
 
-      Note: this will negate all passed states, it is not possible to negate a single one of the array.
+      Note:
+        This will negate all passed states, it is not possible to negate a single one of the array.
+        In order to maintain compatibility it is also possible to negate all values given in the array to achieve the same behaviour.
 
 ##### `string`
 

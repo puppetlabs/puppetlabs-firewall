@@ -549,12 +549,13 @@ And run the tests from the root of the source code:
 bundle exec rake parallel_spec
 ```
 
-See also `.travis.yml` for information on running the acceptance and other tests.
+See the Github Action runs for information on running the acceptance and other tests.
 
 ### Migration path to v7.0.0
 
-As of `v7.0.0` of this module a major rework has been done to adopt the [puppet-resource_api](https://github.com/puppetlabs/puppet-resource_api) into the module and use it style of code in place of the original form of Puppet Type and Providers. As part of this several breaking changes where made to the code that will need to be accounted for whenever you update to this new version of the module.
-These changes include:
+As of `v7.0.0` of this module a major rework has been done to adopt the [puppet-resource_api](https://github.com/puppetlabs/puppet-resource_api) into the module and use it style of code in place of the original form of Puppet Type and Providers. This was done in the most part to increase the ease with with the module could be maintained and updated in the future, the changes helping to structure the module in such a way as to be more easily understood and altered going forward.
+
+As part of this process several breaking changes where made to the code that will need to be accounted for whenever you update to this new version of the module, with these changes including:
 
 * The `provider` attibute within the `firewall` type has been renamed to `protocol`, both to bring it in line with the matching attribute within the `firewallchain` type and due to the resource_api forbidding the use of `provider` as a attribute name. As part of this the attribute has also been updated to accept `IPv4` and `IPv6` in place of `iptables` or `ip6tables`, though they are still valid as input.
 * The `action` attribute within the `firewall` type has been removed as it was merely a restricted version of the `jump` attribute, both of them managing the same function, this being reasoned as a way to enforce the use of generic parameters. From this point the parameters formerly unique to `action` should now be passed to `jump`.
