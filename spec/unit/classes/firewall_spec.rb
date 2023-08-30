@@ -4,9 +4,11 @@ require 'spec_helper'
 
 describe 'firewall', type: :class do
   context 'with kernel => Linux' do
-    with_debian_facts
+    include_examples 'when Debian 10'
+
     it { is_expected.to contain_class('firewall::linux').with_ensure('running') }
   end
+
   context 'with kernel => Windows' do
     let(:facts) { { kernel: 'Windows' } }
 
@@ -26,8 +28,9 @@ describe 'firewall', type: :class do
   end
 
   context 'with ensure => stopped' do
-    with_debian_facts
     let(:params) { { ensure: 'stopped' } }
+
+    include_examples 'when Debian 10'
 
     it { is_expected.to contain_class('firewall::linux').with_ensure('stopped') }
   end
@@ -45,5 +48,4 @@ describe 'firewall', type: :class do
 
     it { expect { is_expected.to contain_package('ebtables') }.to raise_error(Puppet::Error) }
   end
-  # rubocop:enable RSpec/MultipleExpectations
 end

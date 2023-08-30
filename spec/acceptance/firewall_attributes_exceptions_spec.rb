@@ -24,7 +24,7 @@ describe 'firewall basics', docker: true do
                                         (fetch_os_name == 'oraclelinux' && os[:release][0] <= '7') ||
                                         (os[:family] == 'ubuntu') do
     describe 'bytecode' do
-      context '4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0' do
+      context 'when 4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0' do
         pp = <<-PUPPETCODE
             class { '::firewall': }
             firewall { '102 - test':
@@ -1292,7 +1292,7 @@ describe 'firewall basics', docker: true do
   end
 
   describe 'condition', condition_parameter_test: false do
-    context 'is set' do
+    context 'when is set' do
       pp = <<-PUPPETCODE
         if $facts['os']['name'] == 'Ubuntu' {
           firewall { '010 isblue ipv4':

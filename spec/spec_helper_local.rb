@@ -29,15 +29,53 @@ if ENV['COVERAGE'] == 'yes'
   end
 end
 
-def with_debian_facts
+shared_context 'when ArchLinux' do
   let :facts do
     {
       kernel: 'Linux',
       os: {
-        name: 'Debian',
-        release: { full: '8.0' },
-        family: 'Debian',
+        name: 'ArchLinux',
+        family: 'ArchLinux'
       },
+      identity: {
+        uid: 'root'
+      }
     }
   end
+end
+
+shared_context 'when Debian 10' do
+  let(:facts) { on_supported_os['debian-10-x86_64'] }
+end
+
+shared_context 'when Debian 11' do
+  let(:facts) { on_supported_os['debian-11-x86_64'] }
+end
+
+shared_context 'when Debian Unstable' do
+  let(:facts) do
+    {
+      kernel: 'Linux',
+      os: {
+        family: 'Debian',
+        name: 'Debian',
+        release: { full: 'unstable' }
+      },
+      identity: {
+        uid: 'root'
+      }
+    }
+  end
+end
+
+shared_context 'when Ubuntu 18.04' do
+  let(:facts) { on_supported_os['ubuntu-18.04-x86_64'] }
+end
+
+shared_context 'when RedHat 7' do
+  let(:facts) { on_supported_os['redhat-7-x86_64'] }
+end
+
+shared_context 'when RedHat 8' do
+  let(:facts) { on_supported_os['redhat-8-x86_64'] }
 end
