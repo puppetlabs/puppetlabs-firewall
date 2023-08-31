@@ -21,7 +21,7 @@ end
 
 def install_iptables
   LitmusHelper.instance.run_shell('iptables -V')
-rescue
+rescue StandardError
   if os[:family] == 'redhat'
     if fetch_os_name == 'oraclelinux' && os[:release].to_i == 7
       LitmusHelper.instance.run_shell('yum install iptables -y')
@@ -36,7 +36,7 @@ end
 def iptables_version
   install_iptables
   x = LitmusHelper.instance.run_shell('iptables -V')
-  x.stdout.split(' ')[1][1..-1]
+  x.stdout.split[1][1..]
 end
 
 def pre_setup
@@ -51,7 +51,7 @@ def update_profile_file
 end
 
 def fetch_os_name
-  @facter_os_name ||= LitmusHelper.instance.run_shell('facter os.name').stdout.delete("\n").downcase
+  @fetch_os_name ||= LitmusHelper.instance.run_shell('facter os.name').stdout.delete("\n").downcase
 end
 
 RSpec.configure do |c|
@@ -61,9 +61,7 @@ RSpec.configure do |c|
   c.filter_run_excluding condition_parameter_test: false
   c.before :suite do
     # Depmod is not availible by default on our AlmaLinux/CentOS 8 docker image
-    if ['almalinux-8', 'centos-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      LitmusHelper.instance.run_shell('yum install kmod -y')
-    end
+    LitmusHelper.instance.run_shell('yum install kmod -y') if ['almalinux-8', 'centos-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
     if ['centos-6', 'centos-7', 'oraclelinux-6', 'scientific-6', 'scientific-7'].include?("#{fetch_os_name}-#{os[:release].to_i}")
       LitmusHelper.instance.run_shell('yum update -y')
       LitmusHelper.instance.run_shell('depmod -a')
@@ -94,7 +92,7 @@ RSpec.configure do |c|
         package { 'net-tools':
           ensure   => 'latest',
         }
-        PUPPETCODE
+      PUPPETCODE
       LitmusHelper.instance.apply_manifest(pp)
       LitmusHelper.instance.run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
       LitmusHelper.instance.run_shell('update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
@@ -115,8 +113,6 @@ RSpec.configure do |c|
     # Ensure that policycoreutils is present. In the future we could probably refactor
     # this so that policycoreutils is installed on platform where the os.family fact
     # is set to 'redhat'
-    if ['almalinux-8', 'rocky-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      LitmusHelper.instance.run_shell('yum install policycoreutils -y')
-    end
+    LitmusHelper.instance.run_shell('yum install policycoreutils -y') if ['almalinux-8', 'rocky-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
   end
 end

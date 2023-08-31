@@ -9,7 +9,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
     let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' netfilter-persistent 2>/dev/null" }
 
     {
-      'Ubuntu' => '0.5.3ubuntu2',
+      'Ubuntu' => '0.5.3ubuntu2'
     }.each do |os, ver|
       os_release = '20.04'
 
@@ -20,6 +20,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
           allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                              .and_return(ver)
         end
+
         it { expect(Facter.fact(:iptables_persistent_version).value).to eql ver }
       end
     end
@@ -31,6 +32,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
         allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                            .and_return(nil)
       end
+
       it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
 
@@ -39,6 +41,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
         allow(Facter.fact(:operatingsystem)).to receive(:value)
           .and_return('CentOS')
       end
+
       it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
   end
@@ -50,7 +53,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
 
     {
       'Debian' => '0.0.20090701',
-      'Ubuntu' => '0.5.3ubuntu2',
+      'Ubuntu' => '0.5.3ubuntu2'
     }.each do |os, ver|
       if os == 'Debian'
         os_release = '8.0'
@@ -65,6 +68,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
           allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                              .and_return(ver)
         end
+
         it { expect(Facter.fact(:iptables_persistent_version).value).to eql ver }
       end
     end
@@ -77,6 +81,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
         allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                            .and_return(nil)
       end
+
       it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
 
@@ -85,6 +90,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
         allow(Facter.fact(:operatingsystem)).to receive(:value)
           .and_return('CentOS')
       end
+
       it { expect(Facter.fact(:iptables_persistent_version).value).to be_nil }
     end
   end

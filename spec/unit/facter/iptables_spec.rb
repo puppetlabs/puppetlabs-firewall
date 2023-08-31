@@ -26,6 +26,7 @@ describe 'Facter::Util::Fact' do
       allow(Facter::Core::Execution).to receive(:execute)
         .with('ip6tables --version', { on_fail: nil }).and_return('ip6tables v1.4.7')
     end
+
     it { expect(Facter.fact(:ip6tables_version).value).to eql '1.4.7' }
   end
 end
