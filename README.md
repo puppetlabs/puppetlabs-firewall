@@ -572,7 +572,7 @@ firewall { '571 - hop_limit':
   ensure    => present,
   proto     => 'tcp',
   dport     => '571',
-  jump      => 'ACCEPT',
+  action    => 'ACCEPT',
   hop_limit => '5',
   provider  => 'ip6tables',
 }
@@ -595,7 +595,7 @@ And the second negating access to a range of ports on `iptables`:
 firewall { '560 - negated ports':
   proto  => `tcp`,
   sport  => ['! 560-570','! 580'],
-  jump   => `accept`,
+  action => `accept`,
 }
 ```
 

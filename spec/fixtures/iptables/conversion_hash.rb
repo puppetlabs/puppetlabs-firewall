@@ -19,7 +19,7 @@ ARGS_TO_HASH = {
     line: '-A nova-compute-FORWARD -s 0.0.0.0/32 -d 255.255.255.255/32 -p udp -m udp --sport 68 --dport 67 -j ACCEPT',
     table: 'filter',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'nova-compute-FORWARD',
       source: '0.0.0.0/32',
       destination: '255.255.255.255/32',
@@ -33,7 +33,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     compare_all: true,
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'INPUT',
       destination: '1.1.1.1/32',
       dport: ['7061', '7062'],
@@ -52,7 +52,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       jump: nil,
-      action: 'drop',
+      jump: 'drop',
     },
   },
   'action_reject_1' => {
@@ -60,7 +60,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       jump: nil,
-      action: 'reject',
+      jump: 'reject',
     },
   },
   'action_nil_1' => {
@@ -68,7 +68,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       jump: nil,
-      action: nil,
+      jump: nil,
     },
   },
   'jump_custom_chain_1' => {
@@ -76,7 +76,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       jump: 'custom_chain',
-      action: nil,
+      jump: nil,
     },
   },
   'jump_goto' => {
@@ -84,7 +84,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       goto: 'w--default',
-      action: nil,
+      jump: nil,
     },
 
   },
@@ -290,7 +290,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       state: ['ESTABLISHED', 'INVALID', 'RELATED'],
-      action: nil,
+      jump: nil,
     },
   },
   'ctstate_returns_sorted_values' => {
@@ -298,7 +298,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       ctstate: ['ESTABLISHED', 'INVALID', 'RELATED'],
-      action: nil,
+      jump: nil,
     },
   },
   'comment_string_character_validation' => {
@@ -306,7 +306,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       source: '192.168.0.1/32',
-      action: 'accept',
+      jump: 'accept',
     },
   },
   'multiple_comments' => {
@@ -314,7 +314,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       name: '000 allow from 192.168.0.1, please;another comment',
-      action: 'accept',
+      jump: 'accept',
     },
   },
   'comments_without_quotes_with_underscores' => {
@@ -322,7 +322,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       name: '9000 comment_without_quotes',
-      action: 'accept',
+      jump: 'accept',
     },
   },
   'comments_without_quotes_with_dashes' => {
@@ -330,7 +330,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       name: '100-comment_without-quotes',
-      action: 'accept',
+      jump: 'accept',
     },
   },
   'string_escape_sequences' => {
@@ -338,7 +338,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       name: '000 parse escaped "s, "s, \'s, \'s, \\s and \\s',
-      action: 'accept',
+      jump: 'accept',
     },
   },
   'log_level_debug' => {
@@ -388,7 +388,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -m owner --uid-owner root -j ACCEPT -m comment --comment "057 OUTPUT uid root only"',
     table: 'filter',
     params: {
-      action: 'accept',
+      jump: 'accept',
       uid: 'root',
       chain: 'OUTPUT',
     },
@@ -397,7 +397,7 @@ ARGS_TO_HASH = {
     line: '-t mangle -A POSTROUTING -m owner --uid-owner root -j ACCEPT -m comment --comment "057 POSTROUTING uid root only"',
     table: 'mangle',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'POSTROUTING',
       uid: 'root',
     },
@@ -406,7 +406,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -m owner --gid-owner root -j ACCEPT -m comment --comment "057 OUTPUT gid root only"',
     table: 'filter',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'OUTPUT',
       gid: 'root',
     },
@@ -415,7 +415,7 @@ ARGS_TO_HASH = {
     line: '-t mangle -A POSTROUTING -m owner --gid-owner root -j ACCEPT -m comment --comment "057 POSTROUTING gid root only"',
     table: 'mangle',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'POSTROUTING',
       gid: 'root',
     },
@@ -433,7 +433,7 @@ ARGS_TO_HASH = {
     line: '-A INPUT -i eth0 -j DROP -m comment --comment "060 iniface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: 'eth0',
     },
@@ -447,7 +447,7 @@ ARGS_TO_HASH = {
       dport: ['1094'],
       state: ['NEW'],
       ipset: ['! setname1 src'],
-      action: 'drop',
+      jump: 'drop',
     },
   },
   'addrtype_limit_iface_out' => {
@@ -506,7 +506,7 @@ ARGS_TO_HASH = {
     line: '-A INPUT ! -i eth0 -j DROP -m comment --comment "060 iniface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: '! eth0',
     },
@@ -515,7 +515,7 @@ ARGS_TO_HASH = {
     line: '-A CHAIN-WITH-DASH ! -i eth0 -p tcp -m comment --comment "005 iniface 2" -j DROP',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'CHAIN-WITH-DASH',
       iniface: '! eth0',
     },
@@ -524,7 +524,7 @@ ARGS_TO_HASH = {
     line: '-A INPUT -i eth0:1 -j DROP -m comment --comment "060 iniface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: 'eth0:1',
     },
@@ -533,7 +533,7 @@ ARGS_TO_HASH = {
     line: '-A INPUT -i eth0.234 -j DROP -m comment --comment "060 iniface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: 'eth0.234',
     },
@@ -542,7 +542,7 @@ ARGS_TO_HASH = {
     line: '-A INPUT -i eth+ -j DROP -m comment --comment "060 iniface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: 'eth+',
     },
@@ -551,7 +551,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -o eth0 -j DROP -m comment --comment "060 outiface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: 'eth0',
     },
@@ -560,7 +560,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT ! -o eth0 -j DROP -m comment --comment "060 outiface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: '! eth0',
     },
@@ -569,7 +569,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -o eth0:2 -j DROP -m comment --comment "060 outiface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: 'eth0:2',
     },
@@ -578,7 +578,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -o eth0.234 -j DROP -m comment --comment "060 outiface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: 'eth0.234',
     },
@@ -587,7 +587,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -o eth+ -j DROP -m comment --comment "060 outiface"',
     table: 'filter',
     params: {
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: 'eth+',
     },
@@ -596,7 +596,7 @@ ARGS_TO_HASH = {
     line: '-A INPUT -m pkttype --pkt-type multicast -j ACCEPT',
     table: 'filter',
     params: {
-      action: 'accept',
+      jump: 'accept',
       pkttype: 'multicast',
     },
   },
@@ -604,7 +604,7 @@ ARGS_TO_HASH = {
     line: '-A PREROUTING -m socket -j ACCEPT',
     table: 'mangle',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'PREROUTING',
       socket: true,
     },
@@ -614,7 +614,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       name: '010 a-f comment with dashf',
-      action: 'accept',
+      jump: 'accept',
       isfragment: true,
     },
   },
@@ -622,7 +622,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -s 10.94.100.46/32 -p tcp -m tcp --sport 20443 -j ACCEPT',
     table: 'mangle',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'OUTPUT',
       source: '10.94.100.46/32',
       proto: 'tcp',
@@ -633,7 +633,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -s 10.94.100.46/32 -p udp -m udp --sport 20443 -j ACCEPT',
     table: 'mangle',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'OUTPUT',
       source: '10.94.100.46/32',
       proto: 'udp',
@@ -644,7 +644,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -s 10.94.100.46/32 -p tcp -m tcp --dport 20443 -j ACCEPT',
     table: 'mangle',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'OUTPUT',
       source: '10.94.100.46/32',
       proto: 'tcp',
@@ -655,7 +655,7 @@ ARGS_TO_HASH = {
     line: '-A OUTPUT -s 10.94.100.46/32 -p udp -m udp --dport 20443 -j ACCEPT',
     table: 'mangle',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'OUTPUT',
       source: '10.94.100.46/32',
       proto: 'udp',
@@ -669,7 +669,7 @@ ARGS_TO_HASH = {
       proto: 'tcp',
       dport: ['22'],
       connlimit_above: '10',
-      action: 'reject',
+      jump: 'reject',
     },
   },
   'connlimit_above_with_connlimit_mask' => {
@@ -680,7 +680,7 @@ ARGS_TO_HASH = {
       dport: ['22'],
       connlimit_above: '10',
       connlimit_mask: '24',
-      action: 'reject',
+      jump: 'reject',
     },
   },
   'connmark' => {
@@ -689,7 +689,7 @@ ARGS_TO_HASH = {
     params: {
       proto: 'all',
       connmark: '0x1',
-      action: 'reject',
+      jump: 'reject',
     },
   },
   'disallow_esp_protocol' => {
@@ -697,7 +697,7 @@ ARGS_TO_HASH = {
     table: 'filter',
     params: {
       name: '063 disallow esp protocol',
-      action: 'accept',
+      jump: 'accept',
       proto: '! esp',
     },
   },
@@ -707,7 +707,7 @@ ARGS_TO_HASH = {
     params: {
       name: '064 drop NEW non-tcp external packets with FIN/RST/ACK set and SYN unset',
       state: ['NEW'],
-      action: 'drop',
+      jump: 'drop',
       proto: '! tcp',
       source: '! 10.0.0.0/8',
       tcp_flags: '! FIN,SYN,RST,ACK SYN',
@@ -717,7 +717,7 @@ ARGS_TO_HASH = {
     line: '-A nova-compute-FORWARD -s 0.0.0.0/32 -d 255.255.255.255/32 -p udp -m udp ! --sport 68,69 ! --dport 67,66 -j ACCEPT',
     table: 'filter',
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'nova-compute-FORWARD',
       source: '0.0.0.0/32',
       destination: '255.255.255.255/32',
@@ -734,7 +734,7 @@ ARGS_TO_HASH = {
       connlimit_above: '10',
       connlimit_mask: '32',
       match_mark: '0x1',
-      action: 'reject',
+      jump: 'reject',
     },
   },
   'clamp_mss_to_pmtu' => {
@@ -753,7 +753,7 @@ ARGS_TO_HASH = {
     line: '-A foo-filter -p tcp -j ACCEPT -m comment --comment "068 chain name containing -f"',
     params: {
       name: '068 chain name containing -f',
-      action: 'accept',
+      jump: 'accept',
       chain: 'foo-filter',
     },
   },
@@ -868,7 +868,7 @@ ARGS_TO_HASH = {
 HASH_TO_ARGS = {
   'long_rule_1' => {
     params: {
-      action: 'accept',
+      jump: 'accept',
       chain: 'INPUT',
       destination: '1.1.1.1',
       dport: ['7061', '7062'],
@@ -1196,7 +1196,7 @@ HASH_TO_ARGS = {
       name: '057 OUTPUT uid root only',
       table: 'filter',
       uid: 'root',
-      action: 'accept',
+      jump: 'accept',
       chain: 'OUTPUT',
       proto: 'all',
     },
@@ -1207,7 +1207,7 @@ HASH_TO_ARGS = {
       name: '057 POSTROUTING uid root only',
       table: 'mangle',
       uid: 'root',
-      action: 'accept',
+      jump: 'accept',
       chain: 'POSTROUTING',
       proto: 'all',
     },
@@ -1219,7 +1219,7 @@ HASH_TO_ARGS = {
       table: 'filter',
       chain: 'OUTPUT',
       gid: 'root',
-      action: 'accept',
+      jump: 'accept',
       proto: 'all',
     },
     args: ['-t', :filter, '-p', :all, '-m', 'owner', '--gid-owner', 'root', '-j', 'ACCEPT', '-m', 'comment', '--comment', '057 OUTPUT gid root only'],
@@ -1229,7 +1229,7 @@ HASH_TO_ARGS = {
       name: '057 POSTROUTING gid root only',
       table: 'mangle',
       gid: 'root',
-      action: 'accept',
+      jump: 'accept',
       chain: 'POSTROUTING',
       proto: 'all',
     },
@@ -1279,7 +1279,7 @@ HASH_TO_ARGS = {
     params: {
       name: '060 iniface',
       table: 'filter',
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: 'eth0',
     },
@@ -1289,7 +1289,7 @@ HASH_TO_ARGS = {
     params: {
       name: '060 iniface',
       table: 'filter',
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: 'eth0.234',
     },
@@ -1299,7 +1299,7 @@ HASH_TO_ARGS = {
     params: {
       name: '060 iniface',
       table: 'filter',
-      action: 'drop',
+      jump: 'drop',
       chain: 'INPUT',
       iniface: 'eth+',
     },
@@ -1309,7 +1309,7 @@ HASH_TO_ARGS = {
     params: {
       name: '060 outiface',
       table: 'filter',
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: 'eth0',
     },
@@ -1319,7 +1319,7 @@ HASH_TO_ARGS = {
     params: {
       name: '060 outiface',
       table: 'filter',
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: 'eth0.234',
     },
@@ -1329,7 +1329,7 @@ HASH_TO_ARGS = {
     params: {
       name: '060 outiface',
       table: 'filter',
-      action: 'drop',
+      jump: 'drop',
       chain: 'OUTPUT',
       outiface: 'eth+',
     },
@@ -1339,7 +1339,7 @@ HASH_TO_ARGS = {
     params: {
       name: '062 pkttype multicast',
       table: 'filter',
-      action: 'accept',
+      jump: 'accept',
       chain: 'INPUT',
       iniface: 'eth0',
       pkttype: 'multicast',
@@ -1350,7 +1350,7 @@ HASH_TO_ARGS = {
     params: {
       name: '050 socket option',
       table: 'mangle',
-      action: 'accept',
+      jump: 'accept',
       chain: 'PREROUTING',
       socket: true,
     },
@@ -1361,7 +1361,7 @@ HASH_TO_ARGS = {
       name: '050 isfragment option',
       table: 'filter',
       proto: :all,
-      action: 'accept',
+      jump: 'accept',
       isfragment: true,
     },
     args: ['-t', :filter, '-p', :all, '-f', '-j', 'ACCEPT', '-m', 'comment', '--comment', '050 isfragment option'],
@@ -1371,7 +1371,7 @@ HASH_TO_ARGS = {
       name: '050 testcomment-with-fdashf',
       table: 'filter',
       proto: :all,
-      action: 'accept',
+      jump: 'accept',
     },
     args: ['-t', :filter, '-p', :all, '-j', 'ACCEPT', '-m', 'comment', '--comment', '050 testcomment-with-fdashf'],
   },
@@ -1382,7 +1382,7 @@ HASH_TO_ARGS = {
       proto: 'tcp',
       dport: ['22'],
       connlimit_above: '10',
-      action: 'reject',
+      jump: 'reject',
     },
     args: ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '22', '-j', 'REJECT', '-m', 'connlimit', '--connlimit-above', '10', '-m', 'comment', '--comment', '061 REJECT connlimit_above 10'],
   },
@@ -1394,7 +1394,7 @@ HASH_TO_ARGS = {
       dport: ['22'],
       connlimit_above: '10',
       connlimit_mask: '24',
-      action: 'reject',
+      jump: 'reject',
     },
     args: ['-t', :filter, '-p', :tcp, '-m', 'multiport', '--dports', '22', '-j', 'REJECT', '-m', 'connlimit', '--connlimit-above', '10', '--connlimit-mask', '24', '-m', 'comment', '--comment', '061 REJECT connlimit_above 10 with mask 24'], # rubocop:disable Layout/LineLength
   },
@@ -1404,7 +1404,7 @@ HASH_TO_ARGS = {
       table: 'filter',
       proto: 'all',
       connmark: '0x1',
-      action: 'reject',
+      jump: 'reject',
     },
     args: ['-t', :filter, '-p', :all, '-j', 'REJECT', '-m', 'connmark', '--mark', '0x1', '-m', 'comment', '--comment', '062 REJECT connmark'],
   },
@@ -1412,7 +1412,7 @@ HASH_TO_ARGS = {
     params: {
       name: '063 disallow esp protocol',
       table: 'filter',
-      action: 'accept',
+      jump: 'accept',
       proto: '! esp',
     },
     args: ['-t', :filter, '!', '-p', :esp, '-j', 'ACCEPT', '-m', 'comment', '--comment', '063 disallow esp protocol'],
@@ -1423,7 +1423,7 @@ HASH_TO_ARGS = {
       table: 'filter',
       chain: 'INPUT',
       state: ['NEW'],
-      action: 'drop',
+      jump: 'drop',
       proto: '! tcp',
       source: '! 10.0.0.0/8',
       tcp_flags: '! FIN,SYN,RST,ACK SYN',
@@ -1434,7 +1434,7 @@ HASH_TO_ARGS = {
     params: {
       name: '065 negate dport and sport',
       table: 'filter',
-      action: 'accept',
+      jump: 'accept',
       chain: 'nova-compute-FORWARD',
       source: '0.0.0.0/32',
       destination: '255.255.255.255/32',
@@ -1452,7 +1452,7 @@ HASH_TO_ARGS = {
       connlimit_above: '10',
       connlimit_mask: '32',
       match_mark: '0x1',
-      action: 'reject',
+      jump: 'reject',
     },
     args: ['-t', :filter, '-p', :tcp, '-j', 'REJECT', '-m', 'mark', '--mark', '0x1', '-m', 'connlimit', '--connlimit-above', '10', '--connlimit-mask', '32', '-m', 'comment', '--comment', '066 REJECT connlimit_above 10 with mask 32 and mark matches'], # rubocop:disable Layout/LineLength
   },
