@@ -565,7 +565,7 @@ As part of this process several breaking changes where made to the code that wil
   * For attributes that allow passed values to be negated seperately this is not the case. All attributes in this situation are noted within their description.
 * The `sport` and `dport` attributes have been updated so that they will now accept with `:` or `-` as a separator when passing ranges, with `:` being preferred as it matchs what is passed to iptables.
 
-Two pairs of manifest tkane from the tests can be seen below, illustrating the changes that may be required, the fist applying a hoplimit on `ip6tables`:
+Two pairs of manifest tkane from the tests can be seen below, illustrating the changes that may be required, the first applying a hoplimit on `ip6tables`:
 
 ```Puppet
 firewall { '571 - hop_limit':
