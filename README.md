@@ -77,24 +77,24 @@ class my_fw::pre {
 
   # Default firewall rules
   firewall { '000 accept all icmp':
-    proto  => 'icmp',
-    action => 'accept',
+    proto => 'icmp',
+    jump  => 'accept',
   }
   -> firewall { '001 accept all to lo interface':
     proto   => 'all',
     iniface => 'lo',
-    action  => 'accept',
+    jump    => 'accept',
   }
   -> firewall { '002 reject local traffic not on loopback interface':
     iniface     => '! lo',
     proto       => 'all',
     destination => '127.0.0.1/8',
-    action      => 'reject',
+    jump        => 'reject',
   }
   -> firewall { '003 accept related established rules':
     proto  => 'all',
     state  => ['RELATED', 'ESTABLISHED'],
-    action => 'accept',
+    jump   => 'accept',
   }
 }
 ```
@@ -108,7 +108,7 @@ existing connections are not closed.
 class my_fw::post {
   firewall { '999 drop all':
     proto  => 'all',
-    action => 'drop',
+    jump   => 'drop',
     before => undef,
   }
 }
@@ -218,8 +218,8 @@ Basic accept ICMP request example:
 
 ```puppet
 firewall { '000 accept all icmp requests':
-  proto  => 'icmp',
-  action => 'accept',
+  proto => 'icmp',
+  jump  => 'accept',
 }
 ```
 
@@ -227,7 +227,7 @@ Drop all:
 
 ```puppet
 firewall { '999 drop all other requests':
-  action => 'drop',
+  jump => 'drop',
 }
 ```
 
@@ -239,7 +239,7 @@ IPv6 rules can be specified using the _ip6tables_ provider:
 firewall { '006 Allow inbound SSH (v6)':
   dport    => 22,
   proto    => 'tcp',
-  action   => 'accept',
+  jump     => 'accept',
   protocol => 'ip6tables',
 }
 ```
@@ -265,7 +265,7 @@ class profile::apache {
   firewall { '100 allow http and https access':
     dport  => [80, 443],
     proto  => 'tcp',
-    action => 'accept',
+    jump   => 'accept',
   }
 }
 ```
@@ -283,14 +283,14 @@ Examples:
 
 ```puppet
 firewall { '001 disallow esp protocol':
-  action => 'accept',
+  jump   => 'accept',
   proto  => '! esp',
 }
 
 firewall { '002 drop NEW external website packets with FIN/RST/ACK set and SYN unset':
   chain     => 'INPUT',
   state     => 'NEW',
-  action    => 'drop',
+  jump      => 'drop',
   proto     => 'tcp',
   sport     => ['! http', '443'],
   source    => '! 10.0.0.0/8',
@@ -304,7 +304,7 @@ Examples:
 
 ```puppet
 firewall { '001 allow local disallow anycast':
-  action   => 'accept',
+  jump     => 'accept',
   src_type => ['LOCAL', '! ANYCAST'],
 }
 ```
@@ -377,7 +377,7 @@ firewallchain { 'MY_CHAIN:filter:IPv4':
 
 firewall { '100 my rule':
   chain   => 'MY_CHAIN',
-  action  => 'accept',
+  jump    => 'accept',
   proto   => 'tcp',
   dport   => 5000,
 }
@@ -471,7 +471,7 @@ firewall_multi { '100 allow http and https access':
   ],
   dport  => [80, 443],
   proto  => 'tcp',
-  action => 'accept',
+  jump   => 'accept',
 }
 ```
 
@@ -572,7 +572,7 @@ firewall { '571 - hop_limit':
   ensure    => present,
   proto     => 'tcp',
   dport     => '571',
-  action    => 'accept',
+  jump      => 'ACCEPT',
   hop_limit => '5',
   provider  => 'ip6tables',
 }
@@ -595,7 +595,7 @@ And the second negating access to a range of ports on `iptables`:
 firewall { '560 - negated ports':
   proto  => `tcp`,
   sport  => ['! 560-570','! 580'],
-  action => `accept`,
+  jump   => `accept`,
 }
 ```
 
