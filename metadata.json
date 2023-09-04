@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "source": "https://github.com/puppetlabs/puppetlabs-firewall",
   "project_page": "http://github.com/puppetlabs/puppetlabs-firewall",
-  "issues_url": "https://tickets.puppetlabs.com/browse/MODULES",
+  "issues_url": "https://github.com/puppetlabs/puppetlabs-firewall/issues",
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
