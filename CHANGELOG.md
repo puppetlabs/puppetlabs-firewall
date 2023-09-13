@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v7.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v7.0.0) - 2023-09-13
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v6.0.0...v7.0.0)
+
+### Changed
+- (CAT-376) Rework firewall module to use the resource_api [#1145](https://github.com/puppetlabs/puppetlabs-firewall/pull/1145) ([david22swan](https://github.com/david22swan))
+
+### Fixed
+
+- (maint) Update all README.md mentions of `action` to `jump` [#1151](https://github.com/puppetlabs/puppetlabs-firewall/pull/1151) ([david22swan](https://github.com/david22swan))
+- (RUBOCOP) Resolve Rubocop Issues [#1149](https://github.com/puppetlabs/puppetlabs-firewall/pull/1149) ([david22swan](https://github.com/david22swan))
+
 ## [v6.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v6.0.0) - 2023-07-25
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v5.0.0...v6.0.0)
@@ -467,7 +479,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - Fixes SELinux compatibility with EL6 [#664](https://github.com/puppetlabs/puppetlabs-firewall/pull/664) ([bmjen](https://github.com/bmjen))
 - Re-add RHEL7 SELinux support for puppet3 [#660](https://github.com/puppetlabs/puppetlabs-firewall/pull/660) ([bmjen](https://github.com/bmjen))
 - Fixing issue with double quotes being removed when part of the comment [#646](https://github.com/puppetlabs/puppetlabs-firewall/pull/646) ([kindred](https://github.com/kindred))
-- Implemented paramters for NFQUEUE jump target [#644](https://github.com/puppetlabs/puppetlabs-firewall/pull/644) ([ianand0204](https://github.com/ianand0204))
+- Implemented paramters for NFQUEUE jump target [#644](https://github.com/puppetlabs/puppetlabs-firewall/pull/644) ([pid1co](https://github.com/pid1co))
 - (MODULES-3572) Ip6tables service is not managed in the redhat family. [#641](https://github.com/puppetlabs/puppetlabs-firewall/pull/641) ([marcofl](https://github.com/marcofl))
 
 ## [1.8.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.8.1) - 2016-05-17
