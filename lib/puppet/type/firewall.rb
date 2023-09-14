@@ -994,7 +994,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     jump: {
-      type: 'Optional[Pattern[/^[a-zA-Z0-9_]+$/]]',
+      type: 'Optional[String[1]]',
       desc: <<-DESC
       This value for the iptables --jump parameter and the action to perform on a match. Common values are:
 
@@ -1022,7 +1022,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     goto: {
-      type: 'Optional[Pattern[/^[a-zA-Z0-9_]+$/]]',
+      type: 'Optional[String[1]]',
       desc: <<-DESC
       The value for the iptables --goto parameter. Normal values are:
 
