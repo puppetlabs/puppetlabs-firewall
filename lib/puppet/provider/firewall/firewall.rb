@@ -432,7 +432,8 @@ class Puppet::Provider::Firewall::Firewall
       should.each_with_index do |_value, _index|
         should = should.map { |value| value.to_s.tr('! ', '') }.sort
         # Port range can be passed as `-` but will always be set/returned as `:`
-        should = should.map { |value| value.to_s.tr('-', ':') }.sort if [:dport, :sport].include?(property_name)
+        ports = [:dport, :sport]
+        should = should.map { |value| value.to_s.tr('-', ':') }.sort if ports.include?(property_name)
       end
       should[0] = ['!', should[0]].join(' ') if should_negated
 
