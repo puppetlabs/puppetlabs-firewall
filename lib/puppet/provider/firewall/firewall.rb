@@ -384,21 +384,6 @@ class Puppet::Provider::Firewall::Firewall
     when :mac_source, :jump
       # Value of mac_source/jump may be downcased or upcased when returned depending on the OS
       is_hash[property_name].casecmp(should_hash[property_name]).zero?
-    when :state, :ctstate, :ctstatus
-      # Ensure that if both is and should are array values, they are correctly compared in order
-      is = is_hash[property_name]
-      should = should_hash[property_name]
-      return nil unless is.is_a?(Array) && should.is_a?(Array)
-
-      if is[0].start_with?('!')
-        is.append('!')
-        is[0] = is[0].gsub(%r{^!\s?}, '')
-      end
-      if should[0].start_with?('!')
-        should.append('!')
-        should[0] = should[0].gsub(%r{^!\s?}, '')
-      end
-      is.sort == should.sort
     when :icmp
       # Ensure that the values are compared to each other as icmp code numbers
       is = PuppetX::Firewall::Utility.icmp_name_to_number(is_hash[property_name], is_hash[:protocol])
@@ -428,27 +413,31 @@ class Puppet::Provider::Firewall::Firewall
       should = "#{should}:00" if %r{^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$}.match?(should)
 
       is == should
-    when :dport, :sport
+    when :dport, :sport, :state, :ctstate, :ctstatus
       is = is_hash[property_name]
       should = should_hash[property_name]
 
-      # Wrap compared values as arrays in order to simplify comparisons
-      is = [is] unless is.is_a?(Array)
-      should = [should] unless should.is_a?(Array)
+      # Unique logic is only needed when both values are arrays
+      return nil unless is.is_a?(Array) && should.is_a?(Array)
 
-      # If first value includes a negation, retrieve it and set as it's own value
-      if is[0].start_with?('!')
-        is.append('!')
-        is[0] = is[0].gsub(%r{^!\s?}, '')
-      end
-      if should[0].start_with?('!')
-        should.append('!')
-        should[0] = should[0].gsub(%r{^!\s?}, '')
-      end
-
-      # Range can be passed as `-` but will always be set/returned as `:`
       # Ensure values are sorted
-      is.sort == should.map { |port| port.to_s.tr('-', ':') }.sort
+      # Ensure any negation includes only the first value
+      is_negated = true if %r{^!\s}.match?(is[0].to_s)
+      is.each_with_index do |_value, _index|
+        is = is.map { |value| value.to_s.tr('! ', '') }.sort
+      end
+      is[0] = ['!', is[0]].join(' ') if is_negated
+
+      should_negated = true if %r{^!\s}.match?(should[0].to_s)
+      should.each_with_index do |_value, _index|
+        should = should.map { |value| value.to_s.tr('! ', '') }.sort
+        # Port range can be passed as `-` but will always be set/returned as `:`
+        ports = [:dport, :sport]
+        should = should.map { |value| value.to_s.tr('-', ':') }.sort if ports.include?(property_name)
+      end
+      should[0] = ['!', should[0]].join(' ') if should_negated
+
+      is == should
     when :string_hex
       # Compare the values with any whitespace removed
       is = is_hash[property_name].to_s.gsub(%r{\s+}, '')

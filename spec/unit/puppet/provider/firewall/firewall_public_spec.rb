@@ -156,6 +156,7 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { state: 'NEW' }, should_hash: { state: ['NEW', 'INVALID'] }, result: nil },
           { is_hash: { state: ['INVALID', 'NEW'] }, should_hash: { state: ['NEW', 'INVALID'] }, result: true },
           { is_hash: { state: ['! INVALID', 'NEW'] }, should_hash: { state: ['! NEW', 'INVALID'] }, result: true },
+          { is_hash: { state: ['! INVALID', 'NEW'] }, should_hash: { state: ['! NEW', '! INVALID'] }, result: true },
           { is_hash: { state: ['! INVALID', 'NEW'] }, should_hash: { state: ['! NEW', 'INVALID', 'UNTRACKED'] }, result: false },
         ] },
         { testing: 'icmp', property_name: :icmp, comparisons: [
@@ -200,12 +201,11 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { jump: 'accept' }, should_hash: { jump: 'drop' }, result: false },
         ] },
         { testing: 'dport/sport', property_name: :dport, comparisons: [
-          { is_hash: { dport: '! 50' }, should_hash: { dport: '! 50' }, result: true },
-          { is_hash: { dport: '50:60' }, should_hash: { dport: '50-60' }, result: true },
-          { is_hash: { dport: ['50:60'] }, should_hash: { dport: '50-60' }, result: true },
+          { is_hash: { dport: '50' }, should_hash: { dport: '50' }, result: nil },
+          { is_hash: { dport: ['50:60'] }, should_hash: { dport: '50-60' }, result: nil },
           { is_hash: { dport: ['50:60'] }, should_hash: { dport: ['50-60'] }, result: true },
-          { is_hash: { dport: ['! 50:60', '90'] }, should_hash: { dport: ['! 90', '50-60'] }, result: true },
-          { is_hash: { dport: '50' }, should_hash: { dport: '90' }, result: false },
+          { is_hash: { dport: ['! 50:60', '90'] }, should_hash: { dport: ['! 90', '! 50-60'] }, result: true },
+          { is_hash: { dport: ['! 50:60', '90'] }, should_hash: { dport: ['! 100', '! 60-70'] }, result: false },
         ] },
         { testing: 'string_hex', property_name: :string_hex, comparisons: [
           { is_hash: { string_hex: '! |f4 6d 04 25 b2 02 00 0a|' }, should_hash: { string_hex: '! |f46d0425b202000a|' }, result: true },
