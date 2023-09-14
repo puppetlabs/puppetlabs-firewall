@@ -436,19 +436,25 @@ class Puppet::Provider::Firewall::Firewall
       is = [is] unless is.is_a?(Array)
       should = [should] unless should.is_a?(Array)
 
-      # If first value includes a negation, retrieve it and set as it's own value
-      if is[0].start_with?('!')
-        is.append('!')
-        is[0] = is[0].gsub(%r{^!\s?}, '')
+      # Ensure values are sorted
+      # Ensure any negation includes only the first value
+      is_negated = true if %r{^!\s}.match?(is[0].to_s)
+      is.each_with_index do |_value, _index|
+        is = is.map { |value| value.to_s.tr('! ', '') }.sort
       end
-      if should[0].start_with?('!')
-        should.append('!')
-        should[0] = should[0].gsub(%r{^!\s?}, '')
+      is[0] = ['!', is[0]].join(' ') if is_negated
+
+      should_negated = true if %r{^!\s}.match?(should[0].to_s)
+      should.each_with_index do |_value, _index|
+        should = should.map { |value| value.to_s.tr('! ', '') }.sort
+      # Range can be passed as `-` but will always be set/returned as `:`
+        should = should.map { |value| value.to_s.tr('-', ':') }.sort
       end
+      should[0] = ['!', should[0]].join(' ') if should_negated
 
       # Range can be passed as `-` but will always be set/returned as `:`
       # Ensure values are sorted
-      is.sort == should.map { |port| port.to_s.tr('-', ':') }.sort
+      is == should
     when :string_hex
       # Compare the values with any whitespace removed
       is = is_hash[property_name].to_s.gsub(%r{\s+}, '')
