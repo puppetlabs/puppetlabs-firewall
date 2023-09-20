@@ -85,7 +85,7 @@ describe 'puppet resource firewall command' do
     end
   end
 
-  context 'when accepts rules with multiple comments', unless: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
+  context 'when accepts rules with multiple comments' do
     before(:all) do
       iptables_flush_all_tables
       run_shell('iptables -A INPUT -j ACCEPT -p tcp --dport 80 -m comment --comment "http" -m comment --comment "http"')

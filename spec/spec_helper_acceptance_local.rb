@@ -62,7 +62,7 @@ RSpec.configure do |c|
   c.before :suite do
     # Depmod is not availible by default on our AlmaLinux/CentOS 8 docker image
     LitmusHelper.instance.run_shell('yum install kmod -y') if ['almalinux-8', 'centos-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-    if ['centos-6', 'centos-7', 'oraclelinux-6', 'scientific-6', 'scientific-7'].include?("#{fetch_os_name}-#{os[:release].to_i}")
+    if ['centos-7', 'scientific-7'].include?("#{fetch_os_name}-#{os[:release].to_i}")
       LitmusHelper.instance.run_shell('yum update -y')
       LitmusHelper.instance.run_shell('depmod -a')
       ['filter', 'nat', 'mangle', 'raw'].each do |t|

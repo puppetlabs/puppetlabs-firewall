@@ -86,29 +86,6 @@ describe 'firewall ipv6 attribute testing, exceptions' do
             end
           end
         end
-
-        context 'when multiple addrtype fail', if: (os[:family] == 'redhat' && os[:release].start_with?('5')) do
-          pp = <<-PUPPETCODE
-                class { '::firewall': }
-                firewall { '616 - test':
-                  proto    => tcp,
-                  jump     => accept,
-                  #{type}  => ['LOCAL', '! LOCAL'],
-                  protocol => 'IPv6',
-                }
-          PUPPETCODE
-          it 'fails' do
-            apply_manifest(pp, expect_failures: true) do |r|
-              expect(r.stderr).to match(%r{Multiple #{type} elements are available from iptables version})
-            end
-          end
-
-          it 'does not contain the rule' do
-            run_shell('ip6tables-save') do |r|
-              expect(r.stdout).not_to match(%r{-A INPUT -p (tcp|6) -m addrtype --#{type.tr('_', '-')} LOCAL -m addrtype ! --#{type.tr('_', '-')} LOCAL -m comment --comment "616 - test" -j ACCEPT})
-            end
-          end
-        end
       end
     end
 
@@ -135,61 +112,6 @@ describe 'firewall ipv6 attribute testing, exceptions' do
           run_shell('ip6tables-save') do |r|
             expect(r.stdout).not_to match(%r{-A INPUT -p (tcp|6)-m tcp --dport 571 -m comment --comment "571 - test" -m hl --hl-eq invalid -j ACCEPT})
           end
-        end
-      end
-    end
-
-    # ipset is hard to test, only testing on ubuntu 14
-    describe 'ipset', if: (os[:family] == 'redhat' && os[:release].start_with?('14')) do
-      before(:all) do
-        pp = <<-PUPPETCODE
-          exec { 'hackery pt 1':
-            command => 'service iptables-persistent flush',
-            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-          }
-          package { 'ipset':
-            ensure  => present,
-            require => Exec['hackery pt 1'],
-          }
-          exec { 'hackery pt 2':
-            command => 'service iptables-persistent start',
-            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-            require => Package['ipset'],
-          }
-          class { '::firewall': }
-          exec { 'create ipset blacklist':
-            command => 'ipset create blacklist hash:ip,port family inet6 maxelem 1024 hashsize 65535 timeout 120',
-            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-            require => Package['ipset'],
-          }
-          -> exec { 'create ipset honeypot':
-            command => 'ipset create honeypot hash:ip family inet6 maxelem 1024 hashsize 65535 timeout 120',
-            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-          }
-          -> exec { 'add blacklist':
-            command => 'ipset add blacklist 2001:db8::1,80',
-            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-          }
-          -> exec { 'add honeypot':
-            command => 'ipset add honeypot 2001:db8::5',
-            path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-          }
-          firewall { '612 - test':
-            ensure   => present,
-            chain    => 'INPUT',
-            proto    => tcp,
-            jump     => drop,
-            ipset    => ['blacklist src,dst', '! honeypot dst'],
-            protocol => 'IPv6',
-            require  => Exec['add honeypot'],
-          }
-        PUPPETCODE
-        apply_manifest(pp, catch_failures: true)
-      end
-
-      it 'contains the rule' do
-        run_shell('ip6tables-save') do |r|
-          expect(r.stdout).to match(%r{-A INPUT -p (tcp|6) -m set --match-set blacklist src,dst -m set ! --match-set honeypot dst -m comment --comment "612 - test" -j DROP})
         end
       end
     end

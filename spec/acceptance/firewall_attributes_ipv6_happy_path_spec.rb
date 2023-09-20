@@ -2,7 +2,7 @@
 
 require 'spec_helper_acceptance'
 
-describe 'firewall attribute testing, happy path', unless: (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) || (os[:family] == 'sles') do
+describe 'firewall attribute testing, happy path', unless: (os[:family] == 'sles') do
   before :all do
     iptables_flush_all_tables
     ip6tables_flush_all_tables
