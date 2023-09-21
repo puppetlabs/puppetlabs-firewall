@@ -19,9 +19,7 @@ describe 'firewall basics', docker: true do
 
   # --bytecode is only supported by operatingsystems using nftables (in general Linux kernel 3.13, RedHat 7 (and derivates) with 3.10)
   # Skipping those from which we know they would fail.
-  describe 'bytecode property', unless: (os[:family] == 'redhat' && os[:release][0] <= '6') ||
-                                        (os[:family] == 'sles' && os[:release][0..1] <= '11') ||
-                                        (fetch_os_name == 'oraclelinux' && os[:release][0] <= '7') ||
+  describe 'bytecode property', unless: (fetch_os_name == 'oraclelinux' && os[:release][0] == '7') ||
                                         (os[:family] == 'ubuntu') do
     describe 'bytecode' do
       context 'when 4,48 0 0 9,21 0 1 6,6 0 0 1,6 0 0 0' do
