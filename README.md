@@ -240,7 +240,7 @@ firewall { '006 Allow inbound SSH (v6)':
   dport    => 22,
   proto    => 'tcp',
   jump     => 'accept',
-  protocol => 'ip6tables',
+  provider => 'ip6tables',
 }
 ```
 
