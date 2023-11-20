@@ -20,6 +20,7 @@
     * [Additional information](#additional-information)
 5. [Reference - An under-the-hood peek at what the module is doing](#reference)
 6. [Limitations - OS compatibility, etc.](#limitations)
+7. [License](#license)
 7. [Firewall_multi - Arrays for certain parameters](#firewall_multi)
 8. [Development - Guide for contributing to the module](#development)
     * [Tests - Testing your configuration](#tests)
@@ -512,6 +513,10 @@ For other distributions (RedHat, Debian, Centos etc) manual installation of the 
 Please report any bugs in the Puppetlabs GitHub issue tracker:
 
 <https://github.com/puppetlabs/puppetlabs-firewall/issues>
+
+## License
+
+This codebase is licensed under the Apache2.0 licensing, however due to the nature of the codebase the open source dependencies may also use a combination of [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html), [BSD-2](https://opensource.org/license/bsd-2-claus), [BSD-3](https://opensource.org/license/bsd-3-claus), [GPL2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html), [LGPL](https://opensource.org/license/lgpl-3-0/), [MIT](https://opensource.org/license/mit/) and [MPL](https://opensource.org/license/mpl-2-0/) Licensing.
 
 ## Development
 
