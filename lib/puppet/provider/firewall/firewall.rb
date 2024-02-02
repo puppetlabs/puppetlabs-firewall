@@ -863,8 +863,10 @@ class Puppet::Provider::Firewall::Firewall
       should[key][0] = ['!', should[key][0]].join(' ') if negated
     end
 
-    # `jump` values should always be uppercase
-    should[:jump] = should[:jump].upcase if should[:jump]
+    # `jump` common values should always be uppercase
+    jump_common_values = ['accept', 'reject', 'drop', 'queue', 'return', 'dnat', 'snat', 'log', 'nflog',
+                          'netmp', 'masquerade', 'redirect', 'mark', 'ct']
+    should[:jump] = should[:jump].upcase if should[:jump] && jump_common_values.include?(should[:jump].downcase)
 
     # `source` and `destination` must be put through host_to_mask
     should[:source] = PuppetX::Firewall::Utility.host_to_mask(should[:source], should[:protocol]) if should[:source]

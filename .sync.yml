@@ -7,8 +7,8 @@ Gemfile:
   optional:
     ":development":
       - gem: 'puppet-resource_api'
-      - gem: github_changelog_generator
-        version: '= 1.15.2'
+.rubocop.yml:
+  include_todos: true
 Rakefile:
   changelog_user: puppetlabs
   changelog_max_issues: 500

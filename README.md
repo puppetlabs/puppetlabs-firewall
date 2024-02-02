@@ -20,6 +20,7 @@
     * [Additional information](#additional-information)
 5. [Reference - An under-the-hood peek at what the module is doing](#reference)
 6. [Limitations - OS compatibility, etc.](#limitations)
+7. [License](#license)
 7. [Firewall_multi - Arrays for certain parameters](#firewall_multi)
 8. [Development - Guide for contributing to the module](#development)
     * [Tests - Testing your configuration](#tests)
@@ -509,9 +510,13 @@ For other distributions (RedHat, Debian, Centos etc) manual installation of the 
 
 #### Reporting Issues
 
-Please report any bugs in the Puppetlabs JIRA issue tracker:
+Please report any bugs in the Puppetlabs GitHub issue tracker:
 
-<https://tickets.puppetlabs.com/projects/MODULES/issues>
+<https://github.com/puppetlabs/puppetlabs-firewall/issues>
+
+## License
+
+This codebase is licensed under the Apache2.0 licensing, however due to the nature of the codebase the open source dependencies may also use a combination of [AGPL](https://opensource.org/license/agpl-v3/), [BSD-2](https://opensource.org/license/bsd-2-clause/), [BSD-3](https://opensource.org/license/bsd-3-clause/), [GPL2.0](https://opensource.org/license/gpl-2-0/), [LGPL](https://opensource.org/license/lgpl-3-0/), [MIT](https://opensource.org/license/mit/) and [MPL](https://opensource.org/license/mpl-2-0/) Licensing.
 
 ## Development
 
@@ -519,7 +524,7 @@ Acceptance tests for this module leverage [puppet_litmus](https://github.com/pup
 To run the acceptance tests follow the instructions [here](https://github.com/puppetlabs/puppet_litmus/wiki/Tutorial:-use-Litmus-to-execute-acceptance-tests-with-a-sample-module-(MoTD)#install-the-necessary-gems-for-the-module).
 You can also find a tutorial and walkthrough of using Litmus and the PDK on [YouTube](https://www.youtube.com/watch?v=FYfR7ZEGHoE).
 
-If you run into an issue with this module, or if you would like to request a feature, please [file a ticket](https://tickets.puppetlabs.com/browse/MODULES/).
+If you run into an issue with this module, or if you would like to request a feature, please [file a ticket](https://github.com/puppetlabs/puppetlabs-firewall/issues).
 Every Monday the Puppet IA Content Team has [office hours](https://puppet.com/community/office-hours) in the [Puppet Community Slack](http://slack.puppet.com/), alternating between an EMEA friendly time (1300 UTC) and an Americas friendly time (0900 Pacific, 1700 UTC).
 
 If you have problems getting this module up and running, please [contact Support](http://puppetlabs.com/services/customer-support).
