@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.0) - 2024-02-08
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v7.0.2...v8.0.0)
+
+### Changed
+- [CAT-1425] : Removing RedHat/Scientific/OracleLinux 6 [#1163](https://github.com/puppetlabs/puppetlabs-firewall/pull/1163) ([rajat-puppet](https://github.com/rajat-puppet))
+
+### Fixed
+
+- (GH-1164) Only common jump values should be enforced as upcase [#1165](https://github.com/puppetlabs/puppetlabs-firewall/pull/1165) ([david22swan](https://github.com/david22swan))
+
 ## [v7.0.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v7.0.2) - 2023-09-14
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v7.0.1...v7.0.2)
@@ -37,13 +48,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v5.0.0...v6.0.0)
 
-### Added
-
-- Add support for parsing and using --tcp-option [#1126](https://github.com/puppetlabs/puppetlabs-firewall/pull/1126) ([greatflyingsteve](https://github.com/greatflyingsteve))
-
 ### Changed
 - (CONT-242) Fix duplicate rule detection [#1140](https://github.com/puppetlabs/puppetlabs-firewall/pull/1140) ([david22swan](https://github.com/david22swan))
 - pdksync - (MAINT) - Require Stdlib 9.x only [#1135](https://github.com/puppetlabs/puppetlabs-firewall/pull/1135) ([LukasAud](https://github.com/LukasAud))
+
+### Added
+
+- Add support for parsing and using --tcp-option [#1126](https://github.com/puppetlabs/puppetlabs-firewall/pull/1126) ([greatflyingsteve](https://github.com/greatflyingsteve))
 
 ### Fixed
 
@@ -88,12 +99,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.6.0...v4.0.0)
 
+### Changed
+- (CONT-256) Removing outdated code [#1084](https://github.com/puppetlabs/puppetlabs-firewall/pull/1084) ([LukasAud](https://github.com/LukasAud))
+
 ### Added
 
 - add support for using rpfilter in rules [#1059](https://github.com/puppetlabs/puppetlabs-firewall/pull/1059) ([cmusik](https://github.com/cmusik))
-
-### Changed
-- (CONT-256) Removing outdated code [#1084](https://github.com/puppetlabs/puppetlabs-firewall/pull/1084) ([LukasAud](https://github.com/LukasAud))
 
 ### Fixed
 
@@ -326,12 +337,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.3...v2.0.0)
 
+### Changed
+- pdksync - (MODULES-8444) - Raise lower Puppet bound [#841](https://github.com/puppetlabs/puppetlabs-firewall/pull/841) ([david22swan](https://github.com/david22swan))
+
 ### Added
 
 - (FM-7903) - Implement Puppet Strings [#838](https://github.com/puppetlabs/puppetlabs-firewall/pull/838) ([david22swan](https://github.com/david22swan))
-
-### Changed
-- pdksync - (MODULES-8444) - Raise lower Puppet bound [#841](https://github.com/puppetlabs/puppetlabs-firewall/pull/841) ([david22swan](https://github.com/david22swan))
 
 ### Fixed
 
@@ -438,6 +449,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.9.0...1.10.0)
 
+### Changed
+- (MODULES-5501) - Remove unsupported Ubuntu [#715](https://github.com/puppetlabs/puppetlabs-firewall/pull/715) ([pmcmaw](https://github.com/pmcmaw))
+- (Modules-1141) No longer accepts an array for icmp types #puppethack [#705](https://github.com/puppetlabs/puppetlabs-firewall/pull/705) ([spynappels](https://github.com/spynappels))
+
 ### Added
 
 - (MODULES-5144) Prep for puppet 5 [#709](https://github.com/puppetlabs/puppetlabs-firewall/pull/709) ([hunner](https://github.com/hunner))
@@ -445,10 +460,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - (MODULES-5111) Support UNTRACKED in state and ctstate rules [#707](https://github.com/puppetlabs/puppetlabs-firewall/pull/707) ([spynappels](https://github.com/spynappels))
 - MODULES-4828 version_requirement updated #puppethack [#704](https://github.com/puppetlabs/puppetlabs-firewall/pull/704) ([neilbinney](https://github.com/neilbinney))
 - Add gid lookup [#682](https://github.com/puppetlabs/puppetlabs-firewall/pull/682) ([crispygoth](https://github.com/crispygoth))
-
-### Changed
-- (MODULES-5501) - Remove unsupported Ubuntu [#715](https://github.com/puppetlabs/puppetlabs-firewall/pull/715) ([pmcmaw](https://github.com/pmcmaw))
-- (Modules-1141) No longer accepts an array for icmp types #puppethack [#705](https://github.com/puppetlabs/puppetlabs-firewall/pull/705) ([spynappels](https://github.com/spynappels))
 
 ### Fixed
 
@@ -502,15 +513,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.8.0...1.8.1)
 
+### Changed
+- (maint) Remove nat flush [#625](https://github.com/puppetlabs/puppetlabs-firewall/pull/625) ([hunner](https://github.com/hunner))
+
 ### Added
 
 - (Modules 3329) Add support for iptables length and string extensions [#630](https://github.com/puppetlabs/puppetlabs-firewall/pull/630) ([shumbert](https://github.com/shumbert))
 - Add VirtuozzoLinux to the RedHat family [#617](https://github.com/puppetlabs/puppetlabs-firewall/pull/617) ([jpnc](https://github.com/jpnc))
 - support for multiple ipsets in a rule [#615](https://github.com/puppetlabs/puppetlabs-firewall/pull/615) ([nabam](https://github.com/nabam))
 - Add 'ip' and 'pim' to proto [#610](https://github.com/puppetlabs/puppetlabs-firewall/pull/610) ([lunkwill42](https://github.com/lunkwill42))
-
-### Changed
-- (maint) Remove nat flush [#625](https://github.com/puppetlabs/puppetlabs-firewall/pull/625) ([hunner](https://github.com/hunner))
 
 ### Fixed
 
@@ -662,6 +673,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.1.3...1.2.0)
 
+### Changed
+- Doesn't actually support OEL5 [#418](https://github.com/puppetlabs/puppetlabs-firewall/pull/418) ([underscorgan](https://github.com/underscorgan))
+
 ### Added
 
 - Update to support PE3.x [#420](https://github.com/puppetlabs/puppetlabs-firewall/pull/420) ([underscorgan](https://github.com/underscorgan))
@@ -670,9 +684,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - Add cbt protocol, to be able to mitigate some DDoS attacks [#388](https://github.com/puppetlabs/puppetlabs-firewall/pull/388) ([thias](https://github.com/thias))
 - add ipset support [#383](https://github.com/puppetlabs/puppetlabs-firewall/pull/383) ([vzctl](https://github.com/vzctl))
 - Add support for mac address source rules pt2 [#337](https://github.com/puppetlabs/puppetlabs-firewall/pull/337) ([damjanek](https://github.com/damjanek))
-
-### Changed
-- Doesn't actually support OEL5 [#418](https://github.com/puppetlabs/puppetlabs-firewall/pull/418) ([underscorgan](https://github.com/underscorgan))
 
 ### Fixed
 
@@ -704,12 +715,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.0.2...1.1.0)
 
+### Changed
+- Apply firewall resources alphabetically [#342](https://github.com/puppetlabs/puppetlabs-firewall/pull/342) ([mcanevet](https://github.com/mcanevet))
+
 ### Added
 
 - (MODULES-689) Add support for connlimit and connmark [#344](https://github.com/puppetlabs/puppetlabs-firewall/pull/344) ([csschwe](https://github.com/csschwe))
-
-### Changed
-- Apply firewall resources alphabetically [#342](https://github.com/puppetlabs/puppetlabs-firewall/pull/342) ([mcanevet](https://github.com/mcanevet))
 
 ### Fixed
 
@@ -778,11 +789,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 ## [0.4.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/0.4.2) - 2013-09-10
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/0.4.1...0.4.2)
-
-### Fixed
-
-- Only workaround if we're using the old package. [#233](https://github.com/puppetlabs/puppetlabs-firewall/pull/233) ([mrwacky42](https://github.com/mrwacky42))
-- 22090 - Use list of RedHat OSes from newer facter. [#232](https://github.com/puppetlabs/puppetlabs-firewall/pull/232) ([mrwacky42](https://github.com/mrwacky42))
 
 ## [0.4.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/0.4.1) - 2013-08-12
 
@@ -870,17 +876,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 - Mock Resolv.getaddress in #host_to_ip [#110](https://github.com/puppetlabs/puppetlabs-firewall/pull/110) ([dcarley](https://github.com/dcarley))
 - ip6tables provider allways execute /sbin/iptables command [#105](https://github.com/puppetlabs/puppetlabs-firewall/pull/105) ([wuwx](https://github.com/wuwx))
-- (#16004) array_matching is contraindicated. [#100](https://github.com/puppetlabs/puppetlabs-firewall/pull/100) ([mrwacky42](https://github.com/mrwacky42))
 - (#10322) Insert order hash included chains from different tables [#89](https://github.com/puppetlabs/puppetlabs-firewall/pull/89) ([kbarber](https://github.com/kbarber))
 - (#10274) Nullify addresses with zero prefixlen [#80](https://github.com/puppetlabs/puppetlabs-firewall/pull/80) ([dcarley](https://github.com/dcarley))
-- (#14641) Fix for incorrect limit command arguments for ip6tables provider [#79](https://github.com/puppetlabs/puppetlabs-firewall/pull/79) ([cheethoe](https://github.com/cheethoe))
 - Ticket/10619 unable to purge rules [#69](https://github.com/puppetlabs/puppetlabs-firewall/pull/69) ([kbarber](https://github.com/kbarber))
 - (#13201) Firewall autorequire Firewallchains [#67](https://github.com/puppetlabs/puppetlabs-firewall/pull/67) ([dcarley](https://github.com/dcarley))
 - (#13192) Fix allvalidchain iteration [#63](https://github.com/puppetlabs/puppetlabs-firewall/pull/63) ([kbarber](https://github.com/kbarber))
 - Improved Puppet DSL style as per the guidelines. [#61](https://github.com/puppetlabs/puppetlabs-firewall/pull/61) ([adamgibbins](https://github.com/adamgibbins))
 - (#10164) Reject and document icmp => "any" [#60](https://github.com/puppetlabs/puppetlabs-firewall/pull/60) ([dcarley](https://github.com/dcarley))
 - (#11443) simple fix of the error message for allowed values of the jump property [#50](https://github.com/puppetlabs/puppetlabs-firewall/pull/50) ([grooverdan](https://github.com/grooverdan))
-- Initial creation of class firewall for issue #10984 [#34](https://github.com/puppetlabs/puppetlabs-firewall/pull/34) ([mrwacky42](https://github.com/mrwacky42))
 
 ## [v0.0.4](https://github.com/puppetlabs/puppetlabs-firewall/tree/v0.0.4) - 2011-12-05
 
@@ -888,8 +891,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ### Added
 
-- (#10997) Add fixtures for ipencap [#39](https://github.com/puppetlabs/puppetlabs-firewall/pull/39) ([mrwacky42](https://github.com/mrwacky42))
-- Add owner-match support [#38](https://github.com/puppetlabs/puppetlabs-firewall/pull/38) ([mrwacky42](https://github.com/mrwacky42))
 - (#10690) add port property support to ip6tables [#33](https://github.com/puppetlabs/puppetlabs-firewall/pull/33) ([saysjonathan](https://github.com/saysjonathan))
 
 ## [v0.0.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/v0.0.3) - 2011-11-12

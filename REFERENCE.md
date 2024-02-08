@@ -730,8 +730,7 @@ Data type: `Optional[Variant[String[1], Integer]]`
 
 ##### `goto`
 
-Data type: `Optional[Pattern[/^[a-zA-Z0-9_]+$/]]`
-_*this data type contains a regex that may not be accurately reflected in generated documentation_
+Data type: `Optional[String[1]]`
 
       The value for the iptables --goto parameter. Normal values are:
 
@@ -927,8 +926,7 @@ Data type: `Optional[Boolean]`
 
 ##### `jump`
 
-Data type: `Optional[Pattern[/^[a-zA-Z0-9_]+$/]]`
-_*this data type contains a regex that may not be accurately reflected in generated documentation_
+Data type: `Optional[String[1]]`
 
       This value for the iptables --jump parameter and the action to perform on a match. Common values are:
 
