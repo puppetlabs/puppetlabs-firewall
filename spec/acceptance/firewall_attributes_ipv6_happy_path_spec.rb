@@ -217,6 +217,12 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'sles
           src_type => ['LOCAL', '! LOCAL'],
           protocol => 'ip6tables',
         }
+        firewall { '621 - reject with tcp-reset':
+          proto    => tcp,
+          jump     => reject,
+          reject   => 'tcp-reset',
+          protocol => 'ip6tables',
+        }
         firewall { '801 - ipt_modules tests':
           proto              => tcp,
           dport              => '8080',
@@ -394,6 +400,10 @@ describe 'firewall attribute testing, happy path', unless: (os[:family] == 'sles
 
     it 'src_type when multiple values' do
       expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m addrtype --src-type LOCAL -m addrtype ! --src-type LOCAL -m comment --comment "620 - src_type multiple values" -j ACCEPT})
+    end
+
+    it 'tcp-reset is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m comment --comment "621 - reject with tcp-reset" -j REJECT --reject-with tcp-reset})
     end
 
     it 'all the modules with multiple args is set' do
