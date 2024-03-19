@@ -1189,7 +1189,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     toports: {
-      type: 'Optional[Pattern[/^\d+(?:-\d+)?$/]]',
+      type: 'Optional[Variant[Integer[0, 65535], Pattern[/^\d+(?:-\d+)?$/]]]',
       desc: <<-DESC
       For REDIRECT/MASQUERADE this is the port that will replace the destination/source port.
       Can specify a single new port or an inclusive range of ports.
