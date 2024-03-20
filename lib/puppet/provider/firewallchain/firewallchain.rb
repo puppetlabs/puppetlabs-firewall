@@ -172,7 +172,6 @@ class Puppet::Provider::Firewallchain::Firewallchain
       raise ArgumentError, 'PREROUTING, POSTROUTING, INPUT, FORWARD and OUTPUT are the only inbuilt chains that can be used in table \'mangle\'' if %r{^(BROUTING)$}.match?(should[:chain])
     when 'nat'
       raise ArgumentError, 'PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table \'nat\'' if %r{^(BROUTING|FORWARD)$}.match?(should[:chain])
-      raise ArgumentError, 'table nat isn\'t valid in IPv6. You must specify \':IPv4\' as the name suffix' if %r{^(IP(v6)?)?$}.match?(should[:protocol])
     when 'raw'
       raise ArgumentError, 'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\'' if %r{^(POSTROUTING|BROUTING|INPUT|FORWARD)$}.match?(should[:chain])
     when 'broute'

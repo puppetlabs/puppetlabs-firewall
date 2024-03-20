@@ -317,10 +317,6 @@ COMMIT
           error: 'PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table \'nat\''
         },
         {
-          should: { name: 'PREROUTING:nat:IPv6', chain: 'PREROUTING', table: 'nat', protocol: 'IPv6', ensure: 'present', policy: 'accept' },
-          error: 'table nat isn\'t valid in IPv6. You must specify \':IPv4\' as the name suffix'
-        },
-        {
           should: { name: 'INPUT:raw:IPv4', chain: 'INPUT', table: 'raw', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
           error: 'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\''
         },
