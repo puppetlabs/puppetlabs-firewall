@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.0.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.1) - 2024-03-20
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.0...v8.0.1)
+
+### Fixed
+
+- (MODULES-11449) - Fix for IPv6 NAT chain [#1201](https://github.com/puppetlabs/puppetlabs-firewall/pull/1201) ([Ramesh7](https://github.com/Ramesh7))
+
+### Other
+
+- fix typos in documentation [#1195](https://github.com/puppetlabs/puppetlabs-firewall/pull/1195) ([corporate-gadfly](https://github.com/corporate-gadfly))
+
 ## [v8.0.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.0) - 2024-02-08
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v7.0.2...v8.0.0)

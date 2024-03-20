@@ -934,7 +934,7 @@ Data type: `Optional[String[1]]`
       * REJECT - the packet is rejected with a suitable ICMP response
       * DROP - the packet is dropped
 
-      But can also be on of the following:
+      But can also be one of the following:
 
       * QUEUE
       * RETURN
