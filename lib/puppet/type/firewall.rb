@@ -1278,7 +1278,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     match_mark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]',
+      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x\/]+$/]]',
       desc: <<-DESC
       Match the Netfilter mark value associated with the packet, accepts a mark.
       This value will be converted to hex if it is not already.
