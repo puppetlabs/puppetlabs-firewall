@@ -3,7 +3,7 @@
 require 'puppet_x'
 require 'socket'
 require 'resolv'
-require 'puppet_x/puppetlabs/firewall/ipcidr'
+require_relative 'ipcidr'
 
 module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
   # A utility class meant to contain re-usable code
