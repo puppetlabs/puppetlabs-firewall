@@ -192,13 +192,6 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
     it { expect(utility.mark_mask_to_hex('4294967295/42')).to eql '0xffffffff/0x2a' }
   end
 
-  describe '#mark_to_hex' do
-    it { expect(utility.mark_to_hex('0')).to eql '0x0' }
-    it { expect(utility.mark_to_hex('! 0x32')).to eql '! 0x32' }
-    it { expect(utility.mark_to_hex('42')).to eql '0x2a' }
-    it { expect(utility.mark_to_hex('! 4294967295')).to eql '! 0xffffffff' }
-  end
-
   describe '#proto_number_to_name' do
     it { expect(utility.proto_number_to_name('1')).to eql 'icmp' }
     it { expect(utility.proto_number_to_name('2')).to eql 'igmp' }

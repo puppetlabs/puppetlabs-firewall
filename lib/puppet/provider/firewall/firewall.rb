@@ -394,15 +394,10 @@ class Puppet::Provider::Firewall::Firewall
       is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name])
       should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name])
       is == should
-    when :set_mark
+    when :set_mark, :match_mark, :connmark
       # Ensure that the values are compared to eachother in hexidecimal format
       is = PuppetX::Firewall::Utility.mark_mask_to_hex(is_hash[property_name])
       should = PuppetX::Firewall::Utility.mark_mask_to_hex(should_hash[property_name])
-      is == should
-    when :match_mark, :connmark
-      # Ensure that the values are compared to eachother in hexidecimal format
-      is = PuppetX::Firewall::Utility.mark_to_hex(is_hash[property_name])
-      should = PuppetX::Firewall::Utility.mark_to_hex(should_hash[property_name])
       is == should
     when :time_start, :time_stop
       # Ensure the values are compared in full `00:00:00` format
@@ -893,8 +888,8 @@ class Puppet::Provider::Firewall::Firewall
 
     # `set_mark`, `match_mark` and `connmark` must be applied in hexidecimal format
     should[:set_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:set_mark]) if should[:set_mark]
-    should[:match_mark] = PuppetX::Firewall::Utility.mark_to_hex(should[:match_mark]) if should[:match_mark]
-    should[:connmark] = PuppetX::Firewall::Utility.mark_to_hex(should[:connmark]) if should[:connmark]
+    should[:match_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:match_mark]) if should[:match_mark]
+    should[:connmark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:connmark]) if should[:connmark]
 
     # `time_start` and `time_stop` must be applied in full HH:MM:SS format
     time = [:time_start, :time_stop]
