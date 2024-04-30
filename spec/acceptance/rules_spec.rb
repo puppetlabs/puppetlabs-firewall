@@ -194,6 +194,12 @@ describe 'rules spec' do
           icmp   => 'time-exceeded',
           jump   => 'ACCEPT',
         }
+        firewall { '014 icmp destination-unreachable/fragmentation-needed':
+          proto  => 'icmp',
+          icmp   => '3/4',
+          jump   => 'ACCEPT',
+        }
+
         firewall { '443 ssl on aliased interface':
           proto   => 'tcp',
           dport   => '443',
@@ -260,6 +266,7 @@ describe 'rules spec' do
       %r{-A INPUT -p (icmp|1) -m icmp --icmp-type 3 -m comment --comment "013 icmp destination-unreachable" -j ACCEPT},
       %r{-A INPUT -s 10.0.0.0/(8|255\.0\.0\.0) -p (icmp|1) -m icmp --icmp-type 8 -m comment --comment "013 icmp echo-request" -j ACCEPT},
       %r{-A INPUT -p (icmp|1) -m icmp --icmp-type 11 -m comment --comment "013 icmp time-exceeded" -j ACCEPT},
+      %r{-A INPUT -p (icmp|1) -m icmp --icmp-type 3/4 -m comment --comment "014 icmp destination-unreachable/fragmentation-needed" -j ACCEPT},
       %r{-A INPUT -p (tcp|6) -m tcp --dport 22 -m conntrack --ctstate NEW -m comment --comment "020 ssh" -j ACCEPT},
       %r{-A INPUT -i eth0:3 -p (tcp|6) -m tcp --dport 443 -m conntrack --ctstate NEW -m comment --comment "443 ssl on aliased interface" -j ACCEPT},
       %r{-A INPUT -m comment --comment "900 LOCAL_INPUT" -j LOCAL_INPUT},
