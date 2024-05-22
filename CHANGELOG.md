@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.0.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.2) - 2024-05-22
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.1...v8.0.2)
+
+### Fixed
+
+- Fix "creation" of empty built-in firewall chains [#1206](https://github.com/puppetlabs/puppetlabs-firewall/pull/1206) ([2fa](https://github.com/2fa))
+
 ## [v8.0.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.1) - 2024-03-20
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.0...v8.0.1)
@@ -22,6 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v7.0.2...v8.0.0)
 
 ### Changed
+
 - [CAT-1425] : Removing RedHat/Scientific/OracleLinux 6 [#1163](https://github.com/puppetlabs/puppetlabs-firewall/pull/1163) ([rajat-puppet](https://github.com/rajat-puppet))
 
 ### Fixed
@@ -49,6 +58,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v6.0.0...v7.0.0)
 
 ### Changed
+
 - (CAT-376) Rework firewall module to use the resource_api [#1145](https://github.com/puppetlabs/puppetlabs-firewall/pull/1145) ([david22swan](https://github.com/david22swan))
 
 ### Fixed
@@ -61,6 +71,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v5.0.0...v6.0.0)
 
 ### Changed
+
 - (CONT-242) Fix duplicate rule detection [#1140](https://github.com/puppetlabs/puppetlabs-firewall/pull/1140) ([david22swan](https://github.com/david22swan))
 - pdksync - (MAINT) - Require Stdlib 9.x only [#1135](https://github.com/puppetlabs/puppetlabs-firewall/pull/1135) ([LukasAud](https://github.com/LukasAud))
 
@@ -80,6 +91,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v4.1.0...v5.0.0)
 
 ### Changed
+
 - (Cont 779) Add Support for Puppet 8 / Drop Support for Puppet 6 [#1118](https://github.com/puppetlabs/puppetlabs-firewall/pull/1118) ([david22swan](https://github.com/david22swan))
 
 ## [v4.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v4.1.0) - 2023-03-31
@@ -112,6 +124,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v3.6.0...v4.0.0)
 
 ### Changed
+
 - (CONT-256) Removing outdated code [#1084](https://github.com/puppetlabs/puppetlabs-firewall/pull/1084) ([LukasAud](https://github.com/LukasAud))
 
 ### Added
@@ -228,6 +241,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v2.8.1...v3.0.0)
 
 ### Changed
+
 - pdksync - (MAINT) Remove SLES 11 support [#977](https://github.com/puppetlabs/puppetlabs-firewall/pull/977) ([sanfrancrisko](https://github.com/sanfrancrisko))
 - pdksync - (MAINT) Remove RHEL 5 family support [#976](https://github.com/puppetlabs/puppetlabs-firewall/pull/976) ([sanfrancrisko](https://github.com/sanfrancrisko))
 - pdksync - Remove Puppet 5 from testing and bump minimal version to 6.0.0 [#972](https://github.com/puppetlabs/puppetlabs-firewall/pull/972) ([carabasdaniel](https://github.com/carabasdaniel))
@@ -350,6 +364,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.15.3...v2.0.0)
 
 ### Changed
+
 - pdksync - (MODULES-8444) - Raise lower Puppet bound [#841](https://github.com/puppetlabs/puppetlabs-firewall/pull/841) ([david22swan](https://github.com/david22swan))
 
 ### Added
@@ -462,6 +477,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.9.0...1.10.0)
 
 ### Changed
+
 - (MODULES-5501) - Remove unsupported Ubuntu [#715](https://github.com/puppetlabs/puppetlabs-firewall/pull/715) ([pmcmaw](https://github.com/pmcmaw))
 - (Modules-1141) No longer accepts an array for icmp types #puppethack [#705](https://github.com/puppetlabs/puppetlabs-firewall/pull/705) ([spynappels](https://github.com/spynappels))
 
@@ -526,6 +542,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.8.0...1.8.1)
 
 ### Changed
+
 - (maint) Remove nat flush [#625](https://github.com/puppetlabs/puppetlabs-firewall/pull/625) ([hunner](https://github.com/hunner))
 
 ### Added
@@ -579,6 +596,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.7.0...1.7.1)
 
 ### Changed
+
 - Deprecate port parameter [#570](https://github.com/puppetlabs/puppetlabs-firewall/pull/570) ([hunner](https://github.com/hunner))
 
 ### Fixed
@@ -686,6 +704,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.1.3...1.2.0)
 
 ### Changed
+
 - Doesn't actually support OEL5 [#418](https://github.com/puppetlabs/puppetlabs-firewall/pull/418) ([underscorgan](https://github.com/underscorgan))
 
 ### Added
@@ -728,6 +747,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/1.0.2...1.1.0)
 
 ### Changed
+
 - Apply firewall resources alphabetically [#342](https://github.com/puppetlabs/puppetlabs-firewall/pull/342) ([mcanevet](https://github.com/mcanevet))
 
 ### Added
