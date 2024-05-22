@@ -293,7 +293,7 @@ COMMIT
             should: { name: 'INPUT:filter:IPv4', ensure: 'present' }
           },
           output: {
-            is: { title: 'INPUT:filter:IPv4', name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+            is: { title: 'INPUT:filter:IPv4', name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, policy: 'accept' },
             should: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'accept' }
           }
         },
