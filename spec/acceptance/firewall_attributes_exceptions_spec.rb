@@ -1163,6 +1163,11 @@ describe 'firewall basics', docker: true do
               match_mark => '0x1',
               jump       => reject,
             }
+            firewall { '504 match_mark - test with mask':
+              proto      => 'all',
+              match_mark => '0x1/0x2000',
+              jump       => reject,
+            }
       PUPPETCODE
       it 'applies' do
         apply_manifest(pp1, catch_failures: true)
@@ -1171,6 +1176,7 @@ describe 'firewall basics', docker: true do
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
+          expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1/0x2000 -m comment --comment "504 match_mark - test with mask" -j REJECT --reject-with icmp-port-unreachable})
         end
       end
     end
