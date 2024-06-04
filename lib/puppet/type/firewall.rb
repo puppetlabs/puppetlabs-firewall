@@ -1230,8 +1230,7 @@ Puppet::ResourceApi.register_type(
       desc: <<-DESC
       When combined with jump => "LOG" specifies the system log level to log to.
 
-      Note: log level 4/warn is the default setting and as such it is not returned by iptables-save.
-      As a result, explicitly setting `log_level` to this can result in idempotency errors.
+      Note: log level 4/warn is the default setting.
       DESC
     },
     log_uid: {
