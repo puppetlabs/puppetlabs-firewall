@@ -20,7 +20,7 @@ describe 'puppet resource firewall command' do
       run_shell('source /etc/profile.d/my-custom.lang.sh')
     end
     run_shell('echo export LC_ALL="C" >> ~/.bashrc')
-    run_shell('source ~/.bashrc')
+    run_shell('source ~/.bashrc || true')
   end
 
   context 'when make sure it returns no errors when executed on a clean machine' do

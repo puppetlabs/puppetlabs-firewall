@@ -82,6 +82,18 @@ describe 'puppet resource firewallchain command' do
         end
       end
     end
+
+    context 'with NAT chain' do
+      pp3 = <<-PUPPETCODE
+          firewallchain { 'MY_CHAIN:nat:IPv6':
+            ensure  => present,
+          }
+      PUPPETCODE
+      it 'applies cleanly' do
+        # Run it twice and test for idempotency
+        idempotent_apply(pp3)
+      end
+    end
   end
 
   # XXX purge => false is not yet implemented

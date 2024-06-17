@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-firewall",
-  "version": "7.0.2",
+  "version": "8.0.2",
   "author": "puppetlabs",
   "summary": "Manages Firewalls such as iptables",
   "license": "Apache-2.0",
@@ -83,6 +83,6 @@
     }
   ],
   "template-url": "https://github.com/puppetlabs/pdk-templates.git#main",
-  "template-ref": "heads/main-0-g01c6a19",
+  "template-ref": "heads/main-0-g79a2f93",
   "pdk-version": "3.0.0"
 }

@@ -30,6 +30,10 @@ class Puppet::Provider::Firewallchain::Firewallchain
   $chain_delete_command = '-X'
   # Command to set chain policy, works on inbuilt chains only
   $chain_policy_command = '-P'
+  # Command to list specific table so it will generate necessary output for iptables-save
+  # The retrieval of in-built chains may get confused by `iptables-save` tendency to not return table information
+  # for tables that have not yet been interacted with.
+  $table_list_command = '-L'
   # Check if the given chain name references a built in one
   $built_in_regex = %r{^(?:INPUT|OUTPUT|FORWARD|PREROUTING|POSTROUTING)$}
 
@@ -94,7 +98,12 @@ class Puppet::Provider::Firewallchain::Firewallchain
 
   def create(context, name, should)
     context.notice("Creating Chain '#{name}' with #{should.inspect}")
-    Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $chain_create_command, should[:chain]].join(' '))
+    # If a built-in chain is not present we assume that corresponding table has not been interacted with
+    if $built_in_regex.match(should[:chain])
+      Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $table_list_command].join(' '))
+    else
+      Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $chain_create_command, should[:chain]].join(' '))
+    end
     PuppetX::Firewall::Utility.persist_iptables(context, name, should[:protocol])
   end
 
@@ -150,10 +159,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
     should[:name] = should[:title] if should[:name].nil?
     should[:chain], should[:table], should[:protocol] = should[:name].split(':')
 
-    # If an in-built chain, always treat it as being present and ensure it is assigned a policy
-    # The retrieval of in-built chains may get confused by `iptables-save` tendency to not return table information
-    # for tables that have not yet been interacted with.
-    is[:ensure] = 'present' if $built_in_regex.match(is[:chain])
+    # If an in-built chain, ensure it is assigned a policy
     is[:policy] = 'accept' if $built_in_regex.match(is[:chain]) && is[:policy].nil?
     # For the same reason assign it the default policy as an intended state if it does not have one
     should[:policy] = 'accept' if $built_in_regex.match(should[:chain]) && should[:policy].nil?
@@ -172,7 +178,6 @@ class Puppet::Provider::Firewallchain::Firewallchain
       raise ArgumentError, 'PREROUTING, POSTROUTING, INPUT, FORWARD and OUTPUT are the only inbuilt chains that can be used in table \'mangle\'' if %r{^(BROUTING)$}.match?(should[:chain])
     when 'nat'
       raise ArgumentError, 'PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table \'nat\'' if %r{^(BROUTING|FORWARD)$}.match?(should[:chain])
-      raise ArgumentError, 'table nat isn\'t valid in IPv6. You must specify \':IPv4\' as the name suffix' if %r{^(IP(v6)?)?$}.match?(should[:protocol])
     when 'raw'
       raise ArgumentError, 'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\'' if %r{^(POSTROUTING|BROUTING|INPUT|FORWARD)$}.match?(should[:chain])
     when 'broute'
