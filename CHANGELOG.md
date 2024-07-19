@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.0.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.3) - 2024-07-19
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.2...v8.0.3)
+
+### Fixed
+
+- Fix resource generation ipcidr dependency [#1204](https://github.com/puppetlabs/puppetlabs-firewall/pull/1204) ([2fa](https://github.com/2fa))
+
 ## [v8.0.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.2) - 2024-05-22
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.1...v8.0.2)
