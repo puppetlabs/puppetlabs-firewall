@@ -9,7 +9,9 @@ class Puppet::Provider::Firewallchain::Firewallchain
   # Command to list all chains and rules
   $list_command = {
     'IPv4' => 'iptables-save',
-    'IPv6' => 'ip6tables-save'
+    'iptables' => 'iptables-save',
+    'IPv6' => 'ip6tables-save',
+    'ip6tables' => 'ip6tables-save'
   }
   # Regex used to divide output of$list_command between tables
   $table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[^*]+)}
@@ -20,7 +22,9 @@ class Puppet::Provider::Firewallchain::Firewallchain
   # Base commands for the protocols, including table affixes
   $base_command = {
     'IPv4' => 'iptables -t',
-    'IPv6' => 'ip6tables -t'
+    'iptables' => 'iptables -t',
+    'IPv6' => 'ip6tables -t',
+    'ip6tables' => 'ip6tables -t',
   }
   # Command to create a chain
   $chain_create_command = '-N'
