@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.0) - 2024-09-23
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.3...v8.1.0)
+
+### Added
+
+- Support ip[6]tables protocol in firewallchain [#1191](https://github.com/puppetlabs/puppetlabs-firewall/pull/1191) ([jcharaoui](https://github.com/jcharaoui))
+
 ## [v8.0.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.3) - 2024-07-19
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.2...v8.0.3)
@@ -413,7 +421,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 - (DOC-3056) Remove mention of rules ordering [#809](https://github.com/puppetlabs/puppetlabs-firewall/pull/809) ([clairecadman](https://github.com/clairecadman))
 - (FM-7712) - Remove Gentoo 1.0 testing/support for Firewall module [#808](https://github.com/puppetlabs/puppetlabs-firewall/pull/808) ([david22swan](https://github.com/david22swan))
-- (MODULES-8360) Fix IPv6 bug relating to Bugzilla 1015 [#804](https://github.com/puppetlabs/puppetlabs-firewall/pull/804) ([alexharv074](https://github.com/alexharv074))
+- (MODULES-8360) Fix IPv6 bug relating to Bugzilla 1015 [#804](https://github.com/puppetlabs/puppetlabs-firewall/pull/804) ([alex-harvey-z3q](https://github.com/alex-harvey-z3q))
 
 ## [1.15.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.0) - 2019-01-18
 
@@ -459,7 +467,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 ### Fixed
 
 - (MODULES-7627) - Update README Limitations section [#769](https://github.com/puppetlabs/puppetlabs-firewall/pull/769) ([eimlav](https://github.com/eimlav))
-- Corrections to readme [#766](https://github.com/puppetlabs/puppetlabs-firewall/pull/766) ([alexharv074](https://github.com/alexharv074))
+- Corrections to readme [#766](https://github.com/puppetlabs/puppetlabs-firewall/pull/766) ([alex-harvey-z3q](https://github.com/alex-harvey-z3q))
 - (MODULES-6129) negated option with address mask bugfix [#756](https://github.com/puppetlabs/puppetlabs-firewall/pull/756) ([mirekys](https://github.com/mirekys))
 - (MODULES-2119) iptables delete -p all exception [#749](https://github.com/puppetlabs/puppetlabs-firewall/pull/749) ([mikkergimenez](https://github.com/mikkergimenez))
 
