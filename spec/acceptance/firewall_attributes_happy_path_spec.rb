@@ -144,6 +144,13 @@ describe 'firewall attribute testing, happy path' do
             jump    => 'REDIRECT',
             toports => '2222',
           }
+          firewall { '575 - toports-numeric':
+            proto   => icmp,
+            table   => 'nat',
+            chain   => 'PREROUTING',
+            jump    => 'REDIRECT',
+            toports => 3333,
+          }
           firewall { '581 - pkttype':
             ensure  => present,
             proto   => tcp,
@@ -439,6 +446,10 @@ describe 'firewall attribute testing, happy path' do
 
     it 'toports is set' do
       expect(result.stdout).to match(%r{-A PREROUTING -p (icmp|1) -m comment --comment "574 - toports" -j REDIRECT --to-ports 2222})
+    end
+
+    it 'toports-numeric is set' do
+      expect(result.stdout).to match(%r{-A PREROUTING -p (icmp|1) -m comment --comment "575 - toports-numeric" -j REDIRECT --to-ports 3333})
     end
 
     it 'rpfilter is set' do
