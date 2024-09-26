@@ -68,6 +68,21 @@ describe 'firewall basics', docker: true do
         end
       end
     end
+
+    context 'when port range as a string' do
+      pp23 = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '562 - test port range':
+            proto  => tcp,
+            dport  => '561-570',
+            jump   => accept,
+          }
+      PUPPETCODE
+      it 'applies' do
+        idempotent_apply(pp23)
+        apply_manifest(pp23, catch_changes: true)
+      end
+    end
   end
 
   describe 'ensure' do
@@ -650,6 +665,21 @@ describe 'firewall basics', docker: true do
         run_shell('iptables-save') do |r|
           expect(r.stdout).not_to match(%r{-A INPUT -p (tcp|6) -m tcp --sport 9999560-561 -m comment --comment "560 - test" -j ACCEPT})
         end
+      end
+    end
+
+    context 'when port range as a string' do
+      pp20 = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '561 - test port range':
+            proto  => tcp,
+            sport  => '561-570',
+            jump   => accept,
+          }
+      PUPPETCODE
+      it 'applies' do
+        idempotent_apply(pp20)
+        apply_manifest(pp20, catch_changes: true)
       end
     end
   end
