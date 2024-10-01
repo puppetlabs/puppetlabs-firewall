@@ -444,6 +444,12 @@ class Puppet::Provider::Firewall::Firewall
       should = should_hash[property_name].to_s.gsub(%r{\s+}, '')
 
       is == should
+    when :ipset
+      is = is_hash[property_name]
+      is = [is] if is.is_a?(String)
+      should = should_hash[property_name]
+      should = [should] if should.is_a?(String)
+      is.sort == should.sort
     else
       # Ensure that if both values are arrays, that they are sorted prior to comparison
       return nil unless is_hash[property_name].is_a?(Array) && should_hash[property_name].is_a?(Array)
