@@ -593,6 +593,18 @@ Puppet::ResourceApi.register_type(
         In order to maintain compatibility it is also possible to negate all values given in the array to achieve the same behaviour.
       DESC
     },
+    ctmask: {
+      type: 'Optional[String]',
+      desc: <<-DESC
+      ctmask
+      DESC
+    },
+    nfmask: {
+      type: 'Optional[String]',
+      desc: <<-DESC
+      nfmask
+      DESC
+    },
     ctstate: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT)$/], Array[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT)$/]]]]',
       desc: <<-DESC
@@ -1268,6 +1280,12 @@ Puppet::ResourceApi.register_type(
       IPv4 allows: icmp-net-unreachable, icmp-host-unreachable, icmp-port-unreachable, icmp-proto-unreachable, icmp-net-prohibited,
       icmp-host-prohibited, or icmp-admin-prohibited.
       IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach, or icmp6-port-unreachable.
+      DESC
+    },
+    restore_mark: {
+      type: 'Optional[Boolean]',
+      desc: <<-DESC
+      Whether or not to restore mark.
       DESC
     },
     set_mark: {
