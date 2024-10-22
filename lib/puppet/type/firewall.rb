@@ -948,7 +948,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     ipset: {
-      type: 'Optional[Variant[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/]]]]',
+      type: 'Optional[Variant[Pattern[/^(?:!\s)?[\w\-_]+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?[\w\-_]+\s(?:src|dst)(?:,src|,dst)?$/]]]]',
       desc: <<-DESC
       Matches against the specified ipset list.
       Requires ipset kernel module. Will accept a single element or an array.
