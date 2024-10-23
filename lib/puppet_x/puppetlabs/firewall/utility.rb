@@ -216,25 +216,16 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
 
     # Accepts a valid mark or mark/mask and returns them in the valid
     # hexidecimal format.
-    # USed for set_mark
+    # Used for set_mark, match_mark, connmark
     def self.mark_mask_to_hex(value)
-      match = value.to_s.match(%r{([a-fA-F0-9x]+)/?([a-fA-F0-9x]+)?})
-      mark = PuppetX::Firewall::Utility.to_hex32(match[1])
-      return "#{mark}/0xffffffff" if match[2].nil?
+      match = value.to_s.match(%r{^(!\s)?([a-fA-F0-9x]+)\/?([a-fA-F0-9x]+)?})
+      negation = '! '
+      negation = '' if match[1].nil?
+      mark = PuppetX::Firewall::Utility.to_hex32(match[2])
+      return "#{negation}#{mark}/0xffffffff" if match[3].nil?
 
-      mask = PuppetX::Firewall::Utility.to_hex32(match[2])
-      "#{mark}/#{mask}"
-    end
-
-    # Accepts a valid mark and returns them in the valid hexidecimal format.
-    # Accounts for negation.
-    # Used for match_mark / connmark
-    def self.mark_to_hex(value)
-      match = value.to_s.match(%r{^(!\s)?([a-fA-F0-9x]+)})
-      mask = PuppetX::Firewall::Utility.to_hex32(match[2])
-      return mask if match[1].nil?
-
-      "! #{mask}"
+      mask = PuppetX::Firewall::Utility.to_hex32(match[3])
+      "#{negation}#{mark}/#{mask}"
     end
 
     # Converts a given number to its protocol keyword

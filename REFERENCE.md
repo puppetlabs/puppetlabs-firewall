@@ -364,10 +364,10 @@ Data type: `Optional[Integer]`
 
 ##### `connmark`
 
-Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]`
+Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
 
@@ -1039,10 +1039,10 @@ _*this data type contains a regex that may not be accurately reflected in genera
 
 ##### `match_mark`
 
-Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]`
+Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
 

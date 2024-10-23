@@ -1278,9 +1278,9 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     match_mark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]',
+      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
       DESC
@@ -1313,9 +1313,9 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     connmark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]',
+      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
       DESC

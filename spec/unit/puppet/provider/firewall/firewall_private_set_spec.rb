@@ -302,9 +302,9 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           result: { log_level: '1' }
         },
         {
-          process: '`set_mark`, `match_mark` and `connmark` must be put through mark_mask_to_hex/mark_to_hex',
+          process: '`set_mark`, `match_mark` and `connmark` must be put through mark_mask_to_hex',
           should: { set_mark: '42', match_mark: '42', connmark: '42' },
-          result: { set_mark: '0x2a/0xffffffff', match_mark: '0x2a', connmark: '0x2a' }
+          result: { set_mark: '0x2a/0xffffffff', match_mark: '0x2a/0xffffffff', connmark: '0x2a/0xffffffff' }
         },
         {
           process: '`time_start` and `time_stop` must be applied in full HH:MM:SS format',
