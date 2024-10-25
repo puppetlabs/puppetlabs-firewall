@@ -157,7 +157,7 @@ Puppet::ResourceApi.register_type(
       type: "Enum['iptables', 'ip6tables', 'IPv4', 'IPv6']",
       default: 'IPv4',
       desc: <<-DESC
-      The protocol used to set the rule, it's allowed values have been expanded to bring it closer to its `firewallchain` counterpart.
+      The protocol used to set the rule, its allowed values have been expanded to bring it closer to its `firewallchain` counterpart.
       Defaults to `IPv4`
 
       Noted: this was previously defined as `provider`, however the resource_api does not allow this to be used as an attribute title.
@@ -301,7 +301,7 @@ Puppet::ResourceApi.register_type(
     ishasmorefrags: {
       type: 'Optional[Boolean]',
       desc: <<-DESC
-      Matches if the packet has it's 'more fragments' bit set.
+      Matches if the packet has its 'more fragments' bit set.
       Specific to IPv6.
       DESC
     },
