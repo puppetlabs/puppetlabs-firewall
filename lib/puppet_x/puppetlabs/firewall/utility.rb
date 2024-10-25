@@ -197,6 +197,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
         when 'not', 'notice' then '5'
         when 'info' then '6'
         when 'debug' then '7'
+        when nil then '4'
         else nil
         end
       end

@@ -189,6 +189,11 @@ class Puppet::Provider::Firewall::Firewall
     :time_contiguous, :kernel_timezone, :clusterip_new, :queue_bypass, :ipvs, :notrack
   ]
 
+  # These are known resources that is omitted from the output of iptables-save if default value is set.
+  $known_omitted_defaults = [
+    :log_level
+  ]
+
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
   # arguments against the same IPT module) must be in this hash. The keys in this
   # hash are the IPT module names, with the values being an array of the respective
@@ -326,7 +331,7 @@ class Puppet::Provider::Firewall::Firewall
     context.debug("Checking whether '#{property_name}' is out of sync")
 
     # If either value is nil, no custom logic is required
-    return nil if is_hash[property_name].nil? || should_hash[property_name].nil?
+    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && !$known_omitted_defaults.include?(property_name)
 
     case property_name
     when :protocol
