@@ -74,6 +74,7 @@ class Puppet::Provider::Firewall::Firewall
     ipsec_dir: '--dir',
     ipsec_policy: '--pol',
     state: '--state',
+    ctmask: '--ctmask',
     ctstate: '--ctstate',
     ctproto: '--ctproto',
     ctorigsrc: '--ctorigsrc',
@@ -122,6 +123,7 @@ class Puppet::Provider::Firewall::Firewall
     nflog_range: '--nflog-range',
     nflog_size: '--nflog-size',
     nflog_threshold: '--nflog-threshold',
+    nfmask: '--nfmask',
     gateway: '--gateway',
     clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
     set_mss: '--set-mss',
@@ -141,6 +143,7 @@ class Puppet::Provider::Firewall::Firewall
     log_tcp_options: '--log-tcp-options',
     log_ip_options: '--log-ip-options',
     reject: '--reject-with',
+    restore_mark: '--restore-mark',
     set_mark: '--set-xmark',
     match_mark: '-m mark --mark',
     mss: '-m tcpmss --mss',
@@ -186,7 +189,7 @@ class Puppet::Provider::Firewall::Firewall
     :checksum_fill, :clamp_mss_to_pmtu, :isfragment, :ishasmorefrags, :islastfrag, :isfirstfrag,
     :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :random_fully, :random,
     :rdest, :reap, :rsource, :rttl, :socket, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
-    :time_contiguous, :kernel_timezone, :clusterip_new, :queue_bypass, :ipvs, :notrack
+    :time_contiguous, :kernel_timezone, :clusterip_new, :queue_bypass, :ipvs, :notrack, :restore_mark
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
@@ -245,7 +248,7 @@ class Puppet::Provider::Firewall::Firewall
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
     :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
     :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random_fully, :random, :log_prefix,
-    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :mss,
+    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :restore_mark, :nfmask, :ctmask, :mss,
     :connlimit_upto, :connlimit_above, :connlimit_mask, :connmark,
     :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :u32, :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
