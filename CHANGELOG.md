@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.1) - 2024-10-28
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.0...v8.1.1)
+
+### Fixed
+
+- (CAT-2088): Allow colon(:) in IP table syntax [#1240](https://github.com/puppetlabs/puppetlabs-firewall/pull/1240) ([span786](https://github.com/span786))
+
 ## [v8.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.0) - 2024-09-23
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.3...v8.1.0)

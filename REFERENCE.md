@@ -879,7 +879,7 @@ Data type: `Optional[Enum['none', 'ipsec']]`
 
 ##### `ipset`
 
-Data type: `Optional[Variant[Pattern[/^(?:!\s)?[\w\-_]+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?[\w\-_]+\s(?:src|dst)(?:,src|,dst)?$/]]]]`
+Data type: `Optional[Variant[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/]]]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
       Matches against the specified ipset list.
