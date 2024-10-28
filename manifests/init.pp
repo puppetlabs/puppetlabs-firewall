@@ -38,6 +38,7 @@ class firewall (
   Optional[String[1]]                                                $service_name_v6 = $firewall::params::service_name_v6,
   Optional[Variant[String[1], Array[String[1]]]]                     $package_name    = $firewall::params::package_name,
   Boolean                                                            $ebtables_manage = false,
+  Boolean                                                            $ebtables_manage_2 = false,
 ) inherits firewall::params {
   $_ensure_v6 = pick($ensure_v6, $ensure)
 
