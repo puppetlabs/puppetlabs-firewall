@@ -7,38 +7,38 @@ class Puppet::Provider::Firewall::Firewall
   ###### GLOBAL VARIABLES ######
 
   # Command to list all chains and rules
-  # $list_command = 'iptables-save'
-  $list_command = {
+  # $fw_list_command = 'iptables-save'
+  $fw_list_command = {
     'IPv4' => 'iptables-save',
     'iptables' => 'iptables-save',
     'IPv6' => 'ip6tables-save',
     'ip6tables' => 'ip6tables-save'
   }
-  # Regex used to divide output of$list_command between tables
-  $table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[^*]+)}
+  # Regex used to divide output of$fw_list_command between tables
+  $fw_table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[^*]+)}
   # Regex used to retrieve table name
-  $table_name_regex = %r{^\*(nat|mangle|filter|raw|rawpost|broute|security)}
+  $fw_table_name_regex = %r{^\*(nat|mangle|filter|raw|rawpost|broute|security)}
   # Regex used to retrieve Rules
-  $rules_regex = %r{(-A.*)\n}
+  $fw_rules_regex = %r{(-A.*)\n}
   # Base command
-  $base_command = {
+  $fw_base_command = {
     'IPv4' => 'iptables -t',
     'iptables' => 'iptables -t',
     'IPv6' => 'ip6tables -t',
     'ip6tables' => 'ip6tables -t'
   }
   # Command to add a rule to a chain
-  $rule_create_command = '-I' # chain_name rule_num
+  $fw_rule_create_command = '-I' # chain_name rule_num
   # Command to update a rule within a chain
-  $rule_update_command = '-R' # chain_name rule_num
+  $fw_rule_update_command = '-R' # chain_name rule_num
   # Command to delete a rule from a chain
-  $rule_delete_command = '-D' # chain_name rule_num
+  $fw_rule_delete_command = '-D' # chain_name rule_num
   # Number range 9000-9999 is reserved for unmanaged rules
-  $unmanaged_rule_regex = %r{^9[0-9]{3}\s.*$}
+  $fw_unmanaged_rule_regex = %r{^9[0-9]{3}\s.*$}
 
   # Attribute resource map
   # Map is ordered as the attributes appear in the iptables-save/ip6tables-save output
-  $resource_map = {
+  $fw_resource_map = {
     chain: '-A',
     source: '-s',
     destination: '-d',
@@ -182,7 +182,7 @@ class Puppet::Provider::Firewall::Firewall
   }
 
   # These are known booleans that do not take a value.
-  $known_booleans = [
+  $fw_known_booleans = [
     :checksum_fill, :clamp_mss_to_pmtu, :isfragment, :ishasmorefrags, :islastfrag, :isfirstfrag,
     :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :random_fully, :random,
     :rdest, :reap, :rsource, :rttl, :socket, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
@@ -230,7 +230,7 @@ class Puppet::Provider::Firewall::Firewall
   # This is the order of resources as they appear in ip(6)tables-save output,
   # it is used in order to ensure that the rules are applied in the correct order.
   # This order can be determined by going through iptables source code or just tweaking and trying manually
-  $resource_list = [
+  $fw_resource_list = [
     :source, :destination, :iniface, :outiface,
     :physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
     :proto, :isfragment, :ishasmorefrags, :islastfrag, :isfirstfrag,
@@ -299,7 +299,7 @@ class Puppet::Provider::Firewall::Firewall
     context.notice("Creating Rule '#{name}' with #{should.inspect}")
     position = Puppet::Provider::Firewall::Firewall.insert_order(context, name, should[:chain], should[:table], should[:protocol])
     arguments = Puppet::Provider::Firewall::Firewall.hash_to_rule(context, name, should)
-    Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $rule_create_command, should[:chain], position, arguments].join(' '))
+    Puppet::Provider.execute([$fw_base_command[should[:protocol]], should[:table], $fw_rule_create_command, should[:chain], position, arguments].join(' '))
     PuppetX::Firewall::Utility.persist_iptables(context, name, should[:protocol])
   end
 
@@ -307,7 +307,7 @@ class Puppet::Provider::Firewall::Firewall
     context.notice("Updating Rule '#{name}' with #{should.inspect}")
     position = Puppet::Provider::Firewall::Firewall.insert_order(context, name, should[:chain], should[:table], should[:protocol])
     arguments = Puppet::Provider::Firewall::Firewall.hash_to_rule(context, name, should)
-    Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $rule_update_command, should[:chain], position, arguments].join(' '))
+    Puppet::Provider.execute([$fw_base_command[should[:protocol]], should[:table], $fw_rule_update_command, should[:chain], position, arguments].join(' '))
     PuppetX::Firewall::Utility.persist_iptables(context, name, should[:protocol])
   end
 
@@ -315,8 +315,8 @@ class Puppet::Provider::Firewall::Firewall
     context.notice("Deleting Rule '#{name}'")
     # When deleting we use the retrieved iptables-save append command as a base
     # We do this to ensure accuracy when removing non-standard (i.e. uncommented) rules via the firewallchain purge function
-    arguments = is[:line].gsub(%r{^-A}, $rule_delete_command)
-    Puppet::Provider.execute([$base_command[is[:protocol]], is[:table], arguments].join(' '))
+    arguments = is[:line].gsub(%r{^-A}, $fw_rule_delete_command)
+    Puppet::Provider.execute([$fw_base_command[is[:protocol]], is[:table], arguments].join(' '))
     PuppetX::Firewall::Utility.persist_iptables(context, name, is[:protocol])
   end
 
@@ -461,11 +461,11 @@ class Puppet::Provider::Firewall::Firewall
     # For each protocol
     protocols.each do |protocol|
       # Retrieve String containing all information
-      iptables_list = Puppet::Provider.execute($list_command[protocol])
+      iptables_list = Puppet::Provider.execute($fw_list_command[protocol])
       # Scan String to retrieve all Rules
-      iptables_list.scan($table_regex).each do |table|
-        table_name = table[0].scan($table_name_regex)[0][0]
-        table[0].scan($rules_regex).each do |rule|
+      iptables_list.scan($fw_table_regex).each do |table|
+        table_name = table[0].scan($fw_table_name_regex)[0][0]
+        table[0].scan($fw_rules_regex).each do |rule|
           raw_rules = if basic
                         Puppet::Provider::Firewall::Firewall.rule_to_name(context, rule[0], table_name, protocol)
                       else
@@ -489,12 +489,12 @@ class Puppet::Provider::Firewall::Firewall
     rule_hash[:table] = table_name
     rule_hash[:protocol] = protocol
 
-    name_regex = Regexp.new("#{$resource_map[:name]}\\s(?:\"([^\"]*)|([^\"\\s]*))")
+    name_regex = Regexp.new("#{$fw_resource_map[:name]}\\s(?:\"([^\"]*)|([^\"\\s]*))")
     name_value = rule.scan(name_regex)[0]
     # Combine the returned values and remove and trailing or leading whitespace
     rule_hash[:name] = [name_value[0], name_value[1]].join(' ').strip if name_value
 
-    chain_regex = Regexp.new("#{$resource_map[:chain]}\\s(\\S+)")
+    chain_regex = Regexp.new("#{$fw_resource_map[:chain]}\\s(\\S+)")
     rule_hash[:chain] = rule.scan(chain_regex)[0][0]
 
     rule_hash
@@ -510,8 +510,8 @@ class Puppet::Provider::Firewall::Firewall
     rule_hash[:protocol] = protocol
     rule_hash[:line] = rule
     # Add the ensure parameter first
-    $resource_map.each do |key, value|
-      if $known_booleans.include?(key)
+    $fw_resource_map.each do |key, value|
+      if $fw_known_booleans.include?(key)
         # check for flag with regex, add a space/line end to ensure accuracy with the more simplistic flags; i.e. `-f`, `--random`
         rule_hash[key] = if rule.match(Regexp.new("#{value}(\\s|$)"))
                            true
@@ -734,7 +734,7 @@ class Puppet::Provider::Firewall::Firewall
   # @api private
   def self.validate_input(_is, should)
     # Verify that name does not start with 9000-9999, this range has been reserved. Ignore check when deleting the rule
-    raise ArgumentError, 'Rule name cannot start with 9000-9999, as this range is reserved for unmanaged rules.' if should[:name].match($unmanaged_rule_regex) && should[:ensure].to_s == 'present'
+    raise ArgumentError, 'Rule name cannot start with 9000-9999, as this range is reserved for unmanaged rules.' if should[:name].match($fw_unmanaged_rule_regex) && should[:ensure].to_s == 'present'
     # `isfragment` can only be set when `proto` is `tcp`
     raise ArgumentError, '`proto` must be set to `tcp` for `isfragment` to be true.' if should[:isfragment] && should[:proto] != 'tcp'
     # `stat_mode` must be set to `nth` for `stat_every` and `stat_packet` to be set
@@ -913,7 +913,7 @@ class Puppet::Provider::Firewall::Firewall
     arguments = ''
 
     # We loop through an ordered list of all flags as the order that they are added is important
-    $resource_list.each do |key|
+    $fw_resource_list.each do |key|
       next unless rule[key]
 
       value = rule[key]
@@ -931,9 +931,9 @@ class Puppet::Provider::Firewall::Firewall
       end
 
       # if resource is known_boolean
-      if $known_booleans.include?(key)
+      if $fw_known_booleans.include?(key)
         # If value is true, append command to arguments
-        arguments += " #{$resource_map[key]}" if value
+        arguments += " #{$fw_resource_map[key]}" if value
         next
       end
 
@@ -941,34 +941,34 @@ class Puppet::Provider::Firewall::Firewall
       # certain resources may need special rules
       case key
       when :name, :string, :string_hex, :bytecode, :u32, :nflog_prefix, :log_prefix
-        arguments += " #{[$resource_map[key], "'#{rule[key]}'"].join(' ')}" if rule[key].match?(%r{^[^!]}) # if standard
-        arguments += " #{['!', $resource_map[key], "'#{rule[key].gsub(%r{^!\s?}, '')}'"].join(' ')}" if rule[key].match?(%r{^!}) # if negated
+        arguments += " #{[$fw_resource_map[key], "'#{rule[key]}'"].join(' ')}" if rule[key].match?(%r{^[^!]}) # if standard
+        arguments += " #{['!', $fw_resource_map[key], "'#{rule[key].gsub(%r{^!\s?}, '')}'"].join(' ')}" if rule[key].match?(%r{^!}) # if negated
       when :sport, :dport
         if rule[key].is_a?(Array) && rule[key][0].to_s.match(%r{^!})
           # Negated Multiport
-          split_comannd = $resource_map[key][0].split(%r{ })
+          split_comannd = $fw_resource_map[key][0].split(%r{ })
           negated_command = [split_comannd[0], split_comannd[1], '!', split_comannd[2]].join(' ')
           value = rule[key].join(',').gsub(%r{^!\s?}, '')
           arguments += " #{[negated_command, value].join(' ')}"
         elsif rule[key].is_a?(Array)
           # Standard Multiport
-          arguments += " #{[$resource_map[key][0], rule[key].join(',')].join(' ')}"
+          arguments += " #{[$fw_resource_map[key][0], rule[key].join(',')].join(' ')}"
         elsif rule[key].to_s.match?(%r{^!})
           # Negated Standard
-          arguments += " #{['!', $resource_map[key][1], rule[key].gsub(%r{^!\s?}, '')].join(' ')}"
+          arguments += " #{['!', $fw_resource_map[key][1], rule[key].gsub(%r{^!\s?}, '')].join(' ')}"
         else
           # Standard
-          arguments += " #{[$resource_map[key][1], rule[key]].join(' ')}"
+          arguments += " #{[$fw_resource_map[key][1], rule[key]].join(' ')}"
         end
       when :src_type, :dst_type, :ipset, :match_mark, :mss, :connmark
         # Code for if value requires it's own flag each time it is applied
-        split_command = $resource_map[key].split(%r{ })
+        split_command = $fw_resource_map[key].split(%r{ })
         negated_command = [split_command[0], split_command[1], '!', split_command[2]].join(' ')
 
         # If a string, wrap as an array to simplify the code
         rule[key] = [rule[key]] if rule[key].is_a?(String)
         rule[key].each do |ru|
-          arguments += " #{$resource_map[key]} #{ru}" unless ru.match?(%r{^!})
+          arguments += " #{$fw_resource_map[key]} #{ru}" unless ru.match?(%r{^!})
           arguments += " #{negated_command} #{ru.gsub(%r{^!\s?}, '')}" if ru.match?(%r{^!})
         end
       when :state, :ctstate, :ctstatus, :month_days, :week_days
@@ -976,8 +976,8 @@ class Puppet::Provider::Firewall::Firewall
         # If not an array, wrap as an array to simplify the code
         rule[key] = [rule[key]] unless rule[key].is_a?(Array)
         int_attr = [:month_days]
-        arguments += " #{[$resource_map[key], rule[key].join(',')].join(' ')}" if int_attr.include?(key) || rule[key][0].match(%r{^[^!]}) # if standard
-        arguments += " #{['!', $resource_map[key], rule[key].join(',').gsub(%r{^!\s?}, '')].join(' ')}" if !int_attr.include?(key) && rule[key][0].match(%r{^!}) # if negated
+        arguments += " #{[$fw_resource_map[key], rule[key].join(',')].join(' ')}" if int_attr.include?(key) || rule[key][0].match(%r{^[^!]}) # if standard
+        arguments += " #{['!', $fw_resource_map[key], rule[key].join(',').gsub(%r{^!\s?}, '')].join(' ')}" if !int_attr.include?(key) && rule[key][0].match(%r{^!}) # if negated
       when :icmp
         case rule[:protocol]
         when 'IPv4', 'iptables'
@@ -987,28 +987,28 @@ class Puppet::Provider::Firewall::Firewall
         end
         # Retrieve the correct command for the protocol
         # A command is generated to be used for negation
-        split_comannd = $resource_map[key][proto].split(%r{ })
+        split_comannd = $fw_resource_map[key][proto].split(%r{ })
         negated_command = [split_comannd[0], split_comannd[1], '!', split_comannd[2]].join(' ')
 
-        arguments += " #{[$resource_map[key][proto], rule[key]].join(' ')}" if rule[key].match?(%r{^[^!]}) # if standard
+        arguments += " #{[$fw_resource_map[key][proto], rule[key]].join(' ')}" if rule[key].match?(%r{^[^!]}) # if standard
         arguments += " #{[negated_command, rule[key].gsub(%r{^!\s?}, '')].join(' ')}" if rule[key].match?(%r{^!}) # if negated
       when :recent
         # Add value after command, if negated add negation before command
         # Preface the value of recent with `--`
-        arguments += " #{$resource_map[key]} --#{rule[key]}" if rule[key].match?(%r{^[^!]}) # if standard
-        arguments += " #{$resource_map[key]} ! --#{rule[key].gsub(%r{^!\s?}, '')}" if rule[key].match?(%r{^!}) # if negated
+        arguments += " #{$fw_resource_map[key]} --#{rule[key]}" if rule[key].match?(%r{^[^!]}) # if standard
+        arguments += " #{$fw_resource_map[key]} ! --#{rule[key].gsub(%r{^!\s?}, '')}" if rule[key].match?(%r{^!}) # if negated
       when :rpfilter
         # Add value after command
         # Preface the value of recent with `--`
         # If a string, wrap as an array to simplify the code
         rule[key] = [rule[key]] if rule[key].is_a?(String)
-        arguments += " #{$resource_map[key]} --#{rule[key].join(' --')}"
+        arguments += " #{$fw_resource_map[key]} --#{rule[key].join(' --')}"
       when :proto, :source, :destination, :iniface, :outiface, :physdev_in, :physdev_out, :src_range, :dst_range,
             :tcp_option, :tcp_flags, :uid, :gid, :mac_source, :pkttype, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc,
             :ctrepldst, :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctexpire, :cgroup, :hop_limit
         # Add value after command, if negated add negation before command
-        arguments += " #{[$resource_map[key], rule[key]].join(' ')}" if rule[key].is_a?(Integer) || rule[key].match?(%r{^[^!]}) # if standard
-        arguments += " #{['!', $resource_map[key], rule[key].gsub(%r{^!\s?}, '')].join(' ')}" if rule[key].is_a?(String) && rule[key].match?(%r{^!}) # if negated
+        arguments += " #{[$fw_resource_map[key], rule[key]].join(' ')}" if rule[key].is_a?(Integer) || rule[key].match?(%r{^[^!]}) # if standard
+        arguments += " #{['!', $fw_resource_map[key], rule[key].gsub(%r{^!\s?}, '')].join(' ')}" if rule[key].is_a?(String) && rule[key].match?(%r{^!}) # if negated
       else # :chain, stat_mode, stat_every, stat_packet, stat_probability, socket, ipsec_dir, ipsec_policy, :ctdir,
         # :limit, :burst, :length, :rseconds, :rhitcount, :rname, :mask, :string_algo, :string_from, :string_to,
         # :jump, :goto, :clusterip_hashmode, :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node,
@@ -1019,7 +1019,7 @@ class Puppet::Provider::Firewall::Firewall
         # :hashlimit_srcmask, :hashlimit_dstmask, :hashlimit_htable_size, :hashlimit_htable_max, :hashlimit_htable_expire,
         # :hashlimit_htable_gcinterval, :zone, :helper, :condition
         # Add value after command
-        arguments += " #{[$resource_map[key], rule[key]].join(' ')}"
+        arguments += " #{[$fw_resource_map[key], rule[key]].join(' ')}"
       end
     end
     arguments
@@ -1060,15 +1060,15 @@ class Puppet::Provider::Firewall::Firewall
     unnamed_offset = rules[0..rules.index(offset_rule)].reduce(0) do |sum, rule|
       # This regex matches the names given to unmanaged rules (a number
       # 9000-9999 followed by an MD5 hash).
-      sum + (rule.match($unmanaged_rule_regex) ? 1 : 0)
+      sum + (rule.match($fw_unmanaged_rule_regex) ? 1 : 0)
     end
 
     # We want our rule to come before unmanaged rules if it's not a 9-rule
-    unnamed_offset -= 1 if offset_rule.match($unmanaged_rule_regex) && !name.match(%r{^9})
+    unnamed_offset -= 1 if offset_rule.match($fw_unmanaged_rule_regex) && !name.match(%r{^9})
 
     # Insert our new or updated rule in the correct order of named rules, but
     # offset for unnamed rules.
-    sorted_rules = rules.reject { |r| r.match($unmanaged_rule_regex) }.sort
+    sorted_rules = rules.reject { |r| r.match($fw_unmanaged_rule_regex) }.sort
     sorted_rules.index(name) + 1 + unnamed_offset
   end
 end
