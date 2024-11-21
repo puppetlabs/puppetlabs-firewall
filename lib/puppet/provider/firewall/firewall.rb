@@ -468,7 +468,7 @@ class Puppet::Provider::Firewall::Firewall
         table[0].scan($rules_regex).each do |rule|
           # iptables-save escapes ' symbol in it's output for some reason which leads to an incorrect command
           # We need to manually replace \' to '
-          rule[0].gsub!("\\'","'")
+          rule[0].gsub!("\\'", "'")
           raw_rules = if basic
                         Puppet::Provider::Firewall::Firewall.rule_to_name(context, rule[0], table_name, protocol)
                       else
