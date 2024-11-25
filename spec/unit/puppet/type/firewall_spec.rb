@@ -507,9 +507,9 @@ RSpec.describe 'firewall type' do
                 { name: '001 test rule', tosource: 313 }]
     },
     ':toports': {
-      valid: [{ name: '001 test rule', toports: '40' }, { name: '001 test rule', tosource: '50-60' }],
-      invalid: [{ name: '001 test rule', toports: 'invalid' }, { name: '001 test rule', toports: false },
-                { name: '001 test rule', toports: 313 }]
+      valid: [{ name: '001 test rule', toports: '40' }, { name: '001 test rule', tosource: '50-60' },
+              { name: '001 test rule', toports: 313 }],
+      invalid: [{ name: '001 test rule', toports: 'invalid' }, { name: '001 test rule', toports: false }]
     },
     ':to': {
       valid: [{ name: '001 test rule', to: '10.0.0.2' }, { name: '001 test rule', to: '10.0.0.2/24' }],
