@@ -326,7 +326,7 @@ class Puppet::Provider::Firewall::Firewall
     context.debug("Checking whether '#{property_name}' is out of sync")
 
     # If either value is nil, no custom logic is required unless property is source or destination
-    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ! [:source, :destination].include?(property_name)
+    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination].include?(property_name)
 
     case property_name
     when :protocol
