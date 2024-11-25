@@ -1635,7 +1635,7 @@ Data type: `Optional[String[1]]`
 
 ##### `toports`
 
-Data type: `Optional[Pattern[/^\d+(?:-\d+)?$/]]`
+Data type: `Optional[Variant[Integer[0, 65535], Pattern[/^\d+(?:-\d+)?$/]]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
       For REDIRECT/MASQUERADE this is the port that will replace the destination/source port.

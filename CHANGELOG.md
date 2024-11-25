@@ -5,9 +5,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.2) - 2024-11-25
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.1...v8.1.2)
+
+### Fixed
+
+- (MODULE-11463): Fix rule parsing when iptables chains with '-A' in the name [#1210](https://github.com/puppetlabs/puppetlabs-firewall/pull/1210) ([2fa](https://github.com/2fa))
+- Allow a singular numeric port for the `--to-ports` parameter [#1199](https://github.com/puppetlabs/puppetlabs-firewall/pull/1199) ([gcoxmoz](https://github.com/gcoxmoz))
+- Add `tcp-reset` as an allowed option for `--reject-with` [#1194](https://github.com/puppetlabs/puppetlabs-firewall/pull/1194) ([gcoxmoz](https://github.com/gcoxmoz))
+
 ## [v8.1.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.1) - 2024-10-28
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.0...v8.1.1)
+
+### Added
+
+- (CAT-2101) Add support for Debian-12 [#1236](https://github.com/puppetlabs/puppetlabs-firewall/pull/1236) ([skyamgarp](https://github.com/skyamgarp))
 
 ### Fixed
 
