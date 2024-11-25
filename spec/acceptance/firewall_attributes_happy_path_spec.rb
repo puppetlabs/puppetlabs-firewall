@@ -239,6 +239,12 @@ describe 'firewall attribute testing, happy path' do
             chain     => 'FORWARD',
             table     => 'mangle',
           }
+          firewall { '605 - reject with tcp-reset':
+            proto  => tcp,
+            jump   => reject,
+            reject => 'tcp-reset',
+          }
+
           firewall { '700 - blah-A Test Rule':
             jump       => 'LOG',
             log_prefix => 'FW-A-INPUT: ',
@@ -475,6 +481,10 @@ describe 'firewall attribute testing, happy path' do
 
     it 'set_mss is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p (tcp|6) -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "604 - set_mss" -j TCPMSS --set-mss 1360})
+    end
+
+    it 'tcp-reset is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m comment --comment "605 - reject with tcp-reset" -j REJECT --reject-with tcp-reset})
     end
 
     it 'clamp_mss_to_pmtu is set' do

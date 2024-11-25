@@ -1261,13 +1261,15 @@ Puppet::ResourceApi.register_type(
     reject: {
       type: "Optional[Enum['icmp-net-unreachable', 'icmp-host-unreachable', 'icmp-port-unreachable', 'icmp-proto-unreachable',
                               'icmp-net-prohibited', 'icmp-host-prohibited', 'icmp-admin-prohibited', 'icmp6-no-route', 'no-route',
-                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable']]",
+                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable',
+                              'tcp-reset']]",
       desc: <<-DESC
       When combined with jump => "REJECT" you can specify a different icmp response to be sent back to the packet sender.
       Valid values differ depending on if the protocol is `IPv4` or `IPv6`.
       IPv4 allows: icmp-net-unreachable, icmp-host-unreachable, icmp-port-unreachable, icmp-proto-unreachable, icmp-net-prohibited,
-      icmp-host-prohibited, or icmp-admin-prohibited.
-      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach, or icmp6-port-unreachable.
+      icmp-host-prohibited, icmp-admin-prohibited, or tcp-reset.
+      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach,
+      icmp6-port-unreachable, or tcp-reset.
       DESC
     },
     set_mark: {
