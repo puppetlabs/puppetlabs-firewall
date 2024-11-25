@@ -144,6 +144,13 @@ describe 'firewall attribute testing, happy path' do
             jump    => 'REDIRECT',
             toports => '2222',
           }
+          firewall { '575 - toports-numeric':
+            proto   => icmp,
+            table   => 'nat',
+            chain   => 'PREROUTING',
+            jump    => 'REDIRECT',
+            toports => 3333,
+          }
           firewall { '581 - pkttype':
             ensure  => present,
             proto   => tcp,
@@ -239,6 +246,12 @@ describe 'firewall attribute testing, happy path' do
             chain     => 'FORWARD',
             table     => 'mangle',
           }
+          firewall { '605 - reject with tcp-reset':
+            proto  => tcp,
+            jump   => reject,
+            reject => 'tcp-reset',
+          }
+
           firewall { '700 - blah-A Test Rule':
             jump       => 'LOG',
             log_prefix => 'FW-A-INPUT: ',
@@ -441,6 +454,10 @@ describe 'firewall attribute testing, happy path' do
       expect(result.stdout).to match(%r{-A PREROUTING -p (icmp|1) -m comment --comment "574 - toports" -j REDIRECT --to-ports 2222})
     end
 
+    it 'toports-numeric is set' do
+      expect(result.stdout).to match(%r{-A PREROUTING -p (icmp|1) -m comment --comment "575 - toports-numeric" -j REDIRECT --to-ports 3333})
+    end
+
     it 'rpfilter is set' do
       expect(result.stdout).to match(%r{-A PREROUTING -p (tcp|6) -m rpfilter --loose --validmark --accept-local --invert -m comment --comment "900 - set rpfilter" -j ACCEPT})
     end
@@ -475,6 +492,10 @@ describe 'firewall attribute testing, happy path' do
 
     it 'set_mss is set' do
       expect(result.stdout).to match(%r{-A FORWARD -p (tcp|6) -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1541 -m comment --comment "604 - set_mss" -j TCPMSS --set-mss 1360})
+    end
+
+    it 'tcp-reset is set' do
+      expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m comment --comment "605 - reject with tcp-reset" -j REJECT --reject-with tcp-reset})
     end
 
     it 'clamp_mss_to_pmtu is set' do

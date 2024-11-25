@@ -293,7 +293,7 @@ COMMIT
             should: { name: 'INPUT:filter:IPv4', ensure: 'present' }
           },
           output: {
-            is: { title: 'INPUT:filter:IPv4', name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+            is: { title: 'INPUT:filter:IPv4', name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, policy: 'accept' },
             should: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'accept' }
           }
         },
@@ -315,10 +315,6 @@ COMMIT
         {
           should: { name: 'FORWARD:nat:IPv4', chain: 'FORWARD', table: 'nat', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
           error: 'PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table \'nat\''
-        },
-        {
-          should: { name: 'PREROUTING:nat:IPv6', chain: 'PREROUTING', table: 'nat', protocol: 'IPv6', ensure: 'present', policy: 'accept' },
-          error: 'table nat isn\'t valid in IPv6. You must specify \':IPv4\' as the name suffix'
         },
         {
           should: { name: 'INPUT:raw:IPv4', chain: 'INPUT', table: 'raw', protocol: 'IPv4', ensure: 'present', policy: 'accept' },

@@ -948,7 +948,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     ipset: {
-      type: 'Optional[Variant[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/]]]]',
+      type: 'Optional[Variant[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/]]]]',
       desc: <<-DESC
       Matches against the specified ipset list.
       Requires ipset kernel module. Will accept a single element or an array.
@@ -1002,7 +1002,7 @@ Puppet::ResourceApi.register_type(
       * REJECT - the packet is rejected with a suitable ICMP response
       * DROP - the packet is dropped
 
-      But can also be on of the following:
+      But can also be one of the following:
 
       * QUEUE
       * RETURN
@@ -1189,7 +1189,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     toports: {
-      type: 'Optional[Pattern[/^\d+(?:-\d+)?$/]]',
+      type: 'Optional[Variant[Integer[0, 65535], Pattern[/^\d+(?:-\d+)?$/]]]',
       desc: <<-DESC
       For REDIRECT/MASQUERADE this is the port that will replace the destination/source port.
       Can specify a single new port or an inclusive range of ports.
@@ -1261,13 +1261,15 @@ Puppet::ResourceApi.register_type(
     reject: {
       type: "Optional[Enum['icmp-net-unreachable', 'icmp-host-unreachable', 'icmp-port-unreachable', 'icmp-proto-unreachable',
                               'icmp-net-prohibited', 'icmp-host-prohibited', 'icmp-admin-prohibited', 'icmp6-no-route', 'no-route',
-                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable']]",
+                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable',
+                              'tcp-reset']]",
       desc: <<-DESC
       When combined with jump => "REJECT" you can specify a different icmp response to be sent back to the packet sender.
       Valid values differ depending on if the protocol is `IPv4` or `IPv6`.
       IPv4 allows: icmp-net-unreachable, icmp-host-unreachable, icmp-port-unreachable, icmp-proto-unreachable, icmp-net-prohibited,
-      icmp-host-prohibited, or icmp-admin-prohibited.
-      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach, or icmp6-port-unreachable.
+      icmp-host-prohibited, icmp-admin-prohibited, or tcp-reset.
+      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach,
+      icmp6-port-unreachable, or tcp-reset.
       DESC
     },
     set_mark: {
@@ -1278,9 +1280,9 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     match_mark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]',
+      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
       DESC
@@ -1313,9 +1315,9 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     connmark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]',
+      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
       DESC

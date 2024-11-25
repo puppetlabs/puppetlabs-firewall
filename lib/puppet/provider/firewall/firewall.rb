@@ -19,7 +19,7 @@ class Puppet::Provider::Firewall::Firewall
   # Regex used to retrieve table name
   $table_name_regex = %r{^\*(nat|mangle|filter|raw|rawpost|broute|security)}
   # Regex used to retrieve Rules
-  $rules_regex = %r{(-A.*)\n}
+  $rules_regex = %r{^(-A.*)\n}
   # Base command
   $base_command = {
     'IPv4' => 'iptables -t',
@@ -394,15 +394,10 @@ class Puppet::Provider::Firewall::Firewall
       is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name])
       should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name])
       is == should
-    when :set_mark
+    when :set_mark, :match_mark, :connmark
       # Ensure that the values are compared to eachother in hexidecimal format
       is = PuppetX::Firewall::Utility.mark_mask_to_hex(is_hash[property_name])
       should = PuppetX::Firewall::Utility.mark_mask_to_hex(should_hash[property_name])
-      is == should
-    when :match_mark, :connmark
-      # Ensure that the values are compared to eachother in hexidecimal format
-      is = PuppetX::Firewall::Utility.mark_to_hex(is_hash[property_name])
-      should = PuppetX::Firewall::Utility.mark_to_hex(should_hash[property_name])
       is == should
     when :time_start, :time_stop
       # Ensure the values are compared in full `00:00:00` format
@@ -471,6 +466,9 @@ class Puppet::Provider::Firewall::Firewall
       iptables_list.scan($table_regex).each do |table|
         table_name = table[0].scan($table_name_regex)[0][0]
         table[0].scan($rules_regex).each do |rule|
+          # iptables-save escapes ' symbol in it's output for some reason which leads to an incorrect command
+          # We need to manually replace \' to '
+          rule[0].gsub!("\\'", "'")
           raw_rules = if basic
                         Puppet::Provider::Firewall::Firewall.rule_to_name(context, rule[0], table_name, protocol)
                       else
@@ -494,7 +492,7 @@ class Puppet::Provider::Firewall::Firewall
     rule_hash[:table] = table_name
     rule_hash[:protocol] = protocol
 
-    name_regex = Regexp.new("#{$resource_map[:name]}\\s(?:\"([^\"]*)|([^\"\\s]*))")
+    name_regex = Regexp.new("#{$resource_map[:name]}\\s+(?:\"(.+?(?<!\\\\))\"|([^\"\\s]+)\\b)(?:\\s|$)")
     name_value = rule.scan(name_regex)[0]
     # Combine the returned values and remove and trailing or leading whitespace
     rule_hash[:name] = [name_value[0], name_value[1]].join(' ').strip if name_value
@@ -532,7 +530,7 @@ class Puppet::Provider::Firewall::Firewall
         # When only a single word comment is returned no quotes are given, so we must check for this as well
         # First find if flag is present, add a space to ensure accuracy with the more simplistic flags; i.e. `-i`
         if rule.match(Regexp.new("#{value}\\s"))
-          value_regex = Regexp.new("(?:(!\\s))?#{value}\\s(?:\"([^\"]*)|([^\"\\s]*))")
+          value_regex = Regexp.new("(?:(!\\s))?#{value}\\s+(?:\"(.+?(?<!\\\\))\"|([^\"\\s]+)\\b)(?:\\s|$)")
           key_value = rule.scan(value_regex)[0]
           # Combine the returned values and remove and trailing or leading whitespace
           key_value[1] = [key_value[0], key_value[1], key_value[2]].join
@@ -893,8 +891,8 @@ class Puppet::Provider::Firewall::Firewall
 
     # `set_mark`, `match_mark` and `connmark` must be applied in hexidecimal format
     should[:set_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:set_mark]) if should[:set_mark]
-    should[:match_mark] = PuppetX::Firewall::Utility.mark_to_hex(should[:match_mark]) if should[:match_mark]
-    should[:connmark] = PuppetX::Firewall::Utility.mark_to_hex(should[:connmark]) if should[:connmark]
+    should[:match_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:match_mark]) if should[:match_mark]
+    should[:connmark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:connmark]) if should[:connmark]
 
     # `time_start` and `time_stop` must be applied in full HH:MM:SS format
     time = [:time_start, :time_stop]
