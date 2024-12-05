@@ -12,6 +12,9 @@ describe 'firewall attribute testing, happy path' do
   describe 'attributes test' do
     before(:all) do
       pp = <<-PUPPETCODE
+          group { 'testgroup':
+            gid => '1234',
+          }
           class { '::firewall': }
           firewall { '004 - log_level and log_prefix':
             chain      => 'INPUT',
@@ -291,6 +294,12 @@ describe 'firewall attribute testing, happy path' do
             chain => 'OUTPUT',
             jump  => accept,
             gid   => 'root',
+            proto => 'all',
+          }
+          firewall { '801 - gid testgroup':
+            chain => 'OUTPUT',
+            jump  => accept,
+            gid   => 'testgroup',
             proto => 'all',
           }
           firewall { '802 - gid root negated':

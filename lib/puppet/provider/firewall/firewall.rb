@@ -376,9 +376,16 @@ class Puppet::Provider::Firewall::Firewall
       end
 
       # If 'is' or 'should' contain anything other than digits or digit range,
-      # we assume that we have to do a lookup to convert to UID
-      is = Etc.getpwnam(is).uid unless is[%r{[0-9]+(-[0-9]+)?}] == is
-      should = Etc.getpwnam(should).uid unless should[%r{[0-9]+(-[0-9]+)?}] == should
+      # we assume that we have to do a lookup to convert to UID or GID
+      if property_name == :uid
+        is = Etc.getpwnam(is).uid unless is[%r{[0-9]+(-[0-9]+)?}] == is
+        should = Etc.getpwnam(should).uid unless should[%r{[0-9]+(-[0-9]+)?}] == should
+      end
+
+      if property_name == :gid
+        is = Etc.getgrnam(is).gid unless is[%r{[0-9]+(-[0-9]+)?}] == is
+        should = Etc.getgrnam(should).gid unless should[%r{[0-9]+(-[0-9]+)?}] == should
+      end
 
       "#{is_negate}#{is}" == "#{should_negate}#{should}"
     when :mac_source, :jump
