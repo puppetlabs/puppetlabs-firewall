@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.3) - 2024-12-05
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.2...v8.1.3)
+
+### Fixed
+
+- Prevent sources with zero prefix length being applied every agent run [#1189](https://github.com/puppetlabs/puppetlabs-firewall/pull/1189) ([nabertrand](https://github.com/nabertrand))
+
 ## [v8.1.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.2) - 2024-11-25
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.1...v8.1.2)
