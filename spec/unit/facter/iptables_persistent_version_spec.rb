@@ -15,8 +15,8 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
 
       describe "#{os} package installed" do
         before(:each) do
-          allow(Facter.fact(:operatingsystem)).to receive(:value).and_return(os)
-          allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return(os_release)
+          allow(Facter.fact(:'os.name')).to receive(:value).and_return(os)
+          allow(Facter.fact(:'os.release.full')).to receive(:value).and_return(os_release)
           allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                              .and_return(ver)
         end
@@ -27,8 +27,8 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
 
     describe 'Ubuntu package not installed' do
       before(:each) do
-        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
-        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return('20.04')
+        allow(Facter.fact(:'os.name')).to receive(:value).and_return('Ubuntu')
+        allow(Facter.fact(:'os.release.full')).to receive(:value).and_return('20.04')
         allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                            .and_return(nil)
       end
@@ -38,7 +38,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
 
     describe 'CentOS not supported' do
       before(:each) do
-        allow(Facter.fact(:operatingsystem)).to receive(:value)
+        allow(Facter.fact(:'os.name')).to receive(:value)
           .and_return('CentOS')
       end
 
@@ -63,8 +63,8 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
 
       describe "#{os} package installed" do
         before(:each) do
-          allow(Facter.fact(:operatingsystem)).to receive(:value).and_return(os)
-          allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return(os_release)
+          allow(Facter.fact(:'os.name')).to receive(:value).and_return(os)
+          allow(Facter.fact(:'os.release.full')).to receive(:value).and_return(os_release)
           allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                              .and_return(ver)
         end
@@ -76,8 +76,8 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
     describe 'Ubuntu package not installed' do
       os_release = '14.10'
       before(:each) do
-        allow(Facter.fact(:operatingsystem)).to receive(:value).and_return('Ubuntu')
-        allow(Facter.fact(:operatingsystemrelease)).to receive(:value).and_return(os_release)
+        allow(Facter.fact(:'os.name')).to receive(:value).and_return('Ubuntu')
+        allow(Facter.fact(:'os.release.full')).to receive(:value).and_return(os_release)
         allow(Facter::Core::Execution).to receive(:execute).with(dpkg_cmd, { on_fail: nil })
                                                            .and_return(nil)
       end
@@ -87,7 +87,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
 
     describe 'CentOS not supported' do
       before(:each) do
-        allow(Facter.fact(:operatingsystem)).to receive(:value)
+        allow(Facter.fact(:'os.name')).to receive(:value)
           .and_return('CentOS')
       end
 
