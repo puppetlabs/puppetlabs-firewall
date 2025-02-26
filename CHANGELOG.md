@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.4](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.4) - 2025-02-26
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.3...v8.1.4)
+
+### Fixed
+
+- (CAT-2215) Update legacy facts [#1253](https://github.com/puppetlabs/puppetlabs-firewall/pull/1253) ([amitkarsale](https://github.com/amitkarsale))
+
 ## [v8.1.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.3) - 2024-12-05
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.2...v8.1.3)
