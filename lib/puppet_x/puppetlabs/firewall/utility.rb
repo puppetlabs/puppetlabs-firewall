@@ -93,27 +93,29 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
       begin
         value = PuppetX::Firewall::IPCidr.new(value)
       rescue StandardError
-        family = case proto
-                 when 'IPv4', 'iptables'
-                   Socket::AF_INET
-                 when 'IPv6', 'ip6tables'
-                   Socket::AF_INET6
-                 when nil
-                   raise ArgumentError, 'Proto must be specified for a hostname'
-                 else
-                   raise ArgumentError, "Unsupported address family: #{proto}"
-                 end
+        case proto
+        when 'IPv4', 'iptables'
+          family = Socket::AF_INET
+          rr = Resolv::DNS::Resource::IN::A
+        when 'IPv6', 'ip6tables'
+          family = Socket::AF_INET6
+          rr = Resolv::DNS::Resource::IN::AAAA
+        when nil
+          raise ArgumentError, 'Proto must be specified for a hostname'
+        else
+          raise ArgumentError, "Unsupported address family: #{proto}"
+        end
 
         new_value = nil
-        Resolv.each_address(value) do |addr|
+        Resolv::DNS.new.each_resource(value, rr) do |addr|
           begin # rubocop:disable Style/RedundantBegin
-            new_value = PuppetX::Firewall::IPCidr.new(addr, family)
+            new_value = PuppetX::Firewall::IPCidr.new(addr.address.to_s, family)
             break
           rescue StandardError # looking for the one that works # rubocop:disable Lint/SuppressedException
           end
         end
 
-        raise "Failed to resolve hostname #{value}" if new_value.nil?
+        raise "Failed to resolve hostname #{proto} #{value}" if new_value.nil?
 
         value = new_value
       end
