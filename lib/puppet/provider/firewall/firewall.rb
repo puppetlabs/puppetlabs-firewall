@@ -418,28 +418,34 @@ class Puppet::Provider::Firewall::Firewall
     when :dport, :sport, :state, :ctstate, :ctstatus
       is = is_hash[property_name]
       should = should_hash[property_name]
+      ports = [:dport, :sport]
 
-      # Unique logic is only needed when both values are arrays
-      return nil unless is.is_a?(Array) && should.is_a?(Array)
+      if is.is_a?(Array) && should.is_a?(Array)
+        # Ensure values are sorted
+        # Ensure any negation includes only the first value
+        is_negated = true if %r{^!\s}.match?(is[0].to_s)
+        is.each_with_index do |_value, _index|
+          is = is.map { |value| value.to_s.tr('! ', '') }.sort
+        end
+        is[0] = ['!', is[0]].join(' ') if is_negated
 
-      # Ensure values are sorted
-      # Ensure any negation includes only the first value
-      is_negated = true if %r{^!\s}.match?(is[0].to_s)
-      is.each_with_index do |_value, _index|
-        is = is.map { |value| value.to_s.tr('! ', '') }.sort
-      end
-      is[0] = ['!', is[0]].join(' ') if is_negated
+        should_negated = true if %r{^!\s}.match?(should[0].to_s)
+        should.each_with_index do |_value, _index|
+          should = should.map { |value| value.to_s.tr('! ', '') }.sort
+          # Port range can be passed as `-` but will always be set/returned as `:`
+          should = should.map { |value| value.to_s.tr('-', ':') }.sort if ports.include?(property_name)
+        end
+        should[0] = ['!', should[0]].join(' ') if should_negated
 
-      should_negated = true if %r{^!\s}.match?(should[0].to_s)
-      should.each_with_index do |_value, _index|
-        should = should.map { |value| value.to_s.tr('! ', '') }.sort
+        is == should
+      elsif is.is_a?(String) && should.is_a?(String)
         # Port range can be passed as `-` but will always be set/returned as `:`
-        ports = [:dport, :sport]
-        should = should.map { |value| value.to_s.tr('-', ':') }.sort if ports.include?(property_name)
-      end
-      should[0] = ['!', should[0]].join(' ') if should_negated
+        should = should.tr('-', ':') if ports.include?(property_name)
 
-      is == should
+        is == should
+      else
+        return nil
+      end
     when :string_hex
       # Compare the values with any whitespace removed
       is = is_hash[property_name].to_s.gsub(%r{\s+}, '')
