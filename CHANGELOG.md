@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.5](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.5) - 2025-04-15
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.4...v8.1.5)
+
+### Fixed
+
+- Query gid to prevent errors with missing users with the same id (fixes #1229) [#1251](https://github.com/puppetlabs/puppetlabs-firewall/pull/1251) ([cmusik](https://github.com/cmusik))
+
 ## [v8.1.4](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.4) - 2025-02-26
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.3...v8.1.4)
