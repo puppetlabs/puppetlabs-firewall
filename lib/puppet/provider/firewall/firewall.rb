@@ -15,7 +15,7 @@ class Puppet::Provider::Firewall::Firewall
     'ip6tables' => 'ip6tables-save'
   }
   # Regex used to divide output of$list_command between tables
-  $table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[^*]+)}
+  $table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)(?:[\s\S])+?)(?=^\*|\z)}
   # Regex used to retrieve table name
   $table_name_regex = %r{^\*(nat|mangle|filter|raw|rawpost|broute|security)}
   # Regex used to retrieve Rules
