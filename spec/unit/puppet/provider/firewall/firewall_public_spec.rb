@@ -151,7 +151,7 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { mac_source: '! 0A:1B:3C:4D:5E:6F' }, should_hash: { mac_source: '0A:1B:3C:4D:5E:6F' }, result: false },
         ] },
         { testing: 'state/ctstate/ctstatus', property_name: :state, comparisons: [
-          { is_hash: { state: 'NEW' }, should_hash: { state: 'NEW' }, result: nil },
+          { is_hash: { state: 'NEW' }, should_hash: { state: 'NEW' }, result: true },
           { is_hash: { state: ['NEW'] }, should_hash: { state: 'NEW' }, result: nil },
           { is_hash: { state: 'NEW' }, should_hash: { state: ['NEW', 'INVALID'] }, result: nil },
           { is_hash: { state: ['INVALID', 'NEW'] }, should_hash: { state: ['NEW', 'INVALID'] }, result: true },
@@ -201,7 +201,7 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { jump: 'accept' }, should_hash: { jump: 'drop' }, result: false },
         ] },
         { testing: 'dport/sport', property_name: :dport, comparisons: [
-          { is_hash: { dport: '50' }, should_hash: { dport: '50' }, result: nil },
+          { is_hash: { dport: '50' }, should_hash: { dport: '50' }, result: true },
           { is_hash: { dport: ['50:60'] }, should_hash: { dport: '50-60' }, result: nil },
           { is_hash: { dport: ['50:60'] }, should_hash: { dport: ['50-60'] }, result: true },
           { is_hash: { dport: ['! 50:60', '90'] }, should_hash: { dport: ['! 90', '! 50-60'] }, result: true },
