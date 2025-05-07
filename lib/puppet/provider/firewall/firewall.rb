@@ -443,8 +443,6 @@ class Puppet::Provider::Firewall::Firewall
         should = should.tr('-', ':') if ports.include?(property_name)
 
         is == should
-      else
-        return nil
       end
     when :string_hex
       # Compare the values with any whitespace removed
