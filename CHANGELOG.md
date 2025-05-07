@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.6](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.6) - 2025-05-07
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.5...v8.1.6)
+
+### Fixed
+
+- Port ranges as string with hyphen as range indicator should work [#1212](https://github.com/puppetlabs/puppetlabs-firewall/pull/1212) ([2fa](https://github.com/2fa))
+
+### Other
+
+- (CAT-2296) Update github runner image to ubuntu-24.04 [#1259](https://github.com/puppetlabs/puppetlabs-firewall/pull/1259) ([shubhamshinde360](https://github.com/shubhamshinde360))
+
 ## [v8.1.5](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.5) - 2025-04-15
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.4...v8.1.5)
