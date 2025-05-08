@@ -34,10 +34,6 @@ class Puppet::Provider::Firewallchain::Firewallchain
   $chain_delete_command = '-X'
   # Command to set chain policy, works on inbuilt chains only
   $chain_policy_command = '-P'
-  # Command to list specific table so it will generate necessary output for iptables-save
-  # The retrieval of in-built chains may get confused by `iptables-save` tendency to not return table information
-  # for tables that have not yet been interacted with.
-  $table_list_command = '-L'
   # Check if the given chain name references a built in one
   $built_in_regex = %r{^(?:INPUT|OUTPUT|FORWARD|PREROUTING|POSTROUTING)$}
 
@@ -104,7 +100,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
     context.notice("Creating Chain '#{name}' with #{should.inspect}")
     # If a built-in chain is not present we assume that corresponding table has not been interacted with
     if $built_in_regex.match(should[:chain])
-      Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $table_list_command].join(' '))
+      Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $chain_policy_command, should[:chain], should[:policy].upcase].join(' '))
     else
       Puppet::Provider.execute([$base_command[should[:protocol]], should[:table], $chain_create_command, should[:chain]].join(' '))
     end
