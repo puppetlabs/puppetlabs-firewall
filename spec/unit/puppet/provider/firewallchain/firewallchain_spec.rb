@@ -45,21 +45,83 @@ COMMIT
         '
       end
       let(:returned_data) do
-        [{ name: 'INPUT:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+        [{ name: 'INPUT:nat:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:nat:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:nat:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_ONE:nat:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'PREROUTING:nat:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:nat:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_TWO:nat:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'INPUT:mangle:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:mangle:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:mangle:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_ONE:mangle:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'PREROUTING:mangle:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:mangle:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_TWO:mangle:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'INPUT:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
          { name: 'FORWARD:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
          { name: 'OUTPUT:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
          { name: 'TEST_ONE:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'PREROUTING:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_TWO:filter:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'INPUT:raw:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:raw:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:raw:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_ONE:raw:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
          { name: 'PREROUTING:raw:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
          { name: 'OUTPUT:raw:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
          { name: 'TEST_TWO:raw:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'INPUT:rawpost:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:rawpost:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:rawpost:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_ONE:rawpost:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'PREROUTING:rawpost:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:rawpost:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_TWO:rawpost:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'INPUT:broute:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:broute:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:broute:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_ONE:broute:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'PREROUTING:broute:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:broute:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_TWO:broute:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'INPUT:security:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:security:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:security:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_ONE:security:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'PREROUTING:security:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:security:IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'TEST_TWO:security:IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
+         { name: 'INPUT:nat:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:nat:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:nat:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'INPUT:mangle:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:mangle:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:mangle:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
          { name: 'INPUT:filter:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
          { name: 'FORWARD:filter:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
-         { name: 'OUTPUT:filter:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' }]
+         { name: 'OUTPUT:filter:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'INPUT:raw:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:raw:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:raw:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'INPUT:rawpost:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:rawpost:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:rawpost:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'INPUT:broute:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:broute:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:broute:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'INPUT:security:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'FORWARD:security:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
+         { name: 'OUTPUT:security:IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' }]
       end
 
       it 'processes the resource' do
-        allow(Puppet::Util::Execution).to receive(:execute).with('iptables-save').and_return(iptables)
-        allow(Puppet::Util::Execution).to receive(:execute).with('ip6tables-save').and_return(ip6tables)
+        ['nat', 'mangle', 'filter', 'raw', 'rawpost', 'broute', 'security'].each do |table|
+          allow(Puppet::Provider).to receive(:execute).with("iptables-save -t #{table}", any_args).and_return(iptables)
+          allow(Puppet::Provider).to receive(:execute).with("ip6tables-save -t #{table}", any_args).and_return(ip6tables)
+        end
 
         expect(provider.get(context)).to eq(returned_data)
       end
