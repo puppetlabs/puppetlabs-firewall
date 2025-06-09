@@ -15,8 +15,8 @@ class Puppet::Provider::Firewallchain::Firewallchain
   }
   # Regex used to divide output of$list_command between tables
   $table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[^*]+)}
-  # Regex used to retrieve table name
-  $table_name_regex = %r{^\*(nat|mangle|filter|raw|rawpost|broute|security)}
+  # Array of all the supported iptables
+  $supported_tables = ['nat', 'mangle', 'filter', 'raw', 'rawpost', 'broute', 'security']
   # Regex used to retrieve Chains
   $chain_regex = %r{\n:(INPUT|FORWARD|OUTPUT|(?:\S+))(?:\s(ACCEPT|DROP|QEUE|RETURN|PREROUTING|POSTROUTING))?}
   # Base commands for the protocols, including table affixes
@@ -49,11 +49,10 @@ class Puppet::Provider::Firewallchain::Firewallchain
     chains = []
     # Scan String to retrieve all Chains and Policies
     ['IPv4', 'IPv6'].each do |protocol|
-      # Retrieve String containing all IPv4 information
-      iptables_list = Puppet::Provider.execute($list_command[protocol])
-      iptables_list.scan($table_regex).each do |table|
-        table_name = table[0].scan($table_name_regex)[0][0]
-        table[0].scan($chain_regex).each do |chain|
+      # Go through each supported table and retrieve its chains if it exists.
+      $supported_tables.each do |table_name|
+        cmd_output = Puppet::Provider.execute([$list_command[protocol], '-t', table_name].join(' '), failonfail: false)
+        cmd_output.scan($chain_regex).each do |chain|
           # Create the base hash
           chain_hash = {
             name: "#{chain[0]}:#{table_name}:#{protocol}",
