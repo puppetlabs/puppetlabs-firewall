@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.1.7](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.7) - 2025-06-10
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.6...v8.1.7)
+
+### Other
+
+- (MODULES-11476) Fix non-idempotency of firewall table creation [#1263](https://github.com/puppetlabs/puppetlabs-firewall/pull/1263) ([shubhamshinde360](https://github.com/shubhamshinde360))
+
 ## [v8.1.6](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.6) - 2025-05-07
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.5...v8.1.6)
