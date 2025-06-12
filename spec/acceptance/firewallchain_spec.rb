@@ -44,6 +44,24 @@ describe 'puppet resource firewallchain command' do
         end
       end
     end
+
+    context 'with build in chains' do
+      pp1 = <<-PUPPETCODE
+          firewallchain { 'INPUT:nat:IPv4':
+            ensure  => present,
+          }
+      PUPPETCODE
+      it 'applies cleanly' do
+        # Run it twice and test for idempotency
+        idempotent_apply(pp1)
+      end
+
+      it 'finds the chain' do
+        run_shell('iptables-save') do |r|
+          expect(r.stdout).to match(%r{INPUT})
+        end
+      end
+    end
   end
 
   describe 'IPv6' do
