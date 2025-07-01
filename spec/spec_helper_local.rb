@@ -44,12 +44,12 @@ shared_context 'when ArchLinux' do
   end
 end
 
-shared_context 'when Debian 10' do
-  let(:facts) { on_supported_os['debian-10-x86_64'] }
-end
-
 shared_context 'when Debian 11' do
   let(:facts) { on_supported_os['debian-11-x86_64'] }
+end
+
+shared_context 'when Debian 12' do
+  let(:facts) { on_supported_os['debian-12-x86_64'] }
 end
 
 shared_context 'when Debian Unstable' do
