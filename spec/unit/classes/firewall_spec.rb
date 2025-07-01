@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe 'firewall', type: :class do
   context 'with kernel => Linux' do
-    include_examples 'when Debian 10'
+    include_examples 'when Debian 12'
 
     it { is_expected.to contain_class('firewall::linux').with_ensure('running') }
   end
@@ -30,7 +30,7 @@ describe 'firewall', type: :class do
   context 'with ensure => stopped' do
     let(:params) { { ensure: 'stopped' } }
 
-    include_examples 'when Debian 10'
+    include_examples 'when Debian 12'
 
     it { is_expected.to contain_class('firewall::linux').with_ensure('stopped') }
   end
