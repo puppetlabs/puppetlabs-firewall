@@ -326,8 +326,8 @@ COMMIT
         },
       ].each do |test|
         before(:each) do
-          allow(Puppet::Util::Execution).to receive(:execute).with('iptables-save').and_return(iptables)
-          allow(Puppet::Util::Execution).to receive(:execute).with('ip6tables-save').and_return(ip6tables)
+          allow(Puppet::Util::Execution).to receive(:execute).with('iptables-save', { combine: false, failonfail: true }).and_return(iptables)
+          allow(Puppet::Util::Execution).to receive(:execute).with('ip6tables-save', { combine: false, failonfail: true }).and_return(ip6tables)
         end
 
         it "purge chain: '#{test[:should]}'" do

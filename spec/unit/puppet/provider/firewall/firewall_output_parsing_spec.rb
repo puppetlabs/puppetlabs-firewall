@@ -344,8 +344,8 @@ COMMIT
       end
 
       it 'processes the resource' do
-        allow(Puppet::Util::Execution).to receive(:execute).with('iptables-save').and_return(iptables)
-        allow(Puppet::Util::Execution).to receive(:execute).with('ip6tables-save').and_return(ip6tables)
+        allow(Puppet::Util::Execution).to receive(:execute).with('iptables-save', { combine: false, failonfail: true }).and_return(iptables)
+        allow(Puppet::Util::Execution).to receive(:execute).with('ip6tables-save', { combine: false, failonfail: true }).and_return(ip6tables)
 
         expect(provider.get(context)).to eq(returned_data)
       end
