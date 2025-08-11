@@ -472,7 +472,7 @@ class Puppet::Provider::Firewall::Firewall
     # For each protocol
     protocols.each do |protocol|
       # Retrieve String containing all information
-      iptables_list = Puppet::Provider.execute($list_command[protocol])
+      iptables_list = Puppet::Provider.execute($list_command[protocol], combine: false, failonfail: true)
       # Scan String to retrieve all Rules
       iptables_list.scan($table_regex).each do |table|
         table_name = table[0].scan($table_name_regex)[0][0]
