@@ -62,7 +62,7 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
         },
       ].each do |test|
         it "updates the resource: '#{test[:should][:name]}'" do
-          expect(context).to receive(:notice).with(%r{\Updating Rule '#{test[:should][:name]}'})
+          expect(context).to receive(:notice).with(%r{Updating Rule '#{test[:should][:name]}'})
           allow(described_class).to receive(:insert_order)
             .with(context, test[:should][:name], test[:should][:chain], test[:should][:table], test[:should][:protocol]).and_return(1)
           allow(described_class).to receive(:hash_to_rule)
