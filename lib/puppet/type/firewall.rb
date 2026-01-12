@@ -133,7 +133,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     name: {
-      type: 'Pattern[/(^\d+(?:[ \t-]\S+)+$)/]',
+      type: 'Pattern[/(^\d+(?:[ \t-_]\S+)+$)/]',
       behaviour: :namevar,
       desc: <<-DESC
       The canonical name of the rule. This name is also used for ordering

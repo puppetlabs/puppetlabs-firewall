@@ -1699,7 +1699,7 @@ The following parameters are available in the `firewall` type.
 
 namevar
 
-Data type: `Pattern[/(^\d+(?:[ \t-]\S+)+$)/]`
+Data type: `Pattern[/(^\d+(?:[ \t-_]\S+)+$)/]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
       The canonical name of the rule. This name is also used for ordering
