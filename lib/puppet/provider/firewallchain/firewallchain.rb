@@ -47,6 +47,40 @@ class Puppet::Provider::Firewallchain::Firewallchain
   def get(_context)
     # Create empty return array
     chains = []
+    # Built-in chains are not always visible in iptables-save, but they are still there.
+    # Add them to the chains if they aren't found by iptables-save.
+    built_in_chains = []
+    [
+      # filter table
+      "FORWARD:filter",
+      "INPUT:filter",
+      "OUTPUT:filter",
+      # mangle table
+      "FORWARD:mangle",
+      "INPUT:mangle",
+      "OUTPUT:mangle",
+      "POSTROUTING:mangle",
+      "PREROUTING:mangle",
+      # nat table
+      "INPUT:nat",
+      "OUTPUT:nat",
+      "POSTROUTING:nat",
+      "PREROUTING:nat",
+      # raw table
+      "OUTPUT:raw",
+      "PREROUTING:raw"
+    ].each do | chain_table |
+      ['IPv4', 'IPv6'].each do |protocol|
+          name = "#{chain_table}:#{protocol}"
+          chain_hash = {
+            name: name,
+            purge: false,
+            ignore_foreign: false,
+            ensure: 'present'
+          }
+          built_in_chains << chain_hash
+      end
+    end
     # Scan String to retrieve all Chains and Policies
     ['IPv4', 'IPv6'].each do |protocol|
       # Go through each supported table and retrieve its chains if it exists.
@@ -66,7 +100,13 @@ class Puppet::Provider::Firewallchain::Firewallchain
         end
       end
     end
-    # Return array
+    # Add built_in_chains to chains only if they haven't already been found
+    built_in_chains.each do |built_in_chain|
+      unless chains.any? { |chain| chain[:name] == built_in_chain[:name] }
+        chains << built_in_chain
+      end
+    end
+
     chains
   end
 
