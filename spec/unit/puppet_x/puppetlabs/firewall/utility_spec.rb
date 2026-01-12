@@ -143,6 +143,7 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
       it { expect(utility.icmp_name_to_number('timestamp-reply', proto)).to eql '14' }
       it { expect(utility.icmp_name_to_number('address-mask-request', proto)).to eql '17' }
       it { expect(utility.icmp_name_to_number('address-mask-reply', proto)).to eql '18' }
+      it { expect(utility.icmp_name_to_number('3/4', proto)).to eql '3/4' }
     end
 
     context 'with proto IPv6' do

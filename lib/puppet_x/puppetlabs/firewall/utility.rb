@@ -141,7 +141,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
 
     # Translate the symbolic names for icmp packet types to integers
     def self.icmp_name_to_number(value_icmp, protocol)
-      if value_icmp.to_s.match?(%r{^\d+$})
+      if value_icmp.to_s.match?(%r{^(\d+|\d+\/\d+)$})
         value_icmp.to_s
       elsif ['IPv4', 'iptables'].include?(protocol)
         # https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml
