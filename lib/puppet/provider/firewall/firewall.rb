@@ -200,7 +200,7 @@ class Puppet::Provider::Firewall::Firewall
   #             => multiport: (For some reason, the multiport arguments can't be)
   #                specified within the same "-m multiport", but works in seperate
   #                ones.
-  #             => addrtype: Each instance of src_type/dst_type requires it's own preface
+  #             => addrtype: Each instance of src_type/dst_type requires its own preface
   #
   @module_to_argument_mapping = {
     physdev: [:physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out],
@@ -339,7 +339,7 @@ class Puppet::Provider::Firewall::Firewall
 
       is == should
     when :source, :destination
-      # Ensure source/destination has it's valid mask before you compare it
+      # Ensure source/destination has its valid mask before you compare it
       is_hash[property_name] == PuppetX::Firewall::Utility.host_to_mask(should_hash[property_name], should_hash[:protocol])
     when :tcp_option, :ctproto, :hop_limit
       # Ensure that the values are compared as strings
@@ -725,7 +725,7 @@ class Puppet::Provider::Firewall::Firewall
     # Certain OS can return the proto as it;s equivalent number and we make sure to convert it in that case
     rule_hash[:proto] = PuppetX::Firewall::Utility.proto_number_to_name(rule_hash[:proto])
 
-    # If a dscp numer is found, also return it as it's valid class name
+    # If a dscp numer is found, also return it as its valid class name
     rule_hash[:set_dscp_class] = PuppetX::Firewall::Utility.dscp_number_to_class(rule_hash[:set_dscp]) if rule_hash[:set_dscp]
 
     rule_hash
@@ -975,7 +975,7 @@ class Puppet::Provider::Firewall::Firewall
           arguments += " #{[$resource_map[key][1], rule[key]].join(' ')}"
         end
       when :src_type, :dst_type, :ipset, :match_mark, :mss, :connmark
-        # Code for if value requires it's own flag each time it is applied
+        # Code for if value requires its own flag each time it is applied
         split_command = $resource_map[key].split(%r{ })
         negated_command = [split_command[0], split_command[1], '!', split_command[2]].join(' ')
 
@@ -1057,7 +1057,7 @@ class Puppet::Provider::Firewall::Firewall
       # If the rule already exists, use it as the offset
       offset_rule = name
     else
-      # If it doesn't add it to the list and find it's ordered location
+      # If it doesn't add it to the list and find its ordered location
       rules << name
       new_rule_location = rules.sort.uniq.index(name)
       offset_rule = if new_rule_location.zero?
