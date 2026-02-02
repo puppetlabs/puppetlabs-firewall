@@ -70,6 +70,13 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
 
         utility.persist_iptables(context, 'test', proto)
       end
+
+      it 'and OS family is Suse' do
+        allow(Facter.fact('os')).to receive(:value).and_return({ 'family' => 'Suse' })
+        expect(Puppet::Provider).to receive(:execute).with(['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables'])
+
+        utility.persist_iptables(context, 'test', proto)
+      end
     end
   end
 

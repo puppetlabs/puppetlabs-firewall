@@ -12,7 +12,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
     end
   end
 
-  describe 'standard attributes', unless: os[:family] == 'sles' do
+  describe 'standard attributes' do
     describe 'dst_range' do
       context 'when 2001::db8::1-2001:db8::ff' do
         pp = <<-PUPPETCODE
@@ -381,7 +381,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
     end
   end
 
-  describe 'ishasmorefrags/islastfrag/isfirstfrag', unless: os[:family] == 'sles' do
+  describe 'ishasmorefrags/islastfrag/isfirstfrag' do
     shared_examples 'is idempotent' do |values, line_match|
       pp2 = <<-PUPPETCODE
             class { '::firewall': }

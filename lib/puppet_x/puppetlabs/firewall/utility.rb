@@ -43,6 +43,8 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
               case protocol
               when 'IPv4', 'iptables'
                 ['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/sysconfig/iptables']
+              when 'IPv6', 'ip6tables'
+                ['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables']
               end
             else
               # Catch unsupported OSs
