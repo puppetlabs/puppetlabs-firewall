@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.3.0) - 2026-02-09
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.2.0...v8.3.0)
+
+### Changed
+
+- (CAT-2345) Prepare module for Puppetcore / Drop Support for Puppet 7 [#1265](https://github.com/puppetlabs/puppetlabs-firewall/pull/1265) ([david22swan](https://github.com/david22swan))
+
+### Added
+
+- MODULES-11593: Add IPv6 rule saving command for Suse in utility and update specs [#1272](https://github.com/puppetlabs/puppetlabs-firewall/pull/1272) ([span786](https://github.com/span786))
+
 ## [v8.2.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.2.0) - 2025-08-11
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.7...v8.2.0)
