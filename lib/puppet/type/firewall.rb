@@ -1461,7 +1461,7 @@ Puppet::ResourceApi.register_type(
     hashlimit_dstmask: {
       type: 'Optional[Integer[0,32]]',
       desc: <<-DESC
-      When --hashlimit-mode srcip is used, all destination addresses encountered will be grouped according to the given prefix length
+      When --hashlimit-mode dstip is used, all destination addresses encountered will be grouped according to the given prefix length
       and the so-created subnet will be subject to hashlimit.
       Prefix must be between (inclusive) 0 and 32.
       Note that --hashlimit-dstmask 0 is basically doing the same thing as not specifying srcip for --hashlimit-mode, but is technically more expensive.
