@@ -89,12 +89,22 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
   end
 
   describe '#host_to_ip' do
+    let(:dns) { instance_double(Resolv::DNS) }
+
     it {
-      allow(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::A)
+        .and_yield(Resolv::DNS::Resource::IN::A.new('96.126.112.51'))
       expect(utility.host_to_ip('puppetlabs.com', 'IPv4')).to eql '96.126.112.51/32'
+    }
+    it {
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::AAAA)
+        .and_yield(Resolv::DNS::Resource::IN::AAAA.new('2001:DB8:4650::13:8A'))
       expect(utility.host_to_ip('puppetlabs.com', 'IPv6')).to eql '2001:db8:4650::13:8a/128'
     }
-
     it { expect(utility.host_to_ip('96.126.112.51')).to eql '96.126.112.51/32' }
     it { expect(utility.host_to_ip('96.126.112.51/32')).to eql '96.126.112.51/32' }
     it { expect(utility.host_to_ip('2001:db8:85a3:0:0:8a2e:370:7334')).to eql '2001:db8:85a3::8a2e:370:7334/128' }
@@ -104,12 +114,22 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
   end
 
   describe '#host_to_mask' do
+    let(:dns) { instance_double(Resolv::DNS) }
+
     it {
-      allow(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::A)
+        .and_yield(Resolv::DNS::Resource::IN::A.new('96.126.112.51'))
       expect(utility.host_to_mask('puppetlabs.com', 'IPv4')).to eql '96.126.112.51/32'
+    }
+    it {
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::AAAA)
+        .and_yield(Resolv::DNS::Resource::IN::AAAA.new('2001:DB8:4650::13:8A'))
       expect(utility.host_to_mask('! puppetlabs.com', 'IPv6')).to eql '! 2001:db8:4650::13:8a/128'
     }
-
     it { expect(utility.host_to_mask('96.126.112.51', 'IPv4')).to eql '96.126.112.51/32' }
     it { expect(utility.host_to_mask('!96.126.112.51', 'IPv4')).to eql '! 96.126.112.51/32' }
     it { expect(utility.host_to_mask('96.126.112.51/32', 'IPv4')).to eql '96.126.112.51/32' }
