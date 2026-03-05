@@ -5,6 +5,108 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.3.0) - 2026-02-09
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.2.0...v8.3.0)
+
+### Changed
+
+- (CAT-2345) Prepare module for Puppetcore / Drop Support for Puppet 7 [#1265](https://github.com/puppetlabs/puppetlabs-firewall/pull/1265) ([david22swan](https://github.com/david22swan))
+
+### Added
+
+- MODULES-11593: Add IPv6 rule saving command for Suse in utility and update specs [#1272](https://github.com/puppetlabs/puppetlabs-firewall/pull/1272) ([span786](https://github.com/span786))
+
+## [v8.2.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.2.0) - 2025-08-11
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.7...v8.2.0)
+
+### Added
+
+- (MODULES-11580) Do not combine stderr and stdout when scanning rules [#1267](https://github.com/puppetlabs/puppetlabs-firewall/pull/1267) ([shubhamshinde360](https://github.com/shubhamshinde360))
+
+## [v8.1.7](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.7) - 2025-06-10
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.6...v8.1.7)
+
+### Other
+
+- (MODULES-11476) Fix non-idempotency of firewall table creation [#1263](https://github.com/puppetlabs/puppetlabs-firewall/pull/1263) ([shubhamshinde360](https://github.com/shubhamshinde360))
+
+## [v8.1.6](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.6) - 2025-05-07
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.5...v8.1.6)
+
+### Fixed
+
+- Port ranges as string with hyphen as range indicator should work [#1212](https://github.com/puppetlabs/puppetlabs-firewall/pull/1212) ([2fa](https://github.com/2fa))
+
+### Other
+
+- (CAT-2296) Update github runner image to ubuntu-24.04 [#1259](https://github.com/puppetlabs/puppetlabs-firewall/pull/1259) ([shubhamshinde360](https://github.com/shubhamshinde360))
+
+## [v8.1.5](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.5) - 2025-04-15
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.4...v8.1.5)
+
+### Fixed
+
+- Query gid to prevent errors with missing users with the same id (fixes #1229) [#1251](https://github.com/puppetlabs/puppetlabs-firewall/pull/1251) ([cmusik](https://github.com/cmusik))
+
+## [v8.1.4](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.4) - 2025-02-26
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.3...v8.1.4)
+
+### Fixed
+
+- (CAT-2215) Update legacy facts [#1253](https://github.com/puppetlabs/puppetlabs-firewall/pull/1253) ([amitkarsale](https://github.com/amitkarsale))
+
+## [v8.1.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.3) - 2024-12-05
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.2...v8.1.3)
+
+### Fixed
+
+- Prevent sources with zero prefix length being applied every agent run [#1189](https://github.com/puppetlabs/puppetlabs-firewall/pull/1189) ([nabertrand](https://github.com/nabertrand))
+
+## [v8.1.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.2) - 2024-11-25
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.1...v8.1.2)
+
+### Fixed
+
+- (MODULE-11463): Fix rule parsing when iptables chains with '-A' in the name [#1210](https://github.com/puppetlabs/puppetlabs-firewall/pull/1210) ([2fa](https://github.com/2fa))
+- Allow a singular numeric port for the `--to-ports` parameter [#1199](https://github.com/puppetlabs/puppetlabs-firewall/pull/1199) ([gcoxmoz](https://github.com/gcoxmoz))
+- Add `tcp-reset` as an allowed option for `--reject-with` [#1194](https://github.com/puppetlabs/puppetlabs-firewall/pull/1194) ([gcoxmoz](https://github.com/gcoxmoz))
+
+## [v8.1.1](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.1) - 2024-10-28
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.1.0...v8.1.1)
+
+### Added
+
+- (CAT-2101) Add support for Debian-12 [#1236](https://github.com/puppetlabs/puppetlabs-firewall/pull/1236) ([skyamgarp](https://github.com/skyamgarp))
+
+### Fixed
+
+- (CAT-2088): Allow colon(:) in IP table syntax [#1240](https://github.com/puppetlabs/puppetlabs-firewall/pull/1240) ([span786](https://github.com/span786))
+
+## [v8.1.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.1.0) - 2024-09-23
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.3...v8.1.0)
+
+### Added
+
+- Support ip[6]tables protocol in firewallchain [#1191](https://github.com/puppetlabs/puppetlabs-firewall/pull/1191) ([jcharaoui](https://github.com/jcharaoui))
+
+## [v8.0.3](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.3) - 2024-07-19
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.2...v8.0.3)
+
+### Fixed
+
+- Fix resource generation ipcidr dependency [#1204](https://github.com/puppetlabs/puppetlabs-firewall/pull/1204) ([2fa](https://github.com/2fa))
+
 ## [v8.0.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.0.2) - 2024-05-22
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.0.1...v8.0.2)
@@ -405,7 +507,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 - (DOC-3056) Remove mention of rules ordering [#809](https://github.com/puppetlabs/puppetlabs-firewall/pull/809) ([clairecadman](https://github.com/clairecadman))
 - (FM-7712) - Remove Gentoo 1.0 testing/support for Firewall module [#808](https://github.com/puppetlabs/puppetlabs-firewall/pull/808) ([david22swan](https://github.com/david22swan))
-- (MODULES-8360) Fix IPv6 bug relating to Bugzilla 1015 [#804](https://github.com/puppetlabs/puppetlabs-firewall/pull/804) ([alexharv074](https://github.com/alexharv074))
+- (MODULES-8360) Fix IPv6 bug relating to Bugzilla 1015 [#804](https://github.com/puppetlabs/puppetlabs-firewall/pull/804) ([alex-harvey-z3q](https://github.com/alex-harvey-z3q))
 
 ## [1.15.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.15.0) - 2019-01-18
 
@@ -451,7 +553,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 ### Fixed
 
 - (MODULES-7627) - Update README Limitations section [#769](https://github.com/puppetlabs/puppetlabs-firewall/pull/769) ([eimlav](https://github.com/eimlav))
-- Corrections to readme [#766](https://github.com/puppetlabs/puppetlabs-firewall/pull/766) ([alexharv074](https://github.com/alexharv074))
+- Corrections to readme [#766](https://github.com/puppetlabs/puppetlabs-firewall/pull/766) ([alex-harvey-z3q](https://github.com/alex-harvey-z3q))
 - (MODULES-6129) negated option with address mask bugfix [#756](https://github.com/puppetlabs/puppetlabs-firewall/pull/756) ([mirekys](https://github.com/mirekys))
 - (MODULES-2119) iptables delete -p all exception [#749](https://github.com/puppetlabs/puppetlabs-firewall/pull/749) ([mikkergimenez](https://github.com/mikkergimenez))
 

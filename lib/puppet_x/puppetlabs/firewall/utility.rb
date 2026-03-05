@@ -3,7 +3,7 @@
 require 'puppet_x'
 require 'socket'
 require 'resolv'
-require 'puppet_x/puppetlabs/firewall/ipcidr'
+require_relative 'ipcidr'
 
 module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
   # A utility class meant to contain re-usable code
@@ -43,6 +43,8 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
               case protocol
               when 'IPv4', 'iptables'
                 ['/bin/sh', '-c', '/usr/sbin/iptables-save > /etc/sysconfig/iptables']
+              when 'IPv6', 'ip6tables'
+                ['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables']
               end
             else
               # Catch unsupported OSs
@@ -93,27 +95,29 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
       begin
         value = PuppetX::Firewall::IPCidr.new(value)
       rescue StandardError
-        family = case proto
-                 when 'IPv4', 'iptables'
-                   Socket::AF_INET
-                 when 'IPv6', 'ip6tables'
-                   Socket::AF_INET6
-                 when nil
-                   raise ArgumentError, 'Proto must be specified for a hostname'
-                 else
-                   raise ArgumentError, "Unsupported address family: #{proto}"
-                 end
+        case proto
+        when 'IPv4', 'iptables'
+          family = Socket::AF_INET
+          rr = Resolv::DNS::Resource::IN::A
+        when 'IPv6', 'ip6tables'
+          family = Socket::AF_INET6
+          rr = Resolv::DNS::Resource::IN::AAAA
+        when nil
+          raise ArgumentError, 'Proto must be specified for a hostname'
+        else
+          raise ArgumentError, "Unsupported address family: #{proto}"
+        end
 
         new_value = nil
-        Resolv.each_address(value) do |addr|
+        Resolv::DNS.new.each_resource(value, rr) do |addr|
           begin # rubocop:disable Style/RedundantBegin
-            new_value = PuppetX::Firewall::IPCidr.new(addr, family)
+            new_value = PuppetX::Firewall::IPCidr.new(addr.address.to_s, family)
             break
           rescue StandardError # looking for the one that works # rubocop:disable Lint/SuppressedException
           end
         end
 
-        raise "Failed to resolve hostname #{value}" if new_value.nil?
+        raise "Failed to resolve hostname #{proto} #{value}" if new_value.nil?
 
         value = new_value
       end
@@ -216,25 +220,16 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
 
     # Accepts a valid mark or mark/mask and returns them in the valid
     # hexidecimal format.
-    # USed for set_mark
+    # Used for set_mark, match_mark, connmark
     def self.mark_mask_to_hex(value)
-      match = value.to_s.match(%r{([a-fA-F0-9x]+)/?([a-fA-F0-9x]+)?})
-      mark = PuppetX::Firewall::Utility.to_hex32(match[1])
-      return "#{mark}/0xffffffff" if match[2].nil?
+      match = value.to_s.match(%r{^(!\s)?([a-fA-F0-9x]+)\/?([a-fA-F0-9x]+)?})
+      negation = '! '
+      negation = '' if match[1].nil?
+      mark = PuppetX::Firewall::Utility.to_hex32(match[2])
+      return "#{negation}#{mark}/0xffffffff" if match[3].nil?
 
-      mask = PuppetX::Firewall::Utility.to_hex32(match[2])
-      "#{mark}/#{mask}"
-    end
-
-    # Accepts a valid mark and returns them in the valid hexidecimal format.
-    # Accounts for negation.
-    # Used for match_mark / connmark
-    def self.mark_to_hex(value)
-      match = value.to_s.match(%r{^(!\s)?([a-fA-F0-9x]+)})
-      mask = PuppetX::Firewall::Utility.to_hex32(match[2])
-      return mask if match[1].nil?
-
-      "! #{mask}"
+      mask = PuppetX::Firewall::Utility.to_hex32(match[3])
+      "#{negation}#{mark}/#{mask}"
     end
 
     # Converts a given number to its protocol keyword

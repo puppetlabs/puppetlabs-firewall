@@ -19,7 +19,7 @@ class Puppet::Provider::Firewall::Firewall
   # Regex used to retrieve table name
   $fw_table_name_regex = %r{^\*(nat|mangle|filter|raw|rawpost|broute|security)}
   # Regex used to retrieve Rules
-  $fw_rules_regex = %r{(-A.*)\n}
+  $fw_rules_regex = %r{^(-A.*)\n}
   # Base command
   $fw_base_command = {
     'IPv4' => 'iptables -t',
@@ -200,7 +200,7 @@ class Puppet::Provider::Firewall::Firewall
   #             => multiport: (For some reason, the multiport arguments can't be)
   #                specified within the same "-m multiport", but works in seperate
   #                ones.
-  #             => addrtype: Each instance of src_type/dst_type requires it's own preface
+  #             => addrtype: Each instance of src_type/dst_type requires its own preface
   #
   @module_to_argument_mapping = {
     physdev: [:physdev_in, :physdev_out, :physdev_is_bridged, :physdev_is_in, :physdev_is_out],
@@ -325,8 +325,8 @@ class Puppet::Provider::Firewall::Firewall
   def insync?(context, _name, property_name, is_hash, should_hash)
     context.debug("Checking whether '#{property_name}' is out of sync")
 
-    # If either value is nil, no custom logic is required
-    return nil if is_hash[property_name].nil? || should_hash[property_name].nil?
+    # If either value is nil, no custom logic is required unless property is source or destination
+    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination].include?(property_name)
 
     case property_name
     when :protocol
@@ -339,7 +339,7 @@ class Puppet::Provider::Firewall::Firewall
 
       is == should
     when :source, :destination
-      # Ensure source/destination has it's valid mask before you compare it
+      # Ensure source/destination has its valid mask before you compare it
       is_hash[property_name] == PuppetX::Firewall::Utility.host_to_mask(should_hash[property_name], should_hash[:protocol])
     when :tcp_option, :ctproto, :hop_limit
       # Ensure that the values are compared as strings
@@ -376,9 +376,16 @@ class Puppet::Provider::Firewall::Firewall
       end
 
       # If 'is' or 'should' contain anything other than digits or digit range,
-      # we assume that we have to do a lookup to convert to UID
-      is = Etc.getpwnam(is).uid unless is[%r{[0-9]+(-[0-9]+)?}] == is
-      should = Etc.getpwnam(should).uid unless should[%r{[0-9]+(-[0-9]+)?}] == should
+      # we assume that we have to do a lookup to convert to UID or GID
+      if property_name == :uid
+        is = Etc.getpwnam(is).uid unless is[%r{[0-9]+(-[0-9]+)?}] == is
+        should = Etc.getpwnam(should).uid unless should[%r{[0-9]+(-[0-9]+)?}] == should
+      end
+
+      if property_name == :gid
+        is = Etc.getgrnam(is).gid unless is[%r{[0-9]+(-[0-9]+)?}] == is
+        should = Etc.getgrnam(should).gid unless should[%r{[0-9]+(-[0-9]+)?}] == should
+      end
 
       "#{is_negate}#{is}" == "#{should_negate}#{should}"
     when :mac_source, :jump
@@ -394,15 +401,10 @@ class Puppet::Provider::Firewall::Firewall
       is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name])
       should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name])
       is == should
-    when :set_mark
+    when :set_mark, :match_mark, :connmark
       # Ensure that the values are compared to eachother in hexidecimal format
       is = PuppetX::Firewall::Utility.mark_mask_to_hex(is_hash[property_name])
       should = PuppetX::Firewall::Utility.mark_mask_to_hex(should_hash[property_name])
-      is == should
-    when :match_mark, :connmark
-      # Ensure that the values are compared to eachother in hexidecimal format
-      is = PuppetX::Firewall::Utility.mark_to_hex(is_hash[property_name])
-      should = PuppetX::Firewall::Utility.mark_to_hex(should_hash[property_name])
       is == should
     when :time_start, :time_stop
       # Ensure the values are compared in full `00:00:00` format
@@ -416,28 +418,32 @@ class Puppet::Provider::Firewall::Firewall
     when :dport, :sport, :state, :ctstate, :ctstatus
       is = is_hash[property_name]
       should = should_hash[property_name]
+      ports = [:dport, :sport]
 
-      # Unique logic is only needed when both values are arrays
-      return nil unless is.is_a?(Array) && should.is_a?(Array)
+      if is.is_a?(Array) && should.is_a?(Array)
+        # Ensure values are sorted
+        # Ensure any negation includes only the first value
+        is_negated = true if %r{^!\s}.match?(is[0].to_s)
+        is.each_with_index do |_value, _index|
+          is = is.map { |value| value.to_s.tr('! ', '') }.sort
+        end
+        is[0] = ['!', is[0]].join(' ') if is_negated
 
-      # Ensure values are sorted
-      # Ensure any negation includes only the first value
-      is_negated = true if %r{^!\s}.match?(is[0].to_s)
-      is.each_with_index do |_value, _index|
-        is = is.map { |value| value.to_s.tr('! ', '') }.sort
-      end
-      is[0] = ['!', is[0]].join(' ') if is_negated
+        should_negated = true if %r{^!\s}.match?(should[0].to_s)
+        should.each_with_index do |_value, _index|
+          should = should.map { |value| value.to_s.tr('! ', '') }.sort
+          # Port range can be passed as `-` but will always be set/returned as `:`
+          should = should.map { |value| value.to_s.tr('-', ':') }.sort if ports.include?(property_name)
+        end
+        should[0] = ['!', should[0]].join(' ') if should_negated
 
-      should_negated = true if %r{^!\s}.match?(should[0].to_s)
-      should.each_with_index do |_value, _index|
-        should = should.map { |value| value.to_s.tr('! ', '') }.sort
+        is == should
+      elsif is.is_a?(String) && should.is_a?(String)
         # Port range can be passed as `-` but will always be set/returned as `:`
-        ports = [:dport, :sport]
-        should = should.map { |value| value.to_s.tr('-', ':') }.sort if ports.include?(property_name)
-      end
-      should[0] = ['!', should[0]].join(' ') if should_negated
+        should = should.tr('-', ':') if ports.include?(property_name)
 
-      is == should
+        is == should
+      end
     when :string_hex
       # Compare the values with any whitespace removed
       is = is_hash[property_name].to_s.gsub(%r{\s+}, '')
@@ -466,11 +472,14 @@ class Puppet::Provider::Firewall::Firewall
     # For each protocol
     protocols.each do |protocol|
       # Retrieve String containing all information
-      iptables_list = Puppet::Provider.execute($fw_list_command[protocol])
+      iptables_list = Puppet::Provider.execute($fw_list_command[protocol], combine: false, failonfail: true)
       # Scan String to retrieve all Rules
       iptables_list.scan($fw_table_regex).each do |table|
         table_name = table[0].scan($fw_table_name_regex)[0][0]
         table[0].scan($fw_rules_regex).each do |rule|
+          # iptables-save escapes ' symbol in it's output for some reason which leads to an incorrect command
+          # We need to manually replace \' to '
+          rule[0].gsub!("\\'", "'")
           raw_rules = if basic
                         Puppet::Provider::Firewall::Firewall.rule_to_name(context, rule[0], table_name, protocol)
                       else
@@ -494,7 +503,7 @@ class Puppet::Provider::Firewall::Firewall
     rule_hash[:table] = table_name
     rule_hash[:protocol] = protocol
 
-    name_regex = Regexp.new("#{$fw_resource_map[:name]}\\s(?:\"([^\"]*)|([^\"\\s]*))")
+    name_regex = Regexp.new("#{$fw_resource_map[:name]}\\s+(?:\"(.+?(?<!\\\\))\"|([^\"\\s]+)\\b)(?:\\s|$)")
     name_value = rule.scan(name_regex)[0]
     # Combine the returned values and remove and trailing or leading whitespace
     rule_hash[:name] = [name_value[0], name_value[1]].join(' ').strip if name_value
@@ -532,7 +541,7 @@ class Puppet::Provider::Firewall::Firewall
         # When only a single word comment is returned no quotes are given, so we must check for this as well
         # First find if flag is present, add a space to ensure accuracy with the more simplistic flags; i.e. `-i`
         if rule.match(Regexp.new("#{value}\\s"))
-          value_regex = Regexp.new("(?:(!\\s))?#{value}\\s(?:\"([^\"]*)|([^\"\\s]*))")
+          value_regex = Regexp.new("(?:(!\\s))?#{value}\\s+(?:\"(.+?(?<!\\\\))\"|([^\"\\s]+)\\b)(?:\\s|$)")
           key_value = rule.scan(value_regex)[0]
           # Combine the returned values and remove and trailing or leading whitespace
           key_value[1] = [key_value[0], key_value[1], key_value[2]].join
@@ -716,7 +725,7 @@ class Puppet::Provider::Firewall::Firewall
     # Certain OS can return the proto as it;s equivalent number and we make sure to convert it in that case
     rule_hash[:proto] = PuppetX::Firewall::Utility.proto_number_to_name(rule_hash[:proto])
 
-    # If a dscp numer is found, also return it as it's valid class name
+    # If a dscp numer is found, also return it as its valid class name
     rule_hash[:set_dscp_class] = PuppetX::Firewall::Utility.dscp_number_to_class(rule_hash[:set_dscp]) if rule_hash[:set_dscp]
 
     rule_hash
@@ -893,8 +902,8 @@ class Puppet::Provider::Firewall::Firewall
 
     # `set_mark`, `match_mark` and `connmark` must be applied in hexidecimal format
     should[:set_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:set_mark]) if should[:set_mark]
-    should[:match_mark] = PuppetX::Firewall::Utility.mark_to_hex(should[:match_mark]) if should[:match_mark]
-    should[:connmark] = PuppetX::Firewall::Utility.mark_to_hex(should[:connmark]) if should[:connmark]
+    should[:match_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:match_mark]) if should[:match_mark]
+    should[:connmark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:connmark]) if should[:connmark]
 
     # `time_start` and `time_stop` must be applied in full HH:MM:SS format
     time = [:time_start, :time_stop]
@@ -966,7 +975,7 @@ class Puppet::Provider::Firewall::Firewall
           arguments += " #{[$fw_resource_map[key][1], rule[key]].join(' ')}"
         end
       when :src_type, :dst_type, :ipset, :match_mark, :mss, :connmark
-        # Code for if value requires it's own flag each time it is applied
+        # Code for if value requires its own flag each time it is applied
         split_command = $fw_resource_map[key].split(%r{ })
         negated_command = [split_command[0], split_command[1], '!', split_command[2]].join(' ')
 
@@ -1048,7 +1057,7 @@ class Puppet::Provider::Firewall::Firewall
       # If the rule already exists, use it as the offset
       offset_rule = name
     else
-      # If it doesn't add it to the list and find it's ordered location
+      # If it doesn't add it to the list and find its ordered location
       rules << name
       new_rule_location = rules.sort.uniq.index(name)
       offset_rule = if new_rule_location.zero?

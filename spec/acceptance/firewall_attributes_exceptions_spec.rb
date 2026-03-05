@@ -68,6 +68,21 @@ describe 'firewall basics', docker: true do
         end
       end
     end
+
+    context 'when port range as a string' do
+      pp23 = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '562 - test port range':
+            proto  => tcp,
+            dport  => '561-570',
+            jump   => accept,
+          }
+      PUPPETCODE
+      it 'applies' do
+        idempotent_apply(pp23)
+        apply_manifest(pp23, catch_changes: true)
+      end
+    end
   end
 
   describe 'ensure' do
@@ -652,6 +667,21 @@ describe 'firewall basics', docker: true do
         end
       end
     end
+
+    context 'when port range as a string' do
+      pp20 = <<-PUPPETCODE
+          class { '::firewall': }
+          firewall { '561 - test port range':
+            proto  => tcp,
+            sport  => '561-570',
+            jump   => accept,
+          }
+      PUPPETCODE
+      it 'applies' do
+        idempotent_apply(pp20)
+        apply_manifest(pp20, catch_changes: true)
+      end
+    end
   end
 
   describe 'source' do
@@ -1163,6 +1193,11 @@ describe 'firewall basics', docker: true do
               match_mark => '0x1',
               jump       => reject,
             }
+            firewall { '504 match_mark - test with mask':
+              proto      => 'all',
+              match_mark => '0x1/0x2000',
+              jump       => reject,
+            }
       PUPPETCODE
       it 'applies' do
         apply_manifest(pp1, catch_failures: true)
@@ -1171,6 +1206,7 @@ describe 'firewall basics', docker: true do
       it 'contains the rule' do
         run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1 -m comment --comment "503 match_mark - test" -j REJECT --reject-with icmp-port-unreachable})
+          expect(r.stdout).to match(%r{-A INPUT -m mark --mark 0x1/0x2000 -m comment --comment "504 match_mark - test with mask" -j REJECT --reject-with icmp-port-unreachable})
         end
       end
     end

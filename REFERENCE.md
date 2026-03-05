@@ -364,10 +364,10 @@ Data type: `Optional[Integer]`
 
 ##### `connmark`
 
-Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]`
+Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
 
@@ -879,7 +879,7 @@ Data type: `Optional[Enum['none', 'ipsec']]`
 
 ##### `ipset`
 
-Data type: `Optional[Variant[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/]]]]`
+Data type: `Optional[Variant[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/]]]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
       Matches against the specified ipset list.
@@ -1039,10 +1039,10 @@ _*this data type contains a regex that may not be accurately reflected in genera
 
 ##### `match_mark`
 
-Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]`
+Data type: `Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
 
@@ -1267,13 +1267,15 @@ Data type: `Optional[Enum['set', 'update', 'rcheck', 'remove', '! set', '! updat
 
 Data type: `Optional[Enum['icmp-net-unreachable', 'icmp-host-unreachable', 'icmp-port-unreachable', 'icmp-proto-unreachable',
                               'icmp-net-prohibited', 'icmp-host-prohibited', 'icmp-admin-prohibited', 'icmp6-no-route', 'no-route',
-                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable']]`
+                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable',
+                              'tcp-reset']]`
 
       When combined with jump => "REJECT" you can specify a different icmp response to be sent back to the packet sender.
       Valid values differ depending on if the protocol is `IPv4` or `IPv6`.
       IPv4 allows: icmp-net-unreachable, icmp-host-unreachable, icmp-port-unreachable, icmp-proto-unreachable, icmp-net-prohibited,
-      icmp-host-prohibited, or icmp-admin-prohibited.
-      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach, or icmp6-port-unreachable.
+      icmp-host-prohibited, icmp-admin-prohibited, or tcp-reset.
+      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach,
+      icmp6-port-unreachable, or tcp-reset.
 
 ##### `rhitcount`
 
@@ -1633,7 +1635,7 @@ Data type: `Optional[String[1]]`
 
 ##### `toports`
 
-Data type: `Optional[Pattern[/^\d+(?:-\d+)?$/]]`
+Data type: `Optional[Variant[Integer[0, 65535], Pattern[/^\d+(?:-\d+)?$/]]]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
       For REDIRECT/MASQUERADE this is the port that will replace the destination/source port.

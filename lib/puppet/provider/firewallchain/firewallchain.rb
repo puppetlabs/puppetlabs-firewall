@@ -9,18 +9,22 @@ class Puppet::Provider::Firewallchain::Firewallchain
   # Command to list all chains and rules
   $fwc_list_command = {
     'IPv4' => 'iptables-save',
-    'IPv6' => 'ip6tables-save'
+    'iptables' => 'iptables-save',
+    'IPv6' => 'ip6tables-save',
+    'ip6tables' => 'ip6tables-save'
   }
   # Regex used to divide output of$fwc_list_command between tables
   $fwc_table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[^*]+)}
-  # Regex used to retrieve table name
-  $fwc_table_name_regex = %r{^\*(nat|mangle|filter|raw|rawpost|broute|security)}
+  # Array of all the supported iptables
+  $fwc_supported_tables = ['nat', 'mangle', 'filter', 'raw', 'rawpost', 'broute', 'security']
   # Regex used to retrieve Chains
   $fwc_chain_regex = %r{\n:(INPUT|FORWARD|OUTPUT|(?:\S+))(?:\s(ACCEPT|DROP|QEUE|RETURN|PREROUTING|POSTROUTING))?}
   # Base commands for the protocols, including table affixes
   $fwc_base_command = {
     'IPv4' => 'iptables -t',
-    'IPv6' => 'ip6tables -t'
+    'iptables' => 'iptables -t',
+    'IPv6' => 'ip6tables -t',
+    'ip6tables' => 'ip6tables -t',
   }
   # Command to create a chain
   $fwc_chain_create_command = '-N'
@@ -45,11 +49,10 @@ class Puppet::Provider::Firewallchain::Firewallchain
     chains = []
     # Scan String to retrieve all Chains and Policies
     ['IPv4', 'IPv6'].each do |protocol|
-      # Retrieve String containing all IPv4 information
-      iptables_list = Puppet::Provider.execute($fwc_list_command[protocol])
-      iptables_list.scan($fwc_table_regex).each do |table|
-        table_name = table[0].scan($fwc_table_name_regex)[0][0]
-        table[0].scan($fwc_chain_regex).each do |chain|
+      # Go through each supported table and retrieve its chains if it exists.
+      $fwc_supported_tables.each do |table_name|
+        cmd_output = Puppet::Provider.execute([$fwc_list_command[protocol], '-t', table_name].join(' '), failonfail: false)
+        cmd_output.scan($fwc_chain_regex).each do |chain|
           # Create the base hash
           chain_hash = {
             name: "#{chain[0]}:#{table_name}:#{protocol}",

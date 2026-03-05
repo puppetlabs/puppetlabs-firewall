@@ -157,7 +157,7 @@ Puppet::ResourceApi.register_type(
       type: "Enum['iptables', 'ip6tables', 'IPv4', 'IPv6']",
       default: 'IPv4',
       desc: <<-DESC
-      The protocol used to set the rule, it's allowed values have been expanded to bring it closer to its `firewallchain` counterpart.
+      The protocol used to set the rule, its allowed values have been expanded to bring it closer to its `firewallchain` counterpart.
       Defaults to `IPv4`
 
       Noted: this was previously defined as `provider`, however the resource_api does not allow this to be used as an attribute title.
@@ -301,7 +301,7 @@ Puppet::ResourceApi.register_type(
     ishasmorefrags: {
       type: 'Optional[Boolean]',
       desc: <<-DESC
-      Matches if the packet has it's 'more fragments' bit set.
+      Matches if the packet has its 'more fragments' bit set.
       Specific to IPv6.
       DESC
     },
@@ -948,7 +948,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     ipset: {
-      type: 'Optional[Variant[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?\w+\s(?:src|dst)(?:,src|,dst)?$/]]]]',
+      type: 'Optional[Variant[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?[\w\-:_]+\s(?:src|dst)(?:,src|,dst)?$/]]]]',
       desc: <<-DESC
       Matches against the specified ipset list.
       Requires ipset kernel module. Will accept a single element or an array.
@@ -1189,7 +1189,7 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     toports: {
-      type: 'Optional[Pattern[/^\d+(?:-\d+)?$/]]',
+      type: 'Optional[Variant[Integer[0, 65535], Pattern[/^\d+(?:-\d+)?$/]]]',
       desc: <<-DESC
       For REDIRECT/MASQUERADE this is the port that will replace the destination/source port.
       Can specify a single new port or an inclusive range of ports.
@@ -1261,13 +1261,15 @@ Puppet::ResourceApi.register_type(
     reject: {
       type: "Optional[Enum['icmp-net-unreachable', 'icmp-host-unreachable', 'icmp-port-unreachable', 'icmp-proto-unreachable',
                               'icmp-net-prohibited', 'icmp-host-prohibited', 'icmp-admin-prohibited', 'icmp6-no-route', 'no-route',
-                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable']]",
+                              'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable',
+                              'tcp-reset']]",
       desc: <<-DESC
       When combined with jump => "REJECT" you can specify a different icmp response to be sent back to the packet sender.
       Valid values differ depending on if the protocol is `IPv4` or `IPv6`.
       IPv4 allows: icmp-net-unreachable, icmp-host-unreachable, icmp-port-unreachable, icmp-proto-unreachable, icmp-net-prohibited,
-      icmp-host-prohibited, or icmp-admin-prohibited.
-      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach, or icmp6-port-unreachable.
+      icmp-host-prohibited, icmp-admin-prohibited, or tcp-reset.
+      IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach,
+      icmp6-port-unreachable, or tcp-reset.
       DESC
     },
     set_mark: {
@@ -1278,9 +1280,9 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     match_mark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]',
+      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
       DESC
@@ -1313,9 +1315,9 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     connmark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+$/]]',
+      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      Match the Netfilter mark value associated with the packet, accepts a mark.
+      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
       DESC
@@ -1459,7 +1461,7 @@ Puppet::ResourceApi.register_type(
     hashlimit_dstmask: {
       type: 'Optional[Integer[0,32]]',
       desc: <<-DESC
-      When --hashlimit-mode srcip is used, all destination addresses encountered will be grouped according to the given prefix length
+      When --hashlimit-mode dstip is used, all destination addresses encountered will be grouped according to the given prefix length
       and the so-created subnet will be subject to hashlimit.
       Prefix must be between (inclusive) 0 and 32.
       Note that --hashlimit-dstmask 0 is basically doing the same thing as not specifying srcip for --hashlimit-mode, but is technically more expensive.

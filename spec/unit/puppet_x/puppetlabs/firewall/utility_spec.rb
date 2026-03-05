@@ -70,6 +70,13 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
 
         utility.persist_iptables(context, 'test', proto)
       end
+
+      it 'and OS family is Suse' do
+        allow(Facter.fact('os')).to receive(:value).and_return({ 'family' => 'Suse' })
+        expect(Puppet::Provider).to receive(:execute).with(['/bin/sh', '-c', '/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables'])
+
+        utility.persist_iptables(context, 'test', proto)
+      end
     end
   end
 
@@ -82,12 +89,22 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
   end
 
   describe '#host_to_ip' do
+    let(:dns) { instance_double(Resolv::DNS) }
+
     it {
-      allow(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::A)
+        .and_yield(Resolv::DNS::Resource::IN::A.new('96.126.112.51'))
       expect(utility.host_to_ip('puppetlabs.com', 'IPv4')).to eql '96.126.112.51/32'
+    }
+    it {
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::AAAA)
+        .and_yield(Resolv::DNS::Resource::IN::AAAA.new('2001:DB8:4650::13:8A'))
       expect(utility.host_to_ip('puppetlabs.com', 'IPv6')).to eql '2001:db8:4650::13:8a/128'
     }
-
     it { expect(utility.host_to_ip('96.126.112.51')).to eql '96.126.112.51/32' }
     it { expect(utility.host_to_ip('96.126.112.51/32')).to eql '96.126.112.51/32' }
     it { expect(utility.host_to_ip('2001:db8:85a3:0:0:8a2e:370:7334')).to eql '2001:db8:85a3::8a2e:370:7334/128' }
@@ -97,12 +114,22 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
   end
 
   describe '#host_to_mask' do
+    let(:dns) { instance_double(Resolv::DNS) }
+
     it {
-      allow(Resolv).to receive(:each_address).at_least(:once).with('puppetlabs.com').and_yield('96.126.112.51').and_yield('2001:DB8:4650::13:8A')
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::A)
+        .and_yield(Resolv::DNS::Resource::IN::A.new('96.126.112.51'))
       expect(utility.host_to_mask('puppetlabs.com', 'IPv4')).to eql '96.126.112.51/32'
+    }
+    it {
+      allow(Resolv::DNS).to receive(:new).and_return(dns)
+      allow(dns).to receive(:each_resource)
+        .with('puppetlabs.com', Resolv::DNS::Resource::IN::AAAA)
+        .and_yield(Resolv::DNS::Resource::IN::AAAA.new('2001:DB8:4650::13:8A'))
       expect(utility.host_to_mask('! puppetlabs.com', 'IPv6')).to eql '! 2001:db8:4650::13:8a/128'
     }
-
     it { expect(utility.host_to_mask('96.126.112.51', 'IPv4')).to eql '96.126.112.51/32' }
     it { expect(utility.host_to_mask('!96.126.112.51', 'IPv4')).to eql '! 96.126.112.51/32' }
     it { expect(utility.host_to_mask('96.126.112.51/32', 'IPv4')).to eql '96.126.112.51/32' }
@@ -190,13 +217,6 @@ RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
     it { expect(utility.mark_mask_to_hex('0x32/0')).to eql '0x32/0x0' }
     it { expect(utility.mark_mask_to_hex('42')).to eql '0x2a/0xffffffff' }
     it { expect(utility.mark_mask_to_hex('4294967295/42')).to eql '0xffffffff/0x2a' }
-  end
-
-  describe '#mark_to_hex' do
-    it { expect(utility.mark_to_hex('0')).to eql '0x0' }
-    it { expect(utility.mark_to_hex('! 0x32')).to eql '! 0x32' }
-    it { expect(utility.mark_to_hex('42')).to eql '0x2a' }
-    it { expect(utility.mark_to_hex('! 4294967295')).to eql '! 0xffffffff' }
   end
 
   describe '#proto_number_to_name' do
