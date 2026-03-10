@@ -42,6 +42,7 @@ end
 def pre_setup
   LitmusHelper.instance.run_shell('mkdir -p /lib/modules/`uname -r`')
   LitmusHelper.instance.run_shell('yum install module-init-tools -y') if fetch_os_name == 'rocky'
+  LitmusHelper.instance.run_shell('dnf install -y kmod') if fetch_os_name == 'centos' && fetch_os_version == '9'
   LitmusHelper.instance.run_shell('depmod -a')
 end
 
@@ -52,6 +53,10 @@ end
 
 def fetch_os_name
   @fetch_os_name ||= LitmusHelper.instance.run_shell('facter os.name').stdout.delete("\n").downcase
+end
+
+def fetch_os_version
+  @fetch_os_name ||= LitmusHelper.instance.run_shell('facter os.release.full').stdout.delete("\n")
 end
 
 RSpec.configure do |c|
