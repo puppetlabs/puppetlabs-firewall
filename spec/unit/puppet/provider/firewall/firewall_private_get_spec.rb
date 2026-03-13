@@ -339,6 +339,54 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           end
         end
       end
+
+      context 'when quoted comments contain proto-like flags' do
+        it 'does not parse -p from a quoted comment as proto' do
+          rule = '-A INPUT -m comment --comment "008 parser should ignore -p -p"'
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'INPUT',
+              name: '008 parser should ignore -p -p'
+            ).sort
+          )
+        end
+
+        it 'does not parse ! -p from a quoted comment as proto' do
+          rule = '-A INPUT -m comment --comment "009 parser should ignore ! -p -p"'
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'INPUT',
+              name: '009 parser should ignore ! -p -p'
+            ).sort
+          )
+        end
+
+        it 'still parses the real proto outside the quoted comment' do
+          rule = '-A INPUT -p tcp -m comment --comment "010 parser should keep real proto despite -p -p"'
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'INPUT',
+              name: '010 parser should keep real proto despite -p -p',
+              proto: 'tcp'
+            ).sort
+          )
+        end
+      end
     end
 
     describe 'self.validate_get(_context, rules)' do
