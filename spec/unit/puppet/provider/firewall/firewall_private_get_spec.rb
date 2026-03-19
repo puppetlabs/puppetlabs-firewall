@@ -366,8 +366,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
               table: 'filter',
               protocol: 'IPv4',
               chain: 'INPUT',
-              name: '008 parser should ignore -p -p'
-            ).sort
+              name: '008 parser should ignore -p -p',
+            ).sort,
           )
         end
 
@@ -381,8 +381,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
               table: 'filter',
               protocol: 'IPv4',
               chain: 'INPUT',
-              name: '009 parser should ignore -p -p'
-            ).sort
+              name: '009 parser should ignore -p -p',
+            ).sort,
           )
         end
 
@@ -397,8 +397,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
               protocol: 'IPv4',
               chain: 'INPUT',
               name: '010 parser should keep real proto despite -p -p',
-              proto: 'tcp'
-            ).sort
+              proto: 'tcp',
+            ).sort,
           )
         end
 
@@ -413,8 +413,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
               protocol: 'IPv4',
               chain: 'INPUT',
               name: '011 parser should keep real proto despite -p -p',
-              proto: 'tcp'
-            ).sort
+              proto: 'tcp',
+            ).sort,
           )
         end
       end
@@ -431,8 +431,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
               protocol: 'IPv4',
               chain: 'cali-po-_M_pLJ-KDF1NA7XPQJ-p',
               name: '012 chain name ends with -p',
-              proto: 'udp'
-            ).sort
+              proto: 'udp',
+            ).sort,
           )
         end
 
@@ -447,8 +447,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
               protocol: 'IPv4',
               chain: 'COLDFRONT-ACCESS',
               name: '013 chain name contains -A',
-              proto: 'tcp'
-            ).sort
+              proto: 'tcp',
+            ).sort,
           )
         end
       end

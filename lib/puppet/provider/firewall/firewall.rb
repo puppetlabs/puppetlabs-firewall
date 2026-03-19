@@ -530,7 +530,7 @@ class Puppet::Provider::Firewall::Firewall
     searchable_rule = rule
                       .gsub(%r{"(?:\\.|[^"\\])*"}, '""')
                       .gsub(%r{'(?:\\.|[^'\\])*'}, "''")
-    quoted_value_keys = %i[name string string_hex bytecode u32 nflog_prefix log_prefix]
+    quoted_value_keys = [:name, :string, :string_hex, :bytecode, :u32, :nflog_prefix, :log_prefix]
     token_prefix = '(?:\\A|\\s)'
 
     # Add the ensure parameter first
@@ -641,7 +641,7 @@ class Puppet::Provider::Firewall::Firewall
         end
       when :rpfilter
         if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s--"))
-          value_regex = Regexp.new("(?:\\s--(invert|validmark|loose|accept-local))")
+          value_regex = Regexp.new('(?:\\s--(invert|validmark|loose|accept-local))')
           key_value = parse_rule.scan(value_regex)
           return_value = []
           key_value.each do |val|
