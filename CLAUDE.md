@@ -45,7 +45,7 @@ This module manages Linux firewall rules (iptables/ip6tables) and chains. It mig
 
 ### Rule ordering and identity
 
-Rules are numbered 000–999 in their title (e.g. `"001 accept loopback"`). The number is embedded as an iptables comment (`-m comment --comment "001 accept loopback"`), which is how the provider matches existing rules back to Puppet resources during `get()`. Titles 9000–9999 are conventionally reserved for post-rules. The [manifests/pre.pp](manifests/pre.pp) / [manifests/post.pp](manifests/post.pp) classes establish safe defaults around user rules.
+Rules are numbered 000–999 in their title (e.g. `"001 accept loopback"`). The number is embedded as an iptables comment (`-m comment --comment "001 accept loopback"`), which is how the provider matches existing rules back to Puppet resources during `get()`. Titles 9000–9999 are conventionally reserved for post-rules. The `firewall::pre` and `firewall::post` classes are a user-defined convention (not shipped by this module) for establishing safe defaults before and after custom rules.
 
 ### State management
 
