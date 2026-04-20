@@ -73,3 +73,13 @@ Most attributes accept a `!` prefix for inversion (e.g. `source => '! 192.168.1.
 - Requires Puppet >= 8.0.0, < 9.0.0 and stdlib >= 9.0.0, < 10.0.0.
 - The `provider` attribute from the pre-v7 API was renamed `protocol`; `action` was merged into `jump`. Avoid using old attribute names.
 - IPv6 rules must use the `ip6tables` provider (`:IPv6` suffix in chain name or `protocol => IPv6`).
+
+## Project Rules
+
+- At the start of a coding session, review the repository structure and any relevant README or documentation files to understand the area you are working in.
+- Always read the files relevant to the task before suggesting or making a change.
+- Never merge a pull request.
+- Never work directly on the main or master branch.
+- Never push a branch without explicit instruction.
+- Never delete a file without permission — this applies even after a blanket "yes to all".
+- Never output, log, save, or hardcode security-sensitive values — this includes passwords, tokens, API keys, private keys, secrets, and credentials of any kind. Do not write them to files, include them in commit messages, or print them in responses.
