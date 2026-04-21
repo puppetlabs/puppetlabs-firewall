@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/no-pr-merge.sh",
+            "timeout": 5,
+            "statusMessage": "Checking project rules..."
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/no-main-commits.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/no-push.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/no-rm.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
