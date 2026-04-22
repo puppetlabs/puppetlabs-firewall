@@ -29,6 +29,21 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           table_name: 'raw', protocol: 'IPv6',
           result: { ensure: 'present', table: 'raw', protocol: 'IPv6', name: '002 test rule', chain: 'OUTPUT' }
         },
+        {
+          rule: "-A INPUT -p tcp -m comment --comment '003 single quoted test rule'",
+          table_name: 'filter', protocol: 'IPv4',
+          result: { ensure: 'present', table: 'filter', protocol: 'IPv4', name: '003 single quoted test rule', chain: 'INPUT' }
+        },
+        {
+          rule: '-A cali-po-_M_pLJ-KDF1NA7XPQJ-p -p udp -m comment --comment "004 chain suffix test rule"',
+          table_name: 'filter', protocol: 'IPv4',
+          result: { ensure: 'present', table: 'filter', protocol: 'IPv4', name: '004 chain suffix test rule', chain: 'cali-po-_M_pLJ-KDF1NA7XPQJ-p' }
+        },
+        {
+          rule: '-A COLDFRONT-ACCESS -p tcp -m comment --comment "005 chain contains -A test rule"',
+          table_name: 'filter', protocol: 'IPv4',
+          result: { ensure: 'present', table: 'filter', protocol: 'IPv4', name: '005 chain contains -A test rule', chain: 'COLDFRONT-ACCESS' }
+        },
       ].each do |test|
         it "parses the rule: '#{test[:rule]}'" do
           expect(provider.rule_to_name(context, test[:rule], test[:table_name], test[:protocol])).to eq(test[:result])
@@ -337,6 +352,104 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
                 .to eq(boolean_block.merge(rule[:result]).sort)
             end
           end
+        end
+      end
+
+      context 'when quoted comments contain proto-like flags' do
+        it 'does not parse -p from a double-quoted comment as proto' do
+          rule = '-A INPUT -m comment --comment "008 parser should ignore -p -p"'
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'INPUT',
+              name: '008 parser should ignore -p -p',
+            ).sort,
+          )
+        end
+
+        it 'does not parse -p from a single-quoted comment as proto' do
+          rule = "-A INPUT -m comment --comment '009 parser should ignore -p -p'"
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'INPUT',
+              name: '009 parser should ignore -p -p',
+            ).sort,
+          )
+        end
+
+        it 'still parses the real proto outside a double-quoted comment' do
+          rule = '-A INPUT -p tcp -m comment --comment "010 parser should keep real proto despite -p -p"'
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'INPUT',
+              name: '010 parser should keep real proto despite -p -p',
+              proto: 'tcp',
+            ).sort,
+          )
+        end
+
+        it 'still parses the real proto outside a single-quoted comment' do
+          rule = "-A INPUT -p tcp -m comment --comment '011 parser should keep real proto despite -p -p'"
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'INPUT',
+              name: '011 parser should keep real proto despite -p -p',
+              proto: 'tcp',
+            ).sort,
+          )
+        end
+      end
+
+      context 'when chain names contain option-like substrings' do
+        it 'parses the real proto when the chain name ends with -p' do
+          rule = '-A cali-po-_M_pLJ-KDF1NA7XPQJ-p -p udp -m comment --comment "012 chain name ends with -p"'
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'cali-po-_M_pLJ-KDF1NA7XPQJ-p',
+              name: '012 chain name ends with -p',
+              proto: 'udp',
+            ).sort,
+          )
+        end
+
+        it 'parses the chain correctly when the chain name contains -A' do
+          rule = '-A COLDFRONT-ACCESS -p tcp -m comment --comment "013 chain name contains -A"'
+
+          expect(provider.rule_to_hash(context, rule, 'filter', 'IPv4').sort).to eq(
+            boolean_block.merge(
+              line: rule,
+              ensure: 'present',
+              table: 'filter',
+              protocol: 'IPv4',
+              chain: 'COLDFRONT-ACCESS',
+              name: '013 chain name contains -A',
+              proto: 'tcp',
+            ).sort,
+          )
         end
       end
     end
