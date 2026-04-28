@@ -111,8 +111,9 @@ RSpec.configure do |c|
     LitmusHelper.instance.apply_manifest(pp)
 
     if ['centos-8', 'rocky-8', 'almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      LitmusHelper.instance.run_shell('update-alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
-      LitmusHelper.instance.run_shell('update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
+      LitmusHelper.instance.run_shell('yum install -y iptables-legacy', expect_failures: true)
+      LitmusHelper.instance.run_shell('alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
+      LitmusHelper.instance.run_shell('alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
     end
 
     # Ensure that policycoreutils is present. In the future we could probably refactor
