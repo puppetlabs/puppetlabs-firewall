@@ -111,9 +111,12 @@ RSpec.configure do |c|
     LitmusHelper.instance.apply_manifest(pp)
 
     if ['centos-8', 'rocky-8', 'almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      # On newer Azure kernels (6.17+), nft_compat and xt extension modules may not be
-      # auto-loaded. Without nft_compat, iptables-nft cannot insert rules with any xt
-      # extension (including -m comment which the Puppet firewall module appends to every rule).
+      # On newer Azure kernels (6.17+), xt extension .ko files may not be present because
+      # linux-modules-extra-<kernel> is not installed on the runner. The Docker container
+      # bind-mounts /lib/modules/<kernel> from the host, so installing on the host makes
+      # the modules visible in the container immediately. We then modprobe them into the
+      # shared kernel so iptables-nft can use xt extensions (e.g. -m comment).
+      system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
       LitmusHelper.instance.run_shell('modprobe nft_compat', expect_failures: true)
       LitmusHelper.instance.run_shell('modprobe xt_comment', expect_failures: true)
       LitmusHelper.instance.run_shell('modprobe xt_conntrack', expect_failures: true)
