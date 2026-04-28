@@ -111,16 +111,19 @@ RSpec.configure do |c|
     LitmusHelper.instance.apply_manifest(pp)
 
     if ['centos-8', 'rocky-8', 'almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      # On newer Azure kernels (6.17+), xt extension .ko files may not be present because
-      # linux-modules-extra-<kernel> is not installed on the runner. The Docker container
-      # bind-mounts /lib/modules/<kernel> from the host, so installing on the host makes
-      # the modules visible in the container immediately. We then modprobe them into the
-      # shared kernel so iptables-nft can use xt extensions (e.g. -m comment).
+      # On newer Azure kernels (6.17+), xt extension modules may be absent because
+      # linux-modules-extra-<kernel> is not installed on the runner by default.
+      # The Docker container bind-mounts /lib/modules/<kernel> from the host, so
+      # installing the package on the host makes .ko files visible in the container.
+      # Module loading must happen on the host (shared kernel) via system(), not via
+      # run_shell() inside the container — privileged containers can call init_module()
+      # but in practice the host-side modprobe is more reliable for loading xt modules.
       system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
-      LitmusHelper.instance.run_shell('modprobe nft_compat', expect_failures: true)
-      LitmusHelper.instance.run_shell('modprobe xt_comment', expect_failures: true)
-      LitmusHelper.instance.run_shell('modprobe xt_conntrack', expect_failures: true)
-      LitmusHelper.instance.run_shell('modprobe xt_multiport', expect_failures: true)
+      system('sudo depmod -a > /dev/null 2>&1 || true')
+      system('sudo modprobe nft_compat 2>/dev/null || true')
+      system('sudo modprobe xt_comment 2>/dev/null || true')
+      system('sudo modprobe xt_conntrack 2>/dev/null || true')
+      system('sudo modprobe xt_multiport 2>/dev/null || true')
     end
 
     # Ensure that policycoreutils is present. In the future we could probably refactor
