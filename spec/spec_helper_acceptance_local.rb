@@ -111,9 +111,13 @@ RSpec.configure do |c|
     LitmusHelper.instance.apply_manifest(pp)
 
     if ['centos-8', 'rocky-8', 'almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      LitmusHelper.instance.run_shell('yum install -y iptables-legacy', expect_failures: true)
-      LitmusHelper.instance.run_shell('alternatives --set iptables /usr/sbin/iptables-legacy', expect_failures: true)
-      LitmusHelper.instance.run_shell('alternatives --set ip6tables /usr/sbin/ip6tables-legacy', expect_failures: true)
+      # On newer Azure kernels (6.17+), nft_compat and xt extension modules may not be
+      # auto-loaded. Without nft_compat, iptables-nft cannot insert rules with any xt
+      # extension (including -m comment which the Puppet firewall module appends to every rule).
+      LitmusHelper.instance.run_shell('modprobe nft_compat', expect_failures: true)
+      LitmusHelper.instance.run_shell('modprobe xt_comment', expect_failures: true)
+      LitmusHelper.instance.run_shell('modprobe xt_conntrack', expect_failures: true)
+      LitmusHelper.instance.run_shell('modprobe xt_multiport', expect_failures: true)
     end
 
     # Ensure that policycoreutils is present. In the future we could probably refactor
