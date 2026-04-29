@@ -121,7 +121,8 @@ RSpec.configure do |c|
       system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
       system('sudo depmod -a > /dev/null 2>&1 || true')
       system('sudo modprobe nft_compat 2>/dev/null || true')
-      system('find /lib/modules/$(uname -r)/kernel/net -name "xt_*.ko*" 2>/dev/null | xargs -I{} basename {} | cut -d. -f1 | sort -u | xargs -r sudo modprobe 2>/dev/null || true')
+      system('sudo modprobe xt_comment 2>/dev/null || true')
+      system('find /lib/modules/$(uname -r) -name "xt_*.ko*" 2>/dev/null | xargs -I{} basename {} | cut -d. -f1 | sort -u | xargs -r sudo modprobe 2>/dev/null || true')
     end
 
     # Ensure that policycoreutils is present. In the future we could probably refactor
