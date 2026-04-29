@@ -116,15 +116,16 @@ RSpec.configure do |c|
       # The Docker container bind-mounts /lib/modules/<kernel> from the host, so
       # installing the package on the host makes .ko files visible in the container.
       # Module loading runs via system() on the host (shared kernel), not run_shell()
-      # inside the container. nft_compat must load first; then all xt_* modules are
-      # bulk-loaded so every iptables match/target extension works.
+      # inside the container. nft_compat must load first; then only the modules
+      # provided by linux-modules-extra are loaded — loading standard-package modules
+      # (xt_limit etc.) again can corrupt nf_tables state for those extensions.
       system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
       system('sudo depmod -a > /dev/null 2>&1 || true')
       system('sudo modprobe nft_compat 2>/dev/null || true')
       system('sudo modprobe xt_comment 2>/dev/null || true')
-      system('find /lib/modules/$(uname -r) \( -name "xt_*.ko*" -o -name "ipt_*.ko*"' \
-             ' -o -name "ip6t_*.ko*" \) 2>/dev/null | xargs -I{} basename {} |' \
-             ' cut -d. -f1 | sort -u | xargs -r -n 1 sudo modprobe 2>/dev/null; true')
+      system('dpkg -L linux-modules-extra-$(uname -r) 2>/dev/null | grep "\.ko"' \
+             ' | xargs -I{} basename {} | cut -d. -f1 | sort -u' \
+             ' | xargs -r -n 1 sudo modprobe 2>/dev/null; true')
     end
 
     # Ensure that policycoreutils is present. In the future we could probably refactor
