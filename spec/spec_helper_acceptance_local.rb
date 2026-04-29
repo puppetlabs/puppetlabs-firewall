@@ -116,12 +116,16 @@ RSpec.configure do |c|
       # The Docker container bind-mounts /lib/modules/<kernel> from the host, so
       # installing the package on the host makes .ko files visible in the container.
       # Module loading runs via system() on the host (shared kernel), not run_shell()
-      # inside the container. nft_compat must load first. Modules already loaded are
-      # skipped (reloading corrupts nf_tables state). xt_limit and xt_string are also
-      # excluded — they auto-load correctly on-demand but break nf_tables when pre-loaded.
+      # inside the container. nft_compat must load first. xt_limit must be loaded
+      # immediately after nft_compat (before other xt_* modules) — loading it later
+      # after other modules are already registered corrupts its nf_tables binding.
+      # The find loop then skips already-loaded modules via lsmod, and also skips
+      # *_limit and *_string variants because loading the ipt_ versions blocks the
+      # xt_ auto-load path when request_module() is invoked later.
       system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
       system('sudo depmod -a > /dev/null 2>&1 || true')
       system('sudo modprobe nft_compat 2>/dev/null || true')
+      system('sudo modprobe xt_limit 2>/dev/null || true')
       system('find /lib/modules/$(uname -r)/kernel/net \( -name "xt_*.ko*" -o -name "ipt_*.ko*" -o -name "ip6t_*.ko*" \)' \
              ' | sed \'s|.*/||; s/\\.ko.*//\' | grep -vxE \'(xt|ipt|ip6t)_limit|(xt|ipt|ip6t)_string\' | sort -u' \
              ' | while read m; do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
