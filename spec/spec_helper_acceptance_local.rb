@@ -115,15 +115,13 @@ RSpec.configure do |c|
       # linux-modules-extra-<kernel> is not installed on the runner by default.
       # The Docker container bind-mounts /lib/modules/<kernel> from the host, so
       # installing the package on the host makes .ko files visible in the container.
-      # Module loading must happen on the host (shared kernel) via system(), not via
-      # run_shell() inside the container — privileged containers can call init_module()
-      # but in practice the host-side modprobe is more reliable for loading xt modules.
+      # Module loading runs via system() on the host (shared kernel), not run_shell()
+      # inside the container. nft_compat must load first; then all xt_* modules are
+      # bulk-loaded so every iptables match/target extension works.
       system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
       system('sudo depmod -a > /dev/null 2>&1 || true')
       system('sudo modprobe nft_compat 2>/dev/null || true')
-      system('sudo modprobe xt_comment 2>/dev/null || true')
-      system('sudo modprobe xt_conntrack 2>/dev/null || true')
-      system('sudo modprobe xt_multiport 2>/dev/null || true')
+      system('find /lib/modules/$(uname -r)/kernel/net -name "xt_*.ko*" 2>/dev/null | xargs -I{} basename {} | cut -d. -f1 | sort -u | xargs -r sudo modprobe 2>/dev/null || true')
     end
 
     # Ensure that policycoreutils is present. In the future we could probably refactor
