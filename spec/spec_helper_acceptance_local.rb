@@ -116,13 +116,14 @@ RSpec.configure do |c|
       # The Docker container bind-mounts /lib/modules/<kernel> from the host, so
       # installing the package on the host makes .ko files visible in the container.
       # Module loading runs via system() on the host (shared kernel), not run_shell()
-      # inside the container. nft_compat must load first. Only modules not already
-      # loaded are probed — reloading e.g. xt_limit corrupts nf_tables state.
+      # inside the container. nft_compat must load first. Modules already loaded are
+      # skipped (reloading corrupts nf_tables state). xt_limit and xt_string are also
+      # excluded — they auto-load correctly on-demand but break nf_tables when pre-loaded.
       system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
       system('sudo depmod -a > /dev/null 2>&1 || true')
       system('sudo modprobe nft_compat 2>/dev/null || true')
       system('find /lib/modules/$(uname -r)/kernel/net \( -name "xt_*.ko*" -o -name "ipt_*.ko*" -o -name "ip6t_*.ko*" \)' \
-             ' | sed \'s|.*/||; s/\\.ko.*//\' | sort -u' \
+             ' | sed \'s|.*/||; s/\\.ko.*//\' | grep -vxE \'xt_limit|xt_string\' | sort -u' \
              ' | while read m; do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
     end
 
