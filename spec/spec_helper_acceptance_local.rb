@@ -123,7 +123,7 @@ RSpec.configure do |c|
       system('sudo depmod -a > /dev/null 2>&1 || true')
       system('sudo modprobe nft_compat 2>/dev/null || true')
       system('find /lib/modules/$(uname -r)/kernel/net \( -name "xt_*.ko*" -o -name "ipt_*.ko*" -o -name "ip6t_*.ko*" \)' \
-             ' | sed \'s|.*/||; s/\\.ko.*//\' | grep -vxE \'xt_limit|xt_string\' | sort -u' \
+             ' | sed \'s|.*/||; s/\\.ko.*//\' | grep -vxE \'(xt|ipt|ip6t)_limit|(xt|ipt|ip6t)_string\' | sort -u' \
              ' | while read m; do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
     end
 
