@@ -117,16 +117,18 @@ RSpec.configure do |c|
       # installing the package on the host makes .ko files visible in the container.
       # Module loading runs via system() on the host (shared kernel), not run_shell()
       # inside the container. nft_compat must load first.
-      # We load only the specific extensions known to be absent in fresh EL8 containers
-      # rather than bulk-loading all xt_* modules — the broad find-loop approach loads
-      # base kernel modules that corrupt xt_limit's nf_tables binding, causing
-      # RULE_APPEND failures.  xt_limit is already present on the Azure runner host
-      # (it loads cleanly without explicit modprobe), so it is intentionally omitted.
+      # Two-pass loading avoids the broad find(1) loop that corrupts xt_limit's
+      # nf_tables binding:
+      #   Pass 1: linux-modules-extra extensions via dpkg -L (proven safe for xt_limit).
+      #   Pass 2: explicit base kernel extensions absent from fresh EL8 Docker images
+      #           (xt_bpf, xt_mac, xt_NFLOG, etc.) that dpkg -L does not cover.
       system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
       system('sudo depmod -a > /dev/null 2>&1 || true')
       system('sudo modprobe nft_compat 2>/dev/null || true')
-      system('for m in xt_comment xt_bpf xt_mac xt_NFLOG xt_multiport' \
-             ' xt_NETMAP ipt_NETMAP xt_ipvs xt_TEE ipt_TEE xt_CHECKSUM xt_socket;' \
+      system('dpkg -L linux-modules-extra-$(uname -r) 2>/dev/null' \
+             ' | grep -oE "(xt|ipt|ip6t)_[^./]+" | sort -u' \
+             ' | while read m; do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
+      system('for m in xt_bpf xt_mac xt_NFLOG xt_multiport xt_NETMAP ipt_NETMAP xt_ipvs xt_TEE ipt_TEE xt_CHECKSUM xt_socket;' \
              ' do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
     end
 
