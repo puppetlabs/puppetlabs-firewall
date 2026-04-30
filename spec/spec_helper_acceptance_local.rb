@@ -110,29 +110,6 @@ RSpec.configure do |c|
     PUPPETCODE
     LitmusHelper.instance.apply_manifest(pp)
 
-    if ['centos-8', 'rocky-8', 'almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      # On newer Azure kernels (6.17+), xt extension modules may be absent because
-      # linux-modules-extra-<kernel> is not installed on the runner by default.
-      # The Docker container bind-mounts /lib/modules/<kernel> from the host, so
-      # installing the package on the host makes .ko files visible in the container.
-      # Module loading runs via system() on the host (shared kernel), not run_shell()
-      # inside the container. nft_compat must load first.
-      # Explicit list rather than a broad find(1) loop — the find loop loads unknown
-      # modules that corrupt xt_limit's nf_tables binding.  xt_limit itself is
-      # intentionally absent: it is already present on the Azure runner and loading
-      # it explicitly risks re-triggering nf_tables binding corruption.
-      system('sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true')
-      system('sudo depmod -a > /dev/null 2>&1 || true')
-      system('sudo modprobe nft_compat 2>/dev/null || true')
-      system('for m in xt_comment xt_bpf xt_dscp xt_hashlimit ip6t_frag xt_hl' \
-             ' xt_iprange xt_ipvs xt_LOG xt_mac xt_mark xt_multiport' \
-             ' xt_NETMAP ipt_NETMAP xt_NFLOG xt_physdev xt_policy;' \
-             ' do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
-      system('for m in xt_REDIRECT xt_socket xt_statistic xt_string xt_tcpmss' \
-             ' xt_TEE ipt_TEE xt_CHECKSUM xt_ttl;' \
-             ' do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
-    end
-
     # Ensure that policycoreutils is present. In the future we could probably refactor
     # this so that policycoreutils is installed on platform where the os.family fact
     # is set to 'redhat'

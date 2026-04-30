@@ -1,0 +1,215 @@
+# Local copy of cat-github-actions/module_acceptance.yml with an additional step
+# that pre-loads xt_* kernel extension modules on the runner host before tests run.
+# This is needed because EL8 Docker containers bind-mount /lib/modules from the host
+# (kernel_modules: true) but many xt_* modules are not loaded on the Azure runner by
+# default — iptables-nft inside the container cannot load them via request_module().
+name: "Module Acceptance"
+
+on:
+  workflow_call:
+    inputs:
+      runs_on:
+        description: "The operating system used for the runner."
+        required: false
+        type: "string"
+      flags:
+        description: "Additional flags to pass to matrix_from_metadata_v3."
+        required: false
+        default: ''
+        type: "string"
+      service_url:
+        description: "The service URL to target when provisioning from GCP."
+        required: false
+        default: 'https://facade-release-6f3kfepqcq-ew.a.run.app/v1/provision'
+        type: "string"
+      kernel_modules:
+        description: "Volume map host kernel /lib/modules into docker container"
+        default: true
+        type: boolean
+      disable_apparmor:
+        description: "Disable and stop apparmor"
+        default: false
+        type: boolean
+
+
+env:
+  SERVICE_URL: ${{ inputs.service_url }}
+
+jobs:
+
+  setup_matrix:
+    name: "Setup Test Matrix"
+    runs-on: ubuntu-latest
+    outputs:
+      acceptance_matrix: ${{ steps.get-matrix.outputs.matrix }}
+
+    env:
+      BUNDLE_WITHOUT: release_prep
+
+    steps:
+
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Configure forge authentication"
+        env:
+          FORGE_TOKEN: ${{ secrets.PUPPET_FORGE_TOKEN || secrets.PUPPET_FORGE_TOKEN_PUBLIC }}
+        run: |
+          if [ -n "$FORGE_TOKEN" ]; then
+            echo "PUPPET_FORGE_TOKEN=$FORGE_TOKEN" >> $GITHUB_ENV
+            echo "BUNDLE_RUBYGEMS___PUPPETCORE__PUPPET__COM=forge-key:$FORGE_TOKEN" >> $GITHUB_ENV
+          fi
+
+      - name: "Setup ruby"
+        uses: "ruby/setup-ruby@v1"
+        with:
+          ruby-version: "3.1"
+          bundler-cache: true
+
+      - name: "Bundle environment"
+        run: |
+          echo ::group::bundler environment
+          bundle env
+          echo ::endgroup::
+
+      - name: Setup Test Matrix
+        id: get-matrix
+        run: |
+          bundle exec matrix_from_metadata_v3 ${{ inputs.flags }}
+
+  acceptance:
+    name: "Acceptance tests (${{matrix.platforms.label}}, ${{matrix.collection.collection || matrix.collection}})"
+    needs: "setup_matrix"
+    runs-on: ${{ inputs.runs_on || matrix.platforms.runner }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson( needs.setup_matrix.outputs.acceptance_matrix ) }}
+
+    env:
+      BUNDLE_WITHOUT: release_prep
+      PUPPET_GEM_VERSION: '~> 8.9'
+      FACTER_GEM_VERSION: '~> 4.10'
+      TWINGATE_PUBLIC_REPO_KEY: ${{ secrets.TWINGATE_PUBLIC_REPO_KEY }}
+
+    steps:
+      - name: "Configure forge authentication"
+        env:
+          FORGE_TOKEN: ${{ secrets.PUPPET_FORGE_TOKEN || secrets.PUPPET_FORGE_TOKEN_PUBLIC }}
+        run: |
+          if [ -n "$FORGE_TOKEN" ]; then
+            echo "PUPPET_FORGE_TOKEN=$FORGE_TOKEN" >> $GITHUB_ENV
+            echo "BUNDLE_RUBYGEMS___PUPPETCORE__PUPPET__COM=forge-key:$FORGE_TOKEN" >> $GITHUB_ENV
+          fi
+
+      - name: "Install Twingate"
+        if: env.TWINGATE_PUBLIC_REPO_KEY != ''
+        uses: "twingate/github-action@v1"
+        with:
+          service-key: ${{ env.TWINGATE_PUBLIC_REPO_KEY }}
+
+      - name: Fix DNS
+        if: env.TWINGATE_PUBLIC_REPO_KEY != ''
+        run: |
+          echo "=== Remove Azure DNS from eth0 interface ==="
+          sudo resolvectl dns eth0 ""
+
+          echo "=== Configure Twingate DNS properly ==="
+          sudo resolvectl dns sdwan0 100.95.0.251 100.95.0.252
+          sudo resolvectl domain sdwan0 delivery.puppetlabs.net
+
+          echo "=== Flush DNS cache ==="
+          sudo resolvectl flush-caches
+
+          echo "=== Check new configuration ==="
+          resolvectl status
+
+          echo "=== Test DNS resolution ==="
+          nslookup artifactory.delivery.puppetlabs.net
+
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Disable Apparmor"
+        if: ${{ inputs.disable_apparmor }}
+        run: |
+          if command -v apparmor_parser >/dev/null ; then
+            sudo find /etc/apparmor.d/ -maxdepth 1 -type f -exec ln -sf {} /etc/apparmor.d/disable/ \;
+            sudo apparmor_parser -R /etc/apparmor.d/disable/* || true
+            sudo systemctl disable apparmor
+            sudo systemctl stop apparmor
+          fi
+
+      - name: "Setup ruby"
+        uses: "ruby/setup-ruby@v1"
+        with:
+          ruby-version: "3.1"
+          bundler-cache: true
+
+      - name: "Bundle environment"
+        run: |
+          echo ::group::bundler environment
+          bundle env
+          echo ::endgroup::
+
+      - name: "Provision environment"
+        run: |
+          if [[ "${{ inputs.kernel_modules }}" == "true" ]] && [[ "${{matrix.platforms.provider}}" =~ docker* ]] ; then
+            DOCKER_RUN_OPTS="docker_run_opts: {'--volume': '/lib/modules/$(uname -r):/lib/modules/$(uname -r)'}"
+          else
+            DOCKER_RUN_OPTS=''
+          fi
+          bundle exec rake "litmus:provision[${{matrix.platforms.provider}},${{ matrix.platforms.image }},$DOCKER_RUN_OPTS]"
+          FILE='spec/fixtures/litmus_inventory.yaml'
+          sed -e 's/password: .*/password: "[redacted]"/' < $FILE || true
+          if [[ -n "$TWINGATE_PUBLIC_REPO_KEY" ]]; then
+            bundle exec bolt command run "sed '/^nameserver 168.63.129.16\$/d; /^search/d' /etc/resolv.conf > /tmp/resolv.conf && cat /tmp/resolv.conf > /etc/resolv.conf" --targets all --inventoryfile spec/fixtures/litmus_inventory.yaml
+          fi
+
+      - name: "Load kernel extension modules"
+        if: ${{ inputs.kernel_modules && contains(matrix.platforms.provider, 'docker') }}
+        run: |
+          # Install linux-modules-extra so .ko files are present in /lib/modules on the host.
+          # The container bind-mounts /lib/modules from the host, so host-loaded modules
+          # become visible inside the container via the shared kernel.
+          sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true
+          sudo depmod -a > /dev/null 2>&1 || true
+          sudo modprobe nft_compat 2>/dev/null || true
+          # Explicit list — a broad find(1) loop over /kernel/net loads unknown modules
+          # that corrupt xt_limit's nf_tables binding (RULE_APPEND failed errors).
+          # xt_TCPMSS uses an uppercase filename; xt_DSCP is an alias of xt_dscp.
+          for m in \
+            xt_comment xt_bpf xt_connlimit xt_connmark xt_CT \
+            xt_dscp xt_DSCP xt_hashlimit ip6t_frag xt_hl xt_iprange \
+            xt_ipvs xt_limit xt_LOG xt_mac xt_mark xt_multiport \
+            xt_NETMAP ipt_NETMAP xt_NFLOG xt_physdev xt_pkttype \
+            xt_policy xt_recent xt_REDIRECT xt_rpfilter xt_socket \
+            xt_statistic xt_string xt_TCPMSS \
+            xt_TEE ipt_TEE xt_CHECKSUM xt_ttl; do
+            lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true
+          done
+
+      - name: "Install Puppet agent"
+        run: |
+          if [[ "${{ matrix.collection.version }}" ]] ; then
+            export PUPPET_VERSION=${{ matrix.collection.version }}
+            bundle exec rake 'litmus:install_agent[${{ matrix.collection.collection }}]'
+          else
+            bundle exec rake 'litmus:install_agent[${{ matrix.collection }}]'
+          fi
+
+      - name: "Install module"
+        run: |
+          bundle exec rake 'litmus:install_module'
+
+      - name: "Run acceptance tests"
+        run: |
+          bundle exec rake 'litmus:acceptance:parallel'
+
+      - name: "Remove test environment"
+        if: ${{ always() }}
+        continue-on-error: true
+        run: |
+          if [[ -f spec/fixtures/litmus_inventory.yaml ]]; then
+            bundle exec rake 'litmus:tear_down'
+          fi
