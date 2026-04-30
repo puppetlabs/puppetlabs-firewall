@@ -178,14 +178,19 @@ jobs:
           # Explicit list — a broad find(1) loop over /kernel/net loads unknown modules
           # that corrupt xt_limit's nf_tables binding (RULE_APPEND failed errors).
           # xt_TCPMSS uses an uppercase filename; xt_DSCP is an alias of xt_dscp.
+          # rpfilter has separate ipt_ (IPv4) and ip6t_ (IPv6) modules; there is no xt_rpfilter.
+          # xt_limit is loaded last — loading it mid-loop causes corruption when the
+          # base kernel modules that follow (xt_mac, xt_NETMAP, xt_NFLOG, etc.) register
+          # with nft_compat and invalidate its nf_tables binding.
           for m in \
             xt_comment xt_bpf xt_connlimit xt_connmark xt_CT \
             xt_dscp xt_DSCP xt_hashlimit ip6t_frag xt_hl xt_iprange \
-            xt_ipvs xt_limit xt_LOG xt_mac xt_mark xt_multiport \
+            xt_ipvs xt_LOG xt_mac xt_mark xt_multiport \
             xt_NETMAP ipt_NETMAP xt_NFLOG xt_physdev xt_pkttype \
-            xt_policy xt_recent xt_REDIRECT xt_rpfilter xt_socket \
-            xt_statistic xt_string xt_TCPMSS \
-            xt_TEE ipt_TEE xt_CHECKSUM xt_ttl; do
+            xt_policy xt_recent xt_REDIRECT ipt_rpfilter ip6t_rpfilter xt_socket \
+            xt_statistic xt_string xt_tcpmss xt_TCPMSS \
+            xt_TEE ipt_TEE xt_CHECKSUM xt_ttl \
+            xt_limit; do
             lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true
           done
 
