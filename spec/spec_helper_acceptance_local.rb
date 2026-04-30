@@ -128,7 +128,7 @@ RSpec.configure do |c|
       system('dpkg -L linux-modules-extra-$(uname -r) 2>/dev/null' \
              ' | grep -oE "(xt|ipt|ip6t)_[^./]+" | sort -u' \
              ' | while read m; do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
-      system('for m in xt_bpf xt_mac xt_NFLOG xt_multiport xt_NETMAP ipt_NETMAP xt_ipvs xt_TEE ipt_TEE xt_CHECKSUM xt_socket;' \
+      system('for m in xt_comment xt_bpf xt_mac xt_NFLOG xt_multiport xt_NETMAP ipt_NETMAP xt_ipvs xt_TEE ipt_TEE xt_CHECKSUM xt_socket;' \
              ' do lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true; done; true')
     end
 
