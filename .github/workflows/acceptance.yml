@@ -175,10 +175,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true
           sudo depmod -a > /dev/null 2>&1 || true
           sudo modprobe nft_compat 2>/dev/null || true
-          # xt_limit is loaded FIRST — loading it after other xt_* modules registers it into
-          # an already-populated nft_compat state and produces a corrupted nf_tables binding,
-          # causing RULE_APPEND failures. Loading it first into a clean nft_compat state
-          # establishes a stable binding that survives subsequent module additions.
+          # Ubuntu 24.04's native nft_limit module registers expression type "limit" in nf_tables
+          # globally. nft_compat tries to register xt_limit under the same name and gets EEXIST,
+          # leaving the nft_compat binding incomplete — so iptables-nft RULE_APPEND fails with
+          # ENOENT when a rule uses -m limit. Removing nft_limit first frees the name.
+          sudo modprobe -r nft_limit 2>/dev/null || true
           # xt_TCPMSS uses an uppercase filename; xt_DSCP is an alias of xt_dscp.
           # rpfilter has separate ipt_ (IPv4) and ip6t_ (IPv6) modules; there is no xt_rpfilter.
           sudo modprobe xt_limit 2>/dev/null || true
