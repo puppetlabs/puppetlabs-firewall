@@ -110,19 +110,6 @@ RSpec.configure do |c|
     PUPPETCODE
     LitmusHelper.instance.apply_manifest(pp)
 
-    # Switch EL8 containers to iptables-legacy to avoid nft_compat binding corruption.
-    # iptables-nft (the EL8 default) routes rules through nf_tables via nft_compat; bulk
-    # xt_* module loading on the host corrupts nft_compat's internal state for xt_limit,
-    # causing RULE_APPEND failures. Legacy iptables uses xt_tables directly — no corruption.
-    # Use direct symlinks rather than 'alternatives --set': in minimal containers the
-    # alternatives database is not always populated, so the alternatives command fails
-    # silently and the nft binary remains in place.
-    if ['centos-8', 'rocky-8', 'almalinux-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
-      ['iptables', 'iptables-save', 'ip6tables', 'ip6tables-save'].each do |cmd|
-        LitmusHelper.instance.run_shell("test -f /usr/sbin/#{cmd}-legacy && ln -sf /usr/sbin/#{cmd}-legacy /usr/sbin/#{cmd} || true")
-      end
-    end
-
     # Ensure that policycoreutils is present. In the future we could probably refactor
     # this so that policycoreutils is installed on platform where the os.family fact
     # is set to 'redhat'

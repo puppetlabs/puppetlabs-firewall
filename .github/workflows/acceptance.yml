@@ -1,8 +1,8 @@
 # Local copy of cat-github-actions/module_acceptance.yml with an additional step
-# that installs linux-modules-extra on the runner host before tests run.
+# that pre-loads xt_* kernel extension modules on the runner host before tests run.
 # This is needed because EL8 Docker containers bind-mount /lib/modules from the host
-# (kernel_modules: true); installing linux-modules-extra ensures all xt_* .ko files are
-# present for auto-loading by iptables-legacy inside the container.
+# (kernel_modules: true) but many xt_* modules are not loaded on the Azure runner by
+# default — iptables-nft inside the container cannot load them via request_module().
 name: "Module Acceptance"
 
 on:
@@ -170,12 +170,28 @@ jobs:
         if: ${{ inputs.kernel_modules && contains(matrix.platforms.provider, 'docker') && (contains(matrix.platforms.label, 'CentOS-8') || contains(matrix.platforms.label, 'Rocky-8')) }}
         run: |
           # Install linux-modules-extra so .ko files are present in /lib/modules on the host.
-          # The container bind-mounts /lib/modules from the host; iptables-legacy inside the
-          # container auto-loads modules via request_module() from the shared /lib/modules tree.
-          # No explicit modprobe needed — iptables-legacy uses xt_tables (not nft_compat), so
-          # there is no nft_compat binding corruption regardless of load order.
+          # The container bind-mounts /lib/modules from the host, so host-loaded modules
+          # become visible inside the container via the shared kernel.
           sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true
           sudo depmod -a > /dev/null 2>&1 || true
+          sudo modprobe nft_compat 2>/dev/null || true
+          # xt_limit is loaded FIRST — loading it after other xt_* modules registers it into
+          # an already-populated nft_compat state and produces a corrupted nf_tables binding,
+          # causing RULE_APPEND failures. Loading it first into a clean nft_compat state
+          # establishes a stable binding that survives subsequent module additions.
+          # xt_TCPMSS uses an uppercase filename; xt_DSCP is an alias of xt_dscp.
+          # rpfilter has separate ipt_ (IPv4) and ip6t_ (IPv6) modules; there is no xt_rpfilter.
+          sudo modprobe xt_limit 2>/dev/null || true
+          for m in \
+            xt_comment xt_bpf xt_connlimit xt_connmark xt_CT \
+            xt_dscp xt_DSCP xt_hashlimit ip6t_frag xt_hl xt_iprange \
+            xt_ipvs xt_LOG xt_mac xt_mark xt_multiport \
+            xt_NETMAP ipt_NETMAP xt_NFLOG xt_physdev xt_pkttype \
+            xt_policy xt_recent xt_REDIRECT ipt_rpfilter ip6t_rpfilter xt_socket \
+            xt_statistic xt_string xt_tcpmss xt_TCPMSS \
+            xt_TEE ipt_TEE xt_CHECKSUM xt_ttl; do
+            lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true
+          done
 
       - name: "Install Puppet agent"
         run: |
