@@ -160,7 +160,10 @@ jobs:
           # ip6table modules needed by ip6tables-legacy (SLES) — table init fails before request_module fires
           sudo modprobe ip6table_filter 2>/dev/null || true
           sudo modprobe ip6table_mangle 2>/dev/null || true
-          # xt_ modules needed by iptables-legacy on EL8 — proactively load to avoid request_module gaps
+          # nft_compat bridges xtables extensions into nf_tables — required by iptables-nft (EL8)
+          # Without it the kernel returns ENOENT on any rule using an xt_* match extension
+          sudo modprobe nft_compat 2>/dev/null || true
+          # xt_ modules needed by iptables-nft/iptables-legacy on EL8
           for m in xt_limit xt_comment xt_bpf xt_connlimit xt_connmark xt_CT \
             xt_dscp xt_DSCP xt_hashlimit ip6t_frag xt_hl xt_iprange \
             xt_ipvs xt_LOG xt_mac xt_mark xt_multiport \
@@ -170,6 +173,8 @@ jobs:
             xt_TEE ipt_TEE xt_CHECKSUM xt_ttl; do
             lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true
           done
+          echo "=== nft_compat / xt_limit state ==="
+          lsmod | grep -E "^(nft_compat|xt_limit)" || echo "neither loaded (may be built-in)"
 
       - name: "Provision environment"
         run: |
@@ -193,13 +198,24 @@ jobs:
           # "limit" expression type). AlmaLinux-8 passes because its image uses iptables-legacy.
           # Switch these containers to iptables-legacy the same way.
           bundle exec bolt command run \
-            'yum install -y iptables 2>&1 | grep -E "^(Installed|Already|Error|Nothing|Upgraded)";
+            'echo "=== Before install ===";
+             iptables -V 2>/dev/null || echo "(not installed)";
+             echo "=== yum provides iptables-legacy ===";
+             yum provides "/usr/sbin/iptables-legacy" 2>/dev/null | grep "iptables" | head -3 || echo "not in repos";
+             echo "=== Install iptables iptables-services ===";
+             yum install -y iptables iptables-services 2>&1 | grep -E "^(Install|Installed|Already|Error|Nothing|Upgraded|  iptables)" || true;
+             echo "=== Binaries after install ===";
+             ls /usr/sbin/iptables* 2>/dev/null || echo "none";
+             echo "=== rpm -ql iptables | grep legacy ===";
+             rpm -ql iptables 2>/dev/null | grep legacy || echo "no legacy files in iptables rpm";
+             echo "=== Alternatives ===";
+             alternatives --list 2>/dev/null | grep -i iptables || echo "none";
              if [ -x /usr/sbin/iptables-legacy ]; then
                alternatives --set iptables  /usr/sbin/iptables-legacy  2>/dev/null || true;
                alternatives --set ip6tables /usr/sbin/ip6tables-legacy 2>/dev/null || true;
                echo "Switched to: $(iptables -V)";
              else
-               echo "WARN: /usr/sbin/iptables-legacy not found after install";
+               echo "WARN: iptables-legacy not available — container stays on $(iptables -V 2>/dev/null || echo nft)";
              fi' \
             --targets all \
             --inventoryfile spec/fixtures/litmus_inventory.yaml \
