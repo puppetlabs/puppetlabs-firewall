@@ -152,6 +152,25 @@ jobs:
           bundle env
           echo ::endgroup::
 
+      - name: "Load kernel modules for legacy iptables/ip6tables"
+        if: ${{ inputs.kernel_modules && contains(matrix.platforms.provider, 'docker') && (contains(matrix.platforms.label, 'CentOS-8') || contains(matrix.platforms.label, 'Rocky-8') || contains(matrix.platforms.label, 'SLES')) }}
+        run: |
+          sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true
+          sudo depmod -a > /dev/null 2>&1 || true
+          # ip6table modules needed by ip6tables-legacy (SLES) — table init fails before request_module fires
+          sudo modprobe ip6table_filter 2>/dev/null || true
+          sudo modprobe ip6table_mangle 2>/dev/null || true
+          # xt_ modules needed by iptables-legacy on EL8 — proactively load to avoid request_module gaps
+          for m in xt_limit xt_comment xt_bpf xt_connlimit xt_connmark xt_CT \
+            xt_dscp xt_DSCP xt_hashlimit ip6t_frag xt_hl xt_iprange \
+            xt_ipvs xt_LOG xt_mac xt_mark xt_multiport \
+            xt_NETMAP ipt_NETMAP xt_NFLOG xt_physdev xt_pkttype \
+            xt_policy xt_recent xt_REDIRECT ipt_rpfilter ip6t_rpfilter xt_socket \
+            xt_statistic xt_string xt_tcpmss xt_TCPMSS \
+            xt_TEE ipt_TEE xt_CHECKSUM xt_ttl; do
+            lsmod | grep -q "^$m " || sudo modprobe "$m" 2>/dev/null || true
+          done
+
       - name: "Provision environment"
         run: |
           if [[ "${{ inputs.kernel_modules }}" == "true" ]] && [[ "${{matrix.platforms.provider}}" =~ docker* ]] ; then
