@@ -28,7 +28,7 @@ rescue StandardError
     else
       LitmusHelper.instance.run_shell('yum install iptables-services -y')
     end
-  elsif os[:family] == 'suse'
+  elsif os[:family].casecmp('suse').zero?
     LitmusHelper.instance.run_shell('zypper install -y iptables')
   else
     LitmusHelper.instance.run_shell('apt-get install iptables -y')
