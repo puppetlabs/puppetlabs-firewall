@@ -174,15 +174,35 @@ jobs:
           # become visible inside the container via the shared kernel.
           sudo apt-get install -y --no-install-recommends linux-modules-extra-$(uname -r) > /dev/null 2>&1 || true
           sudo depmod -a > /dev/null 2>&1 || true
-          sudo modprobe nft_compat 2>/dev/null || true
-          # Ubuntu 24.04's native nft_limit module registers expression type "limit" in nf_tables
-          # globally. nft_compat tries to register xt_limit under the same name and gets EEXIST,
-          # leaving the nft_compat binding incomplete — so iptables-nft RULE_APPEND fails with
-          # ENOENT when a rule uses -m limit. Removing nft_limit first frees the name.
-          sudo modprobe -r nft_limit 2>/dev/null || true
+
+          echo "=== module state before setup ==="
+          lsmod | grep -E "^(nft_limit|xt_limit|nft_compat) " || echo "(none of nft_limit/xt_limit/nft_compat loaded)"
+          grep -E "nft.limit|xt.limit" /lib/modules/$(uname -r)/modules.builtin 2>/dev/null \
+            && echo "WARNING: nft_limit or xt_limit is a kernel builtin (cannot be removed)" \
+            || echo "nft_limit/xt_limit are loadable modules (not builtin)"
+
+          # nft_limit registers expression type "limit" in nf_tables.  nft_compat tries to
+          # register xt_limit under the same name and gets EEXIST — so iptables-nft
+          # RULE_APPEND fails with ENOENT on -m limit rules.
+          #
+          # Fix: remove nft_limit BEFORE loading nft_compat (so nft_compat is not yet holding
+          # any reference that would prevent removal), then load xt_limit, then load nft_compat
+          # so that nft_compat can register "limit" via xt_limit with no conflict.
+          echo "=== removing nft_limit ==="
+          sudo modprobe -r nft_limit 2>&1 && echo "nft_limit removed OK" \
+            || echo "nft_limit removal failed — limit match will not work via nft_compat"
+          echo "=== loading xt_limit ==="
+          sudo modprobe xt_limit 2>&1 && echo "xt_limit loaded OK" \
+            || echo "xt_limit load failed"
+          echo "=== loading nft_compat ==="
+          sudo modprobe nft_compat 2>&1 && echo "nft_compat loaded OK" \
+            || echo "nft_compat load failed"
+
+          echo "=== module state after setup ==="
+          lsmod | grep -E "^(nft_limit|xt_limit|nft_compat) " || echo "(none of nft_limit/xt_limit/nft_compat loaded)"
+
           # xt_TCPMSS uses an uppercase filename; xt_DSCP is an alias of xt_dscp.
           # rpfilter has separate ipt_ (IPv4) and ip6t_ (IPv6) modules; there is no xt_rpfilter.
-          sudo modprobe xt_limit 2>/dev/null || true
           for m in \
             xt_comment xt_bpf xt_connlimit xt_connmark xt_CT \
             xt_dscp xt_DSCP xt_hashlimit ip6t_frag xt_hl xt_iprange \
