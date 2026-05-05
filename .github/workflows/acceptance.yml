@@ -198,24 +198,15 @@ jobs:
           # "limit" expression type). AlmaLinux-8 passes because its image uses iptables-legacy.
           # Switch these containers to iptables-legacy the same way.
           bundle exec bolt command run \
-            'echo "=== Before install ===";
-             iptables -V 2>/dev/null || echo "(not installed)";
-             echo "=== yum provides iptables-legacy ===";
-             yum provides "/usr/sbin/iptables-legacy" 2>/dev/null | grep "iptables" | head -3 || echo "not in repos";
-             echo "=== Install iptables iptables-services ===";
-             yum install -y iptables iptables-services 2>&1 | grep -E "^(Install|Installed|Already|Error|Nothing|Upgraded|  iptables)" || true;
-             echo "=== Binaries after install ===";
-             ls /usr/sbin/iptables* 2>/dev/null || echo "none";
-             echo "=== rpm -ql iptables | grep legacy ===";
-             rpm -ql iptables 2>/dev/null | grep legacy || echo "no legacy files in iptables rpm";
-             echo "=== Alternatives ===";
-             alternatives --list 2>/dev/null | grep -i iptables || echo "none";
+            'echo "Before: $(iptables -V 2>/dev/null || echo not-installed)";
+             yum update -y iptables iptables-services 2>&1 | grep -E "^(Install|Installed|Already|Error|Nothing|Upgraded|  iptables)" || true;
+             echo "iptables rpm: $(rpm -q iptables 2>/dev/null || echo not-installed)";
              if [ -x /usr/sbin/iptables-legacy ]; then
                alternatives --set iptables  /usr/sbin/iptables-legacy  2>/dev/null || true;
                alternatives --set ip6tables /usr/sbin/ip6tables-legacy 2>/dev/null || true;
                echo "Switched to: $(iptables -V)";
              else
-               echo "WARN: iptables-legacy not available — container stays on $(iptables -V 2>/dev/null || echo nft)";
+               echo "WARN: no iptables-legacy binary after update ($(iptables -V 2>/dev/null || echo nft))";
              fi' \
             --targets all \
             --inventoryfile spec/fixtures/litmus_inventory.yaml \
