@@ -117,6 +117,7 @@ RSpec.configure do |c|
     # is set to 'redhat'
     LitmusHelper.instance.run_shell('yum install policycoreutils -y') if ['almalinux-8', 'rocky-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
     if fetch_os_name.start_with?('sles')
+      LitmusHelper.instance.run_shell('zypper install -y kmod')
       LitmusHelper.instance.run_shell('modprobe ip6table_filter')
       LitmusHelper.instance.run_shell('modprobe ip6table_mangle')
     end
