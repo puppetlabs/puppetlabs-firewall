@@ -28,6 +28,8 @@ rescue StandardError
     else
       LitmusHelper.instance.run_shell('yum install iptables-services -y')
     end
+  elsif os[:family].to_s.casecmp('suse').zero? || fetch_os_name.start_with?('sles')
+    LitmusHelper.instance.run_shell('zypper install -y iptables')
   else
     LitmusHelper.instance.run_shell('apt-get install iptables -y')
   end
@@ -114,5 +116,10 @@ RSpec.configure do |c|
     # this so that policycoreutils is installed on platform where the os.family fact
     # is set to 'redhat'
     LitmusHelper.instance.run_shell('yum install policycoreutils -y') if ['almalinux-8', 'rocky-8'].include?("#{fetch_os_name}-#{os[:release].to_i}")
+    if fetch_os_name.start_with?('sles')
+      LitmusHelper.instance.run_shell('zypper install -y kmod')
+      LitmusHelper.instance.run_shell('modprobe ip6table_filter')
+      LitmusHelper.instance.run_shell('modprobe ip6table_mangle')
+    end
   end
 end
