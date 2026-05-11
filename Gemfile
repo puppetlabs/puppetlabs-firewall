@@ -1,15 +1,37 @@
-source ENV['GEM_SOURCE'] || 'https://rubygems.org'
+# frozen_string_literal: true
 
-def location_for(place_or_version, fake_version = nil)
-  git_url_regex = %r{\A(?<url>(https?|git)[:@][^#]*)(#(?<branch>.*))?}
-  file_url_regex = %r{\Afile:\/\/(?<path>.*)}
+# For puppetcore, set GEM_SOURCE_PUPPETCORE = 'https://rubygems-puppetcore.puppet.com'
+gemsource_default = ENV['GEM_SOURCE'] || 'https://rubygems.org'
+gemsource_puppetcore = if ENV['PUPPET_FORGE_TOKEN']
+  'https://rubygems-puppetcore.puppet.com'
+else
+  ENV['GEM_SOURCE_PUPPETCORE'] || gemsource_default
+end
+source gemsource_default
 
-  if place_or_version && (git_url = place_or_version.match(git_url_regex))
-    [fake_version, { git: git_url[:url], branch: git_url[:branch], require: false }].compact
-  elsif place_or_version && (file_url = place_or_version.match(file_url_regex))
-    ['>= 0', { path: File.expand_path(file_url[:path]), require: false }]
+def location_for(place_or_constraint, fake_constraint = nil, opts = {})
+  git_url_regex  = /\A(?<url>(?:https?|git)[:@][^#]*)(?:#(?<branch>.*))?/
+  file_url_regex = %r{\Afile://(?<path>.*)}
+
+  if place_or_constraint && (git_url = place_or_constraint.match(git_url_regex))
+    # Git source → ignore :source, keep fake_constraint
+    [fake_constraint, { git: git_url[:url], branch: git_url[:branch], require: false }].compact
+
+  elsif place_or_constraint && (file_url = place_or_constraint.match(file_url_regex))
+    # File source → ignore :source, keep fake_constraint or default >= 0
+    [fake_constraint || '>= 0', { path: File.expand_path(file_url[:path]), require: false }]
+
   else
-    [place_or_version, { require: false }]
+    # Plain version constraint → merge opts (including :source if provided)
+    [place_or_constraint, { require: false }.merge(opts)]
+  end
+end
+
+# Print debug information if DEBUG_GEMS or VERBOSE is set
+def print_gem_statement_for(gems)
+  puts 'DEBUG: Gem definitions that will be generated:'
+  gems.each do |gem_name, gem_params|
+    puts "DEBUG:   gem #{([gem_name.inspect] + gem_params.map(&:inspect)).join(', ')}"
   end
 end
 
@@ -30,11 +52,14 @@ group :development do
   gem "pry", '~> 0.10',                          require: false
   gem "simplecov-console", '~> 0.9',             require: false
   gem "puppet-debugger", '~> 1.6',               require: false
-  gem "rubocop", '~> 1.50.0',                    require: false
-  gem "rubocop-performance", '= 1.16.0',         require: false
-  gem "rubocop-rspec", '= 2.19.0',               require: false
-  gem "rb-readline", '= 0.5.5',                  require: false, platforms: [:mswin, :mingw, :x64_mingw]
-  gem "bigdecimal", '< 3.2.2',                   require: false, platforms: [:mswin, :mingw, :x64_mingw]
+  gem "rubocop", '~> 1.73.0',                    require: false
+  gem "rubocop-performance", '~> 1.24.0',        require: false
+  gem "rubocop-rspec", '~> 3.5.0',               require: false
+  gem "rubocop-rspec_rails", '~> 2.31.0',        require: false
+  gem "rubocop-factory_bot", '~> 2.27.0',        require: false
+  gem "rubocop-capybara", '~> 2.22.0',           require: false
+  gem "rb-readline", '= 0.5.5',                  require: false, platforms: [:windows]
+  gem "bigdecimal", '< 3.2.2',                   require: false, platforms: [:windows]
   gem "puppet-resource_api",                     require: false
 end
 group :development, :release_prep do
@@ -43,29 +68,25 @@ group :development, :release_prep do
   gem "puppet-blacksmith", '~> 7.0',      require: false
 end
 group :system_tests do
-  gem "puppet_litmus", '~> 2.0',   require: false, platforms: [:ruby, :x64_mingw] if !ENV['PUPPET_FORGE_TOKEN'].to_s.empty?
-  gem "puppet_litmus", '~> 1.0',   require: false, platforms: [:ruby, :x64_mingw] if ENV['PUPPET_FORGE_TOKEN'].to_s.empty?
-  gem "CFPropertyList", '< 3.0.7', require: false, platforms: [:mswin, :mingw, :x64_mingw]
+  gem "puppet_litmus", '~> 2.0',   require: false, platforms: [:ruby, :windows] if !ENV['PUPPET_FORGE_TOKEN'].to_s.empty?
+  gem "puppet_litmus", '~> 1.0',   require: false, platforms: [:ruby, :windows] if ENV['PUPPET_FORGE_TOKEN'].to_s.empty?
+  gem "CFPropertyList", '< 3.0.7', require: false if RUBY_PLATFORM.include?('darwin')
   gem "serverspec", '~> 2.41',     require: false
 end
 
 gems = {}
+bolt_version = ENV.fetch('BOLT_GEM_VERSION', nil)
 puppet_version = ENV.fetch('PUPPET_GEM_VERSION', nil)
 facter_version = ENV.fetch('FACTER_GEM_VERSION', nil)
 hiera_version = ENV.fetch('HIERA_GEM_VERSION', nil)
 
-# If PUPPET_FORGE_TOKEN is set then use authenticated source for both puppet and facter, since facter is a transitive dependency of puppet
-# Otherwise, do as before and use location_for to fetch gems from the default source
-if !ENV['PUPPET_FORGE_TOKEN'].to_s.empty?
-  gems['puppet'] = ['~> 8.11', { require: false, source: 'https://rubygems-puppetcore.puppet.com' }]
-  gems['facter'] = ['~> 4.11', { require: false, source: 'https://rubygems-puppetcore.puppet.com' }]
-else
-  gems['puppet'] = location_for(puppet_version)
-  gems['facter'] = location_for(facter_version) if facter_version
-end
+gems['bolt'] = location_for(bolt_version, nil, { source: gemsource_puppetcore })
+gems['puppet'] = location_for(puppet_version, nil, { source: gemsource_puppetcore })
+gems['facter'] = location_for(facter_version, nil, { source: gemsource_puppetcore })
+gems['hiera'] = location_for(hiera_version, nil, {}) if hiera_version
 
-gems['hiera'] = location_for(hiera_version) if hiera_version
-
+# Generate the gem definitions
+print_gem_statement_for(gems) if ENV['DEBUG']
 gems.each do |gem_name, gem_params|
   gem gem_name, *gem_params
 end
@@ -73,12 +94,14 @@ end
 # Evaluate Gemfile.local and ~/.gemfile if they exist
 extra_gemfiles = [
   "#{__FILE__}.local",
-  File.join(Dir.home, '.gemfile'),
+  File.join(Dir.home, '.gemfile')
 ]
 
 extra_gemfiles.each do |gemfile|
-  if File.file?(gemfile) && File.readable?(gemfile)
-    eval(File.read(gemfile), binding)
-  end
+  next unless File.file?(gemfile) && File.readable?(gemfile)
+
+  # rubocop:disable Security/Eval
+  eval(File.read(gemfile), binding)
+  # rubocop:enable Security/Eval
 end
 # vim: syntax=ruby

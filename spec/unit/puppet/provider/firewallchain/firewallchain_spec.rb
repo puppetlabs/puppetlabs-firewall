@@ -333,9 +333,8 @@ COMMIT
         it "purge chain: '#{test[:should]}'" do
           resources = provider.generate(context, test[:should][:name], {}, test[:should])
 
-          names = []
-          resources.each do |resource|
-            names << resource.rsapi_current_state[:name]
+          names = resources.map do |resource|
+            resource.rsapi_current_state[:name]
           end
 
           expect(names).to eq(test[:purge])

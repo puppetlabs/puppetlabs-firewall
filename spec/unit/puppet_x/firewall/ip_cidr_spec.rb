@@ -4,7 +4,7 @@ require 'puppet_x'
 require 'spec_helper'
 require 'puppet_x/puppetlabs/firewall/ipcidr'
 
-RSpec.describe PuppetX::Firewall::IPCidr do # rubocop:disable RSpec/FilePath
+RSpec.describe PuppetX::Firewall::IPCidr do
   let(:ipcidr) { described_class }
 
   describe 'ipv4 address' do
