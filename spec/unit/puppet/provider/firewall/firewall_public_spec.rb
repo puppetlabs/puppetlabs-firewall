@@ -219,8 +219,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
         ] },
         # if not needed; either value is nil or only one is an array
         { testing: 'when defaulting to the standard comparison', property_name: :stat_packet, comparisons: [
-          { is_hash: { stat_packet: 313 }, should_hash: { stat_packet: 313 }, result: nil },
-          { is_hash: { stat_packet: 313 }, should_hash: { stat_packet: 42 }, result: nil },
+          { is_hash: { stat_packet: 313 }, should_hash: { stat_packet: 313 }, result: false },
+          { is_hash: { stat_packet: 313 }, should_hash: { stat_packet: 42 }, result: false },
         ] },
       ].each do |test|
         context "with attributes: '#{test[:testing]}'" do

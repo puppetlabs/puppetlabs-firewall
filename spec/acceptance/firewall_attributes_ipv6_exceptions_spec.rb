@@ -373,7 +373,7 @@ describe 'firewall ipv6 attribute testing, exceptions' do
     end
 
     it 'hashlimit_name set to "upto-ip6"' do
-      expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m hashlimit --hashlimit-upto 16/sec --hashlimit-burst 640 --hashlimit-name upto-ip6 --hashlimit-htable-size 1000000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "803 - hashlimit_upto test ip6" -j ACCEPT}) # rubocop:disable Layout/LineLength : Cannot reduce line to required length
+      expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m hashlimit --hashlimit-upto 16/sec --hashlimit-burst 640 --hashlimit-name upto-ip6 --hashlimit-htable-size 1000000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "803 - hashlimit_upto test ip6" -j ACCEPT}) # rubocop:disable Layout/LineLength -- Cannot reduce line to required length
     end
 
     it 'match_mark is set' do

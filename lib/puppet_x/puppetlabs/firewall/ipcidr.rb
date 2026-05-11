@@ -7,7 +7,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
   # IPCidr object wrapper for IPAddr
   class IPCidr < IPAddr
     def initialize(ipaddr, family = Socket::AF_UNSPEC)
-      super(ipaddr, family)
+      super
     rescue ArgumentError => e
       raise ArgumentError, "Invalid address from IPAddr.new: #{ipaddr}" if e.message.include?('invalid address')
 

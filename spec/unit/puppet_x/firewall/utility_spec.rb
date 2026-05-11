@@ -5,7 +5,7 @@ require 'spec_helper'
 require 'puppet/resource_api'
 require 'puppet_x/puppetlabs/firewall/utility'
 
-RSpec.describe PuppetX::Firewall::Utility do # rubocop:disable RSpec/FilePath
+RSpec.describe PuppetX::Firewall::Utility do
   let(:utility) { described_class }
 
   describe '#persist_iptables' do
