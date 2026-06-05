@@ -325,7 +325,7 @@ class Puppet::Provider::Firewall::Firewall
     context.debug("Checking whether '#{property_name}' is out of sync")
 
     # If either value is nil, no custom logic is required unless property is source or destination
-    return false if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination].include?(property_name)
+    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination].include?(property_name) # rubocop:disable Style/ReturnNilInPredicateMethodDefinition -- nil signals "use default comparison" in Puppet's Resource API insync? protocol
 
     case property_name
     when :protocol
@@ -451,7 +451,7 @@ class Puppet::Provider::Firewall::Firewall
       is == should
     else
       # Ensure that if both values are arrays, that they are sorted prior to comparison
-      return false unless is_hash[property_name].is_a?(Array) && should_hash[property_name].is_a?(Array)
+      return nil unless is_hash[property_name].is_a?(Array) && should_hash[property_name].is_a?(Array) # rubocop:disable Style/ReturnNilInPredicateMethodDefinition -- nil signals "use default comparison" in Puppet's Resource API insync? protocol
 
       is_hash[property_name].sort == should_hash[property_name].sort
     end
