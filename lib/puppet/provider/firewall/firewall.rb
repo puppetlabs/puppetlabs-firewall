@@ -325,7 +325,7 @@ class Puppet::Provider::Firewall::Firewall
     context.debug("Checking whether '#{property_name}' is out of sync")
 
     # If either value is nil, no custom logic is required unless property is source or destination
-    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination].include?(property_name)
+    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination].include?(property_name) # rubocop:disable Style/ReturnNilInPredicateMethodDefinition -- nil signals "use default comparison" in Puppet's Resource API insync? protocol
 
     case property_name
     when :protocol
@@ -451,7 +451,7 @@ class Puppet::Provider::Firewall::Firewall
       is == should
     else
       # Ensure that if both values are arrays, that they are sorted prior to comparison
-      return nil unless is_hash[property_name].is_a?(Array) && should_hash[property_name].is_a?(Array)
+      return nil unless is_hash[property_name].is_a?(Array) && should_hash[property_name].is_a?(Array) # rubocop:disable Style/ReturnNilInPredicateMethodDefinition -- nil signals "use default comparison" in Puppet's Resource API insync? protocol
 
       is_hash[property_name].sort == should_hash[property_name].sort
     end
@@ -643,9 +643,8 @@ class Puppet::Provider::Firewall::Firewall
         if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s--"))
           value_regex = Regexp.new('(?:\\s--(invert|validmark|loose|accept-local))')
           key_value = parse_rule.scan(value_regex)
-          return_value = []
-          key_value.each do |val|
-            return_value << val[0]
+          return_value = key_value.map do |val|
+            val[0]
           end
           rule_hash[key] = return_value[0] if return_value.length == 1
           rule_hash[key] = return_value if return_value.length > 1
@@ -686,9 +685,8 @@ class Puppet::Provider::Firewall::Firewall
   # @api private
   def self.validate_get(_context, rules)
     # Verify that names are unique
-    names = []
-    rules.each do |rule|
-      names << rule[:name]
+    names = rules.map do |rule|
+      rule[:name]
     end
     raise ArgumentError, 'Duplicate names have been found within your Firewalls. This prevents the module from working correctly and must be manually resolved.' if names.length != names.uniq.length
     # Verify that the current order of the retrieved puppet rules is correct
@@ -759,7 +757,7 @@ class Puppet::Provider::Firewall::Firewall
             "When negating a `#{key}` array, you must negate either the first given value only or all the given values."
     end
     raise ArgumentError, 'Value `any` is not valid. This behaviour should be achieved by omitting or undefining the ICMP parameter.' if should[:icmp] && should[:icmp] == 'any'
-    raise ArgumentError, '`burst` cannot be set without `limit`.' if should[:burst] && !(should[:limit])
+    raise ArgumentError, '`burst` cannot be set without `limit`.' if should[:burst] && !should[:limit]
 
     # Verify that a correct range has been passed for `length`
     if should[:length]
@@ -778,7 +776,7 @@ class Puppet::Provider::Firewall::Firewall
     raise ArgumentError, '`recent` must be set for `rdest` to be set.' if should[:rdest] && !should[:recent]
     raise ArgumentError, '`rdest` and `rsource` are mutually exclusive, only one may be set at a time.' if should[:rsource] && should[:rdest]
     # String module
-    raise ArgumentError, '`string_algo` must be set for `string` or `string_hex` to be set.' if (should[:string] || should[:string_hex]) && !(should[:string_algo])
+    raise ArgumentError, '`string_algo` must be set for `string` or `string_hex` to be set.' if (should[:string] || should[:string_hex]) && !should[:string_algo]
     # NFQUEUE
     raise ArgumentError, '`queue_num`` must be between 0 and 65535' if should[:queue_num] && (should[:queue_num].to_i > 65_535 || should[:queue_num].to_i.negative?)
     # Jump
@@ -815,11 +813,11 @@ class Puppet::Provider::Firewall::Firewall
     # Protocol
     ipv4_only = [:clusterip_new, :clusterip_hashmode, :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init]
     ipv4_only.each do |ipv4|
-      raise ArgumentError, "Parameter `#{ipv4}` is specific to the `IPv4` protocol" if should[ipv4] && !(should[:protocol] == 'IPv4' || should[:protocol] == 'iptables')
+      raise ArgumentError, "Parameter `#{ipv4}` is specific to the `IPv4` protocol" if should[ipv4] && !['IPv4', 'iptables'].include?(should[:protocol])
     end
     ipv6_only = [:hop_limit, :ishasmorefrags, :islastfrag, :isfirstfrag]
     ipv6_only.each do |ipv6|
-      raise ArgumentError, "Parameter `#{ipv6}` is specific to the `IPv6` protocol" if should[ipv6] && !(should[:protocol] == 'IPv6' || should[:protocol] == 'ip6tables')
+      raise ArgumentError, "Parameter `#{ipv6}` is specific to the `IPv6` protocol" if should[ipv6] && !['IPv6', 'ip6tables'].include?(should[:protocol])
     end
     ## Array elements must be unique
     [:dst_type, :src_type].each do |key|

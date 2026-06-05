@@ -4,7 +4,7 @@ require 'spec_helper_acceptance'
 
 describe 'firewall class' do
   before(:all) do
-    update_profile_file if os[:family] == 'ubuntu' || os[:family] == 'debian'
+    update_profile_file if ['ubuntu', 'debian'].include?(os[:family])
   end
 
   it 'runs successfully' do

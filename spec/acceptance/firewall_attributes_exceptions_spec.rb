@@ -2,9 +2,9 @@
 
 require 'spec_helper_acceptance'
 
-describe 'firewall basics', docker: true do
+describe 'firewall basics', :docker do
   before :all do
-    if os[:family] == 'ubuntu' || os[:family] == 'debian'
+    if ['ubuntu', 'debian'].include?(os[:family])
       update_profile_file
     elsif os[:family] == 'redhat'
       pre_setup
@@ -716,7 +716,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      it 'contains the static 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample : The values being matched differ
+      it 'contains the static 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample -- The values being matched differ
         run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(/32)? -p (tcp|6) -m tcp --dport 100 -m comment --comment "100 test source static" -j ACCEPT})
         end
@@ -741,7 +741,7 @@ describe 'firewall basics', docker: true do
         end
       end
 
-      it 'contains the staic 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample : The values being matched differ
+      it 'contains the staic 8.0.0.2 rule' do # rubocop:disable RSpec/RepeatedExample -- The values being matched differ
         run_shell('iptables-save') do |r|
           expect(r.stdout).to match(%r{-A INPUT -s 8\.0\.0\.2(/32)? -p (tcp|6) -m tcp --dport 100 -m comment --comment "100 test source static" -j ACCEPT})
         end
@@ -1301,7 +1301,7 @@ describe 'firewall basics', docker: true do
     end
 
     it 'hashlimit_upto is set' do
-      expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m hashlimit --hashlimit-upto 16/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1000000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Layout/LineLength : Cannot reduce line to required length
+      expect(result.stdout).to match(%r{-A INPUT -p (tcp|6) -m hashlimit --hashlimit-upto 16/sec --hashlimit-burst 640 --hashlimit-name upto --hashlimit-htable-size 1000000 --hashlimit-htable-max 320000 --hashlimit-htable-expire 36000000 -m comment --comment "806 - hashlimit_upto test" -j ACCEPT}) # rubocop:disable Layout/LineLength -- Cannot reduce line to required length
     end
   end
 
