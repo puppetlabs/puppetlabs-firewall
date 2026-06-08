@@ -173,6 +173,10 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { log_level: '1' }, should_hash: { log_level: 'alert' }, result: true },
           { is_hash: { log_level: '1' }, should_hash: { log_level: 1 }, result: true },
           { is_hash: { log_level: '1' }, should_hash: { log_level: 'err' }, result: false },
+          { is_hash: { log_level: nil }, should_hash: { log_level: 4 }, result: true },
+          { is_hash: { log_level: nil }, should_hash: { log_level: 'warn' }, result: true },
+          { is_hash: { log_level: nil }, should_hash: { log_level: 'warning' }, result: true },
+          { is_hash: { log_level: nil }, should_hash: { log_level: 'alert' }, result: false },
         ] },
         { testing: 'set_mark', property_name: :set_mark, comparisons: [
           { is_hash: { set_mark: '42/42' }, should_hash: { set_mark: '0x2a/0x2a' }, result: true },

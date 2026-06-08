@@ -325,7 +325,7 @@ class Puppet::Provider::Firewall::Firewall
     context.debug("Checking whether '#{property_name}' is out of sync")
 
     # If either value is nil, no custom logic is required unless property is source or destination
-    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination].include?(property_name) # rubocop:disable Style/ReturnNilInPredicateMethodDefinition -- nil signals "use default comparison" in Puppet's Resource API insync? protocol
+    return nil if (is_hash[property_name].nil? || should_hash[property_name].nil?) && ![:source, :destination, :log_level].include?(property_name) # rubocop:disable Style/ReturnNilInPredicateMethodDefinition -- nil signals "use default comparison" in Puppet's Resource API insync? protocol
 
     case property_name
     when :protocol
@@ -396,9 +396,10 @@ class Puppet::Provider::Firewall::Firewall
       should = PuppetX::Firewall::Utility.icmp_name_to_number(should_hash[property_name], should_hash[:protocol])
       is == should
     when :log_level
-      # Ensure that the values are compared to each other as log level numbers
-      is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name])
-      should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name])
+      # iptables-save omits --log-level when the kernel default (4/warn) is in use,
+      # so a nil "is" value is equivalent to 4.
+      is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name] || '4')
+      should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name] || '4')
       is == should
     when :set_mark, :match_mark, :connmark
       # Ensure that the values are compared to eachother in hexidecimal format
