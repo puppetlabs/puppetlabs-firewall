@@ -995,8 +995,8 @@ Data type: `Optional[Variant[Integer[0,7],String[1]]]`
 
       When combined with jump => "LOG" specifies the system log level to log to.
 
-      Note: log level 4/warn is the default setting and as such it is not returned by iptables-save.
-      As a result, explicitly setting `log_level` to this can result in idempotency errors.
+      Note: log level 4/warn is the default setting. iptables-save omits this value, so
+      explicitly setting `log_level` to 4 or "warn" is handled correctly.
 
 ##### `log_prefix`
 
