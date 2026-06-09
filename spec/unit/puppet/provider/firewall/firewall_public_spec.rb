@@ -216,6 +216,15 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { string_hex: '|f46d0425b202000a|' }, should_hash: { string_hex: '|f4 6d 04 25 b2 02 00 0a|' }, result: true },
           { is_hash: { string_hex: '|f4 6d 04 25 b2 02 00 0a|' }, should_hash: { string_hex: '|f4 6d 04 25 b2 02 00 0a|' }, result: true },
         ] },
+        { testing: 'ipset', property_name: :ipset, comparisons: [
+          { is_hash: { ipset: 'setname src' }, should_hash: { ipset: ['setname src'] }, result: true },
+          { is_hash: { ipset: ['setname src'] }, should_hash: { ipset: 'setname src' }, result: true },
+          { is_hash: { ipset: 'setname src' }, should_hash: { ipset: 'setname src' }, result: true },
+          { is_hash: { ipset: ['setname src'] }, should_hash: { ipset: ['setname src'] }, result: true },
+          { is_hash: { ipset: ['setname2 dst', 'setname1 src'] }, should_hash: { ipset: ['setname1 src', 'setname2 dst'] }, result: true },
+          { is_hash: { ipset: 'setname src' }, should_hash: { ipset: 'setname2 dst' }, result: false },
+          { is_hash: { ipset: ['setname src'] }, should_hash: { ipset: ['setname2 dst'] }, result: false },
+        ] },
         # if both values are arrays
         { testing: 'when comparing arrays', property_name: :week_days, comparisons: [
           { is_hash: { week_days: ['Mon', 'Tue', 'Wed'] }, should_hash: { week_days: ['Tue', 'Mon', 'Wed'] }, result: true },
