@@ -26,8 +26,11 @@ RSpec.describe 'firewall type' do
       invalid: [{ name: '001 test rule', ensure: true }, { name: '001 test rule', ensure: 313 }, { name: '001 test rule', ensure: 'false' }]
     },
     ':name': {
-      valid: [{ name: '001 first' }, { name: '202 second rule' }, { name: '333 third rule also' }],
-      invalid: [{ name: 'invalid rule 001' }, { name: 'invalid rule two' }]
+      valid: [{ name: '001 first' }, { name: '202 second rule' }, { name: '333 third rule also' },
+              { name: '001 accept_loopback' }, { name: '100 drop_invalid_packets' },
+              { name: '010 allow-ssh' }, { name: '500 mixed_and-hyphenated rule' }],
+      invalid: [{ name: 'invalid rule 001' }, { name: 'invalid rule two' },
+                { name: '001' }, { name: '001!' }]
     },
     ':protocol': {
       valid: [{ name: '001 test rule', protocol: 'iptables' }, { name: '001 test rule', protocol: 'ip6tables' },
