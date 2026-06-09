@@ -46,14 +46,14 @@ describe 'puppet resource firewallchain command' do
     end
 
     context 'with build in chains' do
-      pp1 = <<-PUPPETCODE
+      pp3 = <<-PUPPETCODE
           firewallchain { 'INPUT:nat:IPv4':
             ensure  => present,
           }
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        idempotent_apply(pp1)
+        idempotent_apply(pp3)
       end
 
       it 'finds the chain' do
@@ -66,14 +66,14 @@ describe 'puppet resource firewallchain command' do
 
   describe 'IPv6' do
     context 'when present' do
-      pp3 = <<-PUPPETCODE
+      pp4 = <<-PUPPETCODE
           firewallchain { 'MY_CHAIN:filter:IPv6':
             ensure  => present,
           }
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        idempotent_apply(pp3)
+        idempotent_apply(pp4)
       end
 
       it 'finds the chain' do
@@ -84,14 +84,14 @@ describe 'puppet resource firewallchain command' do
     end
 
     context 'when absent' do
-      pp4 = <<-PUPPETCODE
+      pp5 = <<-PUPPETCODE
           firewallchain { 'MY_CHAIN:filter:IPv6':
             ensure  => absent,
           }
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        idempotent_apply(pp4)
+        idempotent_apply(pp5)
       end
 
       it 'fails to find the chain' do
@@ -102,26 +102,26 @@ describe 'puppet resource firewallchain command' do
     end
 
     context 'when NAT chain present' do
-      pp5 = <<-PUPPETCODE
+      pp6 = <<-PUPPETCODE
           firewallchain { 'MY_NAT_CHAIN:nat:IPv6':
             ensure  => present,
           }
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        idempotent_apply(pp5)
+        idempotent_apply(pp6)
       end
     end
 
     context 'when NAT chain absent' do
-      pp6 = <<-PUPPETCODE
+      pp7 = <<-PUPPETCODE
           firewallchain { 'MY_NAT_CHAIN:nat:IPv6':
             ensure  => absent,
           }
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        idempotent_apply(pp6)
+        idempotent_apply(pp7)
       end
 
       it 'fails to find the chain' do
@@ -134,7 +134,7 @@ describe 'puppet resource firewallchain command' do
 
   # XXX purge => false is not yet implemented
   # context 'when adding a firewall rule to a chain:' do
-  #    pp7 = <<-PUPPETCODE
+  #    pp8 = <<-PUPPETCODE
   #      firewallchain { 'MY_CHAIN:filter:IPv4':
   #        ensure  => present,
   #      }
@@ -147,13 +147,13 @@ describe 'puppet resource firewallchain command' do
   #    PUPPETCODE
   #  it 'applies cleanly' do
   #    # Run it twice and test for idempotency
-  #    apply_manifest(pp7, :catch_failures => true)
-  #    apply_manifest(pp7, :catch_changes => do_catch_changes)
+  #    apply_manifest(pp8, :catch_failures => true)
+  #    apply_manifest(pp8, :catch_changes => do_catch_changes)
   #  end
   # end
 
   # context 'when not purge firewallchain chains:' do
-  #    pp8 = <<-PUPPETCODE
+  #    pp9 = <<-PUPPETCODE
   #      firewallchain { 'MY_CHAIN:filter:IPv4':
   #        ensure  => present,
   #        purge   => false,
@@ -165,14 +165,14 @@ describe 'puppet resource firewallchain command' do
   #    PUPPETCODE
   #  it 'does not purge the rule' do
   #    # Run it twice and test for idempotency
-  #    apply_manifest(pp8, :catch_failures => true) do |r|
+  #    apply_manifest(pp9, :catch_failures => true) do |r|
   #      expect(r.stdout).to_not match(/removed/)
   #      expect(r.stderr).to eq('')
   #    end
-  #    apply_manifest(pp8, :catch_changes => do_catch_changes)
+  #    apply_manifest(pp9, :catch_changes => do_catch_changes)
   #  end
 
-  #    pp9 = <<-PUPPETCODE
+  #    pp10 = <<-PUPPETCODE
   #      firewall { '100 my rule':
   #        chain   => 'MY_CHAIN',
   #        action  => 'accept',
@@ -182,7 +182,7 @@ describe 'puppet resource firewallchain command' do
   #    PUPPETCODE
   #  it 'still has the rule' do
   #    # Run it twice and test for idempotency
-  #    apply_manifest(pp9, :catch_changes => do_catch_changes)
+  #    apply_manifest(pp10, :catch_changes => do_catch_changes)
   #  end
   # end
 
@@ -192,14 +192,14 @@ describe 'puppet resource firewallchain command' do
     end
 
     context 'when DROP' do
-      pp10 = <<-PUPPETCODE
+      pp11 = <<-PUPPETCODE
           firewallchain { 'FORWARD:filter:IPv4':
             policy  => 'drop',
           }
       PUPPETCODE
       it 'applies cleanly' do
         # Run it twice and test for idempotency
-        idempotent_apply(pp10)
+        idempotent_apply(pp11)
       end
 
       it 'finds the chain' do
