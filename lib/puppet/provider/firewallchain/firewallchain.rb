@@ -14,7 +14,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
     'ip6tables' => 'ip6tables-save'
   }
   # Regex used to divide output of$fwc_list_command between tables
-  $fwc_table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[^*]+)}
+  $fwc_table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[\s\S]+?)(?=^\*|\z)}
   # Array of all the supported iptables
   $fwc_supported_tables = ['nat', 'mangle', 'filter', 'raw', 'rawpost', 'broute', 'security']
   # Regex used to retrieve Chains
