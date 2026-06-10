@@ -482,6 +482,9 @@ class Puppet::Provider::Firewall::Firewall
     protocols.each do |protocol|
       # Retrieve String containing all information
       iptables_list = Puppet::Provider.execute($fw_list_command[protocol], combine: false, failonfail: true)
+      # Strip any iptables warning messages that may be interleaved mid-line in the output
+      # (e.g. "# Warning: iptables-legacy tables present"), which can corrupt rule parsing.
+      iptables_list = iptables_list.gsub(%r{# Warning:[^\n]*\n?}, '')
       # Scan String to retrieve all Rules
       iptables_list.scan($fw_table_regex).each do |table|
         table_name = table[0].scan($fw_table_name_regex)[0][0]
