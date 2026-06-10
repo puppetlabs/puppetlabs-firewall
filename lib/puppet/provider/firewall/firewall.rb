@@ -404,7 +404,7 @@ class Puppet::Provider::Firewall::Firewall
       is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name] || '4')
       should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name] || '4')
       is == should
-    when :set_mark, :match_mark, :connmark
+    when :set_mark, :match_mark, :connmark, :ctmask, :nfmask
       # Ensure that the values are compared to eachother in hexidecimal format
       is = PuppetX::Firewall::Utility.mark_mask_to_hex(is_hash[property_name])
       should = PuppetX::Firewall::Utility.mark_mask_to_hex(should_hash[property_name])
@@ -809,6 +809,8 @@ class Puppet::Provider::Firewall::Firewall
     raise ArgumentError, 'Parameter `helper` requires `jump => CT`'  if should[:helper] && should[:jump] != 'CT'
     raise ArgumentError, 'Parameter `notrack` requires `jump => CT`' if should[:notrack] && should[:jump] != 'CT'
     # Connlimit
+    raise ArgumentError, 'Parameter `ctmask` requires `restore_mark => true`' if should[:ctmask] && !should[:restore_mark]
+    raise ArgumentError, 'Parameter `nfmask` requires `restore_mark => true`' if should[:nfmask] && !should[:restore_mark]
     raise ArgumentError, 'Parameter `connlimit_mask` requires either `connlimit_upto` or `connlimit_above`' if should[:connlimit_mask] && !(should[:connlimit_upto] || should[:connlimit_above])
 
     # Hashlimit
@@ -895,10 +897,12 @@ class Puppet::Provider::Firewall::Firewall
     # `log_level` needs to be converted to a number if passed as a string
     should[:log_level] = PuppetX::Firewall::Utility.log_level_name_to_number(should[:log_level]) if should[:log_level]
 
-    # `set_mark`, `match_mark` and `connmark` must be applied in hexidecimal format
+    # `set_mark`, `match_mark`, `connmark`, `ctmask` and `nfmask` must be applied in hexidecimal format
     should[:set_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:set_mark]) if should[:set_mark]
     should[:match_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:match_mark]) if should[:match_mark]
     should[:connmark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:connmark]) if should[:connmark]
+    should[:ctmask] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:ctmask]) if should[:ctmask]
+    should[:nfmask] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:nfmask]) if should[:nfmask]
 
     # `time_start` and `time_stop` must be applied in full HH:MM:SS format
     time = [:time_start, :time_stop]

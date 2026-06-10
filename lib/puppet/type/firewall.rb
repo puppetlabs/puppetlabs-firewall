@@ -594,15 +594,21 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     ctmask: {
-      type: 'Optional[String]',
+      type: 'Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      ctmask
+      Sets the mask applied to the connection tracking mark when using `restore_mark`.
+      Used with the CONNMARK target to mask which bits of the ctmark are restored into the
+      packet mark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
+      Requires `restore_mark => true`.
       DESC
     },
     nfmask: {
-      type: 'Optional[String]',
+      type: 'Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
       desc: <<-DESC
-      nfmask
+      Sets the mask applied to the Netfilter packet mark when using `restore_mark`.
+      Used with the CONNMARK target to mask which bits of the packet mark are written from the
+      ctmark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
+      Requires `restore_mark => true`.
       DESC
     },
     ctstate: {
@@ -1286,7 +1292,10 @@ Puppet::ResourceApi.register_type(
     restore_mark: {
       type: 'Optional[Boolean]',
       desc: <<-DESC
-      Whether or not to restore mark.
+      Restores the saved Netfilter mark value of the connection to the packet mark using
+      the CONNMARK target. This is used for policy-based routing to carry routing decisions
+      across individual packets of a connection. Can optionally be combined with `nfmask`
+      and `ctmask` to control which bits are restored.
       DESC
     },
     set_mark: {
