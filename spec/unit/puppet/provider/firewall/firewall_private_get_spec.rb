@@ -92,7 +92,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           isfirstfrag: false, log_uid: false, log_tcp_sequence: false, log_tcp_options: false, log_ip_options: false,
           random_fully: false, random: false, rdest: false, reap: false, rsource: false, rttl: false, socket: false,
           physdev_is_bridged: false, physdev_is_in: false, physdev_is_out: false, time_contiguous: false,
-          kernel_timezone: false, clusterip_new: false, queue_bypass: false, ipvs: false, notrack: false
+          kernel_timezone: false, clusterip_new: false, queue_bypass: false, ipvs: false, notrack: false,
+          restore_mark: false
         }
       end
 
@@ -361,6 +362,24 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
                 line: '-A INPUT -p tcp -m comment --comment "001 test rule" --checksum-fill -m socket',
                 ensure: 'present', table: 'filter', protocol: 'IPv4', name: '001 test rule', chain: 'INPUT', proto: 'tcp',
                 checksum_fill: true, socket: true
+              } },
+          ]
+        },
+        {
+          logic_section: ':restore_mark, :nfmask, :ctmask', rules: [
+            { rule: '-A PREROUTING -p all -j CONNMARK --restore-mark -m comment --comment "001 test rule"',
+              table_name: 'mangle', protocol: 'IPv4',
+              result: {
+                line: '-A PREROUTING -p all -j CONNMARK --restore-mark -m comment --comment "001 test rule"',
+                ensure: 'present', table: 'mangle', protocol: 'IPv4', name: '001 test rule', chain: 'PREROUTING',
+                proto: 'all', jump: 'CONNMARK', restore_mark: true
+              } },
+            { rule: '-A PREROUTING -p all -j CONNMARK --restore-mark --nfmask 0xff --ctmask 0xff -m comment --comment "001 test rule"',
+              table_name: 'mangle', protocol: 'IPv4',
+              result: {
+                line: '-A PREROUTING -p all -j CONNMARK --restore-mark --nfmask 0xff --ctmask 0xff -m comment --comment "001 test rule"',
+                ensure: 'present', table: 'mangle', protocol: 'IPv4', name: '001 test rule', chain: 'PREROUTING',
+                proto: 'all', jump: 'CONNMARK', restore_mark: true, nfmask: '0xff', ctmask: '0xff'
               } },
           ]
         },
