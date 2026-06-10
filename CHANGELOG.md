@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.4.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.4.0) - 2026-06-10
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.3.0...v8.4.0)
+
+### Added
+
+- (feat) Add restore_mark, nfmask, ctmask support for CONNMARK-based policy routing [#1291](https://github.com/puppetlabs/puppetlabs-firewall/pull/1291) ([david22swan](https://github.com/david22swan))
+
+### Fixed
+
+- (bugfix) Fix icmp_name_to_number to support type/code format (e.g. 3/4) [#1290](https://github.com/puppetlabs/puppetlabs-firewall/pull/1290) ([david22swan](https://github.com/david22swan))
+- (bugfix) Allow underscores in firewall rule names [#1289](https://github.com/puppetlabs/puppetlabs-firewall/pull/1289) ([david22swan](https://github.com/david22swan))
+- (bugfix) Fix ipset idempotency: single-element array not in sync with String equivalent [#1286](https://github.com/puppetlabs/puppetlabs-firewall/pull/1286) ([david22swan](https://github.com/david22swan))
+- (bugfix) Fix table parsing when iptables-save output contains * in rule comments [#1285](https://github.com/puppetlabs/puppetlabs-firewall/pull/1285) ([david22swan](https://github.com/david22swan))
+- (bugfix) Fix log_level idempotency when explicitly setting the iptables default value [#1284](https://github.com/puppetlabs/puppetlabs-firewall/pull/1284) ([david22swan](https://github.com/david22swan))
+- fix(firewall): avoid parsing flags from chain names and quoted values [#1275](https://github.com/puppetlabs/puppetlabs-firewall/pull/1275) ([ashishrase](https://github.com/ashishrase))
+- explicitly do AAAA lookups even if IPv6 is unavailable [#1255](https://github.com/puppetlabs/puppetlabs-firewall/pull/1255) ([kjetilho](https://github.com/kjetilho))
+- Ensure global variables are unique among providers [#1227](https://github.com/puppetlabs/puppetlabs-firewall/pull/1227) ([nabertrand](https://github.com/nabertrand))
+
 ## [v8.3.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.3.0) - 2026-02-09
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.2.0...v8.3.0)
