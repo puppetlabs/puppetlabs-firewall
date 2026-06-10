@@ -66,7 +66,6 @@ class Puppet::Provider::Firewallchain::Firewallchain
         end
       end
     end
-    # Return array
     chains
   end
 

@@ -563,6 +563,20 @@ RSpec.describe 'firewall type' do
       invalid: [{ name: '001 test rule', reject: 'invalid' }, { name: '001 test rule', reject: false },
                 { name: '001 test rule', reject: 313 }]
     },
+    ':ctmask': {
+      valid: [{ name: '001 test rule', ctmask: '0xff' }, { name: '001 test rule', ctmask: '0x3e8/0xffffffff' }],
+      invalid: [{ name: '001 test rule', ctmask: 'invalid' }, { name: '001 test rule', ctmask: false },
+                { name: '001 test rule', ctmask: 313 }]
+    },
+    ':nfmask': {
+      valid: [{ name: '001 test rule', nfmask: '0xff' }, { name: '001 test rule', nfmask: '0x3e8/0xffffffff' }],
+      invalid: [{ name: '001 test rule', nfmask: 'invalid' }, { name: '001 test rule', nfmask: false },
+                { name: '001 test rule', nfmask: 313 }]
+    },
+    ':restore_mark': {
+      valid: [{ name: '001 test rule', restore_mark: true }, { name: '001 test rule', restore_mark: false }],
+      invalid: [{ name: '001 test rule', restore_mark: 'invalid' }, { name: '001 test rule', restore_mark: 313 }]
+    },
     ':set_mark': {
       valid: [{ name: '001 test rule', set_mark: '0x3e8' }, { name: '001 test rule', set_mark: '0x3e8/0xffffffff' }],
       invalid: [{ name: '001 test rule', set_mark: 'invalid' }, { name: '001 test rule', set_mark: false },

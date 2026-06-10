@@ -593,6 +593,24 @@ Puppet::ResourceApi.register_type(
         In order to maintain compatibility it is also possible to negate all values given in the array to achieve the same behaviour.
       DESC
     },
+    ctmask: {
+      type: 'Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
+      desc: <<-DESC
+      Sets the mask applied to the connection tracking mark when using `restore_mark`.
+      Used with the CONNMARK target to mask which bits of the ctmark are restored into the
+      packet mark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
+      Requires `restore_mark => true`.
+      DESC
+    },
+    nfmask: {
+      type: 'Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
+      desc: <<-DESC
+      Sets the mask applied to the Netfilter packet mark when using `restore_mark`.
+      Used with the CONNMARK target to mask which bits of the packet mark are written from the
+      ctmark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
+      Requires `restore_mark => true`.
+      DESC
+    },
     ctstate: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT)$/], Array[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT)$/]]]]',
       desc: <<-DESC
@@ -1269,6 +1287,15 @@ Puppet::ResourceApi.register_type(
       icmp-host-prohibited, icmp-admin-prohibited, or tcp-reset.
       IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach,
       icmp6-port-unreachable, or tcp-reset.
+      DESC
+    },
+    restore_mark: {
+      type: 'Optional[Boolean]',
+      desc: <<-DESC
+      Restores the saved Netfilter mark value of the connection to the packet mark using
+      the CONNMARK target. This is used for policy-based routing to carry routing decisions
+      across individual packets of a connection. Can optionally be combined with `nfmask`
+      and `ctmask` to control which bits are restored.
       DESC
     },
     set_mark: {
