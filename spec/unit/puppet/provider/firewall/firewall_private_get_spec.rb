@@ -81,6 +81,34 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           expect(names).to include('001 allow * tcp', '002 test rule', '003 raw rule')
         end
       end
+
+      context 'when a legacy iptables warning is interleaved mid-line in the output (issue #1266)' do
+        let(:iptables_output) do
+          # Simulates the bug where an iptables-legacy warning is injected mid-line
+          # inside a --comment value, splitting the rule across two lines. This happens
+          # when the warning is not fully separated from stdout before being read.
+          <<~IPTABLES
+            *filter
+            :INPUT ACCEPT [0:0]
+            :FORWARD ACCEPT [0:0]
+            :OUTPUT ACCEPT [0:0]
+            -A FORWARD ! -s 10.42.0.0/16 -d 10.43.161.110/32 -p tcp -m comment --comment "001 allow forward# Warning: iptables-legacy tables present, use iptables-legacy save to see them
+            " -j ACCEPT
+            -A INPUT -p tcp -m comment --comment "002 allow ssh" -j ACCEPT
+            COMMIT
+          IPTABLES
+        end
+
+        it 'correctly parses all rules after stripping the interleaved warning' do
+          allow(Puppet::Provider).to receive(:execute).with('iptables-save', any_args).and_return(iptables_output)
+          allow(Puppet::Provider).to receive(:execute).with('ip6tables-save', any_args).and_return('')
+
+          rules = provider.get_rules(context, true, ['IPv4'])
+          names = rules.map { |r| r[:name] }
+
+          expect(names).to include('001 allow forward', '002 allow ssh')
+        end
+      end
     end
 
     describe 'self.rule_to_hash(_context, rule, table_name, protocol)' do
