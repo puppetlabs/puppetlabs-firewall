@@ -37,6 +37,7 @@ describe 'firewall::linux::redhat', type: :class do
   ['RedHat', 'CentOS', 'Fedora', 'AlmaLinux'].each do |os|
     releases = ((os == 'Fedora') ? ['36'] : ['7.0.1406'])
     nftablesreleases = ((os == 'Fedora') ? [] : ['8.0'])
+    el9releases = ((os == 'Fedora') ? [] : ['9.0'])
 
     releases.each do |osrel|
       context "with os #{os} and osrel #{osrel}" do
@@ -203,6 +204,90 @@ describe 'firewall::linux::redhat', type: :class do
             ensure: 'installed',
             before: ['Service[iptables]', 'Service[nftables]'],
           )
+        }
+
+        it {
+          expect(subject).not_to contain_file('/etc/sysconfig/nftables')
+        }
+      end
+    end
+
+    el9releases.each do |osrel|
+      context "with os #{os} and osrel #{osrel}" do
+        let(:facts) do
+          {
+            kernel: 'Linux',
+            os: {
+              name: os,
+              release: { full: osrel },
+              family: 'RedHat',
+              selinux: { enabled: false }
+            },
+            puppetversion: Puppet.version
+          }
+        end
+
+        it {
+          expect(subject).to contain_service('nftables').with(
+            ensure: 'running',
+            enable: 'true',
+          )
+          expect(subject).to contain_service('iptables').with(
+            ensure: 'running',
+            enable: 'true',
+          )
+        }
+
+        context 'with ensure => stopped' do
+          let(:params) { { ensure: 'stopped' } }
+
+          it {
+            expect(subject).to contain_service('nftables').with(
+              ensure: 'stopped',
+            )
+            expect(subject).to contain_service('iptables').with(
+              ensure: 'stopped',
+            )
+          }
+        end
+
+        context 'with enable => false' do
+          let(:params) { { enable: 'false' } }
+
+          it {
+            expect(subject).to contain_service('nftables').with(
+              enable: 'false',
+            )
+            expect(subject).to contain_service('iptables').with(
+              enable: 'false',
+            )
+          }
+        end
+
+        it {
+          expect(subject).to contain_service('firewalld').with(
+            ensure: 'stopped',
+            enable: false,
+            before: ['Package[iptables-nft-services]', 'Package[nftables]', 'Service[nftables]', 'Service[iptables]'],
+          )
+        }
+
+        it {
+          expect(subject).to contain_package('iptables-nft-services').with(
+            ensure: 'installed',
+            before: ['Service[nftables]', 'Service[iptables]'],
+          )
+        }
+
+        it {
+          expect(subject).to contain_package('nftables').with(
+            ensure: 'installed',
+            before: ['Service[nftables]', 'Service[iptables]'],
+          )
+        }
+
+        it {
+          expect(subject).not_to contain_package('iptables-services')
         }
 
         it {
