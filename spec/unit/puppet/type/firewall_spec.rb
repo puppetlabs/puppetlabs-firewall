@@ -372,7 +372,8 @@ RSpec.describe 'firewall type' do
     },
     ':ipset': {
       valid: [{ name: '001 test rule', ipset: 'setname1 src' }, { name: '001 test rule', ipset: '! setname2 dst' },
-              { name: '001 test rule', ipset: ['setname1 src', '! setname2 dst'] }],
+              { name: '001 test rule', ipset: ['setname1 src', '! setname2 dst'] },
+              { name: '001 test rule', ipset: 'i360.ipv4.no-redirect-port dst' }],
       invalid: [{ name: '001 test rule', ipset: 'invalid' }, { name: '001 test rule', ipset: false },
                 { name: '001 test rule', ipset: false }]
     },
