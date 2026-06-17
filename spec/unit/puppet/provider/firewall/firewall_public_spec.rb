@@ -192,6 +192,18 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { match_mark: '0x2a' }, should_hash: { match_mark: '0x2a' }, result: true },
           { is_hash: { match_mark: '0x2a' }, should_hash: { match_mark: 43 }, result: false },
         ] },
+        { testing: 'ctmask', property_name: :ctmask, comparisons: [
+          { is_hash: { ctmask: '42' }, should_hash: { ctmask: '0x2a' }, result: true },
+          { is_hash: { ctmask: '0x2a/0xffffffff' }, should_hash: { ctmask: '0x2a' }, result: true },
+          { is_hash: { ctmask: '0x2a' }, should_hash: { ctmask: '0x2a' }, result: true },
+          { is_hash: { ctmask: '0x2a' }, should_hash: { ctmask: '0x2b' }, result: false },
+        ] },
+        { testing: 'nfmask', property_name: :nfmask, comparisons: [
+          { is_hash: { nfmask: '42' }, should_hash: { nfmask: '0x2a' }, result: true },
+          { is_hash: { nfmask: '0x2a/0xffffffff' }, should_hash: { nfmask: '0x2a' }, result: true },
+          { is_hash: { nfmask: '0x2a' }, should_hash: { nfmask: '0x2a' }, result: true },
+          { is_hash: { nfmask: '0x2a' }, should_hash: { nfmask: '0x2b' }, result: false },
+        ] },
         { testing: 'time_start/time_stop', property_name: :time_start, comparisons: [
           { is_hash: { time_start: '04:20:00' }, should_hash: { time_start: '4:20' }, result: true },
           { is_hash: { time_start: '04:20:00' }, should_hash: { time_start: '04:20' }, result: true },

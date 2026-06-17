@@ -74,6 +74,7 @@ class Puppet::Provider::Firewall::Firewall
     ipsec_dir: '--dir',
     ipsec_policy: '--pol',
     state: '--state',
+    ctmask: '--ctmask',
     ctstate: '--ctstate',
     ctproto: '--ctproto',
     ctorigsrc: '--ctorigsrc',
@@ -122,6 +123,7 @@ class Puppet::Provider::Firewall::Firewall
     nflog_range: '--nflog-range',
     nflog_size: '--nflog-size',
     nflog_threshold: '--nflog-threshold',
+    nfmask: '--nfmask',
     gateway: '--gateway',
     clamp_mss_to_pmtu: '--clamp-mss-to-pmtu',
     set_mss: '--set-mss',
@@ -141,6 +143,7 @@ class Puppet::Provider::Firewall::Firewall
     log_tcp_options: '--log-tcp-options',
     log_ip_options: '--log-ip-options',
     reject: '--reject-with',
+    restore_mark: '--restore-mark',
     set_mark: '--set-xmark',
     match_mark: '-m mark --mark',
     mss: '-m tcpmss --mss',
@@ -186,7 +189,7 @@ class Puppet::Provider::Firewall::Firewall
     :checksum_fill, :clamp_mss_to_pmtu, :isfragment, :ishasmorefrags, :islastfrag, :isfirstfrag,
     :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :random_fully, :random,
     :rdest, :reap, :rsource, :rttl, :socket, :physdev_is_bridged, :physdev_is_in, :physdev_is_out,
-    :time_contiguous, :kernel_timezone, :clusterip_new, :queue_bypass, :ipvs, :notrack
+    :time_contiguous, :kernel_timezone, :clusterip_new, :queue_bypass, :ipvs, :notrack, :restore_mark
   ]
 
   # Properties that use "-m <ipt module name>" (with the potential to have multiple
@@ -244,7 +247,7 @@ class Puppet::Provider::Firewall::Firewall
     :clusterip_clustermac, :clusterip_total_nodes, :clusterip_local_node, :clusterip_hash_init, :queue_num, :queue_bypass,
     :nflog_group, :nflog_prefix, :nflog_range, :nflog_size, :nflog_threshold, :clamp_mss_to_pmtu, :gateway,
     :set_mss, :set_dscp, :set_dscp_class, :todest, :tosource, :toports, :to, :checksum_fill, :random_fully, :random, :log_prefix,
-    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :mss,
+    :log_level, :log_uid, :log_tcp_sequence, :log_tcp_options, :log_ip_options, :reject, :set_mark, :match_mark, :restore_mark, :nfmask, :ctmask, :mss,
     :connlimit_upto, :connlimit_above, :connlimit_mask, :connmark,
     :time_start, :time_stop, :month_days, :week_days, :date_start, :date_stop, :time_contiguous, :kernel_timezone,
     :u32, :src_cc, :dst_cc, :hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst,
@@ -401,7 +404,7 @@ class Puppet::Provider::Firewall::Firewall
       is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name] || '4')
       should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name] || '4')
       is == should
-    when :set_mark, :match_mark, :connmark
+    when :set_mark, :match_mark, :connmark, :ctmask, :nfmask
       # Ensure that the values are compared to eachother in hexidecimal format
       is = PuppetX::Firewall::Utility.mark_mask_to_hex(is_hash[property_name])
       should = PuppetX::Firewall::Utility.mark_mask_to_hex(should_hash[property_name])
@@ -479,6 +482,9 @@ class Puppet::Provider::Firewall::Firewall
     protocols.each do |protocol|
       # Retrieve String containing all information
       iptables_list = Puppet::Provider.execute($fw_list_command[protocol], combine: false, failonfail: true)
+      # Strip any iptables warning messages that may be interleaved mid-line in the output
+      # (e.g. "# Warning: iptables-legacy tables present"), which can corrupt rule parsing.
+      iptables_list = iptables_list.gsub(%r{# Warning:[^\n]*\n?}, '')
       # Scan String to retrieve all Rules
       iptables_list.scan($fw_table_regex).each do |table|
         table_name = table[0].scan($fw_table_name_regex)[0][0]
@@ -806,6 +812,8 @@ class Puppet::Provider::Firewall::Firewall
     raise ArgumentError, 'Parameter `helper` requires `jump => CT`'  if should[:helper] && should[:jump] != 'CT'
     raise ArgumentError, 'Parameter `notrack` requires `jump => CT`' if should[:notrack] && should[:jump] != 'CT'
     # Connlimit
+    raise ArgumentError, 'Parameter `ctmask` requires `restore_mark => true`' if should[:ctmask] && !should[:restore_mark]
+    raise ArgumentError, 'Parameter `nfmask` requires `restore_mark => true`' if should[:nfmask] && !should[:restore_mark]
     raise ArgumentError, 'Parameter `connlimit_mask` requires either `connlimit_upto` or `connlimit_above`' if should[:connlimit_mask] && !(should[:connlimit_upto] || should[:connlimit_above])
 
     # Hashlimit
@@ -892,10 +900,12 @@ class Puppet::Provider::Firewall::Firewall
     # `log_level` needs to be converted to a number if passed as a string
     should[:log_level] = PuppetX::Firewall::Utility.log_level_name_to_number(should[:log_level]) if should[:log_level]
 
-    # `set_mark`, `match_mark` and `connmark` must be applied in hexidecimal format
+    # `set_mark`, `match_mark`, `connmark`, `ctmask` and `nfmask` must be applied in hexidecimal format
     should[:set_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:set_mark]) if should[:set_mark]
     should[:match_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:match_mark]) if should[:match_mark]
     should[:connmark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:connmark]) if should[:connmark]
+    should[:ctmask] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:ctmask]) if should[:ctmask]
+    should[:nfmask] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:nfmask]) if should[:nfmask]
 
     # `time_start` and `time_stop` must be applied in full HH:MM:SS format
     time = [:time_start, :time_stop]

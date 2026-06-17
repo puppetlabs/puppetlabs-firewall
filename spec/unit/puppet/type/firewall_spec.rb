@@ -26,8 +26,11 @@ RSpec.describe 'firewall type' do
       invalid: [{ name: '001 test rule', ensure: true }, { name: '001 test rule', ensure: 313 }, { name: '001 test rule', ensure: 'false' }]
     },
     ':name': {
-      valid: [{ name: '001 first' }, { name: '202 second rule' }, { name: '333 third rule also' }],
-      invalid: [{ name: 'invalid rule 001' }, { name: 'invalid rule two' }]
+      valid: [{ name: '001 first' }, { name: '202 second rule' }, { name: '333 third rule also' },
+              { name: '001 accept_loopback' }, { name: '100 drop_invalid_packets' },
+              { name: '010 allow-ssh' }, { name: '500 mixed_and-hyphenated rule' }],
+      invalid: [{ name: 'invalid rule 001' }, { name: 'invalid rule two' },
+                { name: '001' }, { name: '001!' }]
     },
     ':protocol': {
       valid: [{ name: '001 test rule', protocol: 'iptables' }, { name: '001 test rule', protocol: 'ip6tables' },
@@ -369,7 +372,8 @@ RSpec.describe 'firewall type' do
     },
     ':ipset': {
       valid: [{ name: '001 test rule', ipset: 'setname1 src' }, { name: '001 test rule', ipset: '! setname2 dst' },
-              { name: '001 test rule', ipset: ['setname1 src', '! setname2 dst'] }],
+              { name: '001 test rule', ipset: ['setname1 src', '! setname2 dst'] },
+              { name: '001 test rule', ipset: 'i360.ipv4.no-redirect-port dst' }],
       invalid: [{ name: '001 test rule', ipset: 'invalid' }, { name: '001 test rule', ipset: false },
                 { name: '001 test rule', ipset: false }]
     },
@@ -559,6 +563,20 @@ RSpec.describe 'firewall type' do
               { name: '001 test rule', reject: 'icmp-admin-prohibited' }, { name: '001 test rule', reject: 'icmp6-port-unreachable' }],
       invalid: [{ name: '001 test rule', reject: 'invalid' }, { name: '001 test rule', reject: false },
                 { name: '001 test rule', reject: 313 }]
+    },
+    ':ctmask': {
+      valid: [{ name: '001 test rule', ctmask: '0xff' }, { name: '001 test rule', ctmask: '0x3e8/0xffffffff' }],
+      invalid: [{ name: '001 test rule', ctmask: 'invalid' }, { name: '001 test rule', ctmask: false },
+                { name: '001 test rule', ctmask: 313 }]
+    },
+    ':nfmask': {
+      valid: [{ name: '001 test rule', nfmask: '0xff' }, { name: '001 test rule', nfmask: '0x3e8/0xffffffff' }],
+      invalid: [{ name: '001 test rule', nfmask: 'invalid' }, { name: '001 test rule', nfmask: false },
+                { name: '001 test rule', nfmask: 313 }]
+    },
+    ':restore_mark': {
+      valid: [{ name: '001 test rule', restore_mark: true }, { name: '001 test rule', restore_mark: false }],
+      invalid: [{ name: '001 test rule', restore_mark: 'invalid' }, { name: '001 test rule', restore_mark: 313 }]
     },
     ':set_mark': {
       valid: [{ name: '001 test rule', set_mark: '0x3e8' }, { name: '001 test rule', set_mark: '0x3e8/0xffffffff' }],

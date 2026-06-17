@@ -190,6 +190,16 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           error: 'Parameter `notrack` requires `jump => CT`'
         },
         {
+          valid: { is: {}, should: { ensure: 'present', name: '001 Test Rule', restore_mark: true, ctmask: '0xff' } },
+          invalid: { is: {}, should: { ensure: 'present', name: '001 Test Rule', ctmask: '0xff' } },
+          error: 'Parameter `ctmask` requires `restore_mark => true`'
+        },
+        {
+          valid: { is: {}, should: { ensure: 'present', name: '001 Test Rule', restore_mark: true, nfmask: '0xff' } },
+          invalid: { is: {}, should: { ensure: 'present', name: '001 Test Rule', nfmask: '0xff' } },
+          error: 'Parameter `nfmask` requires `restore_mark => true`'
+        },
+        {
           valid: { is: {}, should: { ensure: 'present', name: '001 Test`` Rule', connlimit_mask: 32, connlimit_upto: 5 } },
           invalid: { is: {}, should: { ensure: 'present', name: '001 Test Rule', connlimit_mask: 32 } },
           error: 'Parameter `connlimit_mask` requires either `connlimit_upto` or `connlimit_above`'
@@ -305,6 +315,11 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           process: '`set_mark`, `match_mark` and `connmark` must be put through mark_mask_to_hex',
           should: { set_mark: '42', match_mark: '42', connmark: '42' },
           result: { set_mark: '0x2a/0xffffffff', match_mark: '0x2a/0xffffffff', connmark: '0x2a/0xffffffff' }
+        },
+        {
+          process: '`ctmask` and `nfmask` must be put through mark_mask_to_hex',
+          should: { ctmask: '42', nfmask: '42' },
+          result: { ctmask: '0x2a/0xffffffff', nfmask: '0x2a/0xffffffff' }
         },
         {
           process: '`time_start` and `time_stop` must be applied in full HH:MM:SS format',
@@ -429,6 +444,16 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
             { name: '001 test rule',
               hash: { name: '001 test rule', checksum_fill: true, random: true },
               result: " --checksum-fill --random -m comment --comment '001 test rule'" },
+          ]
+        },
+        {
+          logic_section: ':restore_mark, :nfmask, :ctmask', rules: [
+            { name: '001 test rule',
+              hash: { name: '001 test rule', restore_mark: true },
+              result: " --restore-mark -m comment --comment '001 test rule'" },
+            { name: '001 test rule',
+              hash: { name: '001 test rule', restore_mark: true, nfmask: '0xff', ctmask: '0xff' },
+              result: " --restore-mark --nfmask 0xff --ctmask 0xff -m comment --comment '001 test rule'" },
           ]
         },
         {

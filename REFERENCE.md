@@ -393,6 +393,16 @@ _*this data type contains a regex that may not be accurately reflected in genera
         ctexpire => '100'
         ctexpire => '100:150'
 
+##### `ctmask`
+
+Data type: `Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]`
+_*this data type contains a regex that may not be accurately reflected in generated documentation_
+
+      Sets the mask applied to the connection tracking mark when using `restore_mark`.
+      Used with the CONNMARK target to mask which bits of the ctmark are restored into the
+      packet mark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
+      Requires `restore_mark => true`.
+
 ##### `ctorigdst`
 
 Data type: `Optional[String[1]]`
@@ -766,7 +776,7 @@ Data type: `Optional[Integer[1]]`
 
 Data type: `Optional[Integer[0,32]]`
 
-      When --hashlimit-mode srcip is used, all destination addresses encountered will be grouped according to the given prefix length
+      When --hashlimit-mode dstip is used, all destination addresses encountered will be grouped according to the given prefix length
       and the so-created subnet will be subject to hashlimit.
       Prefix must be between (inclusive) 0 and 32.
       Note that --hashlimit-dstmask 0 is basically doing the same thing as not specifying srcip for --hashlimit-mode, but is technically more expensive.
@@ -914,7 +924,7 @@ Data type: `Optional[Boolean]`
 
 Data type: `Optional[Boolean]`
 
-      Matches if the packet has it's 'more fragments' bit set.
+      Matches if the packet has its 'more fragments' bit set.
       Specific to IPv6.
 
 ##### `islastfrag`
@@ -995,8 +1005,7 @@ Data type: `Optional[Variant[Integer[0,7],String[1]]]`
 
       When combined with jump => "LOG" specifies the system log level to log to.
 
-      Note: log level 4/warn is the default setting. iptables-save omits this value, so
-      explicitly setting `log_level` to 4 or "warn" is handled correctly.
+      Note: log level 4/warn is the default setting.
 
 ##### `log_prefix`
 
@@ -1106,6 +1115,16 @@ Data type: `Optional[Integer[1]]`
       (only applicable for nfnetlink_log). Higher values result in less overhead
       per packet, but increase delay until the packets reach userspace. Defaults to 1.
 
+##### `nfmask`
+
+Data type: `Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]`
+_*this data type contains a regex that may not be accurately reflected in generated documentation_
+
+      Sets the mask applied to the Netfilter packet mark when using `restore_mark`.
+      Used with the CONNMARK target to mask which bits of the packet mark are written from the
+      ctmark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
+      Requires `restore_mark => true`.
+
 ##### `notrack`
 
 Data type: `Optional[Boolean]`
@@ -1180,7 +1199,7 @@ Default value: `tcp`
 
 Data type: `Enum['iptables', 'ip6tables', 'IPv4', 'IPv6']`
 
-      The protocol used to set the rule, it's allowed values have been expanded to bring it closer to its `firewallchain` counterpart.
+      The protocol used to set the rule, its allowed values have been expanded to bring it closer to its `firewallchain` counterpart.
       Defaults to `IPv4`
 
       Noted: this was previously defined as `provider`, however the resource_api does not allow this to be used as an attribute title.
@@ -1276,6 +1295,15 @@ Data type: `Optional[Enum['icmp-net-unreachable', 'icmp-host-unreachable', 'icmp
       icmp-host-prohibited, icmp-admin-prohibited, or tcp-reset.
       IPv6 allows: icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach,
       icmp6-port-unreachable, or tcp-reset.
+
+##### `restore_mark`
+
+Data type: `Optional[Boolean]`
+
+      Restores the saved Netfilter mark value of the connection to the packet mark using
+      the CONNMARK target. This is used for policy-based routing to carry routing decisions
+      across individual packets of a connection. Can optionally be combined with `nfmask`
+      and `ctmask` to control which bits are restored.
 
 ##### `rhitcount`
 
@@ -1699,7 +1727,7 @@ The following parameters are available in the `firewall` type.
 
 namevar
 
-Data type: `Pattern[/(^\d+(?:[ \t-]\S+)+$)/]`
+Data type: `Pattern[/(^\d+(?:[ \t_-]\S+)+$)/]`
 _*this data type contains a regex that may not be accurately reflected in generated documentation_
 
       The canonical name of the rule. This name is also used for ordering

@@ -81,6 +81,34 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           expect(names).to include('001 allow * tcp', '002 test rule', '003 raw rule')
         end
       end
+
+      context 'when a legacy iptables warning is interleaved mid-line in the output (issue #1266)' do
+        let(:iptables_output) do
+          # Simulates the bug where an iptables-legacy warning is injected mid-line
+          # inside a --comment value, splitting the rule across two lines. This happens
+          # when the warning is not fully separated from stdout before being read.
+          <<~IPTABLES
+            *filter
+            :INPUT ACCEPT [0:0]
+            :FORWARD ACCEPT [0:0]
+            :OUTPUT ACCEPT [0:0]
+            -A FORWARD ! -s 10.42.0.0/16 -d 10.43.161.110/32 -p tcp -m comment --comment "001 allow forward# Warning: iptables-legacy tables present, use iptables-legacy save to see them
+            " -j ACCEPT
+            -A INPUT -p tcp -m comment --comment "002 allow ssh" -j ACCEPT
+            COMMIT
+          IPTABLES
+        end
+
+        it 'correctly parses all rules after stripping the interleaved warning' do
+          allow(Puppet::Provider).to receive(:execute).with('iptables-save', any_args).and_return(iptables_output)
+          allow(Puppet::Provider).to receive(:execute).with('ip6tables-save', any_args).and_return('')
+
+          rules = provider.get_rules(context, true, ['IPv4'])
+          names = rules.map { |r| r[:name] }
+
+          expect(names).to include('001 allow forward', '002 allow ssh')
+        end
+      end
     end
 
     describe 'self.rule_to_hash(_context, rule, table_name, protocol)' do
@@ -92,7 +120,8 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           isfirstfrag: false, log_uid: false, log_tcp_sequence: false, log_tcp_options: false, log_ip_options: false,
           random_fully: false, random: false, rdest: false, reap: false, rsource: false, rttl: false, socket: false,
           physdev_is_bridged: false, physdev_is_in: false, physdev_is_out: false, time_contiguous: false,
-          kernel_timezone: false, clusterip_new: false, queue_bypass: false, ipvs: false, notrack: false
+          kernel_timezone: false, clusterip_new: false, queue_bypass: false, ipvs: false, notrack: false,
+          restore_mark: false
         }
       end
 
@@ -361,6 +390,24 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
                 line: '-A INPUT -p tcp -m comment --comment "001 test rule" --checksum-fill -m socket',
                 ensure: 'present', table: 'filter', protocol: 'IPv4', name: '001 test rule', chain: 'INPUT', proto: 'tcp',
                 checksum_fill: true, socket: true
+              } },
+          ]
+        },
+        {
+          logic_section: ':restore_mark, :nfmask, :ctmask', rules: [
+            { rule: '-A PREROUTING -p all -j CONNMARK --restore-mark -m comment --comment "001 test rule"',
+              table_name: 'mangle', protocol: 'IPv4',
+              result: {
+                line: '-A PREROUTING -p all -j CONNMARK --restore-mark -m comment --comment "001 test rule"',
+                ensure: 'present', table: 'mangle', protocol: 'IPv4', name: '001 test rule', chain: 'PREROUTING',
+                proto: 'all', jump: 'CONNMARK', restore_mark: true
+              } },
+            { rule: '-A PREROUTING -p all -j CONNMARK --restore-mark --nfmask 0xff --ctmask 0xff -m comment --comment "001 test rule"',
+              table_name: 'mangle', protocol: 'IPv4',
+              result: {
+                line: '-A PREROUTING -p all -j CONNMARK --restore-mark --nfmask 0xff --ctmask 0xff -m comment --comment "001 test rule"',
+                ensure: 'present', table: 'mangle', protocol: 'IPv4', name: '001 test rule', chain: 'PREROUTING',
+                proto: 'all', jump: 'CONNMARK', restore_mark: true, nfmask: '0xff', ctmask: '0xff'
               } },
           ]
         },

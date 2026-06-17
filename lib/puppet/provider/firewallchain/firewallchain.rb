@@ -18,7 +18,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
   # Array of all the supported iptables
   $fwc_supported_tables = ['nat', 'mangle', 'filter', 'raw', 'rawpost', 'broute', 'security']
   # Regex used to retrieve Chains
-  $fwc_chain_regex = %r{\n:(INPUT|FORWARD|OUTPUT|(?:\S+))(?:\s(ACCEPT|DROP|QEUE|RETURN|PREROUTING|POSTROUTING))?}
+  $fwc_chain_regex = %r{\n:(\S+)(?:\s(ACCEPT|DROP|QEUE|RETURN|PREROUTING|POSTROUTING))?}
   # Base commands for the protocols, including table affixes
   $fwc_base_command = {
     'IPv4' => 'iptables -t',
@@ -66,7 +66,6 @@ class Puppet::Provider::Firewallchain::Firewallchain
         end
       end
     end
-    # Return array
     chains
   end
 
