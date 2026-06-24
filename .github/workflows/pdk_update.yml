@@ -1,0 +1,18 @@
+name: "PDK Update"
+
+on:
+  # Run weekly to keep the module template up to date...
+  schedule:
+    - cron: "0 4 * * 1"  # Mondays at 04:00 UTC
+  # ...and allow manual runs.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pdk_update:
+    # NOTE: pinned to the unmerged branch for testing; switch to @main once merged.
+    uses: "puppetlabs/cat-github-actions/.github/workflows/module_pdk_update.yml@pdk_update_workflow"
+    secrets: "inherit"
