@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.5.0) - 2026-06-25
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.4.0...v8.5.0)
+
+### Added
+
+- (MODULES-11840) Allow puppetlabs/stdlib 10.x [#1288](https://github.com/puppetlabs/puppetlabs-firewall/pull/1288) ([imaqsood](https://github.com/imaqsood))
+
+### Fixed
+
+- (#1254) Remove iptables-services from EL9+ package defaults [#1296](https://github.com/puppetlabs/puppetlabs-firewall/pull/1296) ([david22swan](https://github.com/david22swan))
+- (#1257) Allow dots in ipset names for the ipset attribute pattern [#1295](https://github.com/puppetlabs/puppetlabs-firewall/pull/1295) ([david22swan](https://github.com/david22swan))
+- (#1266) Strip iptables-legacy warnings interleaved in iptables-save output [#1294](https://github.com/puppetlabs/puppetlabs-firewall/pull/1294) ([david22swan](https://github.com/david22swan))
+- (#1270) Fix chain detection for names prefixed with built-in chain names [#1293](https://github.com/puppetlabs/puppetlabs-firewall/pull/1293) ([david22swan](https://github.com/david22swan))
+
 ## [v8.4.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.4.0) - 2026-06-10
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.3.0...v8.4.0)
