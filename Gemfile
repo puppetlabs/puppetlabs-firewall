@@ -55,6 +55,7 @@ group :development do
   gem "puppet-debugger", '~> 1.6',               require: false
   gem "rubocop", '~> 1.73.0',                    require: false
   gem "rubocop-performance", '~> 1.24.0',        require: false
+  gem "rubocop-hash_inspect", '~> 0.2',          require: false
   gem "rubocop-rspec", '~> 3.5.0',               require: false
   gem "rubocop-rspec_rails", '~> 2.31.0',        require: false
   gem "rubocop-factory_bot", '~> 2.27.0',        require: false
@@ -64,9 +65,9 @@ group :development do
   gem "puppet-resource_api",                     require: false
 end
 group :development, :release_prep do
-  gem "puppet-strings", '~> 4.0',         require: false
-  gem "puppetlabs_spec_helper", '~> 8.0', require: false
-  gem "puppet-blacksmith", '~> 7.0',      require: false
+  gem "puppet-strings", '~> 4.0',              require: false
+  gem "puppetlabs_spec_helper", '~> 8.0',      require: false
+  gem "puppet-blacksmith", '>= 7.0', '< 10.0', require: false
 end
 group :system_tests do
   gem "puppet_litmus", '~> 2.5',   require: false
