@@ -70,7 +70,7 @@ Most attributes accept a `!` prefix for inversion (e.g. `source => '! 192.168.1.
 
 ## Key constraints
 
-- Requires Puppet >= 8.0.0, < 9.0.0 and stdlib >= 9.0.0, < 10.0.0.
+- Requires Puppet >= 8.0.0, < 10.0.0 and stdlib >= 9.0.0, < 11.0.0.
 - The `provider` attribute from the pre-v7 API was renamed `protocol`; `action` was merged into `jump`. Avoid using old attribute names.
 - IPv6 rules must use the `ip6tables` provider (`:IPv6` suffix in chain name or `protocol => IPv6`).
 
