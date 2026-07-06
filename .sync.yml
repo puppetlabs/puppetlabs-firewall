@@ -9,6 +9,12 @@ Gemfile:
       - gem: 'puppet-resource_api'
 .rubocop.yml:
   include_todos: true
+  profiles:
+    strict:
+      configs:
+        RSpec/SpecFilePathFormat:
+          Exclude:
+          - spec/unit/puppet_x/puppetlabs/**/*_spec.rb
 Rakefile:
   changelog_user: puppetlabs
   changelog_max_issues: 500
