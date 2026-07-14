@@ -77,6 +77,9 @@ Style/TrailingCommaInArrayLiteral:
 Style/SymbolArray:
   Description: Using percent style obscures symbolic intent of array's contents.
   EnforcedStyle: brackets
+RSpec/SpecFilePathFormat:
+  Exclude:
+  - spec/unit/puppet_x/puppetlabs/**/*_spec.rb
 RSpec/MessageSpies:
   EnforcedStyle: receive
 Style/Documentation:
@@ -731,6 +734,3 @@ Style/StringChars:
   Enabled: false
 Style/SwapValues:
   Enabled: false
-RSpec/SpecFilePathFormat:
-  Exclude:
-  - spec/unit/puppet_x/puppetlabs/**/*_spec.rb
