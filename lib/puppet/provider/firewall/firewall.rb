@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../../puppet_x/puppetlabs/firewall/utility'
+require_relative '../../../puppet_x/puppetlabs/firewall/cache'
 
 # Implementation for the iptables type using the Resource API.
 class Puppet::Provider::Firewall::Firewall
@@ -302,6 +303,7 @@ class Puppet::Provider::Firewall::Firewall
     position = Puppet::Provider::Firewall::Firewall.insert_order(context, name, should[:chain], should[:table], should[:protocol])
     arguments = Puppet::Provider::Firewall::Firewall.hash_to_rule(context, name, should)
     Puppet::Provider.execute([$fw_base_command[should[:protocol]], should[:table], $fw_rule_create_command, should[:chain], position, arguments].join(' '))
+    PuppetX::Firewall::Cache.invalidate
     PuppetX::Firewall::Utility.persist_iptables(context, name, should[:protocol])
   end
 
@@ -310,6 +312,7 @@ class Puppet::Provider::Firewall::Firewall
     position = Puppet::Provider::Firewall::Firewall.insert_order(context, name, should[:chain], should[:table], should[:protocol])
     arguments = Puppet::Provider::Firewall::Firewall.hash_to_rule(context, name, should)
     Puppet::Provider.execute([$fw_base_command[should[:protocol]], should[:table], $fw_rule_update_command, should[:chain], position, arguments].join(' '))
+    PuppetX::Firewall::Cache.invalidate
     PuppetX::Firewall::Utility.persist_iptables(context, name, should[:protocol])
   end
 
@@ -319,6 +322,7 @@ class Puppet::Provider::Firewall::Firewall
     # We do this to ensure accuracy when removing non-standard (i.e. uncommented) rules via the firewallchain purge function
     arguments = is[:line].gsub(%r{^-A}, $fw_rule_delete_command)
     Puppet::Provider.execute([$fw_base_command[is[:protocol]], is[:table], arguments].join(' '))
+    PuppetX::Firewall::Cache.invalidate
     PuppetX::Firewall::Utility.persist_iptables(context, name, is[:protocol])
   end
 
@@ -475,13 +479,31 @@ class Puppet::Provider::Firewall::Firewall
   #   while also allowing for the protocols used to retrieve the rules to be limited.
   # @api private
   def self.get_rules(context, basic, protocols = ['IPv4', 'IPv6'])
+    # The Resource API calls `get` once per firewall resource in the catalog,
+    # and each create/update triggers a further read via `insert_order`. All of
+    # those reads happen within a single catalog application, so the parsed
+    # ruleset is cached for the duration of the run and dropped whenever this
+    # module changes a rule or chain.
+    rules = PuppetX::Firewall::Cache.fetch([:parsed_rules, basic, protocols]) do
+      parse_rules(context, basic, protocols)
+    end
+    # Return copies (including copies of array values, which insync? compares
+    # and future code may sort or negate in place) so that callers cannot
+    # alter the cached entries. This matches the previous behaviour, where
+    # every call produced freshly parsed hashes.
+    rules.map { |rule| rule.transform_values { |value| value.is_a?(Array) ? value.dup : value } }
+  end
+
+  # Retrieve and parse the current ruleset for the given protocols
+  # @api private
+  def self.parse_rules(context, basic, protocols)
     # Create empty return array
     rules = []
     counter = 1
     # For each protocol
     protocols.each do |protocol|
       # Retrieve String containing all information
-      iptables_list = Puppet::Provider.execute($fw_list_command[protocol], combine: false, failonfail: true)
+      iptables_list = save_output(protocol)
       # Strip any iptables warning messages that may be interleaved mid-line in the output
       # (e.g. "# Warning: iptables-legacy tables present"), which can corrupt rule parsing.
       iptables_list = iptables_list.gsub(%r{# Warning:[^\n]*\n?}, '')
@@ -491,20 +513,28 @@ class Puppet::Provider::Firewall::Firewall
         table[0].scan($fw_rules_regex).each do |rule|
           # iptables-save escapes ' symbol in it's output for some reason which leads to an incorrect command
           # We need to manually replace \' to '
-          rule[0].gsub!("\\'", "'")
+          line = rule[0].gsub("\\'", "'")
           raw_rules = if basic
-                        Puppet::Provider::Firewall::Firewall.rule_to_name(context, rule[0], table_name, protocol)
+                        Puppet::Provider::Firewall::Firewall.rule_to_name(context, line, table_name, protocol)
                       else
-                        Puppet::Provider::Firewall::Firewall.rule_to_hash(context, rule[0], table_name, protocol)
+                        Puppet::Provider::Firewall::Firewall.rule_to_hash(context, line, table_name, protocol)
                       end
           # Process the returned values so that it is correct for our purposes
-          rules << Puppet::Provider::Firewall::Firewall.process_get(context, raw_rules, rule[0], counter)
+          rules << Puppet::Provider::Firewall::Firewall.process_get(context, raw_rules, line, counter)
           counter += 1
         end
       end
       # Return array
     end
     rules
+  end
+
+  # Retrieve the raw `iptables-save` output for the given protocol
+  # @api private
+  def self.save_output(protocol)
+    PuppetX::Firewall::Cache.fetch($fw_list_command[protocol]) do
+      Puppet::Provider.execute($fw_list_command[protocol], combine: false, failonfail: true)
+    end
   end
 
   # Simplified version of 'self.rules_to_hash' meant to return name, chain and table only
