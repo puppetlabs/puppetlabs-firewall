@@ -28,9 +28,23 @@ spec/spec_helper.rb:
 .github/workflows/auto_release.yml:
   unmanaged: false
 .github/workflows/ci.yml:
-  unmanaged: true
+  unmanaged: false
+  acceptance_flags:
+    - '--nightly'
+    - '--platform-exclude centos-7'
+    - '--platform-exclude oraclelinux-7'
+    - '--platform-exclude scientific-7'
+    - '--platform-exclude centos-8'
+    - '--platform-exclude rocky-8'
 .github/workflows/nightly.yml:
-  unmanaged: true
+  unmanaged: false
+  acceptance_flags:
+    - '--nightly'
+    - '--platform-exclude centos-7'
+    - '--platform-exclude oraclelinux-7'
+    - '--platform-exclude scientific-7'
+    - '--platform-exclude centos-8'
+    - '--platform-exclude rocky-8'
 .github/workflows/release.yml:
   unmanaged: false
 .travis.yml:
