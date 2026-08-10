@@ -12,4 +12,8 @@ jobs:
 
   mend:
     uses: "puppetlabs/cat-github-actions/.github/workflows/mend_ruby.yml@main"
+    with:
+      # voxpupuli-puppet-lint-plugins 7.0 (needed for Puppet 9 support) requires
+      # ruby >= 3.2; `bundle lock` resolves all groups at the default ruby (3.1).
+      ruby_version: "3.2"
     secrets: "inherit"
