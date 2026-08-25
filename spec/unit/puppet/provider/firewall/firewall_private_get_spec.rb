@@ -109,6 +109,62 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           expect(names).to include('001 allow forward', '002 allow ssh')
         end
       end
+
+      context 'when called multiple times within a single run (issue #1214)' do
+        let(:iptables_output) do
+          <<~IPTABLES
+            *filter
+            :INPUT ACCEPT [0:0]
+            -A INPUT -p tcp -m comment --comment "001 allow ssh" -j ACCEPT
+            -A INPUT -p tcp -m comment --comment "002 allow https" -j ACCEPT
+            COMMIT
+          IPTABLES
+        end
+
+        before(:each) do
+          allow(Puppet).to receive(:lookup).and_call_original
+          allow(Puppet).to receive(:lookup).with(:current_environment).and_return(instance_double(Puppet::Node::Environment))
+          allow(Puppet::Provider).to receive(:execute).with('iptables-save', any_args).and_return(iptables_output)
+          allow(Puppet::Provider).to receive(:execute).with('ip6tables-save', any_args).and_return('')
+        end
+
+        it 'executes iptables-save only once per protocol' do
+          expect(Puppet::Provider).to receive(:execute).with('iptables-save', any_args).once.and_return(iptables_output)
+          expect(Puppet::Provider).to receive(:execute).with('ip6tables-save', any_args).once.and_return('')
+
+          2.times { provider.get_rules(context, false) }
+        end
+
+        it 'returns the same rules on every call' do
+          first = provider.get_rules(context, false)
+          second = provider.get_rules(context, false)
+
+          expect(second).to eq(first)
+        end
+
+        it 'reuses the same snapshot for basic reads' do
+          expect(Puppet::Provider).to receive(:execute).with('iptables-save', any_args).once.and_return(iptables_output)
+
+          provider.get_rules(context, false)
+          rules = provider.get_rules(context, true, ['IPv4'])
+
+          expect(rules.map { |r| r[:name] }).to eq(['001 allow ssh', '002 allow https'])
+        end
+
+        it 'does not let callers alter the cached rules' do
+          provider.get_rules(context, false)[0][:name] = 'altered'
+
+          expect(provider.get_rules(context, false)[0][:name]).to eq('001 allow ssh')
+        end
+
+        it 'executes iptables-save again after the cache is invalidated' do
+          expect(Puppet::Provider).to receive(:execute).with('iptables-save', any_args).twice.and_return(iptables_output)
+
+          provider.get_rules(context, false)
+          PuppetX::Firewall::Cache.invalidate
+          provider.get_rules(context, false)
+        end
+      end
     end
 
     describe 'self.rule_to_hash(_context, rule, table_name, protocol)' do

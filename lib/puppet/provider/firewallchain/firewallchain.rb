@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../../puppet_x/puppetlabs/firewall/utility'
+require_relative '../../../puppet_x/puppetlabs/firewall/cache'
 
 # Implementation for the firewallchain type using the Resource API.
 class Puppet::Provider::Firewallchain::Firewallchain
@@ -51,7 +52,13 @@ class Puppet::Provider::Firewallchain::Firewallchain
     ['IPv4', 'IPv6'].each do |protocol|
       # Go through each supported table and retrieve its chains if it exists.
       $fwc_supported_tables.each do |table_name|
-        cmd_output = Puppet::Provider.execute([$fwc_list_command[protocol], '-t', table_name].join(' '), failonfail: false)
+        # The Resource API calls `get` once per firewallchain resource in the
+        # catalog, so the command output is cached for the duration of the run
+        # and dropped whenever this module changes a rule or chain.
+        command = [$fwc_list_command[protocol], '-t', table_name].join(' ')
+        cmd_output = PuppetX::Firewall::Cache.fetch(command) do
+          Puppet::Provider.execute(command, failonfail: false)
+        end
         cmd_output.scan($fwc_chain_regex).each do |chain|
           # Create the base hash
           chain_hash = {
@@ -106,6 +113,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
     else
       Puppet::Provider.execute([$fwc_base_command[should[:protocol]], should[:table], $fwc_chain_create_command, should[:chain]].join(' '))
     end
+    PuppetX::Firewall::Cache.invalidate
     PuppetX::Firewall::Utility.persist_iptables(context, name, should[:protocol])
   end
 
@@ -116,6 +124,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
 
     context.notice("Updating Chain '#{name}' with #{should.inspect}")
     Puppet::Provider.execute([$fwc_base_command[should[:protocol]], should[:table], $fwc_chain_policy_command, should[:chain], should[:policy].upcase].join(' '))
+    PuppetX::Firewall::Cache.invalidate
     PuppetX::Firewall::Utility.persist_iptables(context, name, should[:protocol])
   end
 
@@ -132,6 +141,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
       context.notice("Deleting Chain '#{name}'")
       Puppet::Provider.execute([$fwc_base_command[is[:protocol]], is[:table], $fwc_chain_delete_command, is[:chain]].join(' '))
     end
+    PuppetX::Firewall::Cache.invalidate
     PuppetX::Firewall::Utility.persist_iptables(context, name, is[:protocol])
   end
 
