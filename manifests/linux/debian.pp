@@ -27,7 +27,7 @@ class firewall::linux::debian (
 ) inherits firewall::params {
   if $package_name {
     stdlib::ensure_packages([$package_name], {
-        ensure  => $package_ensure
+      ensure  => $package_ensure
     })
   }
 
