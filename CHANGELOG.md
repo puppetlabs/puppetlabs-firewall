@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v8.6.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.6.0) - 2026-09-02
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.5.0...v8.6.0)
+
+### Added
+
+- MODULES-11717: Add Puppet 9 support [#1302](https://github.com/puppetlabs/puppetlabs-firewall/pull/1302) ([span786](https://github.com/span786))
+
 ## [v8.5.0](https://github.com/puppetlabs/puppetlabs-firewall/tree/v8.5.0) - 2026-06-25
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-firewall/compare/v8.4.0...v8.5.0)
@@ -709,7 +717,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - (MODULES 3932) - We need to call Facter.flush to clear Facter cache [#603](https://github.com/puppetlabs/puppetlabs-firewall/pull/603) ([jonnytdevops](https://github.com/jonnytdevops))
 - (MODULES-2159) ignore the --connlimit-saddr switch when parsing rules [#602](https://github.com/puppetlabs/puppetlabs-firewall/pull/602) ([paulseward](https://github.com/paulseward))
 - Adding in log_uid boolean for LOG [#593](https://github.com/puppetlabs/puppetlabs-firewall/pull/593) ([mlosapio](https://github.com/mlosapio))
-- (MODULES-2836) Fix handling of chains that contain '-f' [#579](https://github.com/puppetlabs/puppetlabs-firewall/pull/579) ([maxvozeler](https://github.com/maxvozeler))
+- (MODULES-2836) Fix handling of chains that contain '-f' [#579](https://github.com/puppetlabs/puppetlabs-firewall/pull/579) ([mvz0](https://github.com/mvz0))
 - (MODULES-2783) Missing ip6tables service name [#578](https://github.com/puppetlabs/puppetlabs-firewall/pull/578) ([abednarik](https://github.com/abednarik))
 
 ## [1.7.2](https://github.com/puppetlabs/puppetlabs-firewall/tree/1.7.2) - 2015-12-07
