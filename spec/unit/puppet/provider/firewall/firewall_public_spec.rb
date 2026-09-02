@@ -46,6 +46,17 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           provider.create(context, test[:should][:name], test[:should])
         end
       end
+
+      it 'invalidates the run cache' do
+        should = { name: '001 IPv4 Test Rule', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present' }
+        allow(context).to receive(:notice)
+        allow(described_class).to receive_messages(insert_order: 1, hash_to_rule: '-m comment --comment "001 Test Rule"')
+        allow(Puppet::Util::Execution).to receive(:execute)
+        allow(PuppetX::Firewall::Utility).to receive(:persist_iptables)
+        expect(PuppetX::Firewall::Cache).to receive(:invalidate)
+
+        provider.create(context, should[:name], should)
+      end
     end
 
     describe 'update(context, name, should, is)' do
@@ -72,6 +83,17 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
 
           provider.update(context, test[:should][:name], test[:should])
         end
+      end
+
+      it 'invalidates the run cache' do
+        should = { name: '001 IPv4 Test Rule', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present' }
+        allow(context).to receive(:notice)
+        allow(described_class).to receive_messages(insert_order: 1, hash_to_rule: '-m comment --comment "001 Test Rule"')
+        allow(Puppet::Util::Execution).to receive(:execute)
+        allow(PuppetX::Firewall::Utility).to receive(:persist_iptables)
+        expect(PuppetX::Firewall::Cache).to receive(:invalidate)
+
+        provider.update(context, should[:name], should)
       end
     end
 
@@ -101,6 +123,19 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
 
           provider.delete(context, test[:is][:name], test[:is])
         end
+      end
+
+      it 'invalidates the run cache' do
+        is = {
+          name: '001 IPv4 Test Rule', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present',
+          line: '-A INPUT 1 -m comment --comment "001 Test Rule"'
+        }
+        allow(context).to receive(:notice)
+        allow(Puppet::Util::Execution).to receive(:execute)
+        allow(PuppetX::Firewall::Utility).to receive(:persist_iptables)
+        expect(PuppetX::Firewall::Cache).to receive(:invalidate)
+
+        provider.delete(context, is[:name], is)
       end
     end
 
