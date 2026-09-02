@@ -148,10 +148,6 @@ describe 'firewall::linux::redhat', type: :class do
         end
 
         it {
-          expect(subject).to contain_service('nftables').with(
-            ensure: 'running',
-            enable: 'true',
-          )
           expect(subject).to contain_service('iptables').with(
             ensure: 'running',
             enable: 'true',
@@ -162,9 +158,6 @@ describe 'firewall::linux::redhat', type: :class do
           let(:params) { { ensure: 'stopped' } }
 
           it {
-            expect(subject).to contain_service('nftables').with(
-              ensure: 'stopped',
-            )
             expect(subject).to contain_service('iptables').with(
               ensure: 'stopped',
             )
@@ -175,9 +168,6 @@ describe 'firewall::linux::redhat', type: :class do
           let(:params) { { enable: 'false' } }
 
           it {
-            expect(subject).to contain_service('nftables').with(
-              enable: 'false',
-            )
             expect(subject).to contain_service('iptables').with(
               enable: 'false',
             )
@@ -188,21 +178,21 @@ describe 'firewall::linux::redhat', type: :class do
           expect(subject).to contain_service('firewalld').with(
             ensure: 'stopped',
             enable: false,
-            before: ['Package[iptables-services]', 'Package[nftables]', 'Service[iptables]', 'Service[nftables]'],
+            before: ['Package[iptables-services]', 'Package[nftables]', 'Service[iptables]'],
           )
         }
 
         it {
           expect(subject).to contain_package('iptables-services').with(
             ensure: 'installed',
-            before: ['Service[iptables]', 'Service[nftables]'],
+            before: ['Service[iptables]'],
           )
         }
 
         it {
           expect(subject).to contain_package('nftables').with(
             ensure: 'installed',
-            before: ['Service[iptables]', 'Service[nftables]'],
+            before: ['Service[iptables]'],
           )
         }
 
