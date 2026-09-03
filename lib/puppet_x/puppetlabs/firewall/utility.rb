@@ -232,29 +232,94 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
       "#{negation}#{mark}/#{mask}"
     end
 
-    # Converts a given number to its protocol keyword
+    # Mapping of protocol names to IANA protocol numbers.
+    # Populated at load time from /etc/protocols when readable, with this
+    # table as fallback (covers minimally-installed or container environments).
+    # iptables >= 1.8.11 deliberately stopped calling getprotobynumber() in
+    # iptables-save, so rare protocols (vrrp, esp, ah, ospf, gre, …) now
+    # appear as numeric IDs in iptables-save output instead of resolved names.
+    FALLBACK_PROTO_TABLE = {
+      'ip' => '0', 'hopopt' => '0', 'icmp' => '1', 'igmp' => '2', 'ggp' => '3',
+      'ipencap' => '4', 'ip-encap' => '4', 'st' => '5', 'tcp' => '6', 'cbt' => '7',
+      'egp' => '8', 'igp' => '9', 'pup' => '12', 'udp' => '17', 'hmp' => '20',
+      'xns-idp' => '22', 'rdp' => '27', 'iso-tp4' => '29', 'dccp' => '33',
+      'xtp' => '36', 'ddp' => '37', 'idpr-cmtp' => '38', 'ipv6' => '41',
+      'ipv6-route' => '43', 'ipv6-frag' => '44', 'idrp' => '45', 'rsvp' => '46',
+      'gre' => '47', 'esp' => '50', 'ipsec-esp' => '50', 'ah' => '51',
+      'ipsec-ah' => '51', 'skip' => '57', 'ipv6-icmp' => '58', 'ipv6-nonxt' => '59',
+      'ipv6-opts' => '60', 'rspf' => '73', 'cphb' => '73', 'vmtp' => '81',
+      'eigrp' => '88', 'ospf' => '89', 'ospfigp' => '89', 'ax.25' => '93',
+      'ipip' => '94', 'etherip' => '97', 'encap' => '98', 'pim' => '103',
+      'ipcomp' => '108', 'vrrp' => '112', 'l2tp' => '115', 'isis' => '124',
+      'sctp' => '132', 'fc' => '133', 'mobility-header' => '135', 'udplite' => '136',
+      'mpls-in-ip' => '137', 'manet' => '138', 'hip' => '139', 'shim6' => '140',
+      'wesp' => '141', 'rohc' => '142', 'ethernet' => '143', 'mptcp' => '262',
+    }.freeze
+
+    PROTO_NAME_TO_NUMBER = begin
+      map = FALLBACK_PROTO_TABLE.dup
+      if File.readable?('/etc/protocols')
+        File.foreach('/etc/protocols') do |line|
+          line = line.sub(%r{#.*}, '').strip
+          next if line.empty?
+
+          parts = line.split
+          next if parts.length < 2
+
+          num = parts[1]
+          ([parts[0]] + (parts[2..] || [])).each { |n| map[n.downcase] = num }
+        end
+      end
+      map
+    rescue StandardError
+      FALLBACK_PROTO_TABLE.dup
+    end
+
+    # Converts a given number to its protocol keyword.
     # https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
+    # Falls back to returning the raw value when the number is not recognised
+    # so that an unknown protocol does not cause a hard error.
     def self.proto_number_to_name(value)
-      return value if %r{^(?:!\s)?([a-z])}.match?(value)
+      return value if %r{^(?:!\s)?[a-z]}.match?(value)
 
       match = value.to_s.match(%r{^(!\s)?(.*)})
-      keyword = case match[2]
-                when '1' then 'icmp'
-                when '2' then 'igmp'
-                when '4' then 'ipencap'
-                when '6' then 'tcp'
-                when '7' then 'cbt'
-                when '17' then 'udp'
-                when '47' then 'gre'
-                when '50' then 'esp'
-                when '51' then 'ah'
-                when '89' then 'ospf'
-                when '103' then 'pim'
-                when '112' then 'vrrp'
-                when '132' then 'sctp'
-                else raise ArgumentError, "Unsupported proto number: #{value}"
-                end
-      "#{match[1]}#{keyword}"
+      negation = match[1] || ''
+      number   = match[2]
+      # Canonical names for numbers that appear in iptables-save output.
+      # The explicit table keeps the mapping stable regardless of /etc/protocols
+      # content (which varies by distro / container image).
+      name = case number
+             when '1'   then 'icmp'
+             when '2'   then 'igmp'
+             when '4'   then 'ipencap'
+             when '6'   then 'tcp'
+             when '7'   then 'cbt'
+             when '17'  then 'udp'
+             when '47'  then 'gre'
+             when '50'  then 'esp'
+             when '51'  then 'ah'
+             when '89'  then 'ospf'
+             when '103' then 'pim'
+             when '112' then 'vrrp'
+             when '132' then 'sctp'
+             else
+               # Try a reverse lookup via PROTO_NAME_TO_NUMBER for any
+               # protocol not in the table above before giving up.
+               PROTO_NAME_TO_NUMBER.key(number)
+             end
+      name ? "#{negation}#{name}" : value
+    end
+
+    # Converts a protocol name to its IANA number string.
+    # Returns the value unchanged when it is already numeric or unknown.
+    def self.proto_name_to_number(value)
+      match = value.to_s.match(%r{^(!\s)?(.*)})
+      negation = match[1] || ''
+      v = match[2].downcase
+      return value if v =~ %r{^\d+$}
+
+      num = PROTO_NAME_TO_NUMBER[v]
+      num ? "#{negation}#{num}" : value
     end
 
     # Converts a given number to its dscp class name

@@ -390,6 +390,15 @@ class Puppet::Provider::Firewall::Firewall
       end
 
       "#{is_negate}#{is}" == "#{should_negate}#{should}"
+    when :proto
+      # iptables >= 1.8.11 removed getprotobynumber() from iptables-save, so
+      # rare protocols (vrrp, esp, ah, ospf, gre, …) are now emitted as their
+      # numeric IANA IDs instead of resolved names.  Normalise both sides to
+      # their protocol number before comparing so that e.g. '112' and 'vrrp'
+      # are treated as equal.
+      is     = PuppetX::Firewall::Utility.proto_name_to_number(is_hash[property_name].to_s)
+      should = PuppetX::Firewall::Utility.proto_name_to_number(should_hash[property_name].to_s)
+      is == should
     when :mac_source, :jump
       # Value of mac_source/jump may be downcased or upcased when returned depending on the OS
       is_hash[property_name].casecmp(should_hash[property_name]).zero?
