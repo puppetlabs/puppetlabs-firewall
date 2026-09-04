@@ -256,7 +256,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
       'wesp' => '141', 'rohc' => '142', 'ethernet' => '143', 'mptcp' => '262',
     }.freeze
 
-    PROTO_NAME_TO_NUMBER = begin
+    PROTO_NAME_TO_NUMBER = lambda do
       map = FALLBACK_PROTO_TABLE.dup
       if File.readable?('/etc/protocols')
         File.foreach('/etc/protocols') do |line|
@@ -273,7 +273,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
       map
     rescue StandardError
       FALLBACK_PROTO_TABLE.dup
-    end
+    end.call.freeze
 
     # Converts a given number to its protocol keyword.
     # https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
@@ -316,7 +316,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
       match = value.to_s.match(%r{^(!\s)?(.*)})
       negation = match[1] || ''
       v = match[2].downcase
-      return value if v =~ %r{^\d+$}
+      return value if v.match?(%r{^\d+$})
 
       num = PROTO_NAME_TO_NUMBER[v]
       num ? "#{negation}#{num}" : value
