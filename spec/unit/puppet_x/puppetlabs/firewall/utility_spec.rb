@@ -234,9 +234,39 @@ RSpec.describe PuppetX::Firewall::Utility do
     it { expect(utility.proto_number_to_name('103')).to eql 'pim' }
     it { expect(utility.proto_number_to_name('112')).to eql 'vrrp' }
     it { expect(utility.proto_number_to_name('132')).to eql 'sctp' }
+    it 'returns already-named protocols unchanged' do
+      expect(utility.proto_number_to_name('vrrp')).to eql 'vrrp'
+      expect(utility.proto_number_to_name('tcp')).to eql 'tcp'
+    end
+    it 'returns an unrecognised number unchanged rather than raising' do
+      expect(utility.proto_number_to_name('619')).to eql '619'
+    end
+    it 'handles negated numbers' do
+      expect(utility.proto_number_to_name('! 112')).to eql '! vrrp'
+    end
+  end
 
-    it 'rejects invalid number 619' do
-      expect { utility.proto_number_to_name('619') }.to raise_error(ArgumentError, 'Unsupported proto number: 619')
+  describe '#proto_name_to_number' do
+    it { expect(utility.proto_name_to_number('vrrp')).to eql '112' }
+    it { expect(utility.proto_name_to_number('tcp')).to eql '6' }
+    it { expect(utility.proto_name_to_number('udp')).to eql '17' }
+    it { expect(utility.proto_name_to_number('esp')).to eql '50' }
+    it { expect(utility.proto_name_to_number('ah')).to eql '51' }
+    it { expect(utility.proto_name_to_number('ospf')).to eql '89' }
+    it { expect(utility.proto_name_to_number('gre')).to eql '47' }
+    it { expect(utility.proto_name_to_number('sctp')).to eql '132' }
+    it 'leaves already-numeric values unchanged' do
+      expect(utility.proto_name_to_number('112')).to eql '112'
+      expect(utility.proto_name_to_number('6')).to eql '6'
+    end
+    it 'leaves unknown names unchanged' do
+      expect(utility.proto_name_to_number('all')).to eql 'all'
+    end
+    it 'handles negated names' do
+      expect(utility.proto_name_to_number('! vrrp')).to eql '! 112'
+    end
+    it 'handles negated numbers unchanged' do
+      expect(utility.proto_name_to_number('! 112')).to eql '! 112'
     end
   end
 
