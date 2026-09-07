@@ -65,7 +65,7 @@ group :development do
   gem "puppet-resource_api",                     require: false
 end
 group :development, :release_prep do
-  gem "puppet-strings", '~> 4.0',              require: false
+  gem "puppet-strings", '>= 4.0', '< 6.0',     require: false
   gem "puppetlabs_spec_helper", '~> 9.0',      require: false
   gem "puppet-blacksmith", '>= 7.0', '< 10.0', require: false
 end
