@@ -584,9 +584,17 @@ RSpec.describe 'firewall type' do
                 { name: '001 test rule', set_mark: 313 }]
     },
     ':match_mark': {
-      valid: [{ name: '001 test rule', match_mark: '0x1' }, { name: '001 test rule', match_mark: '! 0x1' }],
+      valid: [{ name: '001 test rule', match_mark: '0x1' }, { name: '001 test rule', match_mark: '! 0x1' },
+              { name: '001 test rule', match_mark: '0x200/0xf00' },
+              { name: '001 test rule', match_mark: ['0x1'] },
+              { name: '001 test rule', match_mark: ['512/3840', '! 0x800/0xf00'] },
+              { name: '001 test rule', match_mark: ['! 0xe00/0xf00', '! 0x800/0xf00'] }],
       invalid: [{ name: '001 test rule', match_mark: 'invalid' }, { name: '001 test rule', match_mark: false },
-                { name: '001 test rule', match_mark: 313 }]
+                { name: '001 test rule', match_mark: 313 }, { name: '001 test rule', match_mark: [] },
+                { name: '001 test rule', match_mark: ['0x1', 'invalid'] },
+                { name: '001 test rule', match_mark: ['0x1', false] },
+                { name: '001 test rule', match_mark: ['0x1', 313] },
+                { name: '001 test rule', match_mark: [['0x1']] }]
     },
     ':mss': {
       valid: [{ name: '001 test rule', mss: '1361:1541' }, { name: '001 test rule', mss: '! 1361' },

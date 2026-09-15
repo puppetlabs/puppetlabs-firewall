@@ -432,6 +432,60 @@ COMMIT
         end
       end
 
+      context 'when rules contain multiple negated mark matches' do
+        let(:iptables) do
+          <<~IPTABLES
+            *filter
+            :INPUT ACCEPT [0:0]
+            -A INPUT -m mark ! --mark 0xe00/0xf00 -m mark ! --mark 0x800/0xf00 -m comment --comment "014 two marks" -j ACCEPT
+            -A INPUT -m mark ! --mark 0xd00/0xf00 -m mark ! --mark 0xe00/0xf00 -m mark ! --mark 0x400/0xf00 -m mark ! --mark 0xa00/0xe00 -m mark ! --mark 0x800/0xe00 -m comment --comment "015 five marks" -j ACCEPT
+            COMMIT
+          IPTABLES
+        end
+
+        let(:ip6tables) do
+          <<~IP6TABLES
+            *filter
+            :INPUT ACCEPT [0:0]
+            -A INPUT -m mark ! --mark 0xe00/0xf00 -m mark ! --mark 0x800/0xf00 -m comment --comment "016 two marks" -j ACCEPT
+            -A INPUT -m mark ! --mark 0xd00/0xf00 -m mark ! --mark 0xe00/0xf00 -m mark ! --mark 0x400/0xf00 -m mark ! --mark 0xa00/0xe00 -m mark ! --mark 0x800/0xe00 -m comment --comment "017 five marks" -j ACCEPT
+            COMMIT
+          IP6TABLES
+        end
+
+        it 'parses every mark and mask without violating the Resource API schema' do
+          allow(Puppet::Util::Execution).to receive(:execute).with('iptables-save', { combine: false, failonfail: true }).and_return(iptables)
+          allow(Puppet::Util::Execution).to receive(:execute).with('ip6tables-save', { combine: false, failonfail: true }).and_return(ip6tables)
+
+          parsed = provider.get(context)
+
+          expect(parsed).to include(
+            a_hash_including(
+              name: '014 two marks',
+              protocol: 'IPv4',
+              match_mark: ['! 0xe00/0xf00', '! 0x800/0xf00'],
+            ),
+            a_hash_including(
+              name: '015 five marks',
+              protocol: 'IPv4',
+              match_mark: ['! 0xd00/0xf00', '! 0xe00/0xf00', '! 0x400/0xf00', '! 0xa00/0xe00', '! 0x800/0xe00'],
+            ),
+            a_hash_including(
+              name: '016 two marks',
+              protocol: 'IPv6',
+              match_mark: ['! 0xe00/0xf00', '! 0x800/0xf00'],
+            ),
+            a_hash_including(
+              name: '017 five marks',
+              protocol: 'IPv6',
+              match_mark: ['! 0xd00/0xf00', '! 0xe00/0xf00', '! 0x400/0xf00', '! 0xa00/0xe00', '! 0x800/0xe00'],
+            ),
+          )
+
+          expect(parsed.map { |rule| type.type_definition.check_schema_values(rule) }).to all(be_empty)
+        end
+      end
+
       context 'when chain names contain option-like substrings' do
         let(:iptables) do
           <<~IPTABLES
