@@ -317,6 +317,16 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           result: { set_mark: '0x2a/0xffffffff', match_mark: '0x2a/0xffffffff', connmark: '0x2a/0xffffffff' }
         },
         {
+          process: 'normalize every match_mark independently, preserving its mask and negation',
+          should: { match_mark: ['512/3840', '! 2048/3840', '42'] },
+          result: { match_mark: ['0x200/0xf00', '! 0x800/0xf00', '0x2a/0xffffffff'] }
+        },
+        {
+          process: 'preserve a single-element match_mark array',
+          should: { match_mark: ['! 42'] },
+          result: { match_mark: ['! 0x2a/0xffffffff'] }
+        },
+        {
           process: '`ctmask` and `nfmask` must be put through mark_mask_to_hex',
           should: { ctmask: '42', nfmask: '42' },
           result: { ctmask: '0x2a/0xffffffff', nfmask: '0x2a/0xffffffff' }
@@ -368,6 +378,9 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
         },
         {
           logic_section: ':src_type, :dst_type, :ipset, :match_mark, :mss, :connmark', rules: [
+            { name: '001 test rule',
+              hash: { name: '001 test rule', match_mark: ['0x200/0xf00', '! 0x800/0xf00'] },
+              result: " -m mark --mark 0x200/0xf00 -m mark ! --mark 0x800/0xf00 -m comment --comment '001 test rule'" },
             { name: '001 test rule',
               hash: { name: '001 test rule', src_type: 'LOCAL --limit-iface-in', dst_type: '! UNICAST' },
               result: " -m addrtype --src-type LOCAL --limit-iface-in -m addrtype ! --dst-type UNICAST -m comment --comment '001 test rule'" },

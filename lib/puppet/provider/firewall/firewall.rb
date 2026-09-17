@@ -404,7 +404,12 @@ class Puppet::Provider::Firewall::Firewall
       is = PuppetX::Firewall::Utility.log_level_name_to_number(is_hash[property_name] || '4')
       should = PuppetX::Firewall::Utility.log_level_name_to_number(should_hash[property_name] || '4')
       is == should
-    when :set_mark, :match_mark, :connmark, :ctmask, :nfmask
+    when :match_mark
+      # The parser returns a scalar for one match and an array for repeated matches.
+      is = Array(is_hash[property_name]).map { |mark| PuppetX::Firewall::Utility.mark_mask_to_hex(mark) }
+      should = Array(should_hash[property_name]).map { |mark| PuppetX::Firewall::Utility.mark_mask_to_hex(mark) }
+      is == should
+    when :set_mark, :connmark, :ctmask, :nfmask
       # Ensure that the values are compared to eachother in hexidecimal format
       is = PuppetX::Firewall::Utility.mark_mask_to_hex(is_hash[property_name])
       should = PuppetX::Firewall::Utility.mark_mask_to_hex(should_hash[property_name])
@@ -902,7 +907,10 @@ class Puppet::Provider::Firewall::Firewall
 
     # `set_mark`, `match_mark`, `connmark`, `ctmask` and `nfmask` must be applied in hexidecimal format
     should[:set_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:set_mark]) if should[:set_mark]
-    should[:match_mark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:match_mark]) if should[:match_mark]
+    if should[:match_mark]
+      marks = Array(should[:match_mark]).map { |mark| PuppetX::Firewall::Utility.mark_mask_to_hex(mark) }
+      should[:match_mark] = should[:match_mark].is_a?(Array) ? marks : marks.first
+    end
     should[:connmark] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:connmark]) if should[:connmark]
     should[:ctmask] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:ctmask]) if should[:ctmask]
     should[:nfmask] = PuppetX::Firewall::Utility.mark_mask_to_hex(should[:nfmask]) if should[:nfmask]
