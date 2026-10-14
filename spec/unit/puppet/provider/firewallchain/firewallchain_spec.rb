@@ -133,6 +133,39 @@ COMMIT
 
         expect(provider.get(context)).to eq(returned_data)
       end
+
+      context 'when called multiple times within a single run (issue #1214)' do
+        before(:each) do
+          allow(Puppet).to receive(:lookup).and_call_original
+          allow(Puppet).to receive(:lookup).with(:current_environment).and_return(instance_double(Puppet::Node::Environment))
+          ['nat', 'mangle', 'filter', 'raw', 'rawpost', 'broute', 'security'].each do |table|
+            allow(Puppet::Provider).to receive(:execute).with("iptables-save -t #{table}", any_args).and_return(iptables)
+            allow(Puppet::Provider).to receive(:execute).with("ip6tables-save -t #{table}", any_args).and_return(ip6tables)
+          end
+        end
+
+        it 'executes each list command only once' do
+          expect(Puppet::Provider).to receive(:execute).with('iptables-save -t filter', any_args).once.and_return(iptables)
+          expect(Puppet::Provider).to receive(:execute).with('ip6tables-save -t filter', any_args).once.and_return(ip6tables)
+
+          2.times { provider.get(context) }
+        end
+
+        it 'returns the same chains on every call' do
+          first = provider.get(context)
+          second = provider.get(context)
+
+          expect(second).to eq(first)
+        end
+
+        it 'executes the list commands again after the cache is invalidated' do
+          expect(Puppet::Provider).to receive(:execute).with('iptables-save -t filter', any_args).twice.and_return(iptables)
+
+          provider.get(context)
+          PuppetX::Firewall::Cache.invalidate
+          provider.get(context)
+        end
+      end
     end
 
     describe 'create(context, name, should)' do
@@ -153,6 +186,16 @@ COMMIT
 
           provider.create(context, test[:should][:name], test[:should])
         end
+      end
+
+      it 'invalidates the run cache' do
+        should = { name: 'TEST_ONE:filter:IPv4', chain: 'TEST_ONE', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present' }
+        allow(context).to receive(:notice)
+        allow(Puppet::Util::Execution).to receive(:execute)
+        allow(PuppetX::Firewall::Utility).to receive(:persist_iptables)
+        expect(PuppetX::Firewall::Cache).to receive(:invalidate)
+
+        provider.create(context, should[:name], should)
       end
     end
 
@@ -226,6 +269,16 @@ COMMIT
 
             provider.delete(context, test[:is][:name], test[:is])
           end
+        end
+
+        it 'invalidates the run cache after the chain and its rules are removed' do
+          is = { name: 'TEST_ONE:filter:IPv4', chain: 'TEST_ONE', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' }
+          allow(context).to receive(:notice)
+          allow(Puppet::Util::Execution).to receive(:execute)
+          allow(PuppetX::Firewall::Utility).to receive(:persist_iptables)
+          expect(PuppetX::Firewall::Cache).to receive(:invalidate)
+
+          provider.delete(context, is[:name], is)
         end
       end
 

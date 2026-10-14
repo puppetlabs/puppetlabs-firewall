@@ -29,6 +29,17 @@ if ENV['COVERAGE'] == 'yes'
   end
 end
 
+require 'puppet_x/puppetlabs/firewall/cache'
+
+RSpec.configure do |c|
+  # The run-scoped cache is keyed to Puppet's :current_environment binding,
+  # which the spec harness keeps stable across examples. Real agent runs bind a
+  # fresh environment per run; in specs we drop the cache before each example.
+  c.before(:each) do
+    PuppetX::Firewall::Cache.invalidate
+  end
+end
+
 shared_context 'when ArchLinux' do
   let :facts do
     {
