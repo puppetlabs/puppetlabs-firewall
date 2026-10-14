@@ -1306,11 +1306,12 @@ Puppet::ResourceApi.register_type(
       DESC
     },
     match_mark: {
-      type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
+      type: 'Optional[Variant[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/], Array[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/], 1]]]',
       desc: <<-DESC
-      Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
-      This value will be converted to hex if it is not already.
-      This value can be negated by adding a space seperated `!` to the beginning.
+      Match the Netfilter mark value associated with the packet. Accepts a mark, mark/mask,
+      or a non-empty array of these values. All matches in an array must match the packet (AND).
+      Each value is converted to hex if necessary and can be independently negated by
+      adding a space-separated `!` to the beginning.
       DESC
     },
     mss: {
