@@ -139,11 +139,11 @@ COMMIT
       [
         {
           should: { name: 'TEST_ONE:filter:IPv4', chain: 'TEST_ONE', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present' },
-          create_command: 'iptables -t filter -N TEST_ONE'
+          create_command: 'iptables -t filter -N TEST_ONE',
         },
         {
           should: { name: 'TEST_TWO:raw:IPv6', chain: 'TEST_TWO', table: 'raw', protocol: 'IPv6', purge: false, ignore_foreign: false, ensure: 'present' },
-          create_command: 'ip6tables -t raw -N TEST_TWO'
+          create_command: 'ip6tables -t raw -N TEST_TWO',
         },
       ].each do |test|
         it "creates the resource: '#{test[:should][:name]}'" do
@@ -162,12 +162,12 @@ COMMIT
           {
             should: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'drop' },
             is: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
-            update_command: 'iptables -t filter -P INPUT DROP'
+            update_command: 'iptables -t filter -P INPUT DROP',
           },
           {
             should: { name: 'OUTPUT:raw:IPv6', chain: 'OUTPUT', table: 'raw', protocol: 'IPv6', ensure: 'present', policy: 'queue' },
             is: { name: 'OUTPUT:raw:IPv6', chain: 'OUTPUT', table: 'raw', protocol: 'IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
-            update_command: 'ip6tables -t raw -P OUTPUT QUEUE'
+            update_command: 'ip6tables -t raw -P OUTPUT QUEUE',
           },
         ].each do |test|
           it "updates the resource: '#{test[:should]}'" do
@@ -185,12 +185,12 @@ COMMIT
           {
             should: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
             is: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
-            update_command: 'iptables -t filter -P INPUT DROP'
+            update_command: 'iptables -t filter -P INPUT DROP',
           },
           {
             should: { name: 'TEST_ONE:raw:IPv6', chain: 'TEST_ONE', table: 'raw', protocol: 'IPv6', ensure: 'present', policy: 'queue' },
             is: { name: 'TEST_ONE:raw:IPv6', chain: 'TEST_ONE', table: 'raw', protocol: 'IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
-            update_command: 'ip6tables -t raw -P OUTPUT QUEUE'
+            update_command: 'ip6tables -t raw -P OUTPUT QUEUE',
           },
         ].each do |test|
           it "does not update the resource: '#{test[:should]}'" do
@@ -209,12 +209,12 @@ COMMIT
           {
             is: { name: 'TEST_ONE:filter:IPv4', chain: 'TEST_ONE', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
             flush_command: 'iptables -t filter -F TEST_ONE',
-            delete_command: 'iptables -t filter -X TEST_ONE'
+            delete_command: 'iptables -t filter -X TEST_ONE',
           },
           {
             is: { name: 'TEST_TWO:raw:IPv6', chain: 'TEST_TWO', table: 'raw', protocol: 'IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'accept' },
             flush_command: 'ip6tables -t raw -F TEST_TWO',
-            delete_command: 'ip6tables -t raw -X TEST_TWO'
+            delete_command: 'ip6tables -t raw -X TEST_TWO',
           },
         ].each do |test|
           it "deletes the resource: '#{test[:is]}'" do
@@ -234,12 +234,12 @@ COMMIT
           {
             is: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, ensure: 'present', policy: 'drop' },
             flush_command: 'iptables -t filter -F INPUT',
-            revert_command: 'iptables -t filter -P INPUT ACCEPT'
+            revert_command: 'iptables -t filter -P INPUT ACCEPT',
           },
           {
             is: { name: 'OUTPUT:raw:IPv6', chain: 'OUTPUT', table: 'raw', protocol: 'IPv6', purge: false, ignore_foreign: false, ensure: 'present', policy: 'queue' },
             flush_command: 'ip6tables -t raw -F OUTPUT',
-            revert_command: 'ip6tables -t raw -P OUTPUT ACCEPT'
+            revert_command: 'ip6tables -t raw -P OUTPUT ACCEPT',
           },
         ].each do |test|
           it "reverts the resource: '#{test[:is]}'" do
@@ -318,19 +318,19 @@ COMMIT
       [
         {
           should: { name: 'TEST_ONE:filter:IPv4', purge: true, ensure: 'present' },
-          purge: ['001 test * rule', '9003 ignore_this foreign', '9004 foreign']
+          purge: ['001 test * rule', '9003 ignore_this foreign', '9004 foreign'],
         },
         {
           should: { name: 'TEST_ONE:filter:IPv4', purge: true, ignore: 'ignore_this', ensure: 'present' },
-          purge: ['001 test * rule', '9004 foreign']
+          purge: ['001 test * rule', '9004 foreign'],
         },
         {
           should: { name: 'TEST_ONE:filter:IPv4', purge: true, ignore_foreign: true, ensure: 'present' },
-          purge: ['001 test * rule']
+          purge: ['001 test * rule'],
         },
         {
           should: { name: 'TEST_TWO:raw:IPv6', purge: true, ensure: 'present' },
-          purge: ['002 test rule']
+          purge: ['002 test rule'],
         },
       ].each do |test|
         before(:each) do
@@ -359,12 +359,12 @@ COMMIT
         {
           input: {
             is: { title: 'INPUT:filter:IPv4', purge: false, ignore_foreign: false },
-            should: { name: 'INPUT:filter:IPv4', ensure: 'present' }
+            should: { name: 'INPUT:filter:IPv4', ensure: 'present' },
           },
           output: {
             is: { title: 'INPUT:filter:IPv4', name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', purge: false, ignore_foreign: false, policy: 'accept' },
-            should: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'accept' }
-          }
+            should: { name: 'INPUT:filter:IPv4', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
+          },
         },
       ].each do |test|
         it { expect(provider.process_input(test[:input][:is], test[:input][:should])).to eql([test[:output][:is], test[:output][:should]]) }
@@ -375,35 +375,35 @@ COMMIT
       [
         {
           should: { name: 'PREROUTING:filter:IPv4', chain: 'PREROUTING', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
-          error: 'INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table \'filter\''
+          error: 'INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table \'filter\'',
         },
         {
           should: { name: 'BROUTING:mangle:IPv4', chain: 'BROUTING', table: 'mangle', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
-          error: 'PREROUTING, POSTROUTING, INPUT, FORWARD and OUTPUT are the only inbuilt chains that can be used in table \'mangle\''
+          error: 'PREROUTING, POSTROUTING, INPUT, FORWARD and OUTPUT are the only inbuilt chains that can be used in table \'mangle\'',
         },
         {
           should: { name: 'FORWARD:nat:IPv4', chain: 'FORWARD', table: 'nat', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
-          error: 'PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table \'nat\''
+          error: 'PREROUTING, POSTROUTING, INPUT, and OUTPUT are the only inbuilt chains that can be used in table \'nat\'',
         },
         {
           should: { name: 'INPUT:raw:IPv4', chain: 'INPUT', table: 'raw', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
-          error: 'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\''
+          error: 'PREROUTING and OUTPUT are the only inbuilt chains in the table \'raw\'',
         },
         {
           should: { name: 'BROUTING:broute:IPv4', chain: 'BROUTING', table: 'broute', protocol: 'IPv4', ensure: 'present' },
-          error: 'BROUTE is only valid with protocol \'ethernet\''
+          error: 'BROUTE is only valid with protocol \'ethernet\'',
         },
         {
           should: { name: 'INPUT:broute:ethernet', chain: 'INPUT', table: 'broute', protocol: 'ethernet', ensure: 'present' },
-          error: 'BROUTING is the only inbuilt chain allowed on on table \'broute\''
+          error: 'BROUTING is the only inbuilt chain allowed on on table \'broute\'',
         },
         {
           should: { name: 'PREROUTING:security:IPv4', chain: 'PREROUTING', table: 'security', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
-          error: 'INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table \'security\''
+          error: 'INPUT, OUTPUT and FORWARD are the only inbuilt chains that can be used in table \'security\'',
         },
         {
           should: { name: 'TEST_ONE:filter:IPv4', chain: 'TEST_ONE', table: 'filter', protocol: 'IPv4', ensure: 'present', policy: 'accept' },
-          error: '\'policy\' can only be set on Internal Chains. Setting for \'TEST_ONE:filter:IPv4\' is invalid'
+          error: '\'policy\' can only be set on Internal Chains. Setting for \'TEST_ONE:filter:IPv4\' is invalid',
         },
       ].each do |test|
         it "Expect error: #{test[:error]}" do

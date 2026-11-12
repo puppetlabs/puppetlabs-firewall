@@ -11,7 +11,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
     'IPv4' => 'iptables-save',
     'iptables' => 'iptables-save',
     'IPv6' => 'ip6tables-save',
-    'ip6tables' => 'ip6tables-save'
+    'ip6tables' => 'ip6tables-save',
   }
   # Regex used to divide output of$fwc_list_command between tables
   $fwc_table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[\s\S]+?)(?=^\*|\z)}
@@ -58,7 +58,7 @@ class Puppet::Provider::Firewallchain::Firewallchain
             name: "#{chain[0]}:#{table_name}:#{protocol}",
             purge: false,
             ignore_foreign: false,
-            ensure: 'present'
+            ensure: 'present',
           }
           # If a policy was found add to the hash
           chain_hash[:policy] = chain[1].downcase if chain[1]

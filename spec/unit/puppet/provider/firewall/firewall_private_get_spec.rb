@@ -537,7 +537,7 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
       [
         {
           input: [{ name: '001 test rule' }, { name: '001 test rule' }],
-          error: 'Duplicate names have been found within your Firewalls. This prevents the module from working correctly and must be manually resolved.'
+          error: 'Duplicate names have been found within your Firewalls. This prevents the module from working correctly and must be manually resolved.',
         },
       ].each do |validate|
         it "Validate: #{validate[:error]}" do
@@ -554,7 +554,7 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           rule: 'A INPUT -p tcp',
           counter: 1,
           result: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: 'tcp',
-                    name: '9001 9115c4f4e9a27e6519767ade2f6aa22a66268cea6bf3fb739c6963cdbadcf682' }
+                    name: '9001 9115c4f4e9a27e6519767ade2f6aa22a66268cea6bf3fb739c6963cdbadcf682' },
         },
         {
           process: 'if returned `name` has no number, assign one',
@@ -562,21 +562,21 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           rule: 'A INPUT -p tcp -m comment --comment "test rule"',
           counter: 2,
           result: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: 'tcp',
-                    name: '9002 test rule' }
+                    name: '9002 test rule' },
         },
         {
           process: 'if no `proto` is returned, assume it is `all`',
           rule_hash: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', name: '001 test rule' },
           rule: 'A INPUT -m comment --comment "001 test rule"',
           counter: 0,
-          result: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: 'all', name: '001 test rule' }
+          result: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: 'all', name: '001 test rule' },
         },
         {
           process: 'if `proto` is returned as number, convert to name',
           rule_hash: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: '1', name: '001 test rule' },
           rule: 'A INPUT -p 1 -m comment --comment "001 test rule"',
           counter: 0,
-          result: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: 'icmp', name: '001 test rule' }
+          result: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: 'icmp', name: '001 test rule' },
         },
         {
           process: "if `set_dscp` is returned, also return it's valid class name `set_dscp_class`",
@@ -585,7 +585,7 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           rule: 'A INPUT -p tcp -m comment --comment "001 test rule" --set-dscp 0x0c',
           counter: 0,
           result: { ensure: 'present', table: 'filter', protocol: 'IPv4', chain: 'INPUT', proto: 'tcp',
-                    name: '001 test rule', set_dscp: '0x0c', set_dscp_class: 'af12' }
+                    name: '001 test rule', set_dscp: '0x0c', set_dscp_class: 'af12' },
         },
       ].each do |process|
         it "Process: #{process[:process]}" do
