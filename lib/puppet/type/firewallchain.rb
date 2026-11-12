@@ -24,7 +24,7 @@ Puppet::ResourceApi.register_type(
     ensure: {
       type: 'Enum[present, absent]',
       default: 'present',
-      desc: <<-DESC
+      desc: <<-DESC,
       Whether this chain should be present or absent on the target system.
       Setting this to absent will first remove all rules associated with this chain and then delete the chain itself.
       Inbuilt chains however will merely remove any added rules and, if it has been changed, return their policy to the default.
@@ -33,11 +33,11 @@ Puppet::ResourceApi.register_type(
     name: {
       type: 'Pattern[/^(?:\S+):(?:nat|mangle|filter|raw|rawpost|broute|security):(?:IP(?:v[46])?|ethernet)$/]',
       desc: 'The canonical name of the chain with the required format being `{chain}:{table}:{protocol}`.',
-      behaviour: :namevar
+      behaviour: :namevar,
     },
     policy: {
       type: "Optional[Enum['accept', 'drop', 'queue', 'return']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       This action to take when the end of the chain is reached.
       This can only be set on inbuilt chains (i.e. INPUT, FORWARD, OUTPUT,
       PREROUTING, POSTROUTING) and can be one of:
@@ -52,11 +52,11 @@ Puppet::ResourceApi.register_type(
     purge: {
       type: 'Boolean',
       default: false,
-      desc: 'Whether or not to purge unmanaged rules in this chain'
+      desc: 'Whether or not to purge unmanaged rules in this chain',
     },
     ignore: {
       type: 'Optional[Variant[String[1], Array[String[1]]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Regex to perform on firewall rules to exempt unmanaged rules from purging.
       This is matched against the output of `iptables-save`.
 
@@ -82,10 +82,10 @@ Puppet::ResourceApi.register_type(
     ignore_foreign: {
       type: 'Boolean',
       default: false,
-      desc: <<-DESC
+      desc: <<-DESC,
       Ignore rules that do not match the puppet title pattern "^\d+[[:graph:][:space:]]" when purging unmanaged firewall rules in this chain.
       This can be used to ignore rules that were not put in by puppet. Beware that nothing keeps other systems from configuring firewall rules with a comment that starts with digits, and is indistinguishable from puppet-configured rules.
       DESC
-    }
+    },
   },
 )

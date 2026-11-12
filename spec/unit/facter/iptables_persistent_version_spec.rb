@@ -9,7 +9,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
     let(:dpkg_cmd) { "dpkg-query -Wf '${Version}' netfilter-persistent 2>/dev/null" }
 
     {
-      'Ubuntu' => '0.5.3ubuntu2'
+      'Ubuntu' => '0.5.3ubuntu2',
     }.each do |os, ver|
       os_release = '20.04'
 
@@ -53,7 +53,7 @@ describe 'Facter::Util::Fact iptables_persistent_version' do
 
     {
       'Debian' => '0.0.20090701',
-      'Ubuntu' => '0.5.3ubuntu2'
+      'Ubuntu' => '0.5.3ubuntu2',
     }.each do |os, ver|
       if os == 'Debian'
         os_release = '8.0'
