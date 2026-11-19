@@ -35,11 +35,11 @@ shared_context 'when ArchLinux' do
       kernel: 'Linux',
       os: {
         name: 'ArchLinux',
-        family: 'ArchLinux'
+        family: 'ArchLinux',
       },
       identity: {
-        uid: 'root'
-      }
+        uid: 'root',
+      },
     }
   end
 end
@@ -59,11 +59,11 @@ shared_context 'when Debian Unstable' do
       os: {
         family: 'Debian',
         name: 'Debian',
-        release: { full: 'unstable' }
+        release: { full: 'unstable' },
       },
       identity: {
-        uid: 'root'
-      }
+        uid: 'root',
+      },
     }
   end
 end

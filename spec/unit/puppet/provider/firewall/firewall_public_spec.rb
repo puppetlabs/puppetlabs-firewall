@@ -26,12 +26,12 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
         {
           should: { name: '001 IPv4 Test Rule', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present' },
           arguments: '-m comment --comment "001 Test Rule"',
-          create_command: 'iptables -t filter -I INPUT 1 -m comment --comment "001 Test Rule"'
+          create_command: 'iptables -t filter -I INPUT 1 -m comment --comment "001 Test Rule"',
         },
         {
           should: { name: '002 IPv6 Test Rule', chain: 'OUTPUT', table: 'raw', protocol: 'IPv6', ensure: 'present' },
           arguments: '-m comment --comment "002 Test Rule"',
-          create_command: 'ip6tables -t raw -I OUTPUT 1 -m comment --comment "002 Test Rule"'
+          create_command: 'ip6tables -t raw -I OUTPUT 1 -m comment --comment "002 Test Rule"',
         },
       ].each do |test|
         it "creates the resource: '#{test[:should][:name]}'" do
@@ -53,12 +53,12 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
         {
           should: { name: '001 IPv4 Test Rule', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present' },
           arguments: '-m comment --comment "001 Test Rule"',
-          update_command: 'iptables -t filter -R INPUT 1 -m comment --comment "001 Test Rule"'
+          update_command: 'iptables -t filter -R INPUT 1 -m comment --comment "001 Test Rule"',
         },
         {
           should: { name: '002 IPv6 Test Rule', chain: 'OUTPUT', table: 'raw', protocol: 'IPv6', ensure: 'present' },
           arguments: '-m comment --comment "002 Test Rule"',
-          update_command: 'ip6tables -t raw -R OUTPUT 1 -m comment --comment "002 Test Rule"'
+          update_command: 'ip6tables -t raw -R OUTPUT 1 -m comment --comment "002 Test Rule"',
         },
       ].each do |test|
         it "updates the resource: '#{test[:should][:name]}'" do
@@ -82,14 +82,14 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
             name: '001 IPv4 Test Rule', chain: 'INPUT', table: 'filter', protocol: 'IPv4', ensure: 'present',
             line: '-A INPUT 1 -m comment --comment "001 Test Rule"'
           },
-          delete_command: 'iptables -t filter -D INPUT 1 -m comment --comment "001 Test Rule"'
+          delete_command: 'iptables -t filter -D INPUT 1 -m comment --comment "001 Test Rule"',
         },
         {
           is: {
             name: '002 IPv6 Test Rule', chain: 'OUTPUT', table: 'raw', protocol: 'IPv6', ensure: 'present',
             line: '-A OUTPUT 1 -m comment --comment "002 Test Rule"'
           },
-          delete_command: 'ip6tables -t raw -D OUTPUT 1 -m comment --comment "002 Test Rule"'
+          delete_command: 'ip6tables -t raw -D OUTPUT 1 -m comment --comment "002 Test Rule"',
         },
       ].each do |test|
         it "deletes the resource: '#{test[:is][:name]}'" do

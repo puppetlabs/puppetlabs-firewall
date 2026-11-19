@@ -145,7 +145,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
 
     # Translate the symbolic names for icmp packet types to integers
     def self.icmp_name_to_number(value_icmp, protocol)
-      if value_icmp.to_s.match?(%r{^\d+(\/\d+)?$})
+      if value_icmp.to_s.match?(%r{^\d+(/\d+)?$})
         value_icmp.to_s
       elsif ['IPv4', 'iptables'].include?(protocol)
         # https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml
@@ -222,7 +222,7 @@ module PuppetX::Firewall # rubocop:disable Style/ClassAndModuleChildren
     # hexidecimal format.
     # Used for set_mark, match_mark, connmark
     def self.mark_mask_to_hex(value)
-      match = value.to_s.match(%r{^(!\s)?([a-fA-F0-9x]+)\/?([a-fA-F0-9x]+)?})
+      match = value.to_s.match(%r{^(!\s)?([a-fA-F0-9x]+)/?([a-fA-F0-9x]+)?})
       negation = '! '
       negation = '' if match[1].nil?
       mark = PuppetX::Firewall::Utility.to_hex32(match[2])

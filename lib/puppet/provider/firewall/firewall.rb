@@ -12,7 +12,7 @@ class Puppet::Provider::Firewall::Firewall
     'IPv4' => 'iptables-save',
     'iptables' => 'iptables-save',
     'IPv6' => 'ip6tables-save',
-    'ip6tables' => 'ip6tables-save'
+    'ip6tables' => 'ip6tables-save',
   }
   # Regex used to divide output of$fw_list_command between tables
   $fw_table_regex = %r{(\*(?:nat|mangle|filter|raw|rawpost|broute|security)[\s\S]+?)(?=^\*|\z)}
@@ -25,7 +25,7 @@ class Puppet::Provider::Firewall::Firewall
     'IPv4' => 'iptables -t',
     'iptables' => 'iptables -t',
     'IPv6' => 'ip6tables -t',
-    'ip6tables' => 'ip6tables -t'
+    'ip6tables' => 'ip6tables -t',
   }
   # Command to add a rule to a chain
   $fw_rule_create_command = '-I' # chain_name rule_num
@@ -181,7 +181,7 @@ class Puppet::Provider::Firewall::Firewall
     name: '-m comment --comment',
     notrack: '--notrack',
     helper: '--helper',
-    zone: '--zone'
+    zone: '--zone',
   }
 
   # These are known booleans that do not take a value.
@@ -226,7 +226,7 @@ class Puppet::Provider::Firewall::Firewall
     hashlimit: [:hashlimit_upto, :hashlimit_above, :hashlimit_name, :hashlimit_burst, :hashlimit_mode, :hashlimit_srcmask, :hashlimit_dstmask,
                 :hashlimit_htable_size, :hashlimit_htable_max, :hashlimit_htable_expire, :hashlimit_htable_gcinterval],
     ipvs: [:ipvs],
-    cgroup: [:cgroup]
+    cgroup: [:cgroup],
   }
 
   # This is the order of resources as they appear in ip(6)tables-save output,

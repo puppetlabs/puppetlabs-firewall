@@ -15,9 +15,9 @@ describe 'firewall::linux', type: :class do
                 name: os,
                 release: { full: osrel },
                 family: 'RedHat',
-                selinux: { enabled: false }
+                selinux: { enabled: false },
               },
-              puppetversion: Puppet.version
+              puppetversion: Puppet.version,
             }
           end
 
@@ -39,9 +39,9 @@ describe 'firewall::linux', type: :class do
               name: os,
               release: { full: osrel },
               family: 'Debian',
-              selinux: { enabled: false }
+              selinux: { enabled: false },
             },
-            puppetversion: Puppet.version
+            puppetversion: Puppet.version,
           }
         end
 

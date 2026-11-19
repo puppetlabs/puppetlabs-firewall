@@ -128,14 +128,14 @@ Puppet::ResourceApi.register_type(
     ensure: {
       type: "Enum[present, absent, 'present', 'absent']",
       default: 'present',
-      desc: <<-DESC
+      desc: <<-DESC,
       Whether this rule should be present or absent on the target system.
       DESC
     },
     name: {
       type: 'Pattern[/(^\d+(?:[ \t_-]\S+)+$)/]',
       behaviour: :namevar,
-      desc: <<-DESC
+      desc: <<-DESC,
       The canonical name of the rule. This name is also used for ordering
       so make sure you prefix the rule with a number:
 
@@ -149,14 +149,14 @@ Puppet::ResourceApi.register_type(
     line: {
       type: 'Optional[String[1]]',
       behaviour: :read_only,
-      desc: <<-DESC
+      desc: <<-DESC,
       A read only attribute containing the full rule, used when deleting and when applying firewallchain purge attributes.
       DESC
     },
     protocol: {
       type: "Enum['iptables', 'ip6tables', 'IPv4', 'IPv6']",
       default: 'IPv4',
-      desc: <<-DESC
+      desc: <<-DESC,
       The protocol used to set the rule, its allowed values have been expanded to bring it closer to its `firewallchain` counterpart.
       Defaults to `IPv4`
 
@@ -166,7 +166,7 @@ Puppet::ResourceApi.register_type(
     table: {
       type: "Enum['nat', 'mangle', 'filter', 'raw', 'rawpost', 'broute', 'security']",
       default: 'filter',
-      desc: <<-DESC
+      desc: <<-DESC,
       The table the rule will exist in.
       Valid options are:
 
@@ -182,7 +182,7 @@ Puppet::ResourceApi.register_type(
     chain: {
       type: 'String[1]',
       default: 'INPUT',
-      desc: <<-DESC
+      desc: <<-DESC,
       Name of the chain the rule will be a part of, ensure the chain you choose exists within your set table.
       Can be one of the built-in chains:
 
@@ -198,7 +198,7 @@ Puppet::ResourceApi.register_type(
     },
     source: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The source address. For example:
 
           source => '192.168.2.0/24'
@@ -212,7 +212,7 @@ Puppet::ResourceApi.register_type(
     },
     destination: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The destination address to match. For example:
 
           destination => '192.168.1.0/24'
@@ -226,7 +226,7 @@ Puppet::ResourceApi.register_type(
     },
     iniface: {
       type: 'Optional[Pattern[/^(?:!\s)?[a-zA-Z0-9\-\._\+\:@]+$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Input interface to filter on.  Supports interface alias like eth0:0.
       To negate the match try this:
 
@@ -235,7 +235,7 @@ Puppet::ResourceApi.register_type(
     },
     outiface: {
       type: 'Optional[Pattern[/^(?:!\s)?[a-zA-Z0-9\-\._\+\:@]+$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Output interface to filter on.  Supports interface alias like eth0:0.
       To negate the match try this:
 
@@ -244,7 +244,7 @@ Puppet::ResourceApi.register_type(
     },
     physdev_in: {
       type: 'Optional[Pattern[/^(?:!\s)?[a-zA-Z0-9\-\._\+]+$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match if the packet is entering a bridge from the given interface.
       To negate the match try this:
 
@@ -253,7 +253,7 @@ Puppet::ResourceApi.register_type(
     },
     physdev_out: {
       type: 'Optional[Pattern[/^(?:!\s)?[a-zA-Z0-9\-\._\+]+$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match if the packet is leaving a bridge via the given interface.
       To negate the match try this:
 
@@ -262,84 +262,84 @@ Puppet::ResourceApi.register_type(
     },
     physdev_is_bridged: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match if the packet is transversing a bridge.
       DESC
     },
     physdev_is_in: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches if the packet has entered through a bridge interface.
       DESC
     },
     physdev_is_out: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches if the packet will leave through a bridge interface.
       DESC
     },
     proto: {
       type: 'Optional[Pattern[/^(?:!\s)?(?:ip(?:encap)?|tcp|udp|icmp|esp|ah|vrrp|carp|igmp|ipv4|ospf|gre|cbt|sctp|pim|all)/]]',
       default: 'tcp',
-      desc: <<-DESC
+      desc: <<-DESC,
       The specific protocol to match for this rule.
       DESC
     },
     isfragment: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Set to true to match tcp fragments (requires proto to be set to tcp)
       DESC
     },
     isfirstfrag: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches if the packet is the first fragment.
       Specific to IPv6.
       DESC
     },
     ishasmorefrags: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches if the packet has its 'more fragments' bit set.
       Specific to IPv6.
       DESC
     },
     islastfrag: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches if the packet is the last fragment.
       Specific to IPv6.
       DESC
     },
     stat_mode: {
       type: 'Optional[Enum[nth, random]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Set the matching mode for statistic matching.
       DESC
     },
     stat_every: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match one packet every nth packet. Requires `stat_mode => 'nth'`
       DESC
     },
     stat_packet: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Set the initial counter value for the nth mode. Must be between 0 and the value of `stat_every`.
       Defaults to 0. Requires `stat_mode => 'nth'`
       DESC
     },
     stat_probability: {
       type: 'Optional[Variant[Integer[0,1], Float[0.0,1.0]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Set the probability from 0 to 1 for a packet to be randomly matched. It works only with `stat_mode => 'random'`.
       DESC
     },
     src_range: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The source IP range. For example:
 
           src_range => '192.168.1.1-192.168.1.10'
@@ -353,7 +353,7 @@ Puppet::ResourceApi.register_type(
     },
     dst_range: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The destination IP range. For example:
 
           dst_range => '192.168.1.1-192.168.1.10'
@@ -367,7 +367,7 @@ Puppet::ResourceApi.register_type(
     },
     tcp_option: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?(?:[0-1][0-9]{0,2}|2[0-4][0-9]|25[0-5])$/], Integer[0,255]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match when the TCP option is present or absent.
       Given as a single TCP option, optionally prefixed with '! ' to match
       on absence instead.  Only one TCP option can be matched in a given rule.
@@ -377,7 +377,7 @@ Puppet::ResourceApi.register_type(
     },
     tcp_flags: {
       type: 'Optional[Pattern[/^(?:!\s)?((FIN|SYN|RST|PSH|ACK|URG|ALL|NONE),?)+\s((FIN|SYN|RST|PSH|ACK|URG|ALL|NONE),?)+$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match when the TCP flags are as specified.
       Is a string with a list of comma-separated flag names for the mask,
       then a space, then a comma-separated list of flags that should be set.
@@ -394,7 +394,7 @@ Puppet::ResourceApi.register_type(
     },
     uid: {
       type: 'Optional[Variant[String[1], Integer]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       UID or Username owner matching rule.  Accepts a single argument
       only, as iptables does not accept multiple uid in a single
       statement.
@@ -403,7 +403,7 @@ Puppet::ResourceApi.register_type(
     },
     gid: {
       type: 'Optional[Variant[String[1], Integer]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       GID or Group owner matching rule.  Accepts a single argument
       only, as iptables does not accept multiple gid in a single
       statement.
@@ -412,13 +412,13 @@ Puppet::ResourceApi.register_type(
     },
     mac_source: {
       type: 'Optional[Pattern[/^(?:!\s)?([0-9a-fA-F]{2}[:]){5}([0-9a-fA-F]{2})$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       MAC Source
       DESC
     },
     sport: {
       type: 'Optional[Variant[Array[Variant[Pattern[/^(?:!\s)?\d+(?:(?:\:|-)\d+)?$/],Integer]],Pattern[/^(?:!\s)?\d+(?:(?:\:|-)\d+)?$/],Integer]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The source port to match for this filter (if the protocol supports
       ports). Will accept a single element or an array.
 
@@ -444,7 +444,7 @@ Puppet::ResourceApi.register_type(
     },
     dport: {
       type: 'Optional[Variant[Array[Variant[Pattern[/^(?:!\s)?\d+(?:(?:\:|-)\d+)?$/],Integer]],Pattern[/^(?:!\s)?\d+(?:(?:\:|-)\d+)?$/],Integer]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The source port to match for this filter (if the protocol supports
       ports). Will accept a single element or an array.
 
@@ -472,7 +472,7 @@ Puppet::ResourceApi.register_type(
       type: 'Optional[Variant[
              Array[Pattern[/^(?:!\s)?(?:UNSPEC|UNICAST|LOCAL|BROADCAST|ANYCAST|MULTICAST|BLACKHOLE|UNREACHABLE|UNREACHABLE|PROHIBIT|THROW|NAT|XRESOLVE)(?:\s--limit-iface-(?:in|out))?$/]],
              Pattern[/^(?:!\s)?(?:UNSPEC|UNICAST|LOCAL|BROADCAST|ANYCAST|MULTICAST|BLACKHOLE|UNREACHABLE|UNREACHABLE|PROHIBIT|THROW|NAT|XRESOLVE)(?:\s--limit-iface-(?:in|out))?$/]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The source address type. For example:
 
           src_type => 'LOCAL'
@@ -507,7 +507,7 @@ Puppet::ResourceApi.register_type(
       type: 'Optional[Variant[
              Array[Pattern[/^(?:!\s)?(?:UNSPEC|UNICAST|LOCAL|BROADCAST|ANYCAST|MULTICAST|BLACKHOLE|UNREACHABLE|UNREACHABLE|PROHIBIT|THROW|NAT|XRESOLVE)(?:\s--limit-iface-(?:in|out))?$/]],
              Pattern[/^(?:!\s)?(?:UNSPEC|UNICAST|LOCAL|BROADCAST|ANYCAST|MULTICAST|BLACKHOLE|UNREACHABLE|UNREACHABLE|PROHIBIT|THROW|NAT|XRESOLVE)(?:\s--limit-iface-(?:in|out))?$/]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The destination address type. For example:
 
           dst_type => ['LOCAL']
@@ -540,32 +540,32 @@ Puppet::ResourceApi.register_type(
     },
     socket: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       If true, matches if an open socket can be found by doing a coket lookup
       on the packet.
       DESC
     },
     pkttype: {
       type: "Optional[Enum['unicast', 'broadcast', 'multicast']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the packet type to match.
       DESC
     },
     ipsec_dir: {
       type: "Optional[Enum['in', 'out']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the ipsec policy direction
       DESC
     },
     ipsec_policy: {
       type: "Optional[Enum['none', 'ipsec']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the ipsec policy type. May take a combination of arguments for any flags that can be passed to `--pol ipsec` such as: `--strict`, `--reqid 100`, `--next`, `--proto esp`, etc.
       DESC
     },
     state: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED)$/], Array[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED)$/]]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches a packet based on its state in the firewall stateful inspection
       table. Values can be:
 
@@ -595,7 +595,7 @@ Puppet::ResourceApi.register_type(
     },
     ctmask: {
       type: 'Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the mask applied to the connection tracking mark when using `restore_mark`.
       Used with the CONNMARK target to mask which bits of the ctmark are restored into the
       packet mark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
@@ -604,7 +604,7 @@ Puppet::ResourceApi.register_type(
     },
     nfmask: {
       type: 'Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the mask applied to the Netfilter packet mark when using `restore_mark`.
       Used with the CONNMARK target to mask which bits of the packet mark are written from the
       ctmark. Accepts a hex value (e.g. `0xff`) or a mark/mask pair (e.g. `0x10/0xff`).
@@ -613,7 +613,7 @@ Puppet::ResourceApi.register_type(
     },
     ctstate: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT)$/], Array[Pattern[/^(?:!\s)?(?:INVALID|ESTABLISHED|NEW|RELATED|UNTRACKED|SNAT|DNAT)$/]]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches a packet based on its state in the firewall stateful inspection
       table, using the conntrack module. Values can be:
 
@@ -643,14 +643,14 @@ Puppet::ResourceApi.register_type(
     },
     ctproto: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?\d+$/],Integer]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The specific layer-4 protocol number to match for this rule using the
       conntrack module.
       DESC
     },
     ctorigsrc: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The original source address using the conntrack module. For example:
 
           ctorigsrc => '192.168.2.0/24'
@@ -664,7 +664,7 @@ Puppet::ResourceApi.register_type(
     },
     ctorigdst: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The original destination address using the conntrack module. For example:
 
           ctorigdst => '192.168.2.0/24'
@@ -678,7 +678,7 @@ Puppet::ResourceApi.register_type(
     },
     ctreplsrc: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The reply source address using the conntrack module. For example:
 
           ctreplsrc => '192.168.2.0/24'
@@ -692,7 +692,7 @@ Puppet::ResourceApi.register_type(
     },
     ctrepldst: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The reply destination address using the conntrack module. For example:
 
           ctrepldst => '192.168.2.0/24'
@@ -706,7 +706,7 @@ Puppet::ResourceApi.register_type(
     },
     ctorigsrcport: {
       type: 'Optional[Pattern[/^(?:!\s)?\d+(?:\:\d+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The original source port to match for this filter using the conntrack module.
       For example:
 
@@ -723,7 +723,7 @@ Puppet::ResourceApi.register_type(
     },
     ctorigdstport: {
       type: 'Optional[Pattern[/^(?:!\s)?\d+(?:\:\d+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The original destination port to match for this filter using the conntrack module.
       For example:
 
@@ -740,7 +740,7 @@ Puppet::ResourceApi.register_type(
     },
     ctreplsrcport: {
       type: 'Optional[Pattern[/^(?:!\s)?\d+(?:\:\d+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The reply source port to match for this filter using the conntrack module.
       For example:
 
@@ -757,7 +757,7 @@ Puppet::ResourceApi.register_type(
     },
     ctrepldstport: {
       type: 'Optional[Pattern[/^(?:!\s)?\d+(?:\:\d+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The reply destination port to match for this filter using the conntrack module.
       For example:
 
@@ -774,7 +774,7 @@ Puppet::ResourceApi.register_type(
     },
     ctstatus: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?(?:EXPECTED|SEEN_REPLY|ASSURED|CONFIRMED|NONE)$/], Array[Pattern[/^(?:!\s)?(?:EXPECTED|SEEN_REPLY|ASSURED|CONFIRMED|NONE)$/]]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches a packet based on its status using the conntrack module. Values can be:
 
       * EXPECTED
@@ -801,7 +801,7 @@ Puppet::ResourceApi.register_type(
     },
     ctexpire: {
       type: 'Optional[Pattern[/^(?:!\s)?\d+(?:\:\d+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches a packet based on lifetime remaining in seconds or range of seconds
       using the conntrack module. For example:
 
@@ -811,7 +811,7 @@ Puppet::ResourceApi.register_type(
     },
     ctdir: {
       type: "Optional[Enum['REPLY', 'ORIGINAL']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches a packet that is flowing in the specified direction using the
       conntrack module. If this flag is not specified at all, matches packets
       in both directions. Values can be:
@@ -822,7 +822,7 @@ Puppet::ResourceApi.register_type(
     },
     hop_limit: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?\d+$/],Integer]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Hop limiting value for matched packets.
       To negate add a space seperated `!` the the beginning of the value
       This is IPv6 specific.
@@ -830,7 +830,7 @@ Puppet::ResourceApi.register_type(
     },
     icmp: {
       type: 'Optional[Variant[String[1],Integer]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When matching ICMP packets, this is the type of ICMP packet to match.
 
       A value of "any" is not supported. To achieve this behaviour the
@@ -841,7 +841,7 @@ Puppet::ResourceApi.register_type(
     },
     limit: {
       type: 'Optional[Pattern[/^\d+\/(?:sec(?:ond)?|min(?:ute)?|hour|day)$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Rate limiting value for matched packets. The format is:
       rate/[/second/|/minute|/hour|/day]
 
@@ -850,13 +850,13 @@ Puppet::ResourceApi.register_type(
     },
     burst: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Rate limiting burst value (per second) before limit checks apply.
       DESC
     },
     length: {
       type: 'Optional[Pattern[/^([0-9]+)(:)?([0-9]+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the length of layer-3 payload to match.
 
       Example values are: '500', '5:400'
@@ -864,7 +864,7 @@ Puppet::ResourceApi.register_type(
     },
     recent: {
       type: "Optional[Enum['set', 'update', 'rcheck', 'remove', '! set', '! update', '! rcheck', '! remove']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Enable the recent module. Takes as an argument one of set, update,
       rcheck or remove. For example:
 
@@ -899,7 +899,7 @@ Puppet::ResourceApi.register_type(
     },
     rseconds: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; used in conjunction with one of `recent => 'rcheck'` or
       `recent => 'update'`. When used, this will narrow the match to only
       happen when the address is in the list and was seen within the last given
@@ -908,7 +908,7 @@ Puppet::ResourceApi.register_type(
     },
     reap: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; can only be used in conjunction with the `rseconds`
       attribute. When used, this will cause entries older than 'seconds' to be
       purged.  Must be boolean true.
@@ -916,7 +916,7 @@ Puppet::ResourceApi.register_type(
     },
     rhitcount: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; used in conjunction with `recent => 'update'` or `recent
       => 'rcheck'. When used, this will narrow the match to only happen when
       the address is in the list and packets had been received greater than or
@@ -925,7 +925,7 @@ Puppet::ResourceApi.register_type(
     },
     rttl: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; may only be used in conjunction with one of `recent =>
       'rcheck'` or `recent => 'update'`. When used, this will narrow the match
       to only happen when the address is in the list and the TTL of the current
@@ -937,21 +937,21 @@ Puppet::ResourceApi.register_type(
     },
     rname: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; The name of the list.
       The recent module defaults this to `DEFAULT` when recent is set
       DESC
     },
     mask: {
       type: 'Optional[Pattern[/^\d+\.\d+\.\d+\.\d+$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; sets the mask to use when `recent` is enabled.
       The recent module defaults this to `255.255.255.255` when recent is set
       DESC
     },
     rsource: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; add the source IP address to the list.
       Mutually exclusive with `rdest`
       The recent module defaults this behaviour to true when recent is set.
@@ -959,7 +959,7 @@ Puppet::ResourceApi.register_type(
     },
     rdest: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Recent module; add the destination IP address to the list.
       Mutually exclusive with `rsource`
       Must be boolean true.
@@ -967,7 +967,7 @@ Puppet::ResourceApi.register_type(
     },
     ipset: {
       type: 'Optional[Variant[Pattern[/^(?:!\s)?[\w\-:_.]+\s(?:src|dst)(?:,src|,dst)?$/], Array[Pattern[/^(?:!\s)?[\w\-:_.]+\s(?:src|dst)(?:,src|,dst)?$/]]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches against the specified ipset list.
       Requires ipset kernel module. Will accept a single element or an array.
       The value is the name of the denylist, followed by a space, and then
@@ -979,7 +979,7 @@ Puppet::ResourceApi.register_type(
     },
     string: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       String matching feature. Matches the packet against the pattern
       given as an argument.
       To negate, add a space seperated `!` to the beginning of the string.
@@ -987,7 +987,7 @@ Puppet::ResourceApi.register_type(
     },
     string_hex: {
       type: 'Optional[Pattern[/^(?:!\s)?\|[a-zA-Z0-9\s]+\|$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       String matching feature. Matches the packet against the pattern
       given as an argument.
       To negate, add a space seperated `!` to the beginning of the string.
@@ -995,25 +995,25 @@ Puppet::ResourceApi.register_type(
     },
     string_algo: {
       type: "Optional[Enum['bm', 'kmp']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       String matching feature, pattern matching strategy.
       DESC
     },
     string_from: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       String matching feature, offset from which we start looking for any matching.
       DESC
     },
     string_to: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       String matching feature, offset up to which we should scan.
       DESC
     },
     jump: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       This value for the iptables --jump parameter and the action to perform on a match. Common values are:
 
       * ACCEPT - the packet is accepted
@@ -1041,7 +1041,7 @@ Puppet::ResourceApi.register_type(
     },
     goto: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The value for the iptables --goto parameter. Normal values are:
 
       * QUEUE
@@ -1058,7 +1058,7 @@ Puppet::ResourceApi.register_type(
     },
     clusterip_new: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the CLUSTERIP jump target.
       Create a new ClusterIP. You always have to set this on the first rule for a given ClusterIP.
       This is IPv4 specific.
@@ -1066,7 +1066,7 @@ Puppet::ResourceApi.register_type(
     },
     clusterip_hashmode: {
       type: "Optional[Enum['sourceip', 'sourceip-sourceport', 'sourceip-sourceport-destport']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the CLUSTERIP jump target.
       Specify the hashing mode.
       This is IPv4 specific.
@@ -1074,7 +1074,7 @@ Puppet::ResourceApi.register_type(
     },
     clusterip_clustermac: {
       type: 'Optional[Pattern[/^([0-9a-fA-F]{2}[:]){5}([0-9a-fA-F]{2})$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the CLUSTERIP jump target.
       Specify the ClusterIP MAC address. Has to be a link-layer multicast address.
       This is IPv4 specific.
@@ -1082,7 +1082,7 @@ Puppet::ResourceApi.register_type(
     },
     clusterip_total_nodes: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the CLUSTERIP jump target.
       Number of total nodes within this cluster.
       This is IPv4 specific.
@@ -1090,7 +1090,7 @@ Puppet::ResourceApi.register_type(
     },
     clusterip_local_node: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the CLUSTERIP jump target.
       Specify the random seed used for hash initialization.
       This is IPv4 specific.
@@ -1098,7 +1098,7 @@ Puppet::ResourceApi.register_type(
     },
     clusterip_hash_init: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the CLUSTERIP jump target.
       Specify the random seed used for hash initialization.
       This is IPv4 specific.
@@ -1106,20 +1106,20 @@ Puppet::ResourceApi.register_type(
     },
     queue_num: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with NFQUEUE jump target.
       What queue number to send packets to
       DESC
     },
     queue_bypass: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Allow packets to bypass :queue_num if userspace process is not listening
       DESC
     },
     nflog_group: {
       type: 'Optional[Integer[1, 65535]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the jump target NFLOG.
       The netlink group (0 - 2^16-1) to which packets are (only applicable
       for nfnetlink_log). Defaults to 0.
@@ -1127,7 +1127,7 @@ Puppet::ResourceApi.register_type(
     },
     nflog_prefix: {
       type: 'Optional[String]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the jump target NFLOG.
       A prefix string to include in the log message, up to 64 characters long,
       useful for distinguishing messages in the logs.
@@ -1135,14 +1135,14 @@ Puppet::ResourceApi.register_type(
     },
     nflog_range: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the jump target NFLOG.
       This has never worked, use nflog_size instead.
       DESC
     },
     nflog_size: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the jump target NFLOG.
       The number of bytes to be copied to userspace (only applicable for nfnetlink_log).
       nfnetlink_log instances may specify their own size, this option overrides it.
@@ -1150,7 +1150,7 @@ Puppet::ResourceApi.register_type(
     },
     nflog_threshold: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Used with the jump target NFLOG.
       Number of packets to queue inside the kernel before sending them to userspace
       (only applicable for nfnetlink_log). Higher values result in less overhead
@@ -1159,7 +1159,7 @@ Puppet::ResourceApi.register_type(
     },
     gateway: {
       type: 'Optional[Pattern[/^(\d+.\d+.\d+.\d+|\w+:\w+::\w+)$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The TEE target will clone a packet and redirect this clone to another
       machine on the local network segment.
       Gateway is the target host's IP.
@@ -1167,31 +1167,31 @@ Puppet::ResourceApi.register_type(
     },
     clamp_mss_to_pmtu: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the clamp mss to pmtu flag.
       DESC
     },
     set_mss: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Sets the TCP MSS value for packets.
       DESC
     },
     set_dscp: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Set DSCP Markings.
       DESC
     },
     set_dscp_class: {
       type: "Optional[Enum['af11', 'af12', 'af13', 'af21', 'af22', 'af23', 'af31', 'af32', 'af33', 'af41', 'af42', 'af43', 'cs1', 'cs2', 'cs3', 'cs4', 'cs5', 'cs6', 'cs7', 'ef']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       This sets the DSCP field according to a predefined DiffServ class.
       DESC
     },
     todest: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When using jump => "DNAT" you can specify the new destination address using this paramter.
       Can specify a single new destination IP address or an inclusive range of IP addresses.
       Optionally a port or a port range with a possible follow up baseport can be provided.
@@ -1200,7 +1200,7 @@ Puppet::ResourceApi.register_type(
     },
     tosource: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When using jump => "SNAT" you can specify the new source address using this paramter.
       Can specify a single new destination IP address or an inclusive range of IP addresses.
       Input structure: [ipaddr[-ipaddr]][:port[-port]]
@@ -1208,44 +1208,44 @@ Puppet::ResourceApi.register_type(
     },
     toports: {
       type: 'Optional[Variant[Integer[0, 65535], Pattern[/^\d+(?:-\d+)?$/]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       For REDIRECT/MASQUERADE this is the port that will replace the destination/source port.
       Can specify a single new port or an inclusive range of ports.
       DESC
     },
     to: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       For NETMAP this will replace the destination IP
       DESC
     },
     checksum_fill: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Compute and fill missing packet checksums.
       DESC
     },
     random_fully: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT" this boolean will enable fully randomized port mapping.
       DESC
     },
     random: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When using a jump value of "MASQUERADE", "DNAT", "REDIRECT", or "SNAT" this boolean will enable randomized port mapping.
       DESC
     },
     log_prefix: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When combined with jump => "LOG" specifies the log prefix to use when logging.
       DESC
     },
     log_level: {
       type: 'Optional[Variant[Integer[0,7],String[1]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When combined with jump => "LOG" specifies the system log level to log to.
 
       Note: log level 4/warn is the default setting.
@@ -1253,25 +1253,25 @@ Puppet::ResourceApi.register_type(
     },
     log_uid: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When combined with jump => "LOG" specifies the uid of the process making the connection.
       DESC
     },
     log_tcp_sequence: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When combined with jump => "LOG" enables logging of the TCP sequence numbers.
       DESC
     },
     log_tcp_options: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When combined with jump => "LOG" logging of the TCP packet header.
       DESC
     },
     log_ip_options: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When combined with jump => "LOG" logging of the TCP IP/IPv6 packet header.
       DESC
     },
@@ -1280,7 +1280,7 @@ Puppet::ResourceApi.register_type(
                               'icmp-net-prohibited', 'icmp-host-prohibited', 'icmp-admin-prohibited', 'icmp6-no-route', 'no-route',
                               'icmp6-adm-prohibited', 'adm-prohibited', 'icmp6-addr-unreachable', 'addr-unreach', 'icmp6-port-unreachable',
                               'tcp-reset']]",
-      desc: <<-DESC
+      desc: <<-DESC,
       When combined with jump => "REJECT" you can specify a different icmp response to be sent back to the packet sender.
       Valid values differ depending on if the protocol is `IPv4` or `IPv6`.
       IPv4 allows: icmp-net-unreachable, icmp-host-unreachable, icmp-port-unreachable, icmp-proto-unreachable, icmp-net-prohibited,
@@ -1291,7 +1291,7 @@ Puppet::ResourceApi.register_type(
     },
     restore_mark: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Restores the saved Netfilter mark value of the connection to the packet mark using
       the CONNMARK target. This is used for policy-based routing to carry routing decisions
       across individual packets of a connection. Can optionally be combined with `nfmask`
@@ -1300,14 +1300,14 @@ Puppet::ResourceApi.register_type(
     },
     set_mark: {
       type: 'Optional[Pattern[/^[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Set the Netfilter mark value associated with the packet.  Accepts either of mark/mask or mark.
       These will be converted to hex if they are not already.
       DESC
     },
     match_mark: {
       type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
@@ -1315,26 +1315,26 @@ Puppet::ResourceApi.register_type(
     },
     mss: {
       type: 'Optional[Pattern[/^(?:!\s)?\d+(?:\:\d+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match a given TCP MSS value or range.
       This value can be negated by adding a space seperated `!` to the beginning.
       DESC
     },
     connlimit_upto: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Connection limiting value for matched connections below or equal to n.
       DESC
     },
     connlimit_above: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Connection limiting value for matched connections above n.
       DESC
     },
     connlimit_mask: {
       type: 'Optional[Integer[0,128]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Connection limiting by subnet mask for matched connections.
       IPv4: 0-32
       IPv6: 0-128
@@ -1342,7 +1342,7 @@ Puppet::ResourceApi.register_type(
     },
     connmark: {
       type: 'Optional[Pattern[/^(?:!\s)?[a-fA-F0-9x]+(?:\/[a-fA-F0-9x]+)?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match the Netfilter mark value associated with the packet. Accepts either of mark/mask or mark.
       This value will be converted to hex if it is not already.
       This value can be negated by adding a space seperated `!` to the beginning.
@@ -1350,21 +1350,21 @@ Puppet::ResourceApi.register_type(
     },
     time_start: {
       type: 'Optional[Pattern[/^([0-9]|[0-1][0-9]|2[0-3])\:[0-5][0-9](?:\:[0-5][0-9])?/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Only match during the given daytime. The possible time range is 00:00:00 to 23:59:59.
       Leading zeroes are allowed (e.g. "06:03") and correctly interpreted as base-10.
       DESC
     },
     time_stop: {
       type: 'Optional[Pattern[/^([0-9]|[0-1][0-9]|2[0-3])\:[0-5][0-9](?:\:[0-5][0-9])?/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Only match during the given daytime. The possible time range is 00:00:00 to 23:59:59.
       Leading zeroes are allowed (e.g. "06:03") and correctly interpreted as base-10.
       DESC
     },
     month_days: {
       type: 'Optional[Variant[Integer[0,31], Array[Integer[0,31]]]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Only match on the given days of the month. Possible values are 1 to 31.
       Note that specifying 31 will of course not match on months which do not have a 31st day;
       the same goes for 28-day or 29-day February.
@@ -1376,7 +1376,7 @@ Puppet::ResourceApi.register_type(
     },
     week_days: {
       type: "Optional[Variant[Enum['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], Array[Enum['Mon','Tue','Wed','Thu','Fri','Sat','Sun']]]]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Only match on the given weekdays.
 
       Can be passed either as a single value or an array of values:
@@ -1386,33 +1386,33 @@ Puppet::ResourceApi.register_type(
     },
     date_start: {
       type: 'Optional[Pattern[/^[0-9]{4}\-(?:0[0-9]|1[0-2])\-(?:[0-2][0-9]|3[0-1])T(?:[0-1][0-9]|2[0-3])\:[0-5][0-9]\:[0-5][0-9]$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Only match during the given time, which must be in ISO 8601 "T" notation.
       The possible time range is 1970-01-01T00:00:00 to 2038-01-19T04:17:07
       DESC
     },
     date_stop: {
       type: 'Optional[Pattern[/^[0-9]{4}\-(?:0[0-9]|1[0-2])\-(?:[0-2][0-9]|3[0-1])T(?:[0-1][0-9]|2[0-3])\:[0-5][0-9]\:[0-5][0-9]$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Only match during the given time, which must be in ISO 8601 "T" notation.
       The possible time range is 1970-01-01T00:00:00 to 2038-01-19T04:17:07
       DESC
     },
     time_contiguous: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When time_stop is smaller than time_start value, match this as a single time period instead distinct intervals.
       DESC
     },
     kernel_timezone: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Use the kernel timezone instead of UTC to determine whether a packet meets the time regulations.
       DESC
     },
     u32: {
       type: 'Optional[Pattern[/^0x[0-9a-fA-F]+&0x[0-9a-fA-F]+=0x[0-9a-fA-F]+(?::0x[0-9a-fA-F]+)?(?:&&0x[0-9a-fA-F]+&0x[0-9a-fA-F]+=0x[0-9a-fA-F]+(?::0x[0-9a-fA-F]+)?)*$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Enable the u32 module. Takes as an argument one of set, update,
       rcheck or remove. For example:
         firewall { '032 u32 test':
@@ -1426,19 +1426,19 @@ Puppet::ResourceApi.register_type(
     },
     src_cc: {
       type: 'Optional[Pattern[/^[A-Z]{2}(,[A-Z]{2})*$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       src attribute for the module geoip
       DESC
     },
     dst_cc: {
       type: 'Optional[Pattern[/^[A-Z]{2}(,[A-Z]{2})*$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       dst attribute for the module geoip
       DESC
     },
     hashlimit_upto: {
       type: 'Optional[Pattern[/^\d+(?:\/(?:sec|min|hour|day))?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match if the rate is below or equal to amount/quantum. It is specified either as a number, with an optional time quantum suffix (the default is 3/hour), or as amountb/second (number of bytes per second).
       This parameter or `hashlimit_above` and `hashlimit_name` are required when setting any other hashlimit values.
       Allowed forms are '40','40/sec','40/min','40/hour','40/day'.
@@ -1446,7 +1446,7 @@ Puppet::ResourceApi.register_type(
     },
     hashlimit_above: {
       type: 'Optional[Pattern[/^\d+(?:\/(?:sec|min|hour|day))?$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match if the rate is above amount/quantum.
       This parameter or `hashlimit_upto` and `hashlimit_name` are required when setting any other hashlimit values.
       Allowed forms are '40','40/sec','40/min','40/hour','40/day'.
@@ -1454,14 +1454,14 @@ Puppet::ResourceApi.register_type(
     },
     hashlimit_name: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The name for the /proc/net/ipt_hashlimit/foo entry.
       This parameter and either `hashlimit_upto` or `hashlimit_above` are required when setting any other hashlimit values.
       DESC
     },
     hashlimit_burst: {
       type: 'Optional[Integer[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Maximum initial number of packets to match: this number gets recharged by one every time the limit specified above is not reached, up to this number; the default is 5.
       When byte-based rate matching is requested, this option specifies the amount of bytes that can exceed the given rate.
       This option should be used with caution -- if the entry expires, the burst value is reset too.
@@ -1469,7 +1469,7 @@ Puppet::ResourceApi.register_type(
     },
     hashlimit_mode: {
       type: 'Optional[Pattern[/^(?:srcip|srcport|dstip|dstport)(?:\,(?:srcip|srcport|dstip|dstport))*$/]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       A comma-separated list of objects to take into consideration.
       If no --hashlimit-mode option is given, hashlimit acts like limit, but at the expensive of doing the hash housekeeping.
       Allowed values are: srcip, srcport, dstip, dstport
@@ -1477,7 +1477,7 @@ Puppet::ResourceApi.register_type(
     },
     hashlimit_srcmask: {
       type: 'Optional[Integer[0,32]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When --hashlimit-mode srcip is used, all source addresses encountered will be grouped according to the given prefix length
       and the so-created subnet will be subject to hashlimit.
       Prefix must be between (inclusive) 0 and 32.
@@ -1486,7 +1486,7 @@ Puppet::ResourceApi.register_type(
     },
     hashlimit_dstmask: {
       type: 'Optional[Integer[0,32]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       When --hashlimit-mode dstip is used, all destination addresses encountered will be grouped according to the given prefix length
       and the so-created subnet will be subject to hashlimit.
       Prefix must be between (inclusive) 0 and 32.
@@ -1495,57 +1495,57 @@ Puppet::ResourceApi.register_type(
     },
     hashlimit_htable_size: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       The number of buckets of the hash table
       DESC
     },
     hashlimit_htable_max: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Maximum entries in the hash.
       DESC
     },
     hashlimit_htable_expire: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       After how many milliseconds do hash entries expire.
       DESC
     },
     hashlimit_htable_gcinterval: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       How many milliseconds between garbage collection intervals.
       DESC
     },
     bytecode: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match using Linux Socket Filter. Expects a BPF program in decimal format.
       This is the format generated by the nfbpf_compile utility.
       DESC
     },
     ipvs: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match using Linux Socket Filter. Expects a BPF program in decimal format.
       This is the format generated by the nfbpf_compile utility.
       DESC
     },
     zone: {
       type: 'Optional[Integer]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Assign this packet to zone id and only have lookups done in that zone.
       DESC
     },
     helper: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Invoke the nf_conntrack_xxx helper module for this packet.
       DESC
     },
     cgroup: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Matches against the net_cls cgroup ID of the packet.
 
       To negate add a space seperate `!` to the beginning of the string
@@ -1553,22 +1553,22 @@ Puppet::ResourceApi.register_type(
     },
     rpfilter: {
       type: "Optional[Variant[Enum['loose', 'validmark', 'accept-local', 'invert'], Array[Enum['loose', 'validmark', 'accept-local', 'invert']]]]",
-      desc: <<-DESC
+      desc: <<-DESC,
       Enable the rpfilter module.
       DESC
     },
     condition: {
       type: 'Optional[String[1]]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Match on boolean value (0/1) stored in /proc/net/nf_condition/name.
       DESC
     },
     notrack: {
       type: 'Optional[Boolean]',
-      desc: <<-DESC
+      desc: <<-DESC,
       Invoke the disable connection tracking for this packet.
       This parameter can be used with iptables version >= 1.8.3
       DESC
-    }
+    },
   },
 )

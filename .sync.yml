@@ -14,8 +14,6 @@ Gemfile:
   # needed for Puppet 9), and puppet_litmus below 2.8.0 lacks the Puppet 9 collection
   # support matrix_from_metadata_v3 needs to generate this module's Puppet 9 Spec lane.
   overrides:
-    - gem: 'puppetlabs_spec_helper'
-      version: '~> 9.0'
     - gem: 'puppet_litmus'
       version: '~> 2.8'
 .rubocop.yml:
