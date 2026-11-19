@@ -237,6 +237,18 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
           { is_hash: { ipset: 'setname src' }, should_hash: { ipset: 'setname2 dst' }, result: false },
           { is_hash: { ipset: ['setname src'] }, should_hash: { ipset: ['setname2 dst'] }, result: false },
         ] },
+        { testing: 'proto (name vs number, iptables >= 1.8.11)', property_name: :proto, comparisons: [
+          { is_hash: { proto: 'vrrp' },  should_hash: { proto: 'vrrp' },  result: true },
+          { is_hash: { proto: '112' },   should_hash: { proto: 'vrrp' },  result: true },
+          { is_hash: { proto: 'vrrp' },  should_hash: { proto: '112' },   result: true },
+          { is_hash: { proto: '112' },   should_hash: { proto: '112' },   result: true },
+          { is_hash: { proto: 'esp' },   should_hash: { proto: '50' },    result: true },
+          { is_hash: { proto: '50' },    should_hash: { proto: 'esp' },   result: true },
+          { is_hash: { proto: 'ospf' },  should_hash: { proto: '89' },    result: true },
+          { is_hash: { proto: 'gre' },   should_hash: { proto: '47' },    result: true },
+          { is_hash: { proto: 'tcp' },   should_hash: { proto: 'udp' },   result: false },
+          { is_hash: { proto: '6' },     should_hash: { proto: 'udp' },   result: false },
+        ] },
         # if both values are arrays
         { testing: 'when comparing arrays', property_name: :week_days, comparisons: [
           { is_hash: { week_days: ['Mon', 'Tue', 'Wed'] }, should_hash: { week_days: ['Tue', 'Mon', 'Wed'] }, result: true },
