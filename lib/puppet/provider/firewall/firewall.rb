@@ -470,6 +470,15 @@ class Puppet::Provider::Firewall::Firewall
   ###### PRIVATE METHODS ######
   ###### GET ######
 
+  # rule_to_name and rule_to_hash test each rule against ~175 regexes whose
+  # sources are built only from the constant $fw_resource_map, so the same
+  # patterns were compiled again for every rule parsed. Memoise them by source.
+  # @api private
+  def self.rx(source)
+    @rx_cache ||= {}
+    @rx_cache[source] ||= Regexp.new(source)
+  end
+
   # Retrieve the rules
   # Optional values lets you return a simplified set of data, used for determining order when adding/updating/deleting rules,
   #   while also allowing for the protocols used to retrieve the rules to be limited.
@@ -517,12 +526,12 @@ class Puppet::Provider::Firewall::Firewall
 
     token_prefix = '(?:\\A|\\s)'
 
-    name_regex = Regexp.new("#{token_prefix}#{Regexp.escape($fw_resource_map[:name])}\\s+(?:\"(.+?(?<!\\\\))\"|'(.+?(?<!\\\\))'|([^\"'\\s]+)\\b)(?:\\s|$)")
+    name_regex = rx("#{token_prefix}#{Regexp.escape($fw_resource_map[:name])}\\s+(?:\"(.+?(?<!\\\\))\"|'(.+?(?<!\\\\))'|([^\"'\\s]+)\\b)(?:\\s|$)")
     name_value = rule.scan(name_regex)[0]
     # Combine the returned values and remove and trailing or leading whitespace
     rule_hash[:name] = [name_value[0], name_value[1], name_value[2]].join(' ').strip if name_value
 
-    chain_regex = Regexp.new("#{token_prefix}#{Regexp.escape($fw_resource_map[:chain])}\\s(\\S+)")
+    chain_regex = rx("#{token_prefix}#{Regexp.escape($fw_resource_map[:chain])}\\s(\\S+)")
     rule_hash[:chain] = rule.scan(chain_regex)[0][0]
 
     rule_hash
@@ -552,7 +561,7 @@ class Puppet::Provider::Firewall::Firewall
 
       if $fw_known_booleans.include?(key)
         # check for flag with regex, add a space/line end to ensure accuracy with the more simplistic flags; i.e. `-f`, `--random`
-        rule_hash[key] = if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}(\\s|$)"))
+        rule_hash[key] = if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}(\\s|$)"))
                            true
                          else
                            false
@@ -564,8 +573,8 @@ class Puppet::Provider::Firewall::Firewall
       when :name, :string, :string_hex, :bytecode, :u32, :nflog_prefix, :log_prefix
         # When :name/:string/:string_hex/:bytecode, return everything inside the quote pair following the key value.
         # When only a single word comment is returned no quotes are given, so we must check for this as well.
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s"))
-          value_regex = Regexp.new("#{token_prefix}(?:(!\\s))?#{Regexp.escape(value)}\\s+(?:\"(.+?(?<!\\\\))\"|'(.+?(?<!\\\\))'|([^\"'\\s]+)\\b)(?:\\s|$)")
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}\\s"))
+          value_regex = rx("#{token_prefix}(?:(!\\s))?#{Regexp.escape(value)}\\s+(?:\"(.+?(?<!\\\\))\"|'(.+?(?<!\\\\))'|([^\"'\\s]+)\\b)(?:\\s|$)")
           key_value = parse_rule.scan(value_regex)[0]
           # Combine the returned values and remove any trailing or leading whitespace
           key_value[1] = [key_value[0], key_value[1], key_value[2], key_value[3]].join
@@ -574,45 +583,45 @@ class Puppet::Provider::Firewall::Firewall
       when :sport, :dport
         split_value_regex = value[0].split(%r{ })
         negated_multi_regex = [split_value_regex[0], split_value_regex[1], '!', split_value_regex[2]].join(' ')
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value[0])}\\s"))
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value[0])}\\s"))
           # First check against the multiport value, if found split and return as an array
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(value[0])}\\s(\\S+)")
+          value_regex = rx("#{token_prefix}#{Regexp.escape(value[0])}\\s(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
           rule_hash[key] = key_value[0].split(%r{,})
-        elsif parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(negated_multi_regex)}\\s"))
+        elsif parse_rule.match(rx("#{token_prefix}#{Regexp.escape(negated_multi_regex)}\\s"))
           # Next check against a negated multiport value, if found split and return as an array with the first value negated
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(negated_multi_regex)}\\s(\\S+)")
+          value_regex = rx("#{token_prefix}#{Regexp.escape(negated_multi_regex)}\\s(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
 
           # Add '!' to the beginning of the first value to show it as negated
           split_value = key_value[0].split(%r{,})
           split_value[0] = "! #{split_value[0]}"
           rule_hash[key] = split_value
-        elsif parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value[1])}\\s"))
+        elsif parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value[1])}\\s"))
           # If no multi value matches, check against the regular value instead
-          value_regex = Regexp.new("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value[1])}\\s(\\S+)")
+          value_regex = rx("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value[1])}\\s(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
           # If it is negated, combine the retrieved '!' with the actual value to make one string
           key_value[1] = [key_value[0], key_value[1]].join(' ') unless key_value[0].nil?
           rule_hash[key] = key_value[1]
         end
       when :tcp_flags
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s"))
-          value_regex = Regexp.new("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value)}\\s(\\S+)\\s(\\S+)")
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}\\s"))
+          value_regex = rx("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value)}\\s(\\S+)\\s(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
           key_value[1] = [key_value[0], key_value[1]].join(' ') unless key_value[0].nil?
           rule_hash[key] = [key_value[1], key_value[2]].join(' ')
         end
       when :src_type, :dst_type, :ipset, :match_mark, :mss, :connmark
         split_regex = value.split(%r{ })
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s"))
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s"))
           # The exact information retrieved changes depending on the key
           type_attr = [:src_type, :dst_type]
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s(\\S+)\\s?(--limit-iface-(?:in|out))?") if type_attr.include?(key)
+          value_regex = rx("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s(\\S+)\\s?(--limit-iface-(?:in|out))?") if type_attr.include?(key)
           ip_attr = [:ipset]
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s(\\S+\\s\\S+)") if ip_attr.include?(key)
+          value_regex = rx("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s(\\S+\\s\\S+)") if ip_attr.include?(key)
           mark_attr = [:match_mark, :mss, :connmark]
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s(\\S+)") if mark_attr.include?(key)
+          value_regex = rx("#{token_prefix}#{Regexp.escape(split_regex[1])}\\s(?:(!)\\s)?#{Regexp.escape(split_regex[2])}\\s(\\S+)") if mark_attr.include?(key)
           type_value = []
           key_value = parse_rule.scan(value_regex)
           key_value.length.times do |i|
@@ -622,8 +631,8 @@ class Puppet::Provider::Firewall::Firewall
           rule_hash[key] = type_value if type_value.length > 1
         end
       when :state, :ctstate, :ctstatus, :month_days, :week_days
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s"))
-          value_regex = Regexp.new("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value)}\\s(\\S+)")
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}\\s"))
+          value_regex = rx("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value)}\\s(\\S+)")
           key_value = parse_rule.scan(value_regex)
           split_value = key_value[0][1].split(%r{,})
           split_value[0] = [key_value[0][0], split_value[0]].join(' ') unless key_value[0][0].nil?
@@ -640,21 +649,21 @@ class Puppet::Provider::Firewall::Firewall
           proto = 1
         end
 
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value[proto])}\\s"))
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(value[proto])}\\s(\\S+)")
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value[proto])}\\s"))
+          value_regex = rx("#{token_prefix}#{Regexp.escape(value[proto])}\\s(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
           rule_hash[key] = key_value[0]
         end
       when :recent
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s"))
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s(!\\s)?--(\\S+)")
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}\\s"))
+          value_regex = rx("#{token_prefix}#{Regexp.escape(value)}\\s(!\\s)?--(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
           key_value[1] = [key_value[0], key_value[1]].join unless key_value[0].nil?
           rule_hash[key] = key_value[1] if key_value
         end
       when :rpfilter
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s--"))
-          value_regex = Regexp.new('(?:\\s--(invert|validmark|loose|accept-local))')
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}\\s--"))
+          value_regex = rx('(?:\\s--(invert|validmark|loose|accept-local))')
           key_value = parse_rule.scan(value_regex)
           return_value = key_value.map do |val|
             val[0]
@@ -665,15 +674,15 @@ class Puppet::Provider::Firewall::Firewall
       when :proto, :source, :destination, :iniface, :outiface, :physdev_in, :physdev_out, :src_range, :dst_range,
             :tcp_option, :uid, :gid, :mac_source, :pkttype, :ctproto, :ctorigsrc, :ctorigdst, :ctreplsrc, :ctrepldst,
             :ctorigsrcport, :ctorigdstport, :ctreplsrcport, :ctrepldstport, :ctexpire, :cgroup, :hop_limit
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s"))
-          value_regex = Regexp.new("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value)}\\s(\\S+)")
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}\\s"))
+          value_regex = rx("#{token_prefix}(?:(!)\\s)?#{Regexp.escape(value)}\\s(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
           key_value[1] = [key_value[0], key_value[1]].join(' ') unless key_value[0].nil?
           rule_hash[key] = key_value[1] if key_value
         end
       else
-        if parse_rule.match(Regexp.new("#{token_prefix}#{Regexp.escape(value)}\\s"))
-          value_regex = Regexp.new("#{token_prefix}#{Regexp.escape(value)}(?:\\s(!)\\s|\\s{1,2})(\\S+)")
+        if parse_rule.match(rx("#{token_prefix}#{Regexp.escape(value)}\\s"))
+          value_regex = rx("#{token_prefix}#{Regexp.escape(value)}(?:\\s(!)\\s|\\s{1,2})(\\S+)")
           key_value = parse_rule.scan(value_regex)[0]
           key_value[1] = [key_value[0], key_value[1]].join(' ') unless key_value[0].nil?
           int_attr = [:stat_every, :stat_packet, :burst, :rseconds, :rhitcount, :string_from, :string_to, :clusterip_total_nodes,

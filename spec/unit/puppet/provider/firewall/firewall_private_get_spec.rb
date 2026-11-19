@@ -17,6 +17,16 @@ RSpec.describe Puppet::Provider::Firewall::Firewall do
     # No tests written as method is mainly a wrapper and contains little to no actual logic.
     # end
 
+    describe 'self.rx(source)' do
+      it 'returns a Regexp for the source' do
+        expect(provider.rx('\\s--dport\\s')).to eq(Regexp.new('\\s--dport\\s'))
+      end
+
+      it 'returns the same compiled object for the same source' do
+        expect(provider.rx('\\s--sport\\s')).to equal(provider.rx('\\s--sport\\s'))
+      end
+    end
+
     describe 'self.rule_to_name(_context, rule, table_name, protocol)' do
       [
         {
